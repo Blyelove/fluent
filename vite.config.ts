@@ -61,5 +61,6 @@ export default defineConfig({
     }),
   ],
   base: './',
-  server: { port: 5199, strictPort: true, host: true },
+  // poort komt van de omgeving (PORT) zodat meerdere sessies naast elkaar kunnen draaien; 5199 als basis
+  server: { port: Number(process.env.PORT) || 5199, strictPort: true, host: true },
 })

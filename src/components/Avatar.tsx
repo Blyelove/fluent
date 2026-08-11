@@ -3,11 +3,40 @@ import type { CourseId } from '../types'
 
 export type Look = 'a' | 'b' | 'c' | 'd'
 
-const LOOKS: Record<Look, { skin: string; shade: string; hair: string; long: boolean }> = {
-  a: { skin: '#F2C094', shade: '#DFA672', hair: '#3A2A1E', long: false },
-  b: { skin: '#F2C094', shade: '#DFA672', hair: '#6B4423', long: true },
-  c: { skin: '#9C6644', shade: '#7E4E31', hair: '#1E1611', long: false },
-  d: { skin: '#9C6644', shade: '#7E4E31', hair: '#33202C', long: true },
+/** Vrij samen te stellen personage — 6×6×6×6 = 1.296 combinaties */
+export interface AvatarStyle {
+  /** 0 kort · 1 lang · 2 krullen · 3 knot · 4 buzz · 5 staart */
+  hair: number
+  skin: number
+  hairColor: number
+  outfit: number
+}
+
+export const SKINS = ['#FFDBB4', '#F2C094', '#D9A066', '#B07B4F', '#9C6644', '#6E452C']
+const SKIN_SHADES = ['#EFC392', '#DFA672', '#C48A50', '#96613C', '#7E4E31', '#57351F']
+export const HAIR_COLORS = ['#1E1611', '#3A2A1E', '#6B4423', '#B3502E', '#E0B75C', '#9A93A8']
+export const OUTFIT_COLORS = ['#7C7694', '#3E5C9A', '#B33A4B', '#2E7D5B', '#8A5BB8', '#C77B3F']
+export const HAIR_STYLE_NAMES = ['Kort', 'Lang', 'Krullen', 'Knot', 'Buzz', 'Staart']
+export const DEFAULT_PERSONA: AvatarStyle = { hair: 0, skin: 1, hairColor: 1, outfit: 0 }
+
+const LEGACY: Record<Look, AvatarStyle> = {
+  a: { hair: 0, skin: 1, hairColor: 1, outfit: 0 },
+  b: { hair: 1, skin: 1, hairColor: 2, outfit: 0 },
+  c: { hair: 0, skin: 4, hairColor: 0, outfit: 0 },
+  d: { hair: 1, skin: 4, hairColor: 0, outfit: 0 },
+}
+
+export function normalizePersona(p?: AvatarStyle | Look | null): AvatarStyle {
+  if (!p) return DEFAULT_PERSONA
+  if (typeof p === 'string') return LEGACY[p] ?? DEFAULT_PERSONA
+  const clamp = (v: number | undefined, max: number, fallback: number) =>
+    typeof v === 'number' && v >= 0 && v <= max ? Math.floor(v) : fallback
+  return {
+    hair: clamp(p.hair, 5, 0),
+    skin: clamp(p.skin, SKINS.length - 1, 1),
+    hairColor: clamp(p.hairColor, HAIR_COLORS.length - 1, 1),
+    outfit: clamp(p.outfit, OUTFIT_COLORS.length - 1, 0),
+  }
 }
 
 /**
@@ -49,12 +78,13 @@ export function Avatar({
   mode?: 'idle' | 'run' | 'cheer'
   level?: number
   courseId?: CourseId
-  /** a/c = kort haar · b/d = lang haar · a/b = lichte huid · c/d = donkere huid */
-  look?: Look
+  /** legacy: a-d; nieuw: AvatarStyle-object uit de personage-maker */
+  look?: AvatarStyle | Look
   still?: boolean
 }) {
   const s = STYLE[courseId]
-  const lk = LOOKS[look]
+  const p = normalizePersona(look)
+  const lk = { skin: SKINS[p.skin], shade: SKIN_SHADES[p.skin], hair: HAIR_COLORS[p.hairColor] }
   const running = mode === 'run'
   const cheering = mode === 'cheer'
 
@@ -78,7 +108,7 @@ export function Avatar({
   const cosmic = level >= 19
   const hasHalo = level >= 20
 
-  const shirtFill = hasOutfit ? s.shirt : '#7C7694'
+  const shirtFill = hasOutfit ? s.shirt : OUTFIT_COLORS[p.outfit]
 
   return (
     <motion.svg
@@ -316,14 +346,38 @@ export function Avatar({
       {/* hoofd */}
       <circle cx="100" cy="66" r="34" fill={lk.skin} />
       <path d="M126 44 A34 34 0 0 1 126 88 A44 44 0 0 0 126 44 Z" fill={lk.shade} opacity="0.4" />
-      {/* haar — kort of lang */}
-      {!lk.long ? (
-        <path d="M66 62 Q66 30 100 30 Q134 30 134 62 Q126 44 100 44 Q74 44 66 62 Z" fill={lk.hair} />
-      ) : (
+      {/* haar — 6 stijlen */}
+      {p.hair === 0 && <path d="M66 62 Q66 30 100 30 Q134 30 134 62 Q126 44 100 44 Q74 44 66 62 Z" fill={lk.hair} />}
+      {p.hair === 1 && (
         <g>
           <path d="M64 58 Q58 100 68 114 L80 106 Q71 84 73 58 Z" fill={lk.hair} />
           <path d="M136 58 Q142 100 132 114 L120 106 Q129 84 127 58 Z" fill={lk.hair} />
           <path d="M64 64 Q64 28 100 28 Q136 28 136 64 Q126 42 100 42 Q74 42 64 64 Z" fill={lk.hair} />
+        </g>
+      )}
+      {p.hair === 2 && (
+        <g>
+          <circle cx="74" cy="46" r="12" fill={lk.hair} />
+          <circle cx="92" cy="36" r="13" fill={lk.hair} />
+          <circle cx="112" cy="38" r="13" fill={lk.hair} />
+          <circle cx="128" cy="50" r="11" fill={lk.hair} />
+          <circle cx="66" cy="60" r="9" fill={lk.hair} />
+          <circle cx="134" cy="62" r="9" fill={lk.hair} />
+        </g>
+      )}
+      {p.hair === 3 && (
+        <g>
+          <path d="M66 62 Q66 30 100 30 Q134 30 134 62 Q126 44 100 44 Q74 44 66 62 Z" fill={lk.hair} />
+          <circle cx="100" cy="26" r="10" fill={lk.hair} />
+          <rect x="92" y="32" width="16" height="4" rx="2" fill={s.accent} opacity="0.9" />
+        </g>
+      )}
+      {p.hair === 4 && <path d="M68 52 Q100 26 132 52 Q100 38 68 52 Z" fill={lk.hair} opacity="0.95" />}
+      {p.hair === 5 && (
+        <g>
+          <path d="M66 62 Q66 30 100 30 Q134 30 134 62 Q126 44 100 44 Q74 44 66 62 Z" fill={lk.hair} />
+          <path d="M128 42 Q146 66 138 98 Q132 98 128 92 Q136 68 122 46 Z" fill={lk.hair} />
+          <circle cx="128" cy="46" r="4" fill={s.accent} />
         </g>
       )}
       {/* wenkbrauwen */}
