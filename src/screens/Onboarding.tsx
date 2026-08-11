@@ -30,8 +30,8 @@ export function Onboarding() {
               transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
             />
             <p className="eyebrow">Welkom bij</p>
-            <h1 className="display hot-text" style={{ fontSize: 52, letterSpacing: '0.01em', marginTop: 8 }}>
-              LeoLingo
+            <h1 className="display hot-text" style={{ fontSize: 56, letterSpacing: '0.01em', marginTop: 8 }}>
+              Fluent
             </h1>
             <p className="dim" style={{ marginTop: 12, fontSize: 17 }}>
               Taal leren die je niet meer loslaat.

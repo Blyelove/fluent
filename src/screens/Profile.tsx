@@ -144,7 +144,7 @@ export function ProfileScreen() {
       </div>
 
       <p className="faint center" style={{ fontSize: 13, marginBottom: 16 }}>
-        LeoLingo leert je talen zonder straf: geen hartjes, geen energie, geen limiet. Alleen een reeks die om je geeft — met automatische
+        Fluent leert je talen zonder straf: geen hartjes, geen energie, geen limiet. Alleen een reeks die om je geeft — met automatische
         bescherming als het leven ertussen komt.
       </p>
 

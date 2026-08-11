@@ -26,7 +26,7 @@ function Page({ children, title, sub }: { children: ReactNode; title?: string; s
     <div style={PAGE}>
       {title && (
         <>
-          <p className="eyebrow">{sub ?? 'Aurea · Visuele stijlgids'}</p>
+          <p className="eyebrow">{sub ?? 'Fluent · Visuele stijlgids'}</p>
           <h2 className="display" style={{ fontSize: 32, margin: '6px 0 6px' }}>
             {title}
           </h2>
@@ -58,11 +58,11 @@ export function Gallery() {
         <p className="eyebrow" style={{ marginTop: 30 }}>
           Visuele stijlgids & groeisysteem
         </p>
-        <h1 className="display gold-text" style={{ fontSize: 72, letterSpacing: '0.06em', margin: '10px 0' }}>
-          AUREA
+        <h1 className="display hot-text" style={{ fontSize: 72, letterSpacing: '0.02em', margin: '10px 0' }}>
+          Fluent
         </h1>
         <p className="dim" style={{ fontSize: 17 }}>
-          Taal leren. Maar dan mooi.
+          Taal leren die je niet meer loslaat.
         </p>
         <div style={{ width: 48, height: 2, background: 'linear-gradient(135deg,#EED9A0,#B08D4C)', borderRadius: 2, margin: '22px 0' }} />
         <p className="faint" style={{ fontSize: 14, maxWidth: 420 }}>
