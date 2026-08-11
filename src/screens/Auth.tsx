@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { motion } from 'motion/react'
 import { useStore } from '../store'
-import { Avatar } from '../components/Avatar'
+import { Avatar, type Look } from '../components/Avatar'
 import { sfx } from '../audio'
 
 /** Wachtwoord-hash: SHA-256 waar beschikbaar, anders een simpele fallback (http op wifi-IP) */
@@ -30,7 +30,7 @@ export function AuthScreen() {
   const hasAccounts = useStore((s) => Object.keys(s.accounts).length > 0)
 
   const [tab, setTab] = useState<'nieuw' | 'inloggen'>(hasAccounts ? 'inloggen' : 'nieuw')
-  const [naam, setNaam] = useState('')
+  const [look, setLook] = useState<Look>('a')
   const [email, setEmail] = useState('')
   const [ww, setWw] = useState('')
   const [remember, setRemember] = useState(true)
@@ -39,19 +39,18 @@ export function AuthScreen() {
 
   const submit = async () => {
     setError(null)
-    if (naam.trim().length < 2) return setError('Kies een naam van minstens 2 tekens.')
-    if (tab === 'nieuw' && !email.includes('@')) return setError('Vul een geldig e-mailadres in.')
+    if (!email.includes('@') || email.trim().length < 5) return setError('Vul een geldig e-mailadres in.')
     if (ww.length < 4) return setError('Je wachtwoord moet minstens 4 tekens zijn.')
     setBusy(true)
     const h = await hash(ww)
     setBusy(false)
     if (tab === 'nieuw') {
-      const r = registerAccount(naam, email, h, remember)
-      if (r === 'bestaat') return setError('Deze naam bestaat al op dit apparaat — log in.')
+      const r = registerAccount(email, h, remember, look)
+      if (r === 'bestaat') return setError('Dit e-mailadres heeft al een account — log in.')
       sfx('complete')
     } else {
-      const r = loginAccount(naam, h, remember)
-      if (r === 'fout') return setError('Naam of wachtwoord klopt niet.')
+      const r = loginAccount(email, h, remember)
+      if (r === 'fout') return setError('E-mailadres of wachtwoord klopt niet.')
       sfx('correct')
     }
   }
@@ -62,14 +61,11 @@ export function AuthScreen() {
       <div className="ambient-orb orb-b" />
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
         <div className="center">
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <Avatar size={92} level={1} courseId="es" />
-          </div>
-          <h1 className="display hot-text" style={{ fontSize: 44, margin: '6px 0 2px' }}>
+          <h1 className="display hot-text" style={{ fontSize: 46, margin: '0 0 2px' }}>
             Fluent
           </h1>
-          <p className="dim" style={{ fontSize: 14, marginBottom: 22 }}>
-            {tab === 'nieuw' ? 'Maak je account — je voortgang wordt onthouden.' : 'Welkom terug.'}
+          <p className="dim" style={{ fontSize: 14, marginBottom: 18 }}>
+            {tab === 'nieuw' ? 'Kies je personage en start direct.' : 'Welkom terug.'}
           </p>
         </div>
 
@@ -96,18 +92,40 @@ export function AuthScreen() {
           </button>
         </div>
 
+        {tab === 'nieuw' && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 8, marginBottom: 16 }}>
+            {(['a', 'b', 'c', 'd'] as const).map((l) => (
+              <button
+                key={l}
+                className="glass center"
+                style={{
+                  padding: '10px 4px 4px',
+                  borderColor: look === l ? 'var(--hot2)' : undefined,
+                  boxShadow: look === l ? '0 0 18px rgba(236,72,153,0.35)' : undefined,
+                }}
+                onClick={() => {
+                  sfx('tap')
+                  setLook(l)
+                }}
+              >
+                <Avatar size={62} level={1} look={l} courseId="es" />
+                <p style={{ fontSize: 11.5, fontWeight: 700, color: look === l ? 'var(--hot2)' : 'var(--text-faint)', marginTop: 2 }}>
+                  {look === l ? '✓ Gekozen' : 'Kies mij'}
+                </p>
+              </button>
+            ))}
+          </div>
+        )}
+
         <div className="col" style={{ gap: 10 }}>
-          <input className="type-input" placeholder="Je naam" value={naam} onChange={(e) => setNaam(e.target.value)} autoCapitalize="off" />
-          {tab === 'nieuw' && (
-            <input
-              className="type-input"
-              placeholder="E-mailadres (voor je welkomstmail)"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoCapitalize="off"
-            />
-          )}
+          <input
+            className="type-input"
+            placeholder="E-mailadres"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoCapitalize="off"
+          />
           <input
             className="type-input"
             placeholder="Wachtwoord"
@@ -145,18 +163,11 @@ export function AuthScreen() {
           </span>
         </button>
 
-        {error && (
-          <p style={{ color: 'var(--err)', fontSize: 14, fontWeight: 600, marginBottom: 10 }}>{error}</p>
-        )}
+        {error && <p style={{ color: 'var(--err)', fontSize: 14, fontWeight: 600, marginBottom: 10 }}>{error}</p>}
 
         <button className="btn btn-primary" disabled={busy} onClick={() => void submit()}>
           {tab === 'nieuw' ? 'Start direct' : 'Inloggen'}
         </button>
-        {tab === 'nieuw' && (
-          <p className="faint center" style={{ fontSize: 12, marginTop: 12 }}>
-            Geen bevestigingsmail, geen gedoe — je gaat meteen door.
-          </p>
-        )}
       </motion.div>
     </div>
   )

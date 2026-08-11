@@ -23,7 +23,7 @@ export function ProfileScreen() {
             Niveau {lp.level} · {levelTitle(lp.level)} · <Flag code={courseFlagCode[state.courseId]} size={14} /> {course.name}
           </p>
         </div>
-        <Avatar size={80} mode="idle" level={lp.level} courseId={state.courseId} />
+        <Avatar size={80} mode="idle" level={lp.level} courseId={state.courseId} look={state.avatarLook} />
       </div>
       <div style={{ margin: '14px 0 24px' }}>
         <div className="progress-track" style={{ height: 8 }}>
@@ -109,12 +109,8 @@ export function ProfileScreen() {
         <div className="glass" style={{ padding: '6px 18px', marginBottom: 24 }}>
           <div className="spread" style={{ padding: '14px 0', borderBottom: '1px solid var(--line)' }}>
             <span style={{ fontWeight: 500 }}>Account</span>
-            <span style={{ fontWeight: 700 }}>{state.accounts[state.currentUser].name}</span>
-          </div>
-          <div className="spread" style={{ padding: '14px 0', borderBottom: '1px solid var(--line)' }}>
-            <span style={{ fontWeight: 500 }}>E-mail</span>
-            <span className="dim" style={{ fontSize: 13 }}>
-              {state.accounts[state.currentUser].email || '—'}
+            <span className="dim" style={{ fontSize: 13, fontWeight: 600 }}>
+              {state.accounts[state.currentUser].email}
             </span>
           </div>
           <div style={{ padding: '12px 0' }}>
@@ -159,9 +155,9 @@ export function ProfileScreen() {
               })}
             </div>
             <div className="center" style={{ marginTop: 16 }}>
-              <Avatar size={110} level={10} courseId={state.courseId} />
+              <Avatar size={110} level={20} courseId={state.courseId} look={state.avatarLook} />
               <p className="faint" style={{ fontSize: 12, marginTop: 4 }}>
-                Jij op niveau 10 — volledig {course.name.toLowerCase()}
+                Jij op niveau 20 — Ultiem Fluent, volledig {course.name.toLowerCase()}
               </p>
             </div>
           </div>

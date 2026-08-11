@@ -4,6 +4,7 @@ import type { Card } from 'ts-fsrs'
 import type { CourseId } from './types'
 import { newCard, nextCard, isDue } from './srs'
 import { goalStatus, type CompletedGoal, type Goal } from './goals'
+import type { Look } from './components/Avatar'
 import { setSoundEnabled } from './audio'
 
 export interface SrsEntry {
@@ -27,10 +28,10 @@ export interface TestResult {
 }
 
 export interface Account {
-  name: string
   email: string
   passHash: string
   createdAt: string
+  name?: string
 }
 
 function todayStr(): string {
@@ -51,6 +52,8 @@ interface AureaState {
   currentUser: string | null
   /** "Ingelogd blijven" — true = nooit meer het inlogscherm */
   rememberMe: boolean
+  /** Gekozen personage (4 stijlen) */
+  avatarLook: Look
 
   onboarded: boolean
   courseId: CourseId
@@ -87,8 +90,8 @@ interface AureaState {
   addGoal: (g: Goal) => void
   removeGoal: (id: string) => void
   addTestResult: (r: TestResult) => void
-  registerAccount: (name: string, email: string, passHash: string, remember: boolean) => 'ok' | 'bestaat'
-  loginAccount: (name: string, passHash: string, remember: boolean) => 'ok' | 'fout'
+  registerAccount: (email: string, passHash: string, remember: boolean, look: Look) => 'ok' | 'bestaat'
+  loginAccount: (email: string, passHash: string, remember: boolean) => 'ok' | 'fout'
   logout: () => void
   toggleSound: () => void
   resetAll: () => void
@@ -102,6 +105,7 @@ export const useStore = create<AureaState>()(
       accounts: {},
       currentUser: null,
       rememberMe: true,
+      avatarLook: 'a',
 
       onboarded: false,
       courseId: 'en',
@@ -250,8 +254,8 @@ export const useStore = create<AureaState>()(
 
       addTestResult: (r) => set({ tests: [...get().tests.slice(-19), r] }),
 
-      registerAccount: (name, email, passHash, remember) => {
-        const key = name.trim().toLowerCase()
+      registerAccount: (email, passHash, remember, look) => {
+        const key = email.trim().toLowerCase()
         const s = get()
         if (s.accounts[key]) return 'bestaat'
         try {
@@ -260,15 +264,16 @@ export const useStore = create<AureaState>()(
           /* geen sessionStorage — rememberMe vangt dit op */
         }
         set({
-          accounts: { ...s.accounts, [key]: { name: name.trim(), email: email.trim(), passHash, createdAt: todayStr() } },
+          accounts: { ...s.accounts, [key]: { email: email.trim(), passHash, createdAt: todayStr() } },
           currentUser: key,
           rememberMe: remember,
+          avatarLook: look,
         })
         return 'ok'
       },
 
-      loginAccount: (name, passHash, remember) => {
-        const key = name.trim().toLowerCase()
+      loginAccount: (email, passHash, remember) => {
+        const key = email.trim().toLowerCase()
         const acc = get().accounts[key]
         if (!acc || acc.passHash !== passHash) return 'fout'
         try {

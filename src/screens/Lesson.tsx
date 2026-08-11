@@ -102,7 +102,10 @@ export function LessonScreen({ course, lesson, onExit }: Props) {
     evalRef.current = null
     if (idx + 1 >= items.length) {
       const perfect = mistakes === 0
-      const xp = alreadyDone ? 5 : 10 + (perfect ? 5 : 0) + (maxCombo >= 6 ? 2 : 0)
+      // basis 10 + foutloos-bonus + oplopende combo-bonussen (3/6/9 op rij)
+      const xp = alreadyDone
+        ? 5
+        : 10 + (perfect ? 5 : 0) + (maxCombo >= 3 ? 1 : 0) + (maxCombo >= 6 ? 2 : 0) + (maxCombo >= 9 ? 3 : 0)
       const before = useStore.getState()
       const xpBefore = totalXp(before)
       const completedBefore = (before.progress[course.id]?.completed ?? []).length
@@ -250,6 +253,7 @@ function CompleteView({
 }) {
   const streak = useStore((s) => s.streak)
   const curLevel = useStore((s) => levelForXp(totalXp(s)))
+  const look = useStore((s) => s.avatarLook)
   const [shown, setShown] = useState(0)
 
   const steps = useMemo(() => {
@@ -306,7 +310,7 @@ function CompleteView({
         {step === 'stats' && (
           <motion.div key="stats" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -18 }} transition={{ duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }}>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <Avatar size={100} mode={perfect ? 'cheer' : 'idle'} level={curLevel} courseId={courseId} />
+              <Avatar size={100} mode={perfect ? 'cheer' : 'idle'} level={curLevel} courseId={courseId} look={look} />
             </div>
             <p className="eyebrow" style={{ marginTop: 8 }}>
               Les voltooid
@@ -360,7 +364,7 @@ function CompleteView({
                 animate={{ x: 120 }}
                 transition={{ duration: 1.6, ease: 'easeInOut' }}
               >
-                <Avatar size={86} mode="run" level={curLevel} courseId={courseId} />
+                <Avatar size={86} mode="run" level={curLevel} courseId={courseId} look={look} />
               </motion.div>
             </div>
             <motion.h1
@@ -389,7 +393,7 @@ function CompleteView({
         {step === 'goal' && goalsHit.length > 0 && (
           <motion.div key="goal" initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, y: -18 }} transition={{ duration: 0.35 }}>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <Avatar size={104} mode="cheer" level={curLevel} courseId={courseId} />
+              <Avatar size={104} mode="cheer" level={curLevel} courseId={courseId} look={look} />
             </div>
             <p className="eyebrow" style={{ marginTop: 10 }}>
               Doel gehaald
@@ -428,7 +432,7 @@ function CompleteView({
         {step === 'level' && newLevel && (
           <motion.div key="lvl" initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35 }}>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <Avatar size={128} mode="cheer" level={newLevel} courseId={courseId} />
+              <Avatar size={128} mode="cheer" level={newLevel} courseId={courseId} look={look} />
             </div>
             <p className="eyebrow" style={{ marginTop: 10 }}>
               Niveau omhoog

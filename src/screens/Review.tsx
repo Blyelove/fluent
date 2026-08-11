@@ -48,6 +48,7 @@ export function ReviewScreen() {
   const srs = useStore((s) => s.srs)
   const tests = useStore((s) => s.tests)
   const curLevel = useStore((s) => levelForXp(totalXp(s)))
+  const look = useStore((s) => s.avatarLook)
 
   const course = courses[courseId]
   const [phase, setPhase] = useState<Phase>({ name: 'hub' })
@@ -254,7 +255,7 @@ export function ReviewScreen() {
       <div className="shell center" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '80dvh' }}>
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <Avatar size={104} mode={phase.passed ? 'cheer' : 'idle'} level={curLevel} courseId={courseId} />
+            <Avatar size={104} mode={phase.passed ? 'cheer' : 'idle'} level={curLevel} courseId={courseId} look={look} />
           </div>
           <p className="eyebrow" style={{ marginTop: 8 }}>
             {phase.label}

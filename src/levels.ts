@@ -13,19 +13,32 @@ const TITLES = [
   'Virtuoos',
   'Meester',
   'Grootmeester',
+  'Legende',
+  'Elite',
+  'Kampioen',
+  'Ster',
+  'Idool',
+  'Fenomeen',
+  'Titaan',
+  'Onsterfelijke',
+  'Mythe',
+  'Ultiem Fluent',
 ]
 
+export const MAX_LEVEL = TITLES.length
+
 export function levelTitle(level: number): string {
-  return level <= TITLES.length ? TITLES[level - 1] : 'Legende'
+  return level <= TITLES.length ? TITLES[level - 1] : 'Ultiem Fluent'
 }
 
 /**
- * XP-kosten per niveau: begint laag (snelle eerste winst), maar groeit 35% per
- * niveau — hoog komen is een échte prestatie. Nv1→2: 50 XP, Nv9→10: ~555 XP,
- * cumulatief tot niveau 10 ≈ 2.000 XP (weken werk).
+ * XP-kosten per niveau: begint laag (snelle eerste winst), groeit 35% per
+ * niveau tot 10 (Nv1→2: 50 XP, Nv9→10: ~745 XP), daarna 15% per niveau —
+ * de weg naar niveau 20 is een lange, ultra-verslavende berg (±17.000 XP).
  */
 export function xpCost(level: number): number {
-  return Math.round((50 * Math.pow(1.35, level - 1)) / 5) * 5
+  if (level <= 10) return Math.round((50 * Math.pow(1.35, level - 1)) / 5) * 5
+  return Math.round((xpCost(10) * Math.pow(1.15, level - 10)) / 5) * 5
 }
 
 /** Cumulatieve XP nodig om dit niveau te BEREIKEN (niveau 1 = 0 XP) */
@@ -61,12 +74,31 @@ const ITEM_NAMES: Record<CourseId, [string, string, string, string, string, stri
   pt: ['Portugese halsdoek', 'Vissersmuts', 'Portugese stijl', 'Voetbal', 'Zonnebril', 'Portugal-embleem', 'Vlaggen-cape', 'Gouden aura', 'Portugese kroon'],
 }
 
+/** Niveau 11-20: universele prestige-upgrades — steeds vetter, voor elke taal */
+const PRESTIGE_ITEMS = [
+  'Gouden ketting',
+  'Neon-outfit',
+  'Vuur-aura',
+  'Diamanten horloge',
+  'Platina kroon',
+  'Energievleugels',
+  'Bliksem-aura',
+  'Sterrenmantel',
+  'Kosmische gloed',
+  'Legende-halo',
+] as const
+
 export function wardrobeFor(c: CourseId): { level: number; item: string }[] {
-  return ITEM_NAMES[c].map((item, i) => ({ level: i + 2, item }))
+  return [
+    ...ITEM_NAMES[c].map((item, i) => ({ level: i + 2, item })),
+    ...PRESTIGE_ITEMS.map((item, i) => ({ level: i + 11, item })),
+  ]
 }
 
 export function levelReward(c: CourseId, level: number): string | null {
-  return level >= 2 && level <= 10 ? ITEM_NAMES[c][level - 2] : null
+  if (level >= 2 && level <= 10) return ITEM_NAMES[c][level - 2]
+  if (level >= 11 && level <= 20) return PRESTIGE_ITEMS[level - 11]
+  return null
 }
 
 /** De eerstvolgende unlock boven dit niveau (voor anticipatie) */

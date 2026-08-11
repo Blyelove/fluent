@@ -81,6 +81,7 @@ export function HomeScreen({ onStartLesson, onReview }: Props) {
   const questBonusDay = useStore((s) => s.questBonusDay)
   const goals = useStore((s) => s.goals)
   const goalsDoneCount = useStore((s) => s.goalsDone.length)
+  const look = useStore((s) => s.avatarLook)
   const addGoal = useStore((s) => s.addGoal)
   const removeGoal = useStore((s) => s.removeGoal)
   const [picker, setPicker] = useState(false)
@@ -148,7 +149,7 @@ export function HomeScreen({ onStartLesson, onReview }: Props) {
         return (
           <div className="glass" style={{ padding: '10px 16px', marginBottom: 16 }}>
             <div className="row" style={{ gap: 14 }}>
-              <Avatar size={56} level={lp.level} courseId={courseId} />
+              <Avatar size={56} level={lp.level} courseId={courseId} look={look} />
               <div style={{ flex: 1 }}>
                 <div className="spread">
                   <strong style={{ fontSize: 14 }}>

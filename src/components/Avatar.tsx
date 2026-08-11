@@ -1,6 +1,15 @@
 import { motion } from 'motion/react'
 import type { CourseId } from '../types'
 
+export type Look = 'a' | 'b' | 'c' | 'd'
+
+const LOOKS: Record<Look, { skin: string; shade: string; hair: string; long: boolean }> = {
+  a: { skin: '#F2C094', shade: '#DFA672', hair: '#3A2A1E', long: false },
+  b: { skin: '#F2C094', shade: '#DFA672', hair: '#6B4423', long: true },
+  c: { skin: '#9C6644', shade: '#7E4E31', hair: '#1E1611', long: false },
+  d: { skin: '#9C6644', shade: '#7E4E31', hair: '#33202C', long: true },
+}
+
 /**
  * Jouw personage — wordt per taal steeds meer "van die cultuur" naarmate je
  * niveau stijgt. Per niveau komt er een cultureel item bij:
@@ -33,15 +42,19 @@ export function Avatar({
   mode = 'idle',
   level = 1,
   courseId = 'es',
+  look = 'a',
   still = false,
 }: {
   size?: number
   mode?: 'idle' | 'run' | 'cheer'
   level?: number
   courseId?: CourseId
+  /** a/c = kort haar · b/d = lang haar · a/b = lichte huid · c/d = donkere huid */
+  look?: Look
   still?: boolean
 }) {
   const s = STYLE[courseId]
+  const lk = LOOKS[look]
   const running = mode === 'run'
   const cheering = mode === 'cheer'
 
@@ -54,6 +67,16 @@ export function Avatar({
   const hasCape = level >= 8
   const hasGlow = level >= 9
   const hasCrown = level >= 10
+  const hasChain = level >= 11
+  const hasNeon = level >= 12
+  const hasFire = level >= 13
+  const hasWatch = level >= 14
+  const platinum = level >= 15
+  const hasWings = level >= 16
+  const hasLightning = level >= 17
+  const starCape = level >= 18
+  const cosmic = level >= 19
+  const hasHalo = level >= 20
 
   const shirtFill = hasOutfit ? s.shirt : '#7C7694'
 
@@ -80,21 +103,71 @@ export function Avatar({
           <stop offset="60%" stopColor="#EC4899" stopOpacity="0.15" />
           <stop offset="100%" stopColor="#EC4899" stopOpacity="0" />
         </radialGradient>
+        <radialGradient id={`av-cosmic-${courseId}`}>
+          <stop offset="0%" stopColor="#22D3EE" stopOpacity="0.5" />
+          <stop offset="55%" stopColor="#A855F7" stopOpacity="0.25" />
+          <stop offset="100%" stopColor="#A855F7" stopOpacity="0" />
+        </radialGradient>
         <clipPath id={`av-torso-${courseId}`}>
           <rect x="68" y="106" width="64" height="66" rx="20" />
         </clipPath>
       </defs>
 
-      {/* gouden aura (niveau 9+) */}
+      {/* aura (niveau 9+; kosmisch vanaf 19) */}
       {hasGlow && (
         <motion.circle
           cx="100"
           cy="110"
           r="95"
-          fill={`url(#av-glow-${courseId})`}
+          fill={cosmic ? `url(#av-cosmic-${courseId})` : `url(#av-glow-${courseId})`}
           animate={{ opacity: [0.7, 1, 0.7] }}
           transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
         />
+      )}
+
+      {/* vuur-aura (niveau 13+) */}
+      {hasFire && (
+        <motion.g
+          animate={{ opacity: [0.65, 1, 0.65], scaleY: [1, 1.08, 1] }}
+          transition={{ duration: 0.6, repeat: Infinity, ease: 'easeInOut' }}
+          style={{ originX: '100px', originY: '170px' }}
+        >
+          <ellipse cx="58" cy="148" rx="10" ry="28" fill="#FF8A3D" opacity="0.5" />
+          <ellipse cx="142" cy="148" rx="10" ry="28" fill="#FF8A3D" opacity="0.5" />
+          <ellipse cx="58" cy="140" rx="5" ry="17" fill="#FFC53D" opacity="0.75" />
+          <ellipse cx="142" cy="140" rx="5" ry="17" fill="#FFC53D" opacity="0.75" />
+        </motion.g>
+      )}
+
+      {/* energievleugels (niveau 16+) */}
+      {hasWings && (
+        <motion.g
+          animate={{ rotate: [-4, 4, -4] }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+          style={{ originX: '100px', originY: '118px' }}
+        >
+          <path d="M70 112 Q26 84 24 126 Q42 146 70 134 Z" fill="#22D3EE" opacity="0.7" />
+          <path d="M130 112 Q174 84 176 126 Q158 146 130 134 Z" fill="#A855F7" opacity="0.7" />
+        </motion.g>
+      )}
+
+      {/* bliksem-aura (niveau 17+) */}
+      {hasLightning && (
+        <motion.g animate={{ opacity: [0, 1, 0] }} transition={{ duration: 0.45, repeat: Infinity, repeatDelay: 0.7 }}>
+          <path d="M38 94 l-7 13 h5 l-8 16" stroke="#FFE95E" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M164 90 l-7 13 h5 l-8 16" stroke="#FFE95E" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        </motion.g>
+      )}
+
+      {/* kosmische ster in een baan (niveau 19+) */}
+      {cosmic && (
+        <motion.g
+          animate={{ rotate: 360 }}
+          transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
+          style={{ originX: '100px', originY: '110px' }}
+        >
+          <path d="M100 8 l2.5 6 6 2.5 -6 2.5 -2.5 6 -2.5 -6 -6 -2.5 6 -2.5 z" fill="#22D3EE" />
+        </motion.g>
       )}
 
       {/* vaartlijnen bij rennen */}
@@ -116,6 +189,16 @@ export function Avatar({
           <path d="M72 112 Q56 160 62 196 L138 196 Q144 160 128 112 Z" fill={s.c1} />
           <path d="M84 112 Q76 158 78 196 L122 196 Q124 158 116 112 Z" fill={s.c2} />
           <path d="M95 112 Q92 158 94 196 L106 196 Q108 158 105 112 Z" fill={s.c3} />
+          {starCape && (
+            <g opacity="0.95">
+              <circle cx="74" cy="138" r="2" fill="#fff" />
+              <circle cx="68" cy="168" r="1.6" fill="#fff" />
+              <circle cx="80" cy="186" r="2" fill="#fff" />
+              <circle cx="126" cy="142" r="2" fill="#fff" />
+              <circle cx="132" cy="176" r="1.6" fill="#fff" />
+              <circle cx="120" cy="190" r="2" fill="#fff" />
+            </g>
+          )}
         </motion.g>
       )}
 
@@ -142,8 +225,10 @@ export function Avatar({
         transition={{ duration: 0.32, repeat: Infinity, ease: 'easeInOut' }}
         style={{ originX: '111px', originY: '170px' }}
       />
-      <ellipse cx="89" cy="211" rx="11" ry="6" fill="#241E38" />
-      <ellipse cx="111" cy="211" rx="11" ry="6" fill="#241E38" />
+      <ellipse cx="89" cy="209" rx="11" ry="6" fill="#2C2640" />
+      <ellipse cx="111" cy="209" rx="11" ry="6" fill="#2C2640" />
+      <ellipse cx="89" cy="213" rx="11.5" ry="2.6" fill="#E8E6F5" />
+      <ellipse cx="111" cy="213" rx="11.5" ry="2.6" fill="#E8E6F5" />
 
       {/* armen */}
       <motion.rect
@@ -168,11 +253,21 @@ export function Avatar({
         transition={{ duration: running || cheering ? (running ? 0.32 : 0.7) : 3, repeat: Infinity, ease: 'easeInOut' }}
         style={{ originX: '137.5px', originY: '116px' }}
       />
-      <circle cx="62" cy="158" r="7.5" fill="#F2C094" />
-      <circle cx="138" cy="158" r="7.5" fill="#F2C094" />
+      <circle cx="62" cy="158" r="7.5" fill={lk.skin} />
+      <circle cx="138" cy="158" r="7.5" fill={lk.skin} />
+
+      {/* diamanten horloge (niveau 14+) */}
+      {hasWatch && (
+        <g>
+          <rect x="54" y="147" width="16" height="7" rx="3.5" fill="#FFD75E" />
+          <circle cx="62" cy="150.5" r="4.2" fill="#E8F1F8" stroke="#D97706" strokeWidth="1.3" />
+        </g>
+      )}
 
       {/* torso */}
       <rect x="68" y="106" width="64" height="66" rx="20" fill={shirtFill} />
+      <ellipse cx="100" cy="168" rx="30" ry="8" fill="rgba(0,0,0,0.16)" />
+      <path d="M90 106 L100 116 L110 106 Z" fill="rgba(0,0,0,0.22)" />
       {hasOutfit && s.stripes && (
         <g clipPath={`url(#av-torso-${courseId})`}>
           <rect x="68" y="114" width="64" height="9" fill={s.accent} />
@@ -181,6 +276,13 @@ export function Avatar({
         </g>
       )}
       {hasOutfit && !s.stripes && <rect x="68" y="106" width="64" height="10" rx="5" fill={s.accent} opacity="0.9" />}
+      {/* neon-rand (niveau 12+) */}
+      {hasNeon && (
+        <>
+          <rect x="68" y="106" width="64" height="66" rx="20" fill="none" stroke="#22D3EE" strokeWidth="2.5" opacity="0.95" />
+          <rect x="66" y="104" width="68" height="70" rx="22" fill="none" stroke="#22D3EE" strokeWidth="1" opacity="0.4" />
+        </>
+      )}
 
       {/* vlag-embleem op de borst (niveau 7+) */}
       {hasBadge && (
@@ -202,13 +304,34 @@ export function Avatar({
         </g>
       )}
 
+      {/* gouden ketting (niveau 11+) */}
+      {hasChain && (
+        <g>
+          <path d="M79 110 Q100 128 121 110" stroke="#FFD75E" strokeWidth="3.5" fill="none" />
+          <circle cx="100" cy="126" r="6" fill="#FFD75E" stroke="#D97706" strokeWidth="1.5" />
+          <path d="M100 122.5 l1.1 2.3 2.5 0.3 -1.8 1.7 0.5 2.5 -2.3 -1.2 -2.3 1.2 0.5 -2.5 -1.8 -1.7 2.5 -0.3 z" fill="#B45309" />
+        </g>
+      )}
+
       {/* hoofd */}
-      <circle cx="100" cy="66" r="34" fill="#F2C094" />
-      {/* haar */}
-      <path d="M66 62 Q66 30 100 30 Q134 30 134 62 Q126 44 100 44 Q74 44 66 62 Z" fill="#3A2A1E" />
+      <circle cx="100" cy="66" r="34" fill={lk.skin} />
+      <path d="M126 44 A34 34 0 0 1 126 88 A44 44 0 0 0 126 44 Z" fill={lk.shade} opacity="0.4" />
+      {/* haar — kort of lang */}
+      {!lk.long ? (
+        <path d="M66 62 Q66 30 100 30 Q134 30 134 62 Q126 44 100 44 Q74 44 66 62 Z" fill={lk.hair} />
+      ) : (
+        <g>
+          <path d="M64 58 Q58 100 68 114 L80 106 Q71 84 73 58 Z" fill={lk.hair} />
+          <path d="M136 58 Q142 100 132 114 L120 106 Q129 84 127 58 Z" fill={lk.hair} />
+          <path d="M64 64 Q64 28 100 28 Q136 28 136 64 Q126 42 100 42 Q74 42 64 64 Z" fill={lk.hair} />
+        </g>
+      )}
+      {/* wenkbrauwen */}
+      <rect x="80" y="52" width="14" height="3.5" rx="1.75" fill={lk.hair} transform="rotate(-4 87 54)" />
+      <rect x="106" y="52" width="14" height="3.5" rx="1.75" fill={lk.hair} transform="rotate(4 113 54)" />
       {/* oren */}
-      <circle cx="66" cy="68" r="6" fill="#F2C094" />
-      <circle cx="134" cy="68" r="6" fill="#F2C094" />
+      <circle cx="66" cy="68" r="6" fill={lk.skin} />
+      <circle cx="134" cy="68" r="6" fill={lk.skin} />
 
       {/* ogen */}
       <ellipse cx="87" cy="66" rx="7.5" ry="8.5" fill="#fff" />
@@ -250,11 +373,32 @@ export function Avatar({
           transition={{ duration: 0.7, repeat: Infinity, ease: 'easeInOut' }}
           style={{ originX: '100px', originY: '30px' }}
         >
-          <path d="M76 40 L79 16 L91 28 L100 10 L109 28 L121 16 L124 40 Q100 49 76 40 Z" fill="#FFE08A" stroke="#D97706" strokeWidth="2" />
+          <path
+            d="M76 40 L79 16 L91 28 L100 10 L109 28 L121 16 L124 40 Q100 49 76 40 Z"
+            fill={platinum ? '#E8EDF5' : '#FFE08A'}
+            stroke={platinum ? '#9FB2C8' : '#D97706'}
+            strokeWidth="2"
+          />
           <circle cx="86" cy="37" r="2.6" fill={s.c1} />
           <circle cx="100" cy="39" r="2.6" fill={s.c2} stroke="rgba(0,0,0,0.2)" strokeWidth="0.8" />
           <circle cx="114" cy="37" r="2.6" fill={s.c3} />
+          {platinum && <path d="M100 0 L105 7 L100 15 L95 7 Z" fill="#E8F1F8" stroke="#9FBAD1" strokeWidth="1.2" />}
         </motion.g>
+      )}
+
+      {/* Legende-halo (niveau 20) */}
+      {hasHalo && (
+        <motion.ellipse
+          cx="100"
+          cy="2"
+          rx="25"
+          ry="6"
+          fill="none"
+          stroke="#FFE08A"
+          strokeWidth="4.5"
+          animate={{ y: [0, -4, 0], opacity: [0.8, 1, 0.8] }}
+          transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+        />
       )}
 
       {/* attribuut in de hand (niveau 5+) */}
