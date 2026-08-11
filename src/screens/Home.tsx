@@ -8,7 +8,7 @@ import { countryStates, courseFlagCode, totalLessons } from '../countries'
 import { levelProgress, levelTitle, nextReward } from '../levels'
 import { addDaysStr, daysUntil, goalStatus, suggestGoals, todayStr } from '../goals'
 import { Flag } from '../components/Flag'
-import { Auro } from '../components/Auro'
+import { Avatar } from '../components/Avatar'
 import { sfx } from '../audio'
 
 interface Props {
@@ -144,11 +144,11 @@ export function HomeScreen({ onStartLesson, onReview }: Props) {
 
       {(() => {
         const lp = levelProgress(xpAll)
-        const nr = nextReward(lp.level)
+        const nr = nextReward(courseId, lp.level)
         return (
           <div className="glass" style={{ padding: '10px 16px', marginBottom: 16 }}>
             <div className="row" style={{ gap: 14 }}>
-              <Auro size={64} level={lp.level} />
+              <Avatar size={56} level={lp.level} courseId={courseId} />
               <div style={{ flex: 1 }}>
                 <div className="spread">
                   <strong style={{ fontSize: 14 }}>
@@ -163,7 +163,7 @@ export function HomeScreen({ onStartLesson, onReview }: Props) {
                 </div>
                 <p className="faint" style={{ fontSize: 11 }}>
                   Nog {lp.needed - lp.current} XP tot niveau {lp.level + 1}
-                  {nr ? ` · bij niveau ${nr.level}: ${nr.item} voor Leo` : ''}
+                  {nr ? ` · bij niveau ${nr.level} verdien jij: ${nr.item}` : ''}
                 </p>
               </div>
             </div>

@@ -1,6 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react'
-import { WARDROBE, levelReward, levelTitle, xpToReach } from '../levels'
-import { Auro } from '../components/Auro'
+import { levelReward, levelTitle, wardrobeFor, xpToReach } from '../levels'
+import { Avatar } from '../components/Avatar'
 import { Flag } from '../components/Flag'
 
 /**
@@ -39,14 +39,14 @@ function Page({ children, title, sub }: { children: ReactNode; title?: string; s
 }
 
 const SWATCHES = [
-  { hex: '#0B0A08', name: 'Achtergrond', note: 'warm near-black' },
-  { hex: '#F2ECDF', name: 'Tekst', note: 'warm wit' },
-  { hex: '#D4AF6A', name: 'Goud', note: 'primaire accentkleur' },
-  { hex: '#EED9A0', name: 'Goud licht', note: 'gradiënt-top' },
-  { hex: '#B08D4C', name: 'Goud diep', note: 'gradiënt-basis' },
-  { hex: '#9DBB7B', name: 'Juist', note: 'gedempt groen' },
-  { hex: '#C97B62', name: 'Fout', note: 'terracotta — geen hard rood' },
-  { hex: '#A89F8D', name: 'Gedempt', note: 'secundaire tekst' },
+  { hex: '#0E0B1F', name: 'Achtergrond', note: 'diep indigo' },
+  { hex: '#F5F3FF', name: 'Tekst', note: 'helder wit' },
+  { hex: '#A855F7', name: 'Paars', note: 'primaire actie (gradiënt)' },
+  { hex: '#EC4899', name: 'Roze', note: 'primaire actie (gradiënt)' },
+  { hex: '#FFC53D', name: 'Amber', note: 'XP en beloningen' },
+  { hex: '#22D3EE', name: 'Cyaan', note: 'selectie en focus' },
+  { hex: '#4ADE80', name: 'Juist', note: 'goed antwoord' },
+  { hex: '#FB7185', name: 'Fout', note: 'fout antwoord' },
 ]
 
 export function Gallery() {
@@ -54,7 +54,7 @@ export function Gallery() {
     <div style={{ background: '#0B0A08' }}>
       {/* ======== omslag ======== */}
       <div style={{ ...PAGE, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-        <Auro size={190} level={10} still />
+        <Avatar size={170} level={10} courseId="es" still />
         <p className="eyebrow" style={{ marginTop: 30 }}>
           Visuele stijlgids & groeisysteem
         </p>
@@ -88,7 +88,7 @@ export function Gallery() {
           ))}
         </div>
         <div className="glass" style={{ padding: 24, marginTop: 24 }}>
-          <p className="eyebrow">Fraunces — voor titels en momenten</p>
+          <p className="eyebrow">Baloo 2 — voor titels en momenten</p>
           <p className="display" style={{ fontSize: 34, margin: '4px 0 18px' }}>
             Prachtig. Vlekkeloos. Veroverd.
           </p>
@@ -125,16 +125,16 @@ export function Gallery() {
       </Page>
 
       {/* ======== Auro evolutie 1-5 ======== */}
-      <Page title="Auro's evolutie — niveau 1 t/m 5" sub="Groeisysteem · hoe hoger je komt, hoe rijker Auro wordt">
+      <Page title="Jouw transformatie — niveau 1 t/m 5" sub="Groeisysteem (voorbeeld: Spaans) · jij wordt steeds meer van de cultuur">
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 }}>
           {[1, 2, 3, 4, 5].map((lvl) => (
             <div key={lvl} className="glass" style={{ padding: '18px 20px', textAlign: 'center' }}>
-              <Auro size={150} level={lvl} still />
+              <Avatar size={130} level={lvl} courseId="es" still />
               <p className="display gold-text" style={{ fontSize: 20, marginTop: 6 }}>
                 Niveau {lvl} · {levelTitle(lvl)}
               </p>
               <p className="dim" style={{ fontSize: 13 }}>
-                {lvl === 1 ? 'Basis-Auro — hier begint iedereen' : `Nieuw: ${levelReward(lvl)}`}
+                {lvl === 1 ? 'Startpunt — hier begint iedereen' : `Nieuw: ${levelReward('es', lvl)}`}
               </p>
               <p className="faint" style={{ fontSize: 11, marginTop: 2 }}>
                 vanaf {xpToReach(lvl)} XP
@@ -145,16 +145,16 @@ export function Gallery() {
       </Page>
 
       {/* ======== Auro evolutie 6-10 ======== */}
-      <Page title="Auro's evolutie — niveau 6 t/m 10" sub="Groeisysteem · de late niveaus zijn een échte prestatie">
+      <Page title="Jouw transformatie — niveau 6 t/m 10" sub="Groeisysteem (voorbeeld: Spaans) · de late niveaus zijn een échte prestatie">
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 }}>
           {[6, 7, 8, 9, 10].map((lvl) => (
             <div key={lvl} className="glass" style={{ padding: '18px 20px', textAlign: 'center' }}>
-              <Auro size={150} level={lvl} still />
+              <Avatar size={130} level={lvl} courseId="es" still />
               <p className="display gold-text" style={{ fontSize: 20, marginTop: 6 }}>
                 Niveau {lvl} · {levelTitle(lvl)}
               </p>
               <p className="dim" style={{ fontSize: 13 }}>
-                Nieuw: {levelReward(lvl)}
+                Nieuw: {levelReward('es', lvl)}
               </p>
               <p className="faint" style={{ fontSize: 11, marginTop: 2 }}>
                 vanaf {xpToReach(lvl)} XP
@@ -169,17 +169,17 @@ export function Gallery() {
       </Page>
 
       {/* ======== Auro standen ======== */}
-      <Page title="Auro's drie standen" sub="Mascotte-gedrag · wanneer je hem ziet">
+      <Page title="De drie standen van jouw personage" sub="Wanneer je jezelf ziet bewegen">
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 18 }}>
           {(
             [
-              ['idle', 'Rustig', 'Op je profiel en niveau-strip — altijd aanwezig, knippert af en toe'],
-              ['run', 'Rennend', 'Bij een landverovering rent hij over het scherm naar het nieuwe land'],
+              ['idle', 'Rustig', 'Op je startscherm en profiel — altijd aanwezig, knippert af en toe'],
+              ['run', 'Rennend', 'Bij een landverovering ren jij over het scherm het nieuwe land binnen'],
               ['cheer', 'Juichend', 'Bij niveau-omhoog, gehaalde doelen en foutloze lessen'],
             ] as const
           ).map(([mode, name, desc]) => (
             <div key={mode} className="glass" style={{ padding: 18, textAlign: 'center' }}>
-              <Auro size={150} mode={mode} level={5} still />
+              <Avatar size={125} mode={mode} level={5} courseId="es" still />
               <p className="display gold-text" style={{ fontSize: 19, marginTop: 8 }}>
                 {name}
               </p>
@@ -360,8 +360,8 @@ export function Gallery() {
           Garderobe-ladder
         </p>
         <div className="glass" style={{ padding: '8px 20px' }}>
-          {WARDROBE.map((w, i) => (
-            <div key={w.level} className="spread" style={{ padding: '9px 0', borderBottom: i < WARDROBE.length - 1 ? '1px solid rgba(255,255,255,0.09)' : 'none' }}>
+          {wardrobeFor('es').map((w, i) => (
+            <div key={w.level} className="spread" style={{ padding: '9px 0', borderBottom: i < 8 ? '1px solid rgba(255,255,255,0.09)' : 'none' }}>
               <span style={{ fontSize: 13.5, fontWeight: 500 }}>{w.item}</span>
               <span className="faint" style={{ fontSize: 12 }}>
                 Niveau {w.level}

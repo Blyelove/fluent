@@ -26,6 +26,13 @@ export interface TestResult {
   day: string
 }
 
+export interface Account {
+  name: string
+  email: string
+  passHash: string
+  createdAt: string
+}
+
 function todayStr(): string {
   const d = new Date()
   const y = d.getFullYear()
@@ -39,6 +46,12 @@ function daysBetween(a: string, b: string): number {
 }
 
 interface AureaState {
+  /** Lokale accounts (sleutel = naam in kleine letters); sync via server komt later */
+  accounts: Record<string, Account>
+  currentUser: string | null
+  /** "Ingelogd blijven" — true = nooit meer het inlogscherm */
+  rememberMe: boolean
+
   onboarded: boolean
   courseId: CourseId
   dailyGoalXp: number
@@ -74,6 +87,9 @@ interface AureaState {
   addGoal: (g: Goal) => void
   removeGoal: (id: string) => void
   addTestResult: (r: TestResult) => void
+  registerAccount: (name: string, email: string, passHash: string, remember: boolean) => 'ok' | 'bestaat'
+  loginAccount: (name: string, passHash: string, remember: boolean) => 'ok' | 'fout'
+  logout: () => void
   toggleSound: () => void
   resetAll: () => void
 }
@@ -83,6 +99,10 @@ const emptyProgress = (): Progress => ({ xp: 0, completed: [] })
 export const useStore = create<AureaState>()(
   persist(
     (set, get) => ({
+      accounts: {},
+      currentUser: null,
+      rememberMe: true,
+
       onboarded: false,
       courseId: 'en',
       dailyGoalXp: 40,
@@ -229,6 +249,45 @@ export const useStore = create<AureaState>()(
       removeGoal: (id) => set({ goals: get().goals.filter((g) => g.id !== id) }),
 
       addTestResult: (r) => set({ tests: [...get().tests.slice(-19), r] }),
+
+      registerAccount: (name, email, passHash, remember) => {
+        const key = name.trim().toLowerCase()
+        const s = get()
+        if (s.accounts[key]) return 'bestaat'
+        try {
+          sessionStorage.setItem('fluent-session', '1')
+        } catch {
+          /* geen sessionStorage — rememberMe vangt dit op */
+        }
+        set({
+          accounts: { ...s.accounts, [key]: { name: name.trim(), email: email.trim(), passHash, createdAt: todayStr() } },
+          currentUser: key,
+          rememberMe: remember,
+        })
+        return 'ok'
+      },
+
+      loginAccount: (name, passHash, remember) => {
+        const key = name.trim().toLowerCase()
+        const acc = get().accounts[key]
+        if (!acc || acc.passHash !== passHash) return 'fout'
+        try {
+          sessionStorage.setItem('fluent-session', '1')
+        } catch {
+          /* geen sessionStorage — rememberMe vangt dit op */
+        }
+        set({ currentUser: key, rememberMe: remember })
+        return 'ok'
+      },
+
+      logout: () => {
+        try {
+          sessionStorage.removeItem('fluent-session')
+        } catch {
+          /* niets te verwijderen */
+        }
+        set({ currentUser: null })
+      },
 
       toggleSound: () => {
         const on = !get().soundOn

@@ -6,8 +6,9 @@ import { courseProgress, totalXp, useStore } from '../store'
 import { levelForXp, levelReward, levelTitle } from '../levels'
 import { countryStates, courseFlagCode, type CountryState } from '../countries'
 import type { CompletedGoal } from '../goals'
+import type { CourseId } from '../types'
 import { Flag } from '../components/Flag'
-import { Auro } from '../components/Auro'
+import { Avatar } from '../components/Avatar'
 import { sfx } from '../audio'
 import {
   FillEx,
@@ -133,6 +134,7 @@ export function LessonScreen({ course, lesson, onExit }: Props) {
         conquered={finished.conquered}
         goalsHit={finished.goalsHit}
         startCode={courseFlagCode[course.id]}
+        courseId={course.id}
         onDone={onExit}
       />
     )
@@ -234,6 +236,7 @@ function CompleteView({
   conquered,
   goalsHit,
   startCode,
+  courseId,
   onDone,
 }: {
   xp: number
@@ -242,6 +245,7 @@ function CompleteView({
   conquered: CountryState[]
   goalsHit: CompletedGoal[]
   startCode: string
+  courseId: CourseId
   onDone: () => void
 }) {
   const streak = useStore((s) => s.streak)
@@ -302,7 +306,7 @@ function CompleteView({
         {step === 'stats' && (
           <motion.div key="stats" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -18 }} transition={{ duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }}>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <Auro size={110} mode={perfect ? 'cheer' : 'idle'} level={curLevel} />
+              <Avatar size={100} mode={perfect ? 'cheer' : 'idle'} level={curLevel} courseId={courseId} />
             </div>
             <p className="eyebrow" style={{ marginTop: 8 }}>
               Les voltooid
@@ -356,7 +360,7 @@ function CompleteView({
                 animate={{ x: 120 }}
                 transition={{ duration: 1.6, ease: 'easeInOut' }}
               >
-                <Auro size={100} mode="run" level={curLevel} />
+                <Avatar size={86} mode="run" level={curLevel} courseId={courseId} />
               </motion.div>
             </div>
             <motion.h1
@@ -372,7 +376,7 @@ function CompleteView({
               <p className="dim">+ nog {conquered.length - 1} {conquered.length - 1 === 1 ? 'gebied' : 'gebieden'}</p>
             )}
             <motion.p className="dim" style={{ fontSize: 15, marginTop: 6 }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.8 }}>
-              Leo rent alvast vooruit naar het volgende land.
+              Jij rent alvast vooruit naar het volgende land.
             </motion.p>
             <div style={{ marginTop: 30, padding: '0 8px' }}>
               <button className="btn btn-primary" onClick={next}>
@@ -385,7 +389,7 @@ function CompleteView({
         {step === 'goal' && goalsHit.length > 0 && (
           <motion.div key="goal" initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, y: -18 }} transition={{ duration: 0.35 }}>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <Auro size={120} mode="cheer" level={curLevel} />
+              <Avatar size={104} mode="cheer" level={curLevel} courseId={courseId} />
             </div>
             <p className="eyebrow" style={{ marginTop: 10 }}>
               Doel gehaald
@@ -424,7 +428,7 @@ function CompleteView({
         {step === 'level' && newLevel && (
           <motion.div key="lvl" initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35 }}>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <Auro size={150} mode="cheer" level={newLevel} />
+              <Avatar size={128} mode="cheer" level={newLevel} courseId={courseId} />
             </div>
             <p className="eyebrow" style={{ marginTop: 10 }}>
               Niveau omhoog
@@ -435,7 +439,7 @@ function CompleteView({
             <p className="display dim" style={{ fontSize: 21 }}>
               {levelTitle(newLevel)}
             </p>
-            {levelReward(newLevel) && (
+            {levelReward(courseId, newLevel) && (
               <motion.p
                 className="gold-text"
                 style={{ fontWeight: 700, marginTop: 10 }}
@@ -443,7 +447,7 @@ function CompleteView({
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.5, type: 'spring', stiffness: 220, damping: 16 }}
               >
-                ✦ Nieuw voor Leo: {levelReward(newLevel)}
+                ✦ Jij verdient: {levelReward(courseId, newLevel)}
               </motion.p>
             )}
             <div className="divider-gold" />

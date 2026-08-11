@@ -1,3 +1,5 @@
+import type { CourseId } from './types'
+
 /** XP-niveaucurve met titels — elk niveau kost iets meer dan het vorige */
 
 const TITLES = [
@@ -46,24 +48,28 @@ export function levelProgress(xp: number): { level: number; current: number; nee
   return { level, current: xp - cur, needed: next - cur, frac: (xp - cur) / (next - cur) }
 }
 
-/** Wat Auro per niveau verdient — de garderobe die spelers verzamelen */
-export const WARDROBE: { level: number; item: string }[] = [
-  { level: 2, item: 'Bordeauxrode sjaal' },
-  { level: 3, item: 'Gouden monocle' },
-  { level: 4, item: 'Gouden kroontje' },
-  { level: 5, item: 'Koninklijke cape' },
-  { level: 6, item: 'Glanzende manen' },
-  { level: 7, item: 'Gouden medaille' },
-  { level: 8, item: 'Juwelenkroon' },
-  { level: 9, item: 'Gouden aura' },
-  { level: 10, item: 'Diamanten kroon' },
-]
-
-export function levelReward(level: number): string | null {
-  return WARDROBE.find((w) => w.level === level)?.item ?? null
+/**
+ * Per taal een eigen culturele transformatie: jouw personage wordt met elk
+ * niveau meer "van die cultuur". Index 0 = niveau 2, t/m niveau 10.
+ */
+const ITEM_NAMES: Record<CourseId, [string, string, string, string, string, string, string, string, string]> = {
+  es: ['Rode halsdoek', 'Cordobés-hoed', 'Flamenco-outfit', 'Spaanse gitaar', 'Zonnebril', 'Spanje-embleem', 'Vlaggen-cape', 'Gouden aura', 'Spaanse kroon'],
+  fr: ['Franse halsdoek', 'Baret', 'Marinière', 'Stokbrood', 'Zonnebril', 'Frankrijk-embleem', 'Vlaggen-cape', 'Gouden aura', 'Franse kroon'],
+  de: ['Duitse halsdoek', 'Tirolerhoed', 'Trachten-outfit', 'Pretzel', 'Zonnebril', 'Duitsland-embleem', 'Vlaggen-cape', 'Gouden aura', 'Duitse kroon'],
+  it: ['Italiaanse halsdoek', 'Coppola-pet', 'Italiaanse stijl', 'Pizzapunt', 'Zonnebril', 'Italië-embleem', 'Vlaggen-cape', 'Gouden aura', 'Italiaanse kroon'],
+  en: ['Britse halsdoek', 'Bowlerhoed', 'Britse stijl', 'Paraplu', 'Zonnebril', 'VK-embleem', 'Vlaggen-cape', 'Gouden aura', 'Britse kroon'],
+  pt: ['Portugese halsdoek', 'Vissersmuts', 'Portugese stijl', 'Voetbal', 'Zonnebril', 'Portugal-embleem', 'Vlaggen-cape', 'Gouden aura', 'Portugese kroon'],
 }
 
-/** De eerstvolgende garderobe-unlock boven dit niveau (voor anticipatie) */
-export function nextReward(level: number): { level: number; item: string } | null {
-  return WARDROBE.find((w) => w.level > level) ?? null
+export function wardrobeFor(c: CourseId): { level: number; item: string }[] {
+  return ITEM_NAMES[c].map((item, i) => ({ level: i + 2, item }))
+}
+
+export function levelReward(c: CourseId, level: number): string | null {
+  return level >= 2 && level <= 10 ? ITEM_NAMES[c][level - 2] : null
+}
+
+/** De eerstvolgende unlock boven dit niveau (voor anticipatie) */
+export function nextReward(c: CourseId, level: number): { level: number; item: string } | null {
+  return wardrobeFor(c).find((w) => w.level > level) ?? null
 }

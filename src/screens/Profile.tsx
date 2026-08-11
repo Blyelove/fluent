@@ -1,9 +1,9 @@
 import { courses } from '../content'
 import { courseProgress, totalXp, useStore, wordsLearned } from '../store'
-import { WARDROBE, levelProgress, levelTitle } from '../levels'
+import { levelProgress, levelTitle, wardrobeFor } from '../levels'
 import { courseFlagCode } from '../countries'
 import { Flag } from '../components/Flag'
-import { Auro } from '../components/Auro'
+import { Avatar } from '../components/Avatar'
 
 export function ProfileScreen() {
   const state = useStore()
@@ -23,7 +23,7 @@ export function ProfileScreen() {
             Niveau {lp.level} · {levelTitle(lp.level)} · <Flag code={courseFlagCode[state.courseId]} size={14} /> {course.name}
           </p>
         </div>
-        <Auro size={86} mode="idle" level={lp.level} />
+        <Avatar size={80} mode="idle" level={lp.level} courseId={state.courseId} />
       </div>
       <div style={{ margin: '14px 0 24px' }}>
         <div className="progress-track" style={{ height: 8 }}>
@@ -105,43 +105,68 @@ export function ProfileScreen() {
         </div>
       </div>
 
-      <div className="glass" style={{ padding: 18, marginBottom: 24 }}>
-        <div className="spread">
-          <strong style={{ fontSize: 15 }}>Leo's garderobe</strong>
-          <span className="faint" style={{ fontSize: 13 }}>
-            {WARDROBE.filter((w) => lp.level >= w.level).length} / {WARDROBE.length}
-          </span>
+      {state.currentUser && state.accounts[state.currentUser] && (
+        <div className="glass" style={{ padding: '6px 18px', marginBottom: 24 }}>
+          <div className="spread" style={{ padding: '14px 0', borderBottom: '1px solid var(--line)' }}>
+            <span style={{ fontWeight: 500 }}>Account</span>
+            <span style={{ fontWeight: 700 }}>{state.accounts[state.currentUser].name}</span>
+          </div>
+          <div className="spread" style={{ padding: '14px 0', borderBottom: '1px solid var(--line)' }}>
+            <span style={{ fontWeight: 500 }}>E-mail</span>
+            <span className="dim" style={{ fontSize: 13 }}>
+              {state.accounts[state.currentUser].email || '—'}
+            </span>
+          </div>
+          <div style={{ padding: '12px 0' }}>
+            <button className="btn btn-ghost" style={{ padding: 12, fontSize: 14 }} onClick={state.logout}>
+              Uitloggen
+            </button>
+          </div>
         </div>
-        <div className="col" style={{ marginTop: 8 }}>
-          {WARDROBE.map((w, i) => {
-            const unlocked = lp.level >= w.level
-            return (
-              <div
-                className="spread"
-                key={w.level}
-                style={{ padding: '10px 0', borderBottom: i < WARDROBE.length - 1 ? '1px solid var(--line)' : 'none' }}
-              >
-                <span style={{ fontSize: 14, fontWeight: 500, color: unlocked ? 'var(--text)' : 'var(--text-faint)' }}>{w.item}</span>
-                {unlocked ? (
-                  <span className="gold-text" style={{ fontWeight: 700, fontSize: 14 }}>
-                    ✓
-                  </span>
-                ) : (
-                  <span className="faint" style={{ fontSize: 12 }}>
-                    Niveau {w.level}
-                  </span>
-                )}
-              </div>
-            )
-          })}
-        </div>
-        <div className="center" style={{ marginTop: 16 }}>
-          <Auro size={104} level={10} />
-          <p className="faint" style={{ fontSize: 12, marginTop: 4 }}>
-            Leo op niveau 10 — de volledige Grootmeester-uitrusting
-          </p>
-        </div>
-      </div>
+      )}
+
+      {(() => {
+        const wardrobe = wardrobeFor(state.courseId)
+        return (
+          <div className="glass" style={{ padding: 18, marginBottom: 24 }}>
+            <div className="spread">
+              <strong style={{ fontSize: 15 }}>Jouw transformatie · {course.name}</strong>
+              <span className="faint" style={{ fontSize: 13 }}>
+                {wardrobe.filter((w) => lp.level >= w.level).length} / {wardrobe.length}
+              </span>
+            </div>
+            <div className="col" style={{ marginTop: 8 }}>
+              {wardrobe.map((w, i) => {
+                const unlocked = lp.level >= w.level
+                return (
+                  <div
+                    className="spread"
+                    key={w.level}
+                    style={{ padding: '10px 0', borderBottom: i < wardrobe.length - 1 ? '1px solid var(--line)' : 'none' }}
+                  >
+                    <span style={{ fontSize: 14, fontWeight: 500, color: unlocked ? 'var(--text)' : 'var(--text-faint)' }}>{w.item}</span>
+                    {unlocked ? (
+                      <span className="gold-text" style={{ fontWeight: 700, fontSize: 14 }}>
+                        ✓
+                      </span>
+                    ) : (
+                      <span className="faint" style={{ fontSize: 12 }}>
+                        Niveau {w.level}
+                      </span>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+            <div className="center" style={{ marginTop: 16 }}>
+              <Avatar size={110} level={10} courseId={state.courseId} />
+              <p className="faint" style={{ fontSize: 12, marginTop: 4 }}>
+                Jij op niveau 10 — volledig {course.name.toLowerCase()}
+              </p>
+            </div>
+          </div>
+        )
+      })()}
 
       <p className="faint center" style={{ fontSize: 13, marginBottom: 16 }}>
         Fluent leert je talen zonder straf: geen hartjes, geen energie, geen limiet. Alleen een reeks die om je geeft — met automatische

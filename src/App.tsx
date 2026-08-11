@@ -3,6 +3,7 @@ import type { Course, Lesson } from './types'
 import { dueEntries, useStore } from './store'
 import { initAudioManifest, initVoices, setSoundEnabled } from './audio'
 import { Onboarding } from './screens/Onboarding'
+import { AuthScreen } from './screens/Auth'
 import { Gallery } from './screens/Gallery'
 import { HomeScreen } from './screens/Home'
 import { LessonScreen } from './screens/Lesson'
@@ -33,6 +34,8 @@ const ProfileIcon = () => (
 
 export default function App() {
   const onboarded = useStore((s) => s.onboarded)
+  const currentUser = useStore((s) => s.currentUser)
+  const rememberMe = useStore((s) => s.rememberMe)
   const soundOn = useStore((s) => s.soundOn)
   const dueCount = useStore((s) => dueEntries(s, s.courseId).length)
 
@@ -48,6 +51,14 @@ export default function App() {
 
   // interne stijlgids voor design-review en PDF-export
   if (new URLSearchParams(window.location.search).has('gallery')) return <Gallery />
+
+  let sessionOk = false
+  try {
+    sessionOk = sessionStorage.getItem('fluent-session') === '1'
+  } catch {
+    sessionOk = true
+  }
+  if (!currentUser || (!rememberMe && !sessionOk)) return <AuthScreen />
 
   if (!onboarded) return <Onboarding />
 
