@@ -3,27 +3,30 @@ import type { CourseId } from '../types'
 
 export type Look = 'a' | 'b' | 'c' | 'd'
 
-/** Vrij samen te stellen personage — 6×6×6×6 = 1.296 combinaties */
+/** Vrij samen te stellen personage — 10×8×10×10×4 = 32.000 combinaties */
 export interface AvatarStyle {
-  /** 0 kort · 1 lang · 2 krullen · 3 knot · 4 buzz · 5 staart */
+  /** 0 kort · 1 lang · 2 krullen · 3 knot · 4 buzz · 5 staart · 6 afro · 7 hanekam · 8 kuif · 9 vlechten */
   hair: number
   skin: number
   hairColor: number
   outfit: number
+  /** 0 geen · 1 bril · 2 oorbellen · 3 sproeten */
+  extra?: number
 }
 
-export const SKINS = ['#FFDBB4', '#F2C094', '#D9A066', '#B07B4F', '#9C6644', '#6E452C']
-const SKIN_SHADES = ['#EFC392', '#DFA672', '#C48A50', '#96613C', '#7E4E31', '#57351F']
-export const HAIR_COLORS = ['#1E1611', '#3A2A1E', '#6B4423', '#B3502E', '#E0B75C', '#9A93A8']
-export const OUTFIT_COLORS = ['#7C7694', '#3E5C9A', '#B33A4B', '#2E7D5B', '#8A5BB8', '#C77B3F']
-export const HAIR_STYLE_NAMES = ['Kort', 'Lang', 'Krullen', 'Knot', 'Buzz', 'Staart']
-export const DEFAULT_PERSONA: AvatarStyle = { hair: 0, skin: 1, hairColor: 1, outfit: 0 }
+export const SKINS = ['#FFE4C8', '#FFDBB4', '#F2C094', '#D9A066', '#B07B4F', '#9C6644', '#6E452C', '#4A2E1C']
+const SKIN_SHADES = ['#F5D2AC', '#EFC392', '#DFA672', '#C48A50', '#96613C', '#7E4E31', '#57351F', '#38200F']
+export const HAIR_COLORS = ['#1E1611', '#3A2A1E', '#6B4423', '#B3502E', '#E0B75C', '#9A93A8', '#F2F0F5', '#4FA3E3', '#F06AA8', '#4FC780']
+export const OUTFIT_COLORS = ['#7C7694', '#3E5C9A', '#B33A4B', '#2E7D5B', '#8A5BB8', '#C77B3F', '#22D3EE', '#EC4899', '#E8CB2A', '#232733']
+export const HAIR_STYLE_NAMES = ['Kort', 'Lang', 'Krullen', 'Knot', 'Buzz', 'Staart', 'Afro', 'Hanekam', 'Kuif', 'Vlechten']
+export const EXTRA_NAMES = ['Geen', 'Bril', 'Oorbellen', 'Sproeten']
+export const DEFAULT_PERSONA: AvatarStyle = { hair: 0, skin: 2, hairColor: 1, outfit: 0, extra: 0 }
 
 const LEGACY: Record<Look, AvatarStyle> = {
-  a: { hair: 0, skin: 1, hairColor: 1, outfit: 0 },
-  b: { hair: 1, skin: 1, hairColor: 2, outfit: 0 },
-  c: { hair: 0, skin: 4, hairColor: 0, outfit: 0 },
-  d: { hair: 1, skin: 4, hairColor: 0, outfit: 0 },
+  a: { hair: 0, skin: 2, hairColor: 1, outfit: 0, extra: 0 },
+  b: { hair: 1, skin: 2, hairColor: 2, outfit: 0, extra: 0 },
+  c: { hair: 0, skin: 5, hairColor: 0, outfit: 0, extra: 0 },
+  d: { hair: 1, skin: 5, hairColor: 0, outfit: 0, extra: 0 },
 }
 
 export function normalizePersona(p?: AvatarStyle | Look | null): AvatarStyle {
@@ -32,10 +35,11 @@ export function normalizePersona(p?: AvatarStyle | Look | null): AvatarStyle {
   const clamp = (v: number | undefined, max: number, fallback: number) =>
     typeof v === 'number' && v >= 0 && v <= max ? Math.floor(v) : fallback
   return {
-    hair: clamp(p.hair, 5, 0),
-    skin: clamp(p.skin, SKINS.length - 1, 1),
+    hair: clamp(p.hair, HAIR_STYLE_NAMES.length - 1, 0),
+    skin: clamp(p.skin, SKINS.length - 1, 2),
     hairColor: clamp(p.hairColor, HAIR_COLORS.length - 1, 1),
     outfit: clamp(p.outfit, OUTFIT_COLORS.length - 1, 0),
+    extra: clamp(p.extra, EXTRA_NAMES.length - 1, 0),
   }
 }
 
@@ -380,6 +384,38 @@ export function Avatar({
           <circle cx="128" cy="46" r="4" fill={s.accent} />
         </g>
       )}
+      {p.hair === 6 && (
+        <g>
+          <circle cx="100" cy="38" r="30" fill={lk.hair} />
+          <circle cx="72" cy="52" r="15" fill={lk.hair} />
+          <circle cx="128" cy="52" r="15" fill={lk.hair} />
+        </g>
+      )}
+      {p.hair === 7 && (
+        <g>
+          <path d="M70 52 Q100 40 130 52 Q100 46 70 52 Z" fill={lk.hair} opacity="0.85" />
+          <path d="M86 44 L90 14 L96 42 L100 8 L106 42 L112 14 L116 44 Q100 50 86 44 Z" fill={lk.hair} />
+        </g>
+      )}
+      {p.hair === 8 && (
+        <g>
+          <path d="M66 60 Q66 34 96 32 Q130 28 134 58 Q124 44 100 44 Q76 46 66 60 Z" fill={lk.hair} />
+          <path d="M96 34 Q112 14 132 22 Q136 34 126 40 Q114 32 96 38 Z" fill={lk.hair} />
+        </g>
+      )}
+      {p.hair === 9 && (
+        <g>
+          <path d="M66 62 Q66 30 100 30 Q134 30 134 62 Q126 44 100 44 Q74 44 66 62 Z" fill={lk.hair} />
+          <circle cx="70" cy="76" r="7" fill={lk.hair} />
+          <circle cx="68" cy="90" r="6.2" fill={lk.hair} />
+          <circle cx="67" cy="103" r="5.4" fill={lk.hair} />
+          <circle cx="130" cy="76" r="7" fill={lk.hair} />
+          <circle cx="132" cy="90" r="6.2" fill={lk.hair} />
+          <circle cx="133" cy="103" r="5.4" fill={lk.hair} />
+          <circle cx="67" cy="110" r="2.6" fill={s.accent} />
+          <circle cx="133" cy="110" r="2.6" fill={s.accent} />
+        </g>
+      )}
       {/* wenkbrauwen */}
       <rect x="80" y="52" width="14" height="3.5" rx="1.75" fill={lk.hair} transform="rotate(-4 87 54)" />
       <rect x="106" y="52" width="14" height="3.5" rx="1.75" fill={lk.hair} transform="rotate(4 113 54)" />
@@ -405,6 +441,31 @@ export function Avatar({
       {/* blos */}
       <circle cx="76" cy="78" r="4.5" fill="#E89B6F" opacity="0.55" />
       <circle cx="124" cy="78" r="4.5" fill="#E89B6F" opacity="0.55" />
+
+      {/* extra's: bril · oorbellen · sproeten */}
+      {p.extra === 1 && !hasGlasses && (
+        <g>
+          <circle cx="87" cy="66" r="10" fill="none" stroke="#2B2436" strokeWidth="2.6" />
+          <circle cx="113" cy="66" r="10" fill="none" stroke="#2B2436" strokeWidth="2.6" />
+          <path d="M97 66 L103 66" stroke="#2B2436" strokeWidth="2.6" />
+        </g>
+      )}
+      {p.extra === 2 && (
+        <g>
+          <circle cx="65" cy="76" r="3" fill="#FFD75E" stroke="#D97706" strokeWidth="1" />
+          <circle cx="135" cy="76" r="3" fill="#FFD75E" stroke="#D97706" strokeWidth="1" />
+        </g>
+      )}
+      {p.extra === 3 && (
+        <g fill={lk.shade} opacity="0.85">
+          <circle cx="79" cy="79" r="1.4" />
+          <circle cx="85" cy="82" r="1.4" />
+          <circle cx="91" cy="79" r="1.4" />
+          <circle cx="109" cy="79" r="1.4" />
+          <circle cx="115" cy="82" r="1.4" />
+          <circle cx="121" cy="79" r="1.4" />
+        </g>
+      )}
 
       {/* zonnebril (niveau 6+) */}
       {hasGlasses && (

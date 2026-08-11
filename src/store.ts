@@ -4,7 +4,7 @@ import type { Card } from 'ts-fsrs'
 import type { CourseId } from './types'
 import { newCard, nextCard, isDue } from './srs'
 import { goalStatus, type CompletedGoal, type Goal } from './goals'
-import type { Look } from './components/Avatar'
+import type { AvatarStyle, Look } from './components/Avatar'
 import { setSoundEnabled } from './audio'
 
 export interface SrsEntry {
@@ -53,7 +53,7 @@ interface AureaState {
   /** "Ingelogd blijven" — true = nooit meer het inlogscherm */
   rememberMe: boolean
   /** Gekozen personage (4 stijlen) */
-  avatarLook: Look
+  avatarLook: AvatarStyle | Look
 
   onboarded: boolean
   courseId: CourseId
@@ -90,7 +90,7 @@ interface AureaState {
   addGoal: (g: Goal) => void
   removeGoal: (id: string) => void
   addTestResult: (r: TestResult) => void
-  registerAccount: (email: string, passHash: string, remember: boolean, look: Look) => 'ok' | 'bestaat'
+  registerAccount: (email: string, passHash: string, remember: boolean, look: AvatarStyle | Look) => 'ok' | 'bestaat'
   loginAccount: (email: string, passHash: string, remember: boolean) => 'ok' | 'fout'
   logout: () => void
   toggleSound: () => void

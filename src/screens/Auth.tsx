@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { motion } from 'motion/react'
 import { useStore } from '../store'
-import { Avatar, type Look } from '../components/Avatar'
+import { DEFAULT_PERSONA, type AvatarStyle } from '../components/Avatar'
+import { PersonaPicker } from '../components/PersonaPicker'
 import { sfx } from '../audio'
 
 /** Wachtwoord-hash: SHA-256 waar beschikbaar, anders een simpele fallback (http op wifi-IP) */
@@ -30,7 +31,7 @@ export function AuthScreen() {
   const hasAccounts = useStore((s) => Object.keys(s.accounts).length > 0)
 
   const [tab, setTab] = useState<'nieuw' | 'inloggen'>(hasAccounts ? 'inloggen' : 'nieuw')
-  const [look, setLook] = useState<Look>('a')
+  const [look, setLook] = useState<AvatarStyle>(DEFAULT_PERSONA)
   const [email, setEmail] = useState('')
   const [ww, setWw] = useState('')
   const [remember, setRemember] = useState(true)
@@ -92,30 +93,7 @@ export function AuthScreen() {
           </button>
         </div>
 
-        {tab === 'nieuw' && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 8, marginBottom: 16 }}>
-            {(['a', 'b', 'c', 'd'] as const).map((l) => (
-              <button
-                key={l}
-                className="glass center"
-                style={{
-                  padding: '10px 4px 4px',
-                  borderColor: look === l ? 'var(--hot2)' : undefined,
-                  boxShadow: look === l ? '0 0 18px rgba(236,72,153,0.35)' : undefined,
-                }}
-                onClick={() => {
-                  sfx('tap')
-                  setLook(l)
-                }}
-              >
-                <Avatar size={62} level={1} look={l} courseId="es" />
-                <p style={{ fontSize: 11.5, fontWeight: 700, color: look === l ? 'var(--hot2)' : 'var(--text-faint)', marginTop: 2 }}>
-                  {look === l ? '✓ Gekozen' : 'Kies mij'}
-                </p>
-              </button>
-            ))}
-          </div>
-        )}
+        {tab === 'nieuw' && <PersonaPicker value={look} onChange={setLook} />}
 
         <div className="col" style={{ gap: 10 }}>
           <input
