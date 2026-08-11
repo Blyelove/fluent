@@ -1,0 +1,358 @@
+import { useCallback, useMemo, useRef, useState } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
+import confetti from 'canvas-confetti'
+import type { Course, Exercise, Select, TypeAnswer, Unit } from '../types'
+import { courses } from '../content'
+import { useStore } from '../store'
+import { nextDueDate } from '../srs'
+import { sfx } from '../audio'
+import { Auro } from '../components/Auro'
+import { FillEx, ListenEx, SelectEx, TypeEx, WordBankEx, type EvalResult, type Registration } from './exercises'
+
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr]
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[a[i], a[j]] = [a[j], a[i]]
+  }
+  return a
+}
+
+function courseVocab(course: Course): { word: string; nl: string }[] {
+  const out: { word: string; nl: string }[] = []
+  for (const s of course.sections)
+    for (const u of s.units)
+      for (const l of u.lessons)
+        for (const e of l.exercises) if (e.type === 'new') out.push({ word: e.word, nl: e.nl })
+  return out
+}
+
+interface Item {
+  /** srs-sleutel — alleen bij herhaal-modus */
+  key?: string
+  ex: Exercise
+}
+
+type Phase =
+  | { name: 'hub' }
+  | { name: 'run'; mode: 'srs' | 'test'; items: Item[]; label: string }
+  | { name: 'done'; mode: 'srs' | 'test'; correct: number; total: number; label: string; passed: boolean }
+
+export function ReviewScreen() {
+  const courseId = useStore((s) => s.courseId)
+  const reviewWord = useStore((s) => s.reviewWord)
+  const addReviewXp = useStore((s) => s.addReviewXp)
+  const addTestResult = useStore((s) => s.addTestResult)
+  const srs = useStore((s) => s.srs)
+  const tests = useStore((s) => s.tests)
+
+  const course = courses[courseId]
+  const [phase, setPhase] = useState<Phase>({ name: 'hub' })
+  const [idx, setIdx] = useState(0)
+  const [answered, setAnswered] = useState<EvalResult | null>(null)
+  const [ready, setReady] = useState(false)
+  const [correctCount, setCorrectCount] = useState(0)
+  const [pickedUnits, setPickedUnits] = useState<string[]>([])
+  const evalRef = useRef<(() => EvalResult) | null>(null)
+
+  const due = useMemo(
+    () => Object.entries(srs).filter(([, e]) => e.courseId === courseId && new Date(e.card.due).getTime() <= Date.now()),
+    [srs, courseId]
+  )
+
+  const allCards = useMemo(() => Object.values(srs).filter((e) => e.courseId === courseId).map((e) => e.card), [srs, courseId])
+
+  const allUnits = useMemo(() => course.sections.flatMap((s) => s.units), [course])
+
+  const register = useCallback((r: Registration) => {
+    evalRef.current = r.evaluate
+    setReady(r.ready)
+  }, [])
+
+  const startSession = (mode: 'srs' | 'test', items: Item[], label: string) => {
+    setIdx(0)
+    setCorrectCount(0)
+    setAnswered(null)
+    setReady(false)
+    evalRef.current = null
+    setPhase({ name: 'run', mode, items, label })
+  }
+
+  const startSrs = () => {
+    const pool = courseVocab(course)
+    const items: Item[] = shuffle(due)
+      .slice(0, 10)
+      .map(([key, e]) => {
+        const distractors = [
+          ...new Set(
+            shuffle(pool.filter((w) => w.word.toLowerCase() !== e.word.toLowerCase()))
+              .slice(0, 3)
+              .map((w) => w.word)
+          ),
+        ]
+        if (e.card.reps >= 2 && distractors.length >= 2) {
+          return { key, ex: { type: 'type', nl: e.nl, target: e.word } as TypeAnswer }
+        }
+        const options = shuffle([e.word, ...distractors])
+        return { key, ex: { type: 'select', prompt: e.nl, options, correct: options.indexOf(e.word) } as Select }
+      })
+    startSession('srs', items, 'Herhaling')
+  }
+
+  const startTest = (units: Unit[]) => {
+    const eligible: Exercise[] = []
+    for (const u of units) for (const l of u.lessons) for (const e of l.exercises) if (e.type !== 'new' && e.type !== 'match') eligible.push(e)
+    const items: Item[] = shuffle(eligible)
+      .slice(0, 10)
+      .map((ex) => ({ ex }))
+    const label = units.length === 1 ? `Toets: ${units[0].title}` : `Toets: ${units.length} onderwerpen`
+    startSession('test', items, label)
+  }
+
+  const onCheck = () => {
+    if (phase.name !== 'run' || !evalRef.current) return
+    const r = evalRef.current()
+    setAnswered(r)
+    const item = phase.items[idx]
+    if (phase.mode === 'srs' && item.key) reviewWord(item.key, r.correct)
+    if (r.correct) {
+      sfx('correct')
+      setCorrectCount((c) => c + 1)
+    } else {
+      sfx('wrong')
+    }
+  }
+
+  const advance = () => {
+    if (phase.name !== 'run') return
+    setAnswered(null)
+    setReady(false)
+    evalRef.current = null
+    if (idx + 1 >= phase.items.length) {
+      const total = phase.items.length
+      const finalCorrect = correctCount
+      if (phase.mode === 'srs') {
+        addReviewXp(courseId, Math.max(2, finalCorrect * 2))
+        setPhase({ name: 'done', mode: 'srs', correct: finalCorrect, total, label: phase.label, passed: true })
+      } else {
+        const passed = finalCorrect >= Math.ceil(total * 0.8)
+        addReviewXp(courseId, finalCorrect * 2 + (passed ? 10 : 0))
+        addTestResult({
+          label: phase.label,
+          score: finalCorrect,
+          total,
+          passed,
+          day: new Date().toISOString().slice(0, 10),
+        })
+        if (passed) {
+          confetti({ particleCount: 110, spread: 100, origin: { y: 0.6 }, colors: ['#A855F7', '#EC4899', '#FFC53D', '#22D3EE'], disableForReducedMotion: true })
+        }
+        setPhase({ name: 'done', mode: 'test', correct: finalCorrect, total, label: phase.label, passed })
+      }
+      sfx('complete')
+    } else {
+      setIdx(idx + 1)
+    }
+  }
+
+  /* ---------- hub ---------- */
+
+  if (phase.name === 'hub') {
+    const next = nextDueDate(allCards)
+    const recentTests = [...tests].reverse().slice(0, 3)
+    return (
+      <div className="shell">
+        <p className="eyebrow">Oefenen</p>
+        <h1 className="display" style={{ fontSize: 30, margin: '8px 0 20px' }}>
+          Train jezelf
+        </h1>
+
+        <div className="glass" style={{ padding: 22, marginBottom: 16 }}>
+          <div className="spread">
+            <strong style={{ fontSize: 16 }}>🧠 Herhaling</strong>
+            {due.length > 0 && <span className="gold-text" style={{ fontWeight: 800 }}>{due.length} klaar</span>}
+          </div>
+          <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 14px' }}>
+            {due.length > 0
+              ? 'Herhaal op het perfecte moment — vlak voordat je vergeet. Zo blijft alles hangen.'
+              : allCards.length === 0
+                ? 'Voltooi eerst een les — geleerde woorden verschijnen hier op het perfecte herhaalmoment.'
+                : next
+                  ? `Alles zit nog vers. Kom terug rond ${next.toLocaleDateString('nl-NL', { weekday: 'long', hour: '2-digit', minute: '2-digit' })}.`
+                  : 'Alles zit nog vers.'}
+          </p>
+          {due.length > 0 && (
+            <button className="btn btn-primary" onClick={startSrs}>
+              Start herhaling
+            </button>
+          )}
+        </div>
+
+        <div className="glass" style={{ padding: 22 }}>
+          <strong style={{ fontSize: 16 }}>📝 Eigen toets</strong>
+          <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 12px' }}>
+            Kies zelf je onderwerpen, wij bouwen de toets. Haal 8 van de 10 en je slaagt: dubbele punten + bonus.
+          </p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 14 }}>
+            {allUnits.map((u) => {
+              const on = pickedUnits.includes(u.id)
+              return (
+                <button
+                  key={u.id}
+                  className="tile"
+                  style={
+                    on
+                      ? { background: 'rgba(168,85,247,0.25)', borderColor: 'var(--hot1)', boxShadow: '0 3px 0 rgba(126,34,206,0.6)' }
+                      : undefined
+                  }
+                  onClick={() => {
+                    sfx('tap')
+                    setPickedUnits((p) => (on ? p.filter((x) => x !== u.id) : [...p, u.id]))
+                  }}
+                >
+                  {u.icon} {u.title}
+                </button>
+              )
+            })}
+          </div>
+          <button
+            className="btn btn-primary"
+            disabled={pickedUnits.length === 0}
+            onClick={() => startTest(allUnits.filter((u) => pickedUnits.includes(u.id)))}
+          >
+            Genereer mijn toets
+          </button>
+          {recentTests.length > 0 && (
+            <div style={{ marginTop: 16, borderTop: '1.5px solid var(--line)', paddingTop: 10 }}>
+              <p className="eyebrow" style={{ fontSize: 10.5, marginBottom: 6 }}>
+                Laatste toetsen
+              </p>
+              {recentTests.map((t, i) => (
+                <div className="spread" key={i} style={{ padding: '5px 0' }}>
+                  <span className="dim" style={{ fontSize: 13 }}>
+                    {t.label}
+                  </span>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: t.passed ? 'var(--ok)' : 'var(--err)' }}>
+                    {t.score}/{t.total} {t.passed ? '✓' : '✗'}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  /* ---------- klaar ---------- */
+
+  if (phase.name === 'done') {
+    return (
+      <div className="shell center" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '80dvh' }}>
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <Auro size={120} mode={phase.passed ? 'cheer' : 'idle'} />
+          </div>
+          <p className="eyebrow" style={{ marginTop: 8 }}>
+            {phase.label}
+          </p>
+          <h1 className="display" style={{ fontSize: 34, margin: '10px 0' }}>
+            {phase.mode === 'srs'
+              ? phase.correct === phase.total
+                ? 'IJzersterk geheugen.'
+                : 'Weer wat steviger.'
+              : phase.passed
+                ? 'Geslaagd!'
+                : 'Net niet — probeer opnieuw.'}
+          </h1>
+          <div className="divider-gold" />
+          <p className="dim" style={{ fontSize: 16 }}>
+            {phase.correct} van {phase.total} goed · +
+            {phase.mode === 'srs' ? Math.max(2, phase.correct * 2) : phase.correct * 2 + (phase.passed ? 10 : 0)} XP
+          </p>
+          {phase.mode === 'test' && !phase.passed && (
+            <p className="faint" style={{ fontSize: 13, marginTop: 6 }}>
+              Je hebt {Math.ceil(phase.total * 0.8)} goede antwoorden nodig om te slagen.
+            </p>
+          )}
+          <div style={{ marginTop: 32 }}>
+            <button className="btn btn-primary" onClick={() => setPhase({ name: 'hub' })}>
+              Klaar
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    )
+  }
+
+  /* ---------- sessie ---------- */
+
+  const item = phase.items[idx]
+  const ex = item.ex
+
+  return (
+    <div className="shell shell--bare" style={{ paddingBottom: 170 }}>
+      <div className="lesson-top">
+        <button
+          className="btn-quiet"
+          style={{ padding: 8, fontSize: 22, lineHeight: 1 }}
+          onClick={() => setPhase({ name: 'hub' })}
+          aria-label="Stoppen"
+        >
+          ×
+        </button>
+        <span className="eyebrow" style={{ whiteSpace: 'nowrap' }}>
+          {phase.mode === 'srs' ? 'Herhaling' : 'Toets'}
+        </span>
+        <div className="progress-track">
+          <motion.div
+            className="progress-fill"
+            animate={{ width: `${Math.max(4, (idx / phase.items.length) * 100)}%` }}
+            transition={{ type: 'spring', stiffness: 160, damping: 22 }}
+          />
+        </div>
+        <span className="faint" style={{ fontSize: 13, fontWeight: 700 }}>
+          {idx + 1}/{phase.items.length}
+        </span>
+      </div>
+
+      <div className="lesson-body" key={idx}>
+        {ex.type === 'select' && <SelectEx ex={ex} ttsLang={course.ttsLang} locked={answered !== null} register={register} />}
+        {ex.type === 'type' && <TypeEx ex={ex} ttsLang={course.ttsLang} locked={answered !== null} register={register} />}
+        {ex.type === 'wordbank' && <WordBankEx ex={ex} ttsLang={course.ttsLang} locked={answered !== null} register={register} />}
+        {ex.type === 'listen' && <ListenEx ex={ex} ttsLang={course.ttsLang} locked={answered !== null} register={register} />}
+        {ex.type === 'fill' && <FillEx ex={ex} ttsLang={course.ttsLang} locked={answered !== null} register={register} />}
+      </div>
+
+      <div className="sheet">
+        <AnimatePresence mode="wait">
+          {answered === null ? (
+            <motion.div key="check" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }} transition={{ duration: 0.18 }}>
+              <div className="sheet-inner">
+                <button className="btn btn-primary" disabled={!ready} onClick={onCheck}>
+                  Controleren
+                </button>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div key="fb" initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 30, opacity: 0 }} transition={{ duration: 0.18 }}>
+              <div className={`sheet-inner ${answered.correct ? 'good' : 'bad'}`}>
+                <p className={`feedback-title ${answered.correct ? 'ok-text' : 'err-text'}`} style={{ marginBottom: 10 }}>
+                  {answered.correct ? (phase.mode === 'srs' ? 'Onthouden.' : 'Goed!') : phase.mode === 'srs' ? 'Deze komt sneller terug.' : 'Helaas.'}
+                </p>
+                {!answered.correct && answered.correctAnswer && (
+                  <p className="dim" style={{ fontSize: 15, marginBottom: 10, marginTop: -6 }}>
+                    Juiste antwoord: <strong style={{ color: 'var(--text)' }}>{answered.correctAnswer}</strong>
+                  </p>
+                )}
+                <button className="btn btn-primary" onClick={advance}>
+                  Verder
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  )
+}

@@ -1,0 +1,460 @@
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
+import confetti from 'canvas-confetti'
+import type { Course, Exercise, Lesson } from '../types'
+import { courseProgress, totalXp, useStore } from '../store'
+import { levelForXp, levelReward, levelTitle } from '../levels'
+import { countryStates, courseFlagCode, type CountryState } from '../countries'
+import type { CompletedGoal } from '../goals'
+import { Flag } from '../components/Flag'
+import { Auro } from '../components/Auro'
+import { sfx } from '../audio'
+import {
+  FillEx,
+  ListenEx,
+  MatchEx,
+  NewWordEx,
+  SelectEx,
+  TypeEx,
+  WordBankEx,
+  type EvalResult,
+  type Registration,
+} from './exercises'
+
+interface Props {
+  course: Course
+  lesson: Lesson
+  onExit: () => void
+}
+
+const PRAISE = ['Juist.', 'Precies.', 'Uitstekend.', 'Prachtig.', 'Zo hoort het.']
+const GENTLE = ['Bijna.', 'Net niet.', 'Volgende keer.', 'Blijf scherp.']
+
+export function LessonScreen({ course, lesson, onExit }: Props) {
+  const learnWord = useStore((s) => s.learnWord)
+  const completeLesson = useStore((s) => s.completeLesson)
+  const alreadyDone = useStore((s) => courseProgress(s, course.id).completed.includes(lesson.id))
+
+  const [items, setItems] = useState<Exercise[]>(() => [...lesson.exercises])
+  const [idx, setIdx] = useState(0)
+  const [phase, setPhase] = useState<'answer' | 'feedback'>('answer')
+  const [result, setResult] = useState<EvalResult | null>(null)
+  const [ready, setReady] = useState(false)
+  const [mistakes, setMistakes] = useState(0)
+  const [combo, setCombo] = useState(0)
+  const [maxCombo, setMaxCombo] = useState(0)
+  const [finished, setFinished] = useState<{
+    xp: number
+    perfect: boolean
+    newLevel: number | null
+    conquered: CountryState[]
+    goalsHit: CompletedGoal[]
+  } | null>(null)
+
+  const evalRef = useRef<(() => EvalResult) | null>(null)
+  const retried = useRef(new Set<Exercise>())
+
+  const ex = items[idx]
+
+  const register = useCallback((r: Registration) => {
+    evalRef.current = r.evaluate
+    setReady(r.ready)
+  }, [])
+
+  const applyResult = (r: EvalResult) => {
+    setResult(r)
+    setPhase('feedback')
+    if (ex.type !== 'new') {
+      if (r.correct) {
+        sfx('correct')
+        setCombo((c) => {
+          const n = c + 1
+          setMaxCombo((m) => Math.max(m, n))
+          return n
+        })
+      } else {
+        sfx('wrong')
+        setCombo(0)
+        setMistakes((m) => m + 1)
+        if (!retried.current.has(ex)) {
+          retried.current.add(ex)
+          setItems((arr) => [...arr, ex])
+        }
+      }
+    }
+  }
+
+  const onCheck = () => {
+    if (ex.type === 'new') {
+      learnWord(course.id, ex.word, ex.nl)
+      advance()
+      return
+    }
+    if (!evalRef.current) return
+    applyResult(evalRef.current())
+  }
+
+  const advance = () => {
+    setResult(null)
+    setPhase('answer')
+    setReady(false)
+    evalRef.current = null
+    if (idx + 1 >= items.length) {
+      const perfect = mistakes === 0
+      const xp = alreadyDone ? 5 : 10 + (perfect ? 5 : 0) + (maxCombo >= 6 ? 2 : 0)
+      const before = useStore.getState()
+      const xpBefore = totalXp(before)
+      const completedBefore = (before.progress[course.id]?.completed ?? []).length
+      const goalsDoneBefore = before.goalsDone.length
+      completeLesson(course.id, lesson.id, xp, perfect)
+      const after = useStore.getState()
+      const xpAfter = totalXp(after)
+      const completedAfter = (after.progress[course.id]?.completed ?? []).length
+      const levelAfter = levelForXp(xpAfter)
+      setFinished({
+        xp,
+        perfect,
+        newLevel: levelAfter > levelForXp(xpBefore) ? levelAfter : null,
+        conquered: countryStates(course, completedAfter).filter((c) => c.conquered && c.threshold > completedBefore),
+        goalsHit: after.goalsDone.slice(goalsDoneBefore),
+      })
+      sfx('complete')
+    } else {
+      setIdx(idx + 1)
+    }
+  }
+
+  if (finished) {
+    return (
+      <CompleteView
+        xp={finished.xp}
+        perfect={finished.perfect}
+        newLevel={finished.newLevel}
+        conquered={finished.conquered}
+        goalsHit={finished.goalsHit}
+        startCode={courseFlagCode[course.id]}
+        onDone={onExit}
+      />
+    )
+  }
+
+  const progress = items.length > 0 ? idx / items.length : 0
+
+  return (
+    <div className="shell shell--bare" style={{ paddingBottom: 170 }}>
+      <div className="lesson-top">
+        <button className="btn-quiet" style={{ padding: 8, fontSize: 22, lineHeight: 1 }} onClick={onExit} aria-label="Les sluiten">
+          ×
+        </button>
+        <div className="progress-track">
+          <motion.div
+            className="progress-fill"
+            animate={{ width: `${Math.max(4, progress * 100)}%` }}
+            transition={{ type: 'spring', stiffness: 160, damping: 22 }}
+          />
+        </div>
+        <AnimatePresence>
+          {combo >= 3 && (
+            <motion.span
+              initial={{ opacity: 0, scale: 0.7 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.7 }}
+              className="gold-text"
+              style={{ fontWeight: 700, fontSize: 14, whiteSpace: 'nowrap' }}
+            >
+              ×{combo}
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </div>
+
+      <div className="lesson-body" key={idx}>
+        {ex.type === 'new' && <NewWordEx ex={ex} ttsLang={course.ttsLang} locked={false} register={register} />}
+        {ex.type === 'select' && <SelectEx ex={ex} ttsLang={course.ttsLang} locked={phase === 'feedback'} register={register} />}
+        {ex.type === 'wordbank' && <WordBankEx ex={ex} ttsLang={course.ttsLang} locked={phase === 'feedback'} register={register} />}
+        {ex.type === 'listen' && <ListenEx ex={ex} ttsLang={course.ttsLang} locked={phase === 'feedback'} register={register} />}
+        {ex.type === 'type' && <TypeEx ex={ex} ttsLang={course.ttsLang} locked={phase === 'feedback'} register={register} />}
+        {ex.type === 'fill' && <FillEx ex={ex} ttsLang={course.ttsLang} locked={phase === 'feedback'} register={register} />}
+        {ex.type === 'match' && <MatchEx ex={ex} ttsLang={course.ttsLang} onAuto={applyResult} />}
+      </div>
+
+      <div className="sheet">
+        <AnimatePresence mode="wait">
+          {phase === 'answer' ? (
+            <motion.div key="check" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }} transition={{ duration: 0.18 }}>
+              <div className="sheet-inner">
+                {ex.type === 'match' ? (
+                  <p className="center dim" style={{ padding: '8px 0', fontSize: 15 }}>
+                    Match alle paren om verder te gaan
+                  </p>
+                ) : (
+                  <button className="btn btn-primary" disabled={ex.type !== 'new' && !ready} onClick={onCheck}>
+                    {ex.type === 'new' ? 'Begrepen' : 'Controleren'}
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div key="fb" initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 30, opacity: 0 }} transition={{ duration: 0.18 }}>
+              <div className={`sheet-inner ${result?.correct ? 'good' : 'bad'}`}>
+                <div className="spread" style={{ marginBottom: 12 }}>
+                  <div>
+                    <p className={`feedback-title ${result?.correct ? 'ok-text' : 'err-text'}`}>
+                      {result?.correct
+                        ? PRAISE[Math.floor(Math.random() * PRAISE.length)]
+                        : GENTLE[Math.floor(Math.random() * GENTLE.length)]}
+                    </p>
+                    {!result?.correct && result?.correctAnswer && (
+                      <p className="dim" style={{ fontSize: 15 }}>
+                        Juiste antwoord: <strong style={{ color: 'var(--text)' }}>{result.correctAnswer}</strong>
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <button className="btn btn-primary" onClick={advance}>
+                  Verder
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  )
+}
+
+/* ---------- lesresultaat: stats → landverovering → level-up ---------- */
+
+const GOLD_CONFETTI = ['#EED9A0', '#D4AF6A', '#B08D4C', '#F2ECDF']
+
+function CompleteView({
+  xp,
+  perfect,
+  newLevel,
+  conquered,
+  goalsHit,
+  startCode,
+  onDone,
+}: {
+  xp: number
+  perfect: boolean
+  newLevel: number | null
+  conquered: CountryState[]
+  goalsHit: CompletedGoal[]
+  startCode: string
+  onDone: () => void
+}) {
+  const streak = useStore((s) => s.streak)
+  const curLevel = useStore((s) => levelForXp(totalXp(s)))
+  const [shown, setShown] = useState(0)
+
+  const steps = useMemo(() => {
+    const s: ('stats' | 'conquest' | 'goal' | 'level')[] = ['stats']
+    if (conquered.length > 0) s.push('conquest')
+    if (goalsHit.length > 0) s.push('goal')
+    if (newLevel) s.push('level')
+    return s
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  const [si, setSi] = useState(0)
+  const step = steps[si]
+  const next = () => (si + 1 < steps.length ? setSi(si + 1) : onDone())
+
+  useEffect(() => {
+    if (step === 'stats' && perfect) {
+      confetti({ particleCount: 70, spread: 75, origin: { y: 0.7 }, colors: GOLD_CONFETTI, disableForReducedMotion: true })
+    }
+    if (step === 'conquest') {
+      const t = setTimeout(() => {
+        sfx('complete')
+        confetti({ particleCount: 90, spread: 90, origin: { y: 0.6 }, colors: GOLD_CONFETTI, disableForReducedMotion: true })
+      }, 1500)
+      return () => clearTimeout(t)
+    }
+    if (step === 'goal') {
+      sfx('complete')
+      confetti({ particleCount: 100, spread: 95, origin: { y: 0.6 }, colors: GOLD_CONFETTI, disableForReducedMotion: true })
+    }
+    if (step === 'level') {
+      sfx('complete')
+      confetti({ particleCount: 130, spread: 110, origin: { y: 0.6 }, colors: GOLD_CONFETTI, disableForReducedMotion: true })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step])
+
+  useEffect(() => {
+    const stepSize = Math.max(1, Math.round(xp / 24))
+    const t = setInterval(() => {
+      setShown((v) => {
+        if (v + stepSize >= xp) {
+          clearInterval(t)
+          return xp
+        }
+        return v + stepSize
+      })
+    }, 40)
+    return () => clearInterval(t)
+  }, [xp])
+
+  return (
+    <div className="shell shell--bare center" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '100dvh' }}>
+      <AnimatePresence mode="wait">
+        {step === 'stats' && (
+          <motion.div key="stats" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -18 }} transition={{ duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }}>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <Auro size={110} mode={perfect ? 'cheer' : 'idle'} level={curLevel} />
+            </div>
+            <p className="eyebrow" style={{ marginTop: 8 }}>
+              Les voltooid
+            </p>
+            <h1 className="display" style={{ fontSize: 38, margin: '10px 0 4px' }}>
+              {perfect ? 'Vlekkeloos.' : 'Goed gedaan.'}
+            </h1>
+            <div className="divider-gold" />
+            <div className="row" style={{ justifyContent: 'center', gap: 14, marginTop: 16 }}>
+              <div className="glass stat-card" style={{ minWidth: 120 }}>
+                <div className="stat-value gold-text">+{shown}</div>
+                <div className="stat-label">XP verdiend</div>
+              </div>
+              <div className="glass stat-card" style={{ minWidth: 120 }}>
+                <div className="stat-value">{streak}</div>
+                <div className="stat-label">dagen reeks</div>
+              </div>
+            </div>
+            {perfect && (
+              <p className="gold-text" style={{ marginTop: 18, fontWeight: 600 }}>
+                Foutloze les — uitzonderlijk.
+              </p>
+            )}
+            <div style={{ marginTop: 34, padding: '0 8px' }}>
+              <button className="btn btn-primary" onClick={next}>
+                Verder
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {step === 'conquest' && (
+          <motion.div key="conq" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, y: -18 }} transition={{ duration: 0.3 }}>
+            <p className="eyebrow">Nieuw gebied veroverd</p>
+            <div style={{ position: 'relative', height: 140, margin: '10px 0 0', overflow: 'hidden' }}>
+              <span style={{ position: 'absolute', left: 14, bottom: 30, opacity: 0.45, lineHeight: 0 }}>
+                <Flag code={startCode} size={24} />
+              </span>
+              <motion.span
+                style={{ position: 'absolute', right: 14, bottom: 28, display: 'inline-block', lineHeight: 0 }}
+                initial={{ scale: 0.7, opacity: 0.4 }}
+                animate={{ scale: [0.7, 1.35, 1], opacity: 1 }}
+                transition={{ delay: 1.45, duration: 0.5 }}
+              >
+                <Flag code={conquered[0].code} size={34} />
+              </motion.span>
+              <div style={{ position: 'absolute', left: 20, right: 20, bottom: 22, borderBottom: '2px dashed rgba(212,175,106,0.35)' }} />
+              <motion.div
+                style={{ position: 'absolute', bottom: 18, left: '50%' }}
+                initial={{ x: -190 }}
+                animate={{ x: 120 }}
+                transition={{ duration: 1.6, ease: 'easeInOut' }}
+              >
+                <Auro size={100} mode="run" level={curLevel} />
+              </motion.div>
+            </div>
+            <motion.h1
+              className="display gold-text"
+              style={{ fontSize: 32, margin: '8px 0 4px' }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.6 }}
+            >
+              {conquered[0].name} veroverd!
+            </motion.h1>
+            {conquered.length > 1 && (
+              <p className="dim">+ nog {conquered.length - 1} {conquered.length - 1 === 1 ? 'gebied' : 'gebieden'}</p>
+            )}
+            <motion.p className="dim" style={{ fontSize: 15, marginTop: 6 }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.8 }}>
+              Leo rent alvast vooruit naar het volgende land.
+            </motion.p>
+            <div style={{ marginTop: 30, padding: '0 8px' }}>
+              <button className="btn btn-primary" onClick={next}>
+                Verder
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {step === 'goal' && goalsHit.length > 0 && (
+          <motion.div key="goal" initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, y: -18 }} transition={{ duration: 0.35 }}>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <Auro size={120} mode="cheer" level={curLevel} />
+            </div>
+            <p className="eyebrow" style={{ marginTop: 10 }}>
+              Doel gehaald
+            </p>
+            <h1 className="display gold-text" style={{ fontSize: 30, margin: '10px 0 6px' }}>
+              {goalsHit[0].label}
+            </h1>
+            {goalsHit[0].earlyDays > 0 && (
+              <motion.p
+                className="display"
+                style={{ fontSize: 19, color: 'var(--ok)' }}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+              >
+                {goalsHit[0].earlyDays} {goalsHit[0].earlyDays === 1 ? 'dag' : 'dagen'} vóór je deadline.
+              </motion.p>
+            )}
+            <p className="gold-text" style={{ fontWeight: 700, fontSize: 17, marginTop: 8 }}>
+              +{goalsHit[0].rewardXp} XP beloning
+            </p>
+            {goalsHit.length > 1 && (
+              <p className="dim" style={{ fontSize: 14, marginTop: 4 }}>
+                + nog {goalsHit.length - 1} {goalsHit.length - 1 === 1 ? 'doel' : 'doelen'} gehaald
+              </p>
+            )}
+            <div className="divider-gold" />
+            <div style={{ marginTop: 26, padding: '0 8px' }}>
+              <button className="btn btn-primary" onClick={next}>
+                Verder
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {step === 'level' && newLevel && (
+          <motion.div key="lvl" initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35 }}>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <Auro size={150} mode="cheer" level={newLevel} />
+            </div>
+            <p className="eyebrow" style={{ marginTop: 10 }}>
+              Niveau omhoog
+            </p>
+            <h1 className="display gold-text" style={{ fontSize: 46, margin: '8px 0 2px' }}>
+              Niveau {newLevel}
+            </h1>
+            <p className="display dim" style={{ fontSize: 21 }}>
+              {levelTitle(newLevel)}
+            </p>
+            {levelReward(newLevel) && (
+              <motion.p
+                className="gold-text"
+                style={{ fontWeight: 700, marginTop: 10 }}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.5, type: 'spring', stiffness: 220, damping: 16 }}
+              >
+                ✦ Nieuw voor Leo: {levelReward(newLevel)}
+              </motion.p>
+            )}
+            <div className="divider-gold" />
+            <div style={{ marginTop: 26, padding: '0 8px' }}>
+              <button className="btn btn-primary" onClick={next}>
+                Prachtig
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
