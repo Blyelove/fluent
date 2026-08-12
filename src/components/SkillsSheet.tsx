@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { courseList } from '../content'
 import { useStore } from '../store'
 import { MAX_SKILL_LEVEL, skillStand, volgendeMijlpaal } from '../skills'
-import { courseFlagCode } from '../countries'
+import { countryStates, courseFlagCode } from '../countries'
 import { Flag } from './Flag'
 import { sfx } from '../audio'
 
@@ -20,15 +20,19 @@ export function SkillsSheet({ onClose }: { onClose: () => void }) {
   const rijen = courseList.map((c) => {
     const xp = progress[c.id]?.xp ?? 0
     const stand = skillStand(xp)
+    const lessen = progress[c.id]?.completed.length ?? 0
     return {
       id: c.id,
       naam: c.name,
       xp,
       stand,
-      lessen: progress[c.id]?.completed.length ?? 0,
+      lessen,
       woorden: Object.values(srs).filter((e) => e.courseId === c.id).length,
       gesprekken: gesprekken[c.id]?.length ?? 0,
       stempels: Object.keys(stamps[c.id] ?? {}).length,
+      // alle soorten van deze taal: elk land op de route is een variant die
+      // je kan veroveren, van Spanje-Spaans tot Mexicaans-Spaans
+      landen: countryStates(c, lessen),
     }
   })
   // actiefste taal bovenaan, maar alles blijft zichtbaar: ook een level 1
@@ -111,10 +115,36 @@ export function SkillsSheet({ onClose }: { onClose: () => void }) {
                     </span>
                   </div>
                   {r.xp > 0 && (
-                    <p className="faint num" style={{ fontSize: 11, marginTop: 4 }}>
-                      {r.lessen} {r.lessen === 1 ? 'les' : 'lessen'} · {r.woorden} {r.woorden === 1 ? 'woord' : 'woorden'} · {r.gesprekken}{' '}
-                      {r.gesprekken === 1 ? 'gesprek' : 'gesprekken'} · {r.stempels} {r.stempels === 1 ? 'stempel' : 'stempels'}
-                    </p>
+                    <>
+                      <p className="faint num" style={{ fontSize: 11, marginTop: 4 }}>
+                        {r.lessen} {r.lessen === 1 ? 'les' : 'lessen'} · {r.woorden} {r.woorden === 1 ? 'woord' : 'woorden'} · {r.gesprekken}{' '}
+                        {r.gesprekken === 1 ? 'gesprek' : 'gesprekken'} · {r.stempels} {r.stempels === 1 ? 'stempel' : 'stempels'}
+                      </p>
+                      {/* alle soorten van deze taal: veroverde varianten in kleur */}
+                      <div className="spread" style={{ marginTop: 8 }}>
+                        <span className="faint" style={{ fontSize: 11 }}>
+                          Soorten {r.naam}
+                        </span>
+                        <span className="faint num" style={{ fontSize: 11 }}>
+                          {r.landen.filter((l) => l.conquered).length}/{r.landen.length}
+                        </span>
+                      </div>
+                      <div className="row" style={{ flexWrap: 'wrap', gap: 5, marginTop: 5 }}>
+                        {r.landen.map((l) => (
+                          <span
+                            key={l.name + l.threshold}
+                            title={l.conquered ? `${l.name}: veroverd` : `${l.name}: na ${l.threshold} lessen`}
+                            style={{
+                              lineHeight: 0,
+                              opacity: l.conquered ? 1 : 0.25,
+                              filter: l.conquered ? 'drop-shadow(0 0 5px rgba(255,197,61,0.55))' : 'grayscale(0.8)',
+                            }}
+                          >
+                            <Flag code={l.code} size={16} />
+                          </span>
+                        ))}
+                      </div>
+                    </>
                   )}
                 </div>
               )
