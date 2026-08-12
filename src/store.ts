@@ -144,6 +144,10 @@ interface AureaState {
   botsVerslagen: string[]
   markBotVerslagen: (naam: string) => void
 
+  /** Paspoortstempels: per cursus per landcode de dag waarop je de Grensproef doorstond */
+  stamps: Partial<Record<CourseId, Record<string, string>>>
+  zetStempel: (c: CourseId, code: string) => void
+
   completeOnboarding: (c: CourseId, goalXp: number) => void
   /** Je dagdoel aanpassen — kan altijd, niet alleen tijdens de onboarding */
   setDailyGoal: (xp: number) => void
@@ -233,6 +237,7 @@ export type Profiel = Pick<
   | 'weekUitslag'
   | 'worldSeen'
   | 'botsVerslagen'
+  | 'stamps'
 >
 
 /** Een kersvers profiel: waar elk nieuw account mee begint */
@@ -287,6 +292,7 @@ function nieuwProfiel(): Profiel {
     weekUitslag: null,
     worldSeen: {},
     botsVerslagen: [],
+    stamps: {},
   }
 }
 
@@ -752,6 +758,14 @@ export const useStore = create<AureaState>()(
       clearWeekUitslag: () => set({ weekUitslag: null }),
 
       markWorldSeen: (c, count) => set({ worldSeen: { ...get().worldSeen, [c]: count } }),
+
+      // een stempel is voorgoed van jou; opnieuw doen overschrijft de datum niet
+      zetStempel: (c, code) => {
+        const s = get()
+        const perCursus = s.stamps[c] ?? {}
+        if (perCursus[code]) return
+        set({ stamps: { ...s.stamps, [c]: { ...perCursus, [code]: todayStr() } } })
+      },
 
       // eenmaal verslagen blijft verslagen: vrijspelen mag, afpakken nooit
       markBotVerslagen: (naam) => {

@@ -8,6 +8,7 @@ import { Avatar } from '../components/Avatar'
 import { levelForXp } from '../levels'
 import { totalXp, useStore } from '../store'
 import { sfx } from '../audio'
+import { GrensproefScreen } from './Grensproef'
 
 /**
  * De Wereldreis — fase 1: de kaart.
@@ -33,6 +34,9 @@ const VOET = 150
 
 /** Deterministische zigzag: geen willekeur, dus een stabiele kaart */
 const XS = [96, 272, 132, 252]
+
+/** stabiele lege verzameling, anders ratelt de selector bij elke render */
+const GEEN_STEMPELS: Record<string, string> = {}
 
 interface Knoop extends CountryState {
   x: number
@@ -70,6 +74,9 @@ export function WorldMapScreen({
   onVerderLeren?: () => void
 }) {
   const [gekozen, setGekozen] = useState<Knoop | null>(null)
+  /** land waarvan de Grensproef nu gespeeld wordt */
+  const [proef, setProef] = useState<Knoop | null>(null)
+  const stempels = useStore((s) => s.stamps[course.id] ?? GEEN_STEMPELS)
   const scroller = useRef<HTMLDivElement | null>(null)
   const actiefPad = useRef<SVGPathElement | null>(null)
   const renPad = useRef<SVGPathElement | null>(null)
@@ -295,6 +302,9 @@ export function WorldMapScreen({
     el.scrollTop = Math.max(0, doel.y - el.clientHeight * 0.55)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // de Grensproef neemt het hele scherm over zolang hij loopt
+  if (proef) return <GrensproefScreen course={course} land={proef} onKlaar={() => setProef(null)} />
 
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 60, background: 'var(--bg)', display: 'flex', flexDirection: 'column' }}>
@@ -652,10 +662,25 @@ export function WorldMapScreen({
               </div>
 
               {gekozen.conquered ? (
-                <p className="dim" style={{ fontSize: 14, marginBottom: 16 }}>
-                  Dit land is van jou — veroverd na {gekozen.threshold} lessen. Jouw personage reisde hier doorheen op weg naar de
-                  volgende bestemming.
-                </p>
+                <>
+                  <p className="dim" style={{ fontSize: 14, marginBottom: 14 }}>
+                    {stempels[gekozen.code]
+                      ? `Grensproef doorstaan op ${stempels[gekozen.code]}. Dit land kent jou.`
+                      : `Veroverd na ${gekozen.threshold} lessen. De Poortwachter wacht nog op je.`}
+                  </p>
+                  {/* de eindbaas: pure glorie, je kunt hier niets verliezen */}
+                  <button
+                    className="btn btn-primary"
+                    style={{ padding: 15, fontSize: 15.5, marginBottom: 10 }}
+                    onClick={() => {
+                      sfx('tap')
+                      setProef(gekozen)
+                      setGekozen(null)
+                    }}
+                  >
+                    {stempels[gekozen.code] ? '⚔️ Nog eens tegen de Poortwachter' : '⚔️ Start de Grensproef'}
+                  </button>
+                </>
               ) : gekozen.isVolgende ? (
                 <>
                   <p className="dim" style={{ fontSize: 14, marginBottom: 10 }}>
