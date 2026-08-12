@@ -107,6 +107,8 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
     xp: number
     /** was dubbele XP actief? dan verdient dat een eigen vermelding */
     dubbel: boolean
+    /** is je reeks door deze les gegroeid? dan komt er een vlam-stap bij */
+    reeksGegroeid: boolean
     perfect: boolean
     newLevel: number | null
     conquered: CountryState[]
@@ -198,6 +200,8 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
         // en kreeg er 20.
         xp: Math.max(0, xpAfter - xpBefore),
         dubbel: before.boostUntil > Date.now(),
+        // groeide je reeks door déze les? alleen dan is er iets te vieren
+        reeksGegroeid: after.streak > before.streak,
         perfect,
         newLevel: levelAfter > levelForXp(xpBefore) ? levelAfter : null,
         conquered: countryStates(course, completedAfter).filter((c) => c.conquered && c.threshold > completedBefore),
@@ -214,6 +218,7 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
       <CompleteView
         xp={finished.xp}
         dubbel={finished.dubbel}
+        reeksGegroeid={finished.reeksGegroeid}
         perfect={finished.perfect}
         newLevel={finished.newLevel}
         conquered={finished.conquered}
@@ -452,6 +457,7 @@ const GOLD_CONFETTI = ['#EED9A0', '#D4AF6A', '#B08D4C', '#F2ECDF']
 function CompleteView({
   xp,
   dubbel,
+  reeksGegroeid,
   perfect,
   newLevel,
   conquered,
@@ -464,6 +470,7 @@ function CompleteView({
 }: {
   xp: number
   dubbel: boolean
+  reeksGegroeid: boolean
   perfect: boolean
   newLevel: number | null
   conquered: CountryState[]
@@ -487,7 +494,10 @@ function CompleteView({
   const figuurRef = useRef<HTMLDivElement | null>(null)
 
   const steps = useMemo(() => {
-    const s: ('stats' | 'conquest' | 'goal' | 'level')[] = ['stats']
+    const s: ('stats' | 'reeks' | 'conquest' | 'goal' | 'level')[] = ['stats']
+    // je reeks groeide alleen bij de eerste les van de dag: dat verdient een
+    // eigen moment, want daar komen mensen voor terug
+    if (reeksGegroeid) s.push('reeks')
     if (conquered.length > 0) s.push('conquest')
     if (goalsHit.length > 0) s.push('goal')
     if (newLevel) s.push('level')
@@ -537,6 +547,18 @@ function CompleteView({
   useEffect(() => {
     if (step === 'stats' && perfect) {
       confetti({ particleCount: 70, spread: 75, origin: { y: 0.7 }, colors: GOLD_CONFETTI, disableForReducedMotion: true })
+    }
+    if (step === 'reeks') {
+      sfx('complete')
+      // mijlpalen krijgen een groter feest dan een gewone dag erbij
+      const mijlpaal = streak === 7 || streak === 30 || streak === 100 || streak === 365
+      confetti({
+        particleCount: mijlpaal ? 150 : 60,
+        spread: mijlpaal ? 110 : 70,
+        origin: { y: 0.55 },
+        colors: ['#FF8A3D', '#FFC53D', '#EC4899', '#FFFFFF'],
+        disableForReducedMotion: true,
+      })
     }
     if (step === 'conquest') {
       const t = setTimeout(() => {
@@ -626,6 +648,36 @@ function CompleteView({
               </p>
             </div>
 
+            {chainFooter()}
+          </motion.div>
+        )}
+
+        {step === 'reeks' && (
+          <motion.div key="reeks" initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, y: -18 }} transition={{ duration: 0.32 }}>
+            <p className="eyebrow">Je reeks groeit</p>
+            <motion.div
+              style={{ fontSize: 92, lineHeight: 1, marginTop: 6 }}
+              initial={{ scale: 0.4, rotate: -12 }}
+              animate={{ scale: [0.4, 1.18, 1], rotate: [-12, 6, 0] }}
+              transition={{ duration: 0.7, times: [0, 0.6, 1], ease: 'easeOut' }}
+            >
+              🔥
+            </motion.div>
+            <h1 className="display gold-text" style={{ fontSize: 44, margin: '6px 0 2px' }}>
+              Dag {streak} op rij
+            </h1>
+            <p className="dim" style={{ fontSize: 15.5 }}>
+              {streak === 7
+                ? 'Een hele week. Dit is precies waar het omslaat.'
+                : streak === 30
+                  ? 'Dertig dagen. Je bent geen beginner meer.'
+                  : streak === 100
+                    ? 'Honderd dagen op rij. Dat doet bijna niemand je na.'
+                    : streak < 7
+                      ? `Nog ${7 - streak} ${7 - streak === 1 ? 'dag' : 'dagen'} tot je eerste week.`
+                      : 'Elke dag telt. Morgen weer.'}
+            </p>
+            <div className="divider-gold" />
             {chainFooter()}
           </motion.div>
         )}

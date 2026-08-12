@@ -98,7 +98,7 @@ Fluent heeft een kern die al als topspel voelt — chunky leslus met combo's en 
 
 **Bewijs:** Open het vlam-scherm bij streak 0 en 5: beide tonen een knop die direct de volgende les start.
 
-### 23. Reeks-verlenging vieren in de resultaatketen: de streak groeit stilletjes (Lesson.tsx CompleteView toont alleen een stil kaartje, r531-534). Extra stap 'reeks' in de steps-array wanneer streak ná de les hoger is dan ervoor (before/after-patroon bestaat al voor XP): vlam-animatie, '🔥 Dag 12 op rij!', en mijlpalen 7/30/100 expliciet.
+### 23. ✅ AF (ronde 39) — Reeks-verlenging vieren in de resultaatketen: de streak groeit stilletjes (Lesson.tsx CompleteView toont alleen een stil kaartje, r531-534). Extra stap 'reeks' in de steps-array wanneer streak ná de les hoger is dan ervoor (before/after-patroon bestaat al voor XP): vlam-animatie, '🔥 Dag 12 op rij!', en mijlpalen 7/30/100 expliciet.
 
 **Bewijs:** Eerste les van de dag: de keten toont een aparte vlam-stap; tweede les van dezelfde dag toont hem niet.
 
