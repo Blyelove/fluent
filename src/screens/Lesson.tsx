@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import confetti from 'canvas-confetti'
-import type { Course, Exercise, Lesson } from '../types'
+import type { Course, Exercise, Lesson, UnitGuide } from '../types'
+import { loadGuides, pickRule } from '../content/guides'
 import { courseProgress, totalXp, useStore } from '../store'
 import { levelForXp, levelReward, levelTitle } from '../levels'
 import { countryStates, courseFlagCode, type CountryState } from '../countries'
@@ -9,7 +10,7 @@ import type { CompletedGoal } from '../goals'
 import type { CourseId } from '../types'
 import { Flag } from '../components/Flag'
 import { Avatar } from '../components/Avatar'
-import { sfx } from '../audio'
+import { sfx, speak } from '../audio'
 import {
   FillEx,
   ListenEx,
@@ -32,10 +33,49 @@ interface Props {
 
 const GEEN_LESSEN: string[] = []
 
+/** De zichtbare vraagtekst van een oefening — helpt bij het kiezen van de juiste regel */
+function vraagTekst(ex: Exercise): string {
+  switch (ex.type) {
+    case 'select':
+      return ex.prompt
+    case 'fill':
+      return `${ex.before} ${ex.after} ${ex.nl ?? ''}`
+    case 'wordbank':
+      return ex.target
+    case 'type':
+      return ex.target
+    case 'listen':
+      return ex.target
+    default:
+      return ''
+  }
+}
+
 const PRAISE = ['Juist.', 'Precies.', 'Uitstekend.', 'Prachtig.', 'Zo hoort het.']
 const GENTLE = ['Bijna.', 'Net niet.', 'Volgende keer.', 'Blijf scherp.']
 
 export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
+  /** De unit waar deze les in zit — nodig om de juiste grammatica-gids te laden */
+  const unit = useMemo(() => {
+    for (const sec of course.sections)
+      for (const u of sec.units) if (u.lessons.some((l) => l.id === lesson.id)) return u
+    return null
+  }, [course, lesson.id])
+
+  const [guide, setGuide] = useState<UnitGuide | null>(null)
+  useEffect(() => {
+    let levend = true
+    void loadGuides(course.id).then((g) => {
+      if (levend && unit) setGuide(g[unit.id] ?? null)
+    })
+    return () => {
+      levend = false
+    }
+  }, [course.id, unit])
+
+  /** Uitleg opengeklapt bij het huidige foute antwoord */
+  const [uitlegOpen, setUitlegOpen] = useState(false)
+
   const learnWord = useStore((s) => s.learnWord)
   const completeLesson = useStore((s) => s.completeLesson)
   const alreadyDone = useStore((s) => courseProgress(s, course.id).completed.includes(lesson.id))
@@ -108,9 +148,16 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
     applyResult(evalRef.current())
   }
 
+  /** De regel uit de gids die het best past bij deze fout */
+  const regel = useMemo(
+    () => (result && !result.correct ? pickRule(guide ?? undefined, result.correctAnswer ?? '', vraagTekst(ex)) : null),
+    [result, guide, ex]
+  )
+
   const advance = () => {
     setResult(null)
     setPhase('answer')
+    setUitlegOpen(false)
     setReady(false)
     evalRef.current = null
     if (idx + 1 >= items.length) {
@@ -231,6 +278,83 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
                     )}
                   </div>
                 </div>
+
+                {/* Waarom was dit fout? De regel uit de gids, precies op het moment dat je hem nodig hebt */}
+                {!result?.correct && regel && (
+                  <div style={{ marginBottom: 12 }}>
+                    <AnimatePresence initial={false}>
+                      {uitlegOpen ? (
+                        <motion.div
+                          key="uitleg"
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.22 }}
+                          style={{ overflow: 'hidden' }}
+                        >
+                          <div
+                            className="glass"
+                            style={{ padding: '13px 15px', background: 'rgba(255,255,255,0.05)', textAlign: 'left' }}
+                          >
+                            <strong className="hot-text" style={{ fontSize: 14, display: 'block', marginBottom: 4 }}>
+                              💡 {regel.title}
+                            </strong>
+                            <p style={{ fontSize: 13.5, lineHeight: 1.55, color: 'var(--text-dim)' }}>{regel.explanation}</p>
+                            {regel.examples.slice(0, 2).map((v, i) => (
+                              <button
+                                key={i}
+                                className="row"
+                                style={{ gap: 9, width: '100%', textAlign: 'left', padding: '7px 0', minHeight: 44 }}
+                                onClick={() => {
+                                  sfx('tap')
+                                  speak(v.target, course.ttsLang)
+                                }}
+                              >
+                                <span
+                                  style={{
+                                    width: 26,
+                                    height: 26,
+                                    borderRadius: 8,
+                                    flexShrink: 0,
+                                    background: 'rgba(168,85,247,0.25)',
+                                    border: '1px solid rgba(168,85,247,0.5)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: 11,
+                                  }}
+                                >
+                                  ▶
+                                </span>
+                                <span className="col" style={{ gap: 0, flex: 1, minWidth: 0 }}>
+                                  <strong style={{ fontSize: 13.5 }}>{v.target}</strong>
+                                  <span className="faint" style={{ fontSize: 12 }}>
+                                    {v.nl}
+                                  </span>
+                                </span>
+                              </button>
+                            ))}
+                          </div>
+                        </motion.div>
+                      ) : (
+                        <motion.button
+                          key="waarom"
+                          className="btn btn-ghost"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          style={{ padding: 12, fontSize: 14.5 }}
+                          onClick={() => {
+                            sfx('tap')
+                            setUitlegOpen(true)
+                          }}
+                        >
+                          💡 Waarom?
+                        </motion.button>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                )}
+
                 <button className="btn btn-primary" onClick={advance}>
                   Verder
                 </button>
