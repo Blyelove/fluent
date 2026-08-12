@@ -133,6 +133,11 @@ interface AureaState {
   weekUitslag: WeekUitslag | null
   clearWeekUitslag: () => void
 
+  /* ---- de wereldreis ---- */
+  /** Per cursus: hoeveel veroveringen je op de kaart al gevierd hebt gezien */
+  worldSeen: Partial<Record<CourseId, number>>
+  markWorldSeen: (c: CourseId, count: number) => void
+
   completeOnboarding: (c: CourseId, goalXp: number) => void
   setCourse: (c: CourseId) => void
   completeLesson: (c: CourseId, lessonId: string, xp: number, perfect: boolean) => void
@@ -356,6 +361,7 @@ export const useStore = create<AureaState>()(
       weekDuels: 0,
       weekChestWeek: -1,
       weekUitslag: null,
+      worldSeen: {},
 
       completeOnboarding: (c, goalXp) => set({ onboarded: true, courseId: c, dailyGoalXp: goalXp }),
 
@@ -646,6 +652,8 @@ export const useStore = create<AureaState>()(
       setAvatarLook: (look) => set({ avatarLook: look }),
 
       clearWeekUitslag: () => set({ weekUitslag: null }),
+
+      markWorldSeen: (c, count) => set({ worldSeen: { ...get().worldSeen, [c]: count } }),
 
       resetAll: () =>
         set({

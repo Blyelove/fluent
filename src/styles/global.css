@@ -58,6 +58,13 @@ html, body { height: 100%; }
 .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 
+/* Galerijcellen renderen alleen wanneer ze (bijna) in beeld zijn — zo blijft
+   een raster met honderden personages soepel scrollen op een telefoon */
+.galerij-cel {
+  content-visibility: auto;
+  contain-intrinsic-size: 62px 88px;
+}
+
 body {
   background: var(--bg);
   background-image:

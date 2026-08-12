@@ -1,5 +1,6 @@
-import { useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { AnimatePresence, motion } from 'motion/react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { AnimatePresence, animate, motion, useMotionValue, useReducedMotion } from 'motion/react'
+import confetti from 'canvas-confetti'
 import type { Course } from '../types'
 import { countryStates, type CountryState } from '../countries'
 import { Flag } from '../components/Flag'
@@ -71,13 +72,39 @@ export function WorldMapScreen({
   const [gekozen, setGekozen] = useState<Knoop | null>(null)
   const scroller = useRef<HTMLDivElement | null>(null)
   const actiefPad = useRef<SVGPathElement | null>(null)
+  const renPad = useRef<SVGPathElement | null>(null)
   const look = useStore((s) => s.avatarLook)
   const level = useStore((s) => levelForXp(totalXp(s)))
+  const worldSeen = useStore((s) => s.worldSeen)
+  const markWorldSeen = useStore((s) => s.markWorldSeen)
+  const kalm = Boolean(useReducedMotion())
 
   const landen = useMemo(() => countryStates(course, completedCount), [course, completedCount])
   const hoogte = KOP + VOET + Math.max(1, landen.length - 1) * STAP + 80
   const knopen = useMemo(() => bouwKnopen(landen, hoogte), [landen, hoogte])
   const veroverd = landen.filter((c) => c.conquered).length
+
+  /**
+   * De veroveringsviering: is er sinds je laatste bezoek een land bij gekomen,
+   * dan rent je held bij het openen over de etappe naar het nieuwe land.
+   * Eerste bezoek (nog niets bijgehouden)? Dan stil beginnen — we vieren geen
+   * geschiedenis, alleen het moment zelf.
+   */
+  const gezien = worldSeen[course.id]
+  const viering = useMemo(() => {
+    if (gezien === undefined || veroverd <= gezien || kalm) return null
+    const nieuw = knopen.filter((k) => k.conquered).slice(-1)[0]
+    if (!nieuw) return null
+    const idx = knopen.indexOf(nieuw)
+    const van = idx > 0 ? knopen[idx - 1] : { x: knopen[0]?.x ?? BREEDTE / 2, y: hoogte - 52 }
+    return { d: bocht(van, nieuw), doel: nieuw }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  /** het nieuwe land blijft grijs tot de held aankomt */
+  const [onthuld, setOnthuld] = useState(viering === null)
+  const [rennen, setRennen] = useState(viering !== null)
+  const [banner, setBanner] = useState<string | null>(null)
+  const knoopRefs = useRef<Record<string, HTMLButtonElement | null>>({})
 
   /**
    * De actieve etappe: van je laatst veroverde land (of het vertrekpunt) naar
@@ -100,19 +127,113 @@ export function WorldMapScreen({
     return { d: bocht(van, doel), frac, rustpunt: null, naarLinks: doel.x < van.x }
   }, [knopen, hoogte, completedCount])
 
-  // positie van de held op het actieve pad — gemeten aan het échte SVG-pad
-  const [held, setHeld] = useState<{ x: number; y: number } | null>(null)
-  useLayoutEffect(() => {
-    if (!actief) return
-    if (actief.rustpunt) {
-      setHeld(actief.rustpunt)
-      return
-    }
+  /**
+   * De positie van de held loopt via motion-waarden BUITEN React om: tijdens
+   * de veroveringsrun verandert hij 60 keer per seconde, en een re-render van
+   * de hele kaart per frame zou zichtbaar haperen. mx is in ontwerp-pixels
+   * (0-375) en wordt in de stijl geschaald naar containerbreedte.
+   */
+  const mx = useMotionValue(0)
+  const my = useMotionValue(0)
+  const kaartVak = useRef<HTMLDivElement | null>(null)
+  const [heldKlaar, setHeldKlaar] = useState(false)
+  const naarPx = (vx: number) => ((kaartVak.current?.clientWidth ?? BREEDTE) * vx) / BREEDTE
+
+  const zetHeld = (p: { x: number; y: number }) => {
+    mx.set(naarPx(p.x))
+    my.set(p.y)
+    setHeldKlaar(true)
+  }
+
+  /** rustpositie: zo ver op de actieve etappe als je lessen reiken */
+  const rustpunt = (): { x: number; y: number } | null => {
+    if (!actief) return null
+    if (actief.rustpunt) return actief.rustpunt
     const pad = actiefPad.current
-    if (!pad) return
+    if (!pad) return null
     const punt = pad.getPointAtLength(actief.frac * pad.getTotalLength())
-    setHeld({ x: punt.x, y: punt.y })
-  }, [actief])
+    return { x: punt.x, y: punt.y }
+  }
+
+  useLayoutEffect(() => {
+    if (viering) return // de viering zet de held zelf neer
+    const p = rustpunt()
+    if (p) zetHeld(p)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [actief, viering])
+
+  // de veroveringsrun: held rent vloeiend over de etappe, vlag klapt open, confetti
+  useEffect(() => {
+    if (!viering) return
+    const pad = renPad.current
+    if (!pad) return
+    const lengte = pad.getTotalLength()
+    zetHeld(pad.getPointAtLength(0))
+    let vervolg: ReturnType<typeof animate> | null = null
+    const timer = window.setTimeout(() => {
+      const ctrl = animate(0, 1, {
+        duration: 2.4,
+        ease: 'easeInOut',
+        onUpdate: (v) => {
+          const punt = pad.getPointAtLength(v * lengte)
+          mx.set(naarPx(punt.x))
+          my.set(punt.y)
+        },
+        onComplete: () => {
+          setRennen(false)
+          setOnthuld(true)
+          sfx('complete')
+          setBanner(`${viering.doel.name} veroverd!`)
+          markWorldSeen(course.id, veroverd)
+          // confetti precies vanaf de knoop, in schermfracties
+          const el = knoopRefs.current[viering.doel.code + viering.doel.threshold]
+          const r = el?.getBoundingClientRect()
+          confetti({
+            particleCount: 130,
+            spread: 85,
+            startVelocity: 32,
+            origin: r
+              ? { x: (r.left + r.width / 2) / window.innerWidth, y: (r.top + 32) / window.innerHeight }
+              : { y: 0.4 },
+            colors: ['#A855F7', '#EC4899', '#FFC53D', '#22D3EE'],
+            disableForReducedMotion: true,
+          })
+          // daarna wandelt de held rustig door naar zijn plek op de volgende etappe
+          window.setTimeout(() => {
+            setBanner(null)
+            const doorPad = actiefPad.current
+            if (doorPad && actief && !actief.rustpunt && actief.frac > 0) {
+              const doorLengte = doorPad.getTotalLength()
+              vervolg = animate(0, actief.frac, {
+                duration: 0.9,
+                ease: 'easeInOut',
+                onUpdate: (v) => {
+                  const punt = doorPad.getPointAtLength(v * doorLengte)
+                  mx.set(naarPx(punt.x))
+                  my.set(punt.y)
+                },
+              })
+            } else {
+              const p = rustpunt()
+              if (p) zetHeld(p)
+            }
+          }, 2600)
+        },
+      })
+      return () => ctrl.stop()
+    }, 700)
+    return () => {
+      window.clearTimeout(timer)
+      vervolg?.stop()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // wie geen viering krijgt maar de kaart voor het eerst opent: stand vastleggen
+  useEffect(() => {
+    if (gezien === undefined || (gezien < veroverd && kalm)) markWorldSeen(course.id, veroverd)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // de hele route als één gememoïseerde SVG — knopen komen er als HTML overheen
   const kaart = useMemo(() => {
@@ -165,11 +286,11 @@ export function WorldMapScreen({
     )
   }, [knopen, hoogte])
 
-  // bij openen: het volgende land rond 55% van het scherm zetten
+  // bij openen: het volgende land (of het gevierde land) rond 55% van het scherm
   useLayoutEffect(() => {
     const el = scroller.current
     if (!el) return
-    const doel = knopen.find((k) => k.isVolgende) ?? knopen[knopen.length - 1]
+    const doel = viering?.doel ?? knopen.find((k) => k.isVolgende) ?? knopen[knopen.length - 1]
     if (!doel) return
     el.scrollTop = Math.max(0, doel.y - el.clientHeight * 0.55)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -244,40 +365,50 @@ export function WorldMapScreen({
                 strokeDasharray="1 1"
                 initial={{ strokeDashoffset: 1 }}
                 animate={{ strokeDashoffset: 1 - actief.frac }}
-                transition={{ duration: 0.9, ease: 'easeInOut', delay: 0.25 }}
+                transition={{ duration: 0.9, ease: 'easeInOut', delay: viering ? 3.4 : 0.25 }}
               />
+              {/* onzichtbaar meetpad voor de veroveringsrun */}
+              {viering && <path ref={renPad} d={viering.d} fill="none" stroke="none" />}
             </svg>
           )}
 
-          {/* jouw held, precies zo ver als je lessen reiken */}
-          {held && (
-            <div
+          {/* jouw held — positie via motion-waarden, buiten React om (vloeiend op 60fps) */}
+          {heldKlaar && (
+            <motion.div
               style={{
                 position: 'absolute',
-                left: `${(held.x / BREEDTE) * 100}%`,
-                top: held.y,
-                transform: 'translate(-50%, -88%)',
+                left: 0,
+                top: 0,
+                x: mx,
+                y: my,
                 pointerEvents: 'none',
                 zIndex: 2,
-                filter: 'drop-shadow(0 6px 10px rgba(0,0,0,0.5))',
               }}
             >
-              <motion.div
-                initial={{ opacity: 0, scale: 0.6, y: -14 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                transition={{ type: 'spring', stiffness: 240, damping: 18, delay: 0.35 }}
-                style={actief?.naarLinks ? { transform: 'scaleX(-1)' } : undefined}
-              >
-                <Avatar size={84} mode="idle" level={level} courseId={course.id} look={look} />
-              </motion.div>
-            </div>
+              <div style={{ transform: 'translate(-50%, -88%)', filter: 'drop-shadow(0 6px 10px rgba(0,0,0,0.5))' }}>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.6 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ type: 'spring', stiffness: 240, damping: 18, delay: 0.35 }}
+                  style={actief?.naarLinks && !rennen ? { transform: 'scaleX(-1)' } : undefined}
+                >
+                  <Avatar size={84} mode={rennen ? 'run' : 'idle'} level={level} courseId={course.id} look={look} />
+                </motion.div>
+              </div>
+            </motion.div>
           )}
 
           {knopen.map((k) => {
             const resterend = Math.max(0, k.threshold - completedCount)
+            // het net veroverde land blijft grijs tot de held aankomt
+            const verborgen = !!viering && !onthuld && viering.doel === k
+            const alsVeroverd = k.conquered && !verborgen
             return (
               <button
                 key={k.code + k.threshold}
+                ref={(el) => {
+                  knoopRefs.current[k.code + k.threshold] = el
+                }}
                 aria-label={k.name}
                 onClick={() => {
                   sfx('tap')
@@ -310,7 +441,11 @@ export function WorldMapScreen({
                       transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
                     />
                   )}
-                  <div
+                  <motion.div
+                    key={alsVeroverd ? 'open' : 'dicht'}
+                    initial={alsVeroverd && verborgen === false && viering?.doel === k ? { scale: 0.5 } : false}
+                    animate={{ scale: 1 }}
+                    transition={{ type: 'spring', stiffness: 320, damping: 14 }}
                     style={{
                       width: 64,
                       height: 64,
@@ -319,20 +454,21 @@ export function WorldMapScreen({
                       alignItems: 'center',
                       justifyContent: 'center',
                       overflow: 'hidden',
-                      background: k.conquered ? 'rgba(255, 197, 61, 0.16)' : 'var(--surface-2)',
-                      border: k.conquered
+                      background: alsVeroverd ? 'rgba(255, 197, 61, 0.16)' : 'var(--surface-2)',
+                      border: alsVeroverd
                         ? '3px solid var(--gold)'
                         : k.isVolgende
                           ? '3px solid var(--gold)'
                           : '2.5px solid var(--line)',
-                      boxShadow: k.conquered ? '0 0 22px rgba(255, 197, 61, 0.35)' : '0 3px 0 rgba(0,0,0,0.35)',
-                      opacity: k.conquered || k.isVolgende ? 1 : 0.35,
-                      filter: k.conquered || k.isVolgende ? undefined : 'grayscale(0.85)',
+                      boxShadow: alsVeroverd ? '0 0 22px rgba(255, 197, 61, 0.35)' : '0 3px 0 rgba(0,0,0,0.35)',
+                      opacity: alsVeroverd || k.isVolgende ? 1 : 0.35,
+                      filter: alsVeroverd || k.isVolgende ? undefined : 'grayscale(0.85)',
+                      transition: 'background 0.4s ease, border 0.4s ease, opacity 0.4s ease, filter 0.4s ease',
                     }}
                   >
                     <Flag code={k.code} size={40} />
-                  </div>
-                  {k.conquered && (
+                  </motion.div>
+                  {alsVeroverd && (
                     <span
                       style={{
                         position: 'absolute',
@@ -360,14 +496,14 @@ export function WorldMapScreen({
                     marginTop: 7,
                     fontSize: 12.5,
                     fontWeight: 800,
-                    color: k.conquered ? 'var(--gold)' : k.isVolgende ? 'var(--text)' : 'var(--text-faint)',
+                    color: alsVeroverd ? 'var(--gold)' : k.isVolgende ? 'var(--text)' : 'var(--text-faint)',
                     textShadow: '0 2px 6px rgba(0,0,0,0.6)',
                   }}
                 >
                   {k.name}
                 </p>
                 <p className="faint" style={{ fontSize: 10.5, marginTop: 1 }}>
-                  {k.conquered
+                  {alsVeroverd
                     ? 'veroverd'
                     : !k.inCourse
                       ? '🔭 komt met nieuwe lessen'
@@ -395,6 +531,34 @@ export function WorldMapScreen({
           </p>
         </div>
       </div>
+
+      {/* de veroveringsbanner */}
+      <AnimatePresence>
+        {banner && (
+          <motion.div
+            initial={{ opacity: 0, y: -26, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -18 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            style={{
+              position: 'absolute',
+              top: 86,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 65,
+              padding: '12px 22px',
+              borderRadius: 999,
+              background: 'var(--grad-hot)',
+              boxShadow: '0 6px 26px rgba(168, 85, 247, 0.55)',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <span className="display" style={{ fontSize: 17, color: '#fff' }}>
+              🏆 {banner}
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* het land-paneel: per status een eigen verhaal, nooit een slot */}
       <AnimatePresence>

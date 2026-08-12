@@ -1,9 +1,5 @@
-import { useState } from 'react'
 import {
   Avatar,
-  AVATAR_PRESETS,
-  AVATAR_STYLES,
-  AVATAR_STYLE_NAMES,
   EXTRA_NAMES,
   GENDER_NAMES,
   HAIR_COLORS,
@@ -12,13 +8,12 @@ import {
   OUTFIT_COLORS,
   SKINS,
   type AvatarStyle,
-  type Look,
 } from './Avatar'
+import { GALERIJ } from './avatarGallery'
 import { sfx } from '../audio'
 
 /** De personage-maker: 10 haarstijlen × 8 huidtinten × 12 haarkleuren × 10 outfits × extra's × monden */
 export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChange: (p: AvatarStyle) => void }) {
-  const [alles, setAlles] = useState(false)
   const set = (patch: Partial<AvatarStyle>) => {
     sfx('tap')
     onChange({ ...value, ...patch })
@@ -46,81 +41,96 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
     </div>
   )
 
-  // snelkeuze: de acht kant-en-klare personages, daarna nog vrij aan te passen
-  const pickPreset = (l: Look) => {
-    sfx('tap')
-    onChange({ ...AVATAR_PRESETS[l] })
-  }
-  const isPreset = (l: Look) => {
-    const q = AVATAR_PRESETS[l]
-    return (
-      q.hair === value.hair &&
-      q.skin === value.skin &&
-      q.hairColor === value.hairColor &&
-      q.outfit === value.outfit &&
-      (q.extra ?? 0) === (value.extra ?? 0) &&
-      (q.gender ?? 0) === (value.gender ?? 0) &&
-      (q.mouth ?? 0) === (value.mouth ?? 0)
-    )
-  }
+  // dezelfde vergelijking als de galerij gebruikt om dubbelen te weren
+  const zelfde = (q: AvatarStyle) =>
+    q.hair === value.hair &&
+    q.skin === value.skin &&
+    q.hairColor === value.hairColor &&
+    q.outfit === value.outfit &&
+    (q.extra ?? 0) === (value.extra ?? 0) &&
+    (q.gender ?? 0) === (value.gender ?? 0) &&
+    (q.mouth ?? 0) === (value.mouth ?? 0)
 
-  // ingeklapt tonen we er acht; is jouw huidige personage er één van verderop,
-  // dan schuift die erbij zodat je selectie nooit onzichtbaar wordt
-  const eersteAcht = AVATAR_STYLES.slice(0, 8)
-  const gekozen = AVATAR_STYLES.find(isPreset)
-  const zichtbaar = alles
-    ? AVATAR_STYLES
-    : gekozen && !eersteAcht.includes(gekozen)
-      ? [...eersteAcht, gekozen]
-      : eersteAcht
+  // eerst man of vrouw kiezen — de galerij toont daarna alleen díe helden
+  const geslacht = value.gender ?? 0
+  const helden = GALERIJ.filter((h) => (h.stijl.gender ?? 0) === geslacht)
 
   return (
     <div className="glass" style={{ padding: 16, marginBottom: 16 }}>
-      <p className="eyebrow" style={{ fontSize: 10, marginBottom: 6 }}>
-        Snelkeuze — {AVATAR_STYLES.length} personages
+      <p className="eyebrow" style={{ fontSize: 10, marginBottom: 5 }}>
+        Stap 1 · Ik ben een...
       </p>
-      {/* een afbrekend raster in plaats van een schuifbalk: alles is zichtbaar
-          zonder te slepen, en er staat nergens een lelijke scrollbalk */}
+      <div className="row" style={{ gap: 8, marginBottom: 14 }}>
+        {GENDER_NAMES.map((name, gi) => (
+          <button
+            key={name}
+            onClick={() => set({ gender: gi, hair: gi === 1 ? 1 : 0 })}
+            style={{
+              flex: 1,
+              padding: '11px 10px',
+              borderRadius: 12,
+              fontSize: 14.5,
+              fontWeight: 800,
+              background: geslacht === gi ? 'var(--grad-hot)' : 'var(--surface-2)',
+              color: geslacht === gi ? '#fff' : 'var(--text-dim)',
+              border: geslacht === gi ? 'none' : '1.5px solid var(--line)',
+              boxShadow: geslacht === gi ? '0 3px 0 #7e22ce' : '0 3px 0 rgba(0,0,0,0.3)',
+            }}
+          >
+            {gi === 0 ? '♂' : '♀'} {name}
+          </button>
+        ))}
+      </div>
+
+      <p className="eyebrow" style={{ fontSize: 10, marginBottom: 6 }}>
+        Stap 2 · Kies je held — {helden.length} {geslacht === 0 ? 'mannen' : 'vrouwen'}
+      </p>
+      <p className="faint" style={{ fontSize: 11.5, marginBottom: 10 }}>
+        Allemaal uniek, allemaal direct te kiezen — en onderaan stel je hem zelf samen uit ruim 300.000 combinaties.
+      </p>
+      {/* de helden van jouw keuze in één raster; .galerij-cel rendert alleen
+          wat in beeld is, dus ook honderden figuren scrollen soepel */}
       <div
+        className="no-scrollbar"
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fill, minmax(58px, 1fr))',
           gap: 6,
-          marginBottom: 10,
+          marginBottom: 12,
+          maxHeight: 340,
+          overflowY: 'auto',
+          overscrollBehavior: 'contain',
+          borderBottom: '1.5px solid var(--line)',
+          paddingBottom: 8,
         }}
       >
-        {zichtbaar.map((l) => (
-          <button
-            key={l}
-            onClick={() => pickPreset(l)}
-            title={AVATAR_STYLE_NAMES[l]}
-            style={{
-              minHeight: 76,
-              borderRadius: 14,
-              padding: '3px 0 2px',
-              background: isPreset(l) ? 'rgba(236,72,153,0.16)' : 'var(--surface-2)',
-              border: isPreset(l) ? '2px solid var(--hot2)' : '1.5px solid var(--line)',
-            }}
-          >
-            <div style={{ height: 46, overflow: 'hidden', display: 'flex', justifyContent: 'center' }}>
-              <Avatar size={62} look={l} courseId="es" still />
-            </div>
-            <p style={{ fontSize: 9.5, fontWeight: 700, color: isPreset(l) ? 'var(--hot2)' : 'var(--text-faint)' }}>
-              {AVATAR_STYLE_NAMES[l]}
-            </p>
-          </button>
-        ))}
+        {helden.map((h, i) => {
+          const actief = zelfde(h.stijl)
+          return (
+            <button
+              key={i}
+              className="galerij-cel"
+              onClick={() => {
+                sfx('tap')
+                onChange({ ...h.stijl })
+              }}
+              title={h.naam}
+              style={{
+                minHeight: 76,
+                borderRadius: 14,
+                padding: '3px 0 2px',
+                background: actief ? 'rgba(236,72,153,0.16)' : 'var(--surface-2)',
+                border: actief ? '2px solid var(--hot2)' : '1.5px solid var(--line)',
+              }}
+            >
+              <div style={{ height: 46, overflow: 'hidden', display: 'flex', justifyContent: 'center' }}>
+                <Avatar size={62} look={h.stijl} courseId="es" still />
+              </div>
+              <p style={{ fontSize: 9.5, fontWeight: 700, color: actief ? 'var(--hot2)' : 'var(--text-faint)' }}>{h.naam}</p>
+            </button>
+          )
+        })}
       </div>
-      <button
-        className="btn btn-ghost"
-        style={{ fontSize: 12.5, padding: 9, marginBottom: 12 }}
-        onClick={() => {
-          sfx('tap')
-          setAlles((a) => !a)
-        }}
-      >
-        {alles ? 'Toon er minder' : `Toon alle ${AVATAR_STYLES.length} personages`}
-      </button>
       <div className="row" style={{ gap: 14, alignItems: 'flex-start' }}>
         <div className="center" style={{ flexShrink: 0 }}>
           <Avatar size={96} look={value} courseId="es" />
@@ -131,32 +141,9 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
         <div className="col" style={{ gap: 10, flex: 1, minWidth: 0 }}>
           <div>
             <p className="eyebrow" style={{ fontSize: 10, marginBottom: 5 }}>
-              Ik ben een...
+              Stap 3 (mag ook) · Maak hem helemaal eigen
             </p>
-            <div className="row" style={{ gap: 8 }}>
-              {GENDER_NAMES.map((name, i) => (
-                <button
-                  key={name}
-                  onClick={() => set({ gender: i, hair: i === 1 ? 1 : 0, extra: i === 1 ? 2 : value.extra })}
-                  style={{
-                    flex: 1,
-                    padding: '8px 10px',
-                    borderRadius: 12,
-                    fontSize: 13.5,
-                    fontWeight: 800,
-                    background: (value.gender ?? 0) === i ? 'var(--grad-hot)' : 'var(--surface-2)',
-                    color: (value.gender ?? 0) === i ? '#fff' : 'var(--text-dim)',
-                    border: (value.gender ?? 0) === i ? 'none' : '1.5px solid var(--line)',
-                    boxShadow: (value.gender ?? 0) === i ? '0 3px 0 #7e22ce' : '0 3px 0 rgba(0,0,0,0.3)',
-                  }}
-                >
-                  {i === 0 ? '♂' : '♀'} {name}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div>
-            <p className="eyebrow" style={{ fontSize: 10, marginBottom: 5 }}>
+            <p className="eyebrow" style={{ fontSize: 10, marginBottom: 5, color: 'var(--text-faint)' }}>
               Haarstijl — met jouw kleuren
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>

@@ -39,7 +39,7 @@ held, en die held ben jij.**
    *Bewijs: rond één les af, heropen de kaart: de avatar staat zichtbaar één stap verder.*
 3. ✅ **AF (ronde 28) — Land-sheet.** Bottom sheet per status: veroverd = gouden badge + datum; volgende = voortgangsbalk "nog X van Y lessen" + knop "Verder leren →" die de juiste les start; toekomst = "Dit land komt met nieuwe lessen — jouw wereld groeit vanzelf", nooit een slot.
    *Bewijs: alle drie de staten tonen de juiste variant en "Verder leren →" start echt de volgende les.*
-4. **Reisanimatie.** Store-veld worldSeen; bij openen delta detecteren: avatar mode='run' rent in 2,2s over het pad (motionValues, geen rerenders), knoop-pop, vlag-crossfade grijs→kleur, confetti vanaf de knooppositie, banner "{Land} veroverd!"; bij prefers-reduced-motion direct de eindtoestand.
+4. ✅ **AF (ronde 29) — Reisanimatie.** Store-veld worldSeen; bij openen delta detecteren: avatar mode='run' rent in 2,2s over het pad (motionValues, geen rerenders), knoop-pop, vlag-crossfade grijs→kleur, confetti vanaf de knooppositie, banner "{Land} veroverd!"; bij prefers-reduced-motion direct de eindtoestand.
    *Bewijs: drempel kunstmatig naderen, les afronden, kaart openen: de held rent zichtbaar naar het nieuwe land — één keer (worldSeen).*
 5. **De Poortwachter.** `src/components/Gatekeeper.tsx`: donker harnas met cyaan neonrand, helm met T-vizier, knipperende amber ogen, rond schild 84px met de Flag van het land in een cirkelmasker. Introscherm: poortdeuren met amber kier, instamp met schermschud, "De Grensproef van {land}", uitleg "10 vragen, 8 goed — verliezen bestaat niet", 3-2-1-aftelling. Bereikbaar via de land-sheet op veroverde knopen.
    *Bewijs: bij twee verschillende landen klopt het vlagschild automatisch.*
