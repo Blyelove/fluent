@@ -126,6 +126,18 @@ export function countryStates(course: Course, completedCount: number): CountrySt
   })
 }
 
+/**
+ * Hoe ver je op de etappe náár dit land bent (0-1). Meet vanaf het vórige
+ * land, niet vanaf nul: anders zegt het paneel "74%" terwijl je held nog aan
+ * het begin van de etappe staat.
+ */
+export function etappeFrac(landen: CountryState[], doel: CountryState, completedCount: number): number {
+  const i = landen.findIndex((c) => c.code === doel.code && c.threshold === doel.threshold)
+  const vorige = i > 0 ? landen[i - 1].threshold : 0
+  const span = Math.max(1, doel.threshold - vorige)
+  return Math.min(1, Math.max(0, (completedCount - vorige) / span))
+}
+
 export function nextCountry(course: Course, completedCount: number): CountryState | null {
   return countryStates(course, completedCount).find((c) => !c.conquered) ?? null
 }

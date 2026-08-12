@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, animate, motion, useMotionValue, useReducedMotion } from 'motion/react'
 import confetti from 'canvas-confetti'
 import type { Course } from '../types'
-import { countryStates, type CountryState } from '../countries'
+import { countryStates, etappeFrac, type CountryState } from '../countries'
 import { Flag } from '../components/Flag'
 import { Avatar } from '../components/Avatar'
 import { levelForXp } from '../levels'
@@ -122,10 +122,10 @@ export function WorldMapScreen({
     const doel = knopen[volgendeIdx]
     const vorige = volgendeIdx > 0 ? knopen[volgendeIdx - 1] : null
     const van = vorige ?? start
-    const vorigeDrempel = vorige ? vorige.threshold : 0
-    const frac = Math.min(1, Math.max(0, (completedCount - vorigeDrempel) / Math.max(1, doel.threshold - vorigeDrempel)))
+    // zelfde meting als het landpaneel gebruikt, uit één bron
+    const frac = etappeFrac(landen, doel, completedCount)
     return { d: bocht(van, doel), frac, rustpunt: null, naarLinks: doel.x < van.x }
-  }, [knopen, hoogte, completedCount])
+  }, [knopen, hoogte, completedCount, landen])
 
   /**
    * De positie van de held loopt via motion-waarden BUITEN React om: tijdens
@@ -669,7 +669,7 @@ export function WorldMapScreen({
                   <div className="progress-track" style={{ height: 8, marginBottom: 16 }}>
                     <div
                       className="progress-fill"
-                      style={{ width: `${Math.min(100, (completedCount / gekozen.threshold) * 100)}%` }}
+                      style={{ width: `${Math.round(etappeFrac(landen, gekozen, completedCount) * 100)}%` }}
                     />
                   </div>
                   {onVerderLeren && (

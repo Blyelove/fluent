@@ -557,7 +557,7 @@ export function ReviewScreen({ onGoLearn }: { onGoLearn?: () => void } = {}) {
         <div className="progress-track">
           <motion.div
             className="progress-fill"
-            animate={{ width: `${Math.max(4, (idx / phase.items.length) * 100)}%` }}
+            animate={{ width: `${Math.max(4, ((idx + (answered ? 1 : 0)) / phase.items.length) * 100)}%` }}
             transition={{ type: 'spring', stiffness: 160, damping: 22 }}
           />
         </div>

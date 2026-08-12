@@ -232,7 +232,14 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
     )
   }
 
+  /**
+   * De balk mag nooit terugkruipen. Een fout voegt de vraag achteraan toe,
+   * waardoor de noemer groeit en je zichtbaar terugging: een straf voor een
+   * fout, precies wat hier niet hoort. We houden daarom het hoogste punt vast.
+   */
   const progress = items.length > 0 ? idx / items.length : 0
+  const maxProgress = useRef(0)
+  maxProgress.current = Math.max(maxProgress.current, progress)
   const restVragen = Math.max(0, items.length - idx)
 
   return (
@@ -294,7 +301,7 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
         <div className="progress-track">
           <motion.div
             className="progress-fill"
-            animate={{ width: `${Math.max(4, progress * 100)}%` }}
+            animate={{ width: `${Math.max(4, maxProgress.current * 100)}%` }}
             transition={{ type: 'spring', stiffness: 160, damping: 22 }}
           />
         </div>

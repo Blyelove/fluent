@@ -118,7 +118,7 @@ Fluent heeft een kern die al als topspel voelt — chunky leslus met combo's en 
 
 **Bewijs:** Vanaf het eindscherm: 'Nog een keer' + één tik = binnen een seconde spelen, en de regels zijn vóór de start leesbaar.
 
-### 28. Progressiebalken belonen in plaats van straffen: de lesbalk (Lesson.tsx r221) krimpt zichtbaar bij een fout (her-aanbieden verlengt items) — houd de maximaal bereikte breedte vast; de Review-balk (r411) beweegt pas bij 'Verder' en haalt nooit 100% — vul op basis van beantwoord: ((idx + (answered?1:0)) / items.length).
+### 28. ✅ AF (ronde 48) — Progressiebalken belonen in plaats van straffen: de lesbalk (Lesson.tsx r221) krimpt zichtbaar bij een fout (her-aanbieden verlengt items) — houd de maximaal bereikte breedte vast; de Review-balk (r411) beweegt pas bij 'Verder' en haalt nooit 100% — vul op basis van beantwoord: ((idx + (answered?1:0)) / items.length).
 
 **Bewijs:** Maak een fout in een les: de balk blijft staan; beantwoord de laatste toetsvraag: de balk loopt vol vóór het klaar-scherm.
 
@@ -150,7 +150,7 @@ Fluent heeft een kern die al als topspel voelt — chunky leslus met combo's en 
 
 **Bewijs:** Waarom-tik verandert de feedbacktekst niet meer; misser toont +3s bij de klok; naam staat voorgevuld na tabwissel; twee keer fout = hoger n in mistakes.
 
-### 36. Eén etappe-definitie op de wereldkaart: het pad meet per etappe (WorldMap.tsx r126) maar het landpaneel (r638) meet vanaf nul — 14/19 lessen heet daar 74% terwijl je held op 0% van de etappe staat. Helper etappeFrac() in countries.ts en overal binnen WorldMap gebruiken. (Het Home-blok is Wereldreis fase 9 — niet aanraken.)
+### 36. ✅ AF (ronde 48) — Eén etappe-definitie op de wereldkaart: het pad meet per etappe (WorldMap.tsx r126) maar het landpaneel (r638) meet vanaf nul — 14/19 lessen heet daar 74% terwijl je held op 0% van de etappe staat. Helper etappeFrac() in countries.ts en overal binnen WorldMap gebruiken. (Het Home-blok is Wereldreis fase 9 — niet aanraken.)
 
 **Bewijs:** Bij 14 voltooide lessen en drempel 19 tonen pad én paneel dezelfde etappe-fractie, en een vers land begint op 0%.
 
