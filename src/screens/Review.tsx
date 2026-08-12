@@ -65,7 +65,7 @@ type Phase =
       units?: Unit[]
     }
 
-export function ReviewScreen() {
+export function ReviewScreen({ onGoLearn }: { onGoLearn?: () => void } = {}) {
   const courseId = useStore((s) => s.courseId)
   const voltooid = useStore((s) => s.progress[s.courseId]?.completed ?? GEEN_LESSEN)
   const reviewWord = useStore((s) => s.reviewWord)
@@ -133,6 +133,31 @@ export function ReviewScreen() {
     setPauze(false)
     evalRef.current = null
     setPhase({ name: 'run', mode, items, label, units })
+  }
+
+  /**
+   * Vrij oefenen: alles zit nog vers, maar wie wil oefenen mag dat altijd.
+   * Deze ronde raakt het geheugenmodel bewust niet aan, zodat je herhaalmomenten
+   * kloppend blijven; de XP verdien je gewoon.
+   */
+  const startVrij = () => {
+    const pool = courseVocab(course)
+    const geleerd = Object.values(srs).filter((e) => e.courseId === courseId)
+    const items: Item[] = shuffle(geleerd)
+      .slice(0, 10)
+      .map((e) => {
+        const distractors = [
+          ...new Set(
+            shuffle(pool.filter((w) => w.word.toLowerCase() !== e.word.toLowerCase()))
+              .slice(0, 3)
+              .map((w) => w.word)
+          ),
+        ]
+        const options = shuffle([e.word, ...distractors])
+        return { ex: { type: 'select', prompt: e.nl, options, correct: options.indexOf(e.word) } as Select }
+      })
+    if (items.length === 0) return
+    startSession('srs', items, 'Vrij oefenen')
   }
 
   const startSrs = () => {
@@ -299,9 +324,21 @@ export function ReviewScreen() {
                   ? `Alles zit nog vers. Kom terug rond ${next.toLocaleDateString('nl-NL', { weekday: 'long', hour: '2-digit', minute: '2-digit' })}.`
                   : 'Alles zit nog vers.'}
           </p>
-          {due.length > 0 && (
+          {due.length > 0 ? (
             <button className="btn btn-primary" onClick={startSrs}>
               Start herhaling
+            </button>
+          ) : allCards.length === 0 ? (
+            // nog geen woorden geleerd: het tabblad mag nooit een dood spoor zijn
+            onGoLearn && (
+              <button className="btn btn-primary" onClick={onGoLearn}>
+                ▶ Start je eerste les
+              </button>
+            )
+          ) : (
+            // alles vers, maar wie zin heeft mag altijd oefenen
+            <button className="btn btn-ghost" onClick={startVrij}>
+              Oefen toch even
             </button>
           )}
         </div>

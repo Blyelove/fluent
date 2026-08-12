@@ -135,7 +135,7 @@ export default function App() {
       )}
       {tab === 'play' && <PlayScreen incomingDuel={incomingDuel} onPlayingChange={setGamePlaying} />}
       {tab === 'league' && <LeagueScreen />}
-      {tab === 'review' && <ReviewScreen />}
+      {tab === 'review' && <ReviewScreen onGoLearn={() => setTab('home')} />}
       {tab === 'profile' && <ProfileScreen />}
 
       {!gamePlaying && (

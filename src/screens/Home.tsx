@@ -227,8 +227,10 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
         CEFR-niveau {activeSection.cefr} · {completed.length} van {flat.length} lessen voltooid
       </p>
 
-      {/* Doorgaan-hero: de volgende les start met één tik, zonder scrollen */}
-      {(() => {
+      {/* Doorgaan-hero: de volgende les start met één tik, zonder scrollen.
+          Ben je net terug na een paar dagen, dan neemt de welkom-terug-kaart
+          deze plek over: twee knoppen die dezelfde les starten is verwarrend. */}
+      {comebackDays === 0 && (() => {
         const next = flat[currentIdx]
         // alles uitgespeeld? dan geen dood spoor, maar een viering met een vervolgstap
         if (!next)
@@ -301,6 +303,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
           </motion.div>
         )
       })()}
+
 
       {/* Welkom terug: geen verwijt, wel een zachte landing en een cadeautje */}
       <AnimatePresence>

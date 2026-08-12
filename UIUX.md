@@ -34,11 +34,11 @@ Fluent heeft een kern die al als topspel voelt — chunky leslus met combo's en 
 
 **Bewijs:** Zak een toets: één tik op 'Probeer opnieuw' start direct een nieuwe run over dezelfde units.
 
-### 7. Oefenen-tab krijgt altijd een uitweg: bij nul geleerde woorden een held-CTA 'Start je eerste les' (geef ReviewScreen een onGoLearn-prop vanuit App.tsx, zoals HomeScreen zijn callbacks krijgt); bij due.length === 0 (r266-279) een secundaire knop 'Oefen toch' met 10 willekeurige geleerde woorden (allCards, r83) zonder SRS-effect.
+### 7. ✅ AF (ronde 36) — Oefenen-tab krijgt altijd een uitweg: bij nul geleerde woorden een held-CTA 'Start je eerste les' (geef ReviewScreen een onGoLearn-prop vanuit App.tsx, zoals HomeScreen zijn callbacks krijgt); bij due.length === 0 (r266-279) een secundaire knop 'Oefen toch' met 10 willekeurige geleerde woorden (allCards, r83) zonder SRS-effect.
 
 **Bewijs:** Vers profiel: Oefenen-tab heeft één werkende knop naar het leerpad; profiel met alles 'vers': 'Oefen toch' start een sessie van 10.
 
-### 8. Comeback-kaart vervángt de hero in plaats van erbovenop te stapelen: Home.tsx r231-303 (hero '▶ Doorgaan') en r306-364 (comeback '▶ Rustig weer beginnen') starten exact dezelfde les. Bij comebackDays > 0 alleen de comeback-kaart tonen met de lesnaam in de knop; na dismiss de normale hero.
+### 8. ✅ AF (ronde 36) — Comeback-kaart vervángt de hero in plaats van erbovenop te stapelen: Home.tsx r231-303 (hero '▶ Doorgaan') en r306-364 (comeback '▶ Rustig weer beginnen') starten exact dezelfde les. Bij comebackDays > 0 alleen de comeback-kaart tonen met de lesnaam in de knop; na dismiss de normale hero.
 
 **Bewijs:** Zet lastActive kunstmatig 3 dagen terug: Home toont één primaire CTA, niet twee.
 
