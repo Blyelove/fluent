@@ -66,7 +66,7 @@ Fluent heeft een kern die al als topspel voelt — chunky leslus met combo's en 
 
 **Bewijs:** Genereer een toets over een kleine unit: het getoonde aantal en de lat komen exact overeen met wat advance() hanteert.
 
-### 15. Dagmissies boven het leerpad en de order-trucs eruit: Home.tsx duwt alle voortgangskaarten via flex order:1 visueel ónder het complete pad (DOM/kijk-mismatch breekt ook tab-volgorde). Dagmissies-kaart direct onder de Doorgaan-hero; id='vandaag' van de divisieknop (r453) naar de dagmissies; chips krijgen mini-labels ('Missies', 'Week') en de 🏆-chip vervalt (de nav-badge en divisiekaart tonen hetzelfde getal al).
+### 15. ✅ AF (ronde 40) — Dagmissies boven het leerpad en de order-trucs eruit: Home.tsx duwt alle voortgangskaarten via flex order:1 visueel ónder het complete pad (DOM/kijk-mismatch breekt ook tab-volgorde). Dagmissies-kaart direct onder de Doorgaan-hero; id='vandaag' van de divisieknop (r453) naar de dagmissies; chips krijgen mini-labels ('Missies', 'Week') en de 🏆-chip vervalt (de nav-badge en divisiekaart tonen hetzelfde getal al).
 
 **Bewijs:** Op 375px: dagmissies zichtbaar zonder scrollen onder de hero, chip ⚜️ scrolt naar de missies, en Tab-volgorde volgt de kijkvolgorde.
 

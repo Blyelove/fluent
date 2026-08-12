@@ -379,13 +379,14 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
           sfx('tap')
           document.getElementById('vandaag')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
         }
+        // korte woorden erbij: een los cijfer naast een plaatje zegt niets
         const chips: { key: string; icon: string; label: string; klaar: boolean; hot?: boolean; actie: () => void }[] = [
-          { key: 'dag', icon: '⚜️', label: `${questsDone}/3`, klaar: questsDone === 3, actie: naarVandaag },
-          { key: 'week', icon: '🎁', label: `${weekDone}/4`, klaar: weekDone === 4, actie: naarVandaag },
+          { key: 'dag', icon: '⚜️', label: `Vandaag ${questsDone}/3`, klaar: questsDone === 3, actie: naarVandaag },
+          { key: 'week', icon: '🎁', label: `Week ${weekDone}/4`, klaar: weekDone === 4, actie: naarVandaag },
           {
             key: 'divisie',
             icon: '🏆',
-            label: `#${leagueRank}`,
+            label: `Plek ${leagueRank}`,
             klaar: false,
             actie: () => {
               sfx('tap')
@@ -398,7 +399,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
           chips.push({
             key: 'fouten',
             icon: '🎯',
-            label: String(mijnFouten),
+            label: `Fouten ${mijnFouten}`,
             klaar: false,
             hot: true,
             actie: () => {
@@ -453,8 +454,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
       {onLeague && (
         <button
           className="glass spread"
-          id="vandaag"
-          style={{ width: '100%', padding: '14px 16px', marginBottom: 16, textAlign: 'left', order: 1, scrollMarginTop: 16 }}
+          style={{ width: '100%', padding: '14px 16px', marginBottom: 16, textAlign: 'left', order: 1 }}
           onClick={onLeague}
         >
           <span className="row" style={{ gap: 12 }}>
@@ -503,7 +503,10 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
         const doneCount = quests.filter((q) => q.done).length
         const bonusIn = questBonusDay !== null && isToday && questBonusDay === todayDay
         return (
-          <div className="glass unit-card" style={{ order: 1 }}>
+          // de dagmissies zijn de dagelijkse haak: die horen boven het pad,
+          // niet zeven schermen eronder. De rest van de kaarten blijft achter
+          // het leerpad staan (order 1).
+          <div className="glass unit-card" id="vandaag" style={{ order: 0, scrollMarginTop: 16 }}>
             <div className="spread">
               <strong style={{ fontSize: 15 }}>⚜️ Dagelijkse missies</strong>
               <span className="gold-text" style={{ fontWeight: 700, fontSize: 14 }}>
