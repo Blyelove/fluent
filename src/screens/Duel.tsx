@@ -9,7 +9,7 @@ import { sfx, speak } from '../audio'
 import { Avatar } from '../components/Avatar'
 import { Flag } from '../components/Flag'
 import { courseFlagCode } from '../countries'
-import { decodeDuel, duelLink, encodeDuel, seededPick, type DuelPayload } from '../duel'
+import { decodeDuel, duelAfgerond, duelLink, encodeDuel, markeerDuelAfgerond, seededPick, type DuelPayload } from '../duel'
 import { isHerhaalbaar } from '../mistakes'
 import { FillEx, ListenEx, SelectEx, TypeEx, WordBankEx, type EvalResult, type Registration } from './exercises'
 
@@ -399,6 +399,7 @@ export function DuelScreen({
     const xp = won ? 25 : tie ? 15 : 10
     recordDuel({ opponent: p.n || 'Je vriend', yourScore: yours, theirScore: theirs, total, won, day: today() })
     awardXp(xp)
+    markeerDuelAfgerond(p.s)
     saveOpen(open.filter((d) => d.s !== mine.s))
     setCodeInput('')
     setCodeError(null)
@@ -412,6 +413,12 @@ export function DuelScreen({
     if (!p) {
       sfx('wrong')
       setCodeError('Deze code klopt niet. Plak hem helemaal — de hele link mag ook.')
+      return
+    }
+    // dezelfde code twee keer plakken mag, maar levert geen tweede beloning op
+    if (duelAfgerond(p.s)) {
+      sfx('wrong')
+      setCodeError('Dit duel heb je al gespeeld. De uitslag staat in je geschiedenis hieronder.')
       return
     }
     const mine = open.find((d) => d.s === p.s)
@@ -478,6 +485,8 @@ export function DuelScreen({
       const xp = won ? 25 : tie ? 15 : 10
       recordDuel({ opponent: phase.payload.n || 'Je vriend', yourScore: score, theirScore: theirs, total, won, day: today() })
       awardXp(xp)
+      // een botduel mag altijd opnieuw; een echte uitdaging telt maar één keer
+      if (!isBotNaam(phase.payload.n)) markeerDuelAfgerond(phase.payload.s)
       if (won) burst()
       setPhase({ name: 'result', payload: phase.payload, score, total, theirScore: theirs, xp })
     } else {
@@ -804,7 +813,9 @@ export function DuelScreen({
   const openForIncoming = openMatch && safeIncoming?.r === 1 ? openMatch : undefined
   // wél een eigen open duel, maar géén antwoord: dit is je eigen uitdaging-link
   const eigenLink = !!openMatch && safeIncoming?.r !== 1
-  const showIncoming = !!safeIncoming && !hideIncoming
+  // een duel dat al afgerekend is, komt nooit meer terug: geen tweede uitbetaling
+  const alGespeeld = !!safeIncoming && duelAfgerond(safeIncoming.s)
+  const showIncoming = !!safeIncoming && !hideIncoming && !alGespeeld
   const history = [...duelHistory].reverse().slice(0, 6)
 
   return (

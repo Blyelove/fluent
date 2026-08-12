@@ -255,6 +255,15 @@ wat je onderweg zelf vindt.
 - Updates zonder onderbreking: `skipWaiting` kan nu een les breken tijdens een deploy.
 - Linkvoorvertoning voor gedeelde duel-links en deelplaatjes.
 
+▓▓ BLOK U — UI/UX-VERBOUWLIJST (zie UIUX.md)
+   Uit een doorlichting van vijf flows door beoordelaars die de app als nieuwe
+   gebruiker doorliepen: 36 punten, elk in één kwartierronde af en met een
+   eigen bewijs. Grote lijn: de kern voelt al als een topspel, maar de eerste
+   vijf minuten kosten te veel (accountmuur, dubbele onboarding, Home vol lege
+   tellers vóór je eerste woord), en beloningen zwijgen of liegen op precies de
+   momenten die verslavend horen te zijn. Werk de lijst van boven naar beneden
+   af en streep af in UIUX.md.
+
 ▓▓ BLOK H — DE WERELDREIS (het videogame-handelsmerk; uitdrukkelijke wens van de gebruiker: "regel het")
    De wereldverovering is nu een saaie lijst vlaggetjes onderaan het startscherm,
    terwijl de data er al ligt (COUNTRIES + countryStates in src/countries.ts,

@@ -70,7 +70,41 @@ export function duelLink(code: string): string {
 
 export function readDuelFromUrl(): DuelPayload | null {
   const p = new URLSearchParams(window.location.search).get('duel')
-  return p ? decodeDuel(p) : null
+  if (!p) return null
+  // de code meteen uit de adresbalk halen: anders komt dezelfde uitdaging bij
+  // elke herlading terug en kon je hem eindeloos opnieuw laten uitbetalen
+  try {
+    const url = new URL(window.location.href)
+    url.searchParams.delete('duel')
+    window.history.replaceState({}, '', url.pathname + url.search + url.hash)
+  } catch {
+    /* oudere browser zonder history-API: dan blijft de code staan */
+  }
+  return decodeDuel(p)
+}
+
+/** Seeds van duels die al afgerekend zijn, zodat XP nooit twee keer valt */
+const AFGEROND_KEY = 'fluent-duels-afgerond'
+
+export function duelAfgerond(seed: number): boolean {
+  try {
+    const lijst = JSON.parse(localStorage.getItem(AFGEROND_KEY) ?? '[]')
+    return Array.isArray(lijst) && lijst.includes(seed)
+  } catch {
+    return false
+  }
+}
+
+export function markeerDuelAfgerond(seed: number) {
+  try {
+    const lijst = JSON.parse(localStorage.getItem(AFGEROND_KEY) ?? '[]')
+    const uit = Array.isArray(lijst) ? lijst.filter((v) => typeof v === 'number') : []
+    if (!uit.includes(seed)) uit.push(seed)
+    // ruim genoeg voor een mensenleven aan duels, en toch begrensd
+    localStorage.setItem(AFGEROND_KEY, JSON.stringify(uit.slice(-200)))
+  } catch {
+    /* geen opslag beschikbaar: dan valt de bescherming weg, maar de app werkt */
+  }
 }
 
 export interface DuelRecord {
