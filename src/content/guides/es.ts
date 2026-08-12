@@ -484,6 +484,16 @@ export const guides: Record<string, UnitGuide> = {
           { target: 'No tengo dinero. — Yo tampoco.', nl: 'Ik heb geen geld. — Ik ook niet.' },
         ],
       },
+      {
+        title: 'Afspreken: a las tres, en la plaza',
+        explanation:
+          'In een afspraak noem je het tijdstip met a en de plaats met en: Nos vemos a las tres en la plaza. Bij één uur wordt dat a la una, vanaf twee uur a las dos. Het lidwoord la of las laat je nooit weg.',
+        examples: [
+          { target: 'Nos vemos a las tres.', nl: 'We zien elkaar om drie uur.' },
+          { target: '¿En la plaza a las cuatro? Vale.', nl: 'Op het plein om vier uur? Oké.' },
+          { target: 'Nos vemos mañana en la oficina.', nl: 'We zien elkaar morgen op kantoor.' },
+        ],
+      },
     ],
     phrases: [
       { target: 'Perdona, ¿qué hora es?', nl: 'Pardon, hoe laat is het?' },
@@ -559,7 +569,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Me duele: mijn hoofd doet mij pijn',
         explanation:
-          'Me duele la cabeza betekent letterlijk "het hoofd doet mij pijn". Het lichaamsdeel is dus het onderwerp van de zin en krijgt la of el, niet mi. Doen er meerdere dingen pijn, dan wordt het duelen met -n.',
+          'Me duele la cabeza betekent letterlijk "het hoofd doet mij pijn". Het lichaamsdeel bepaalt dus de vorm van het werkwoord, en het krijgt la of el, niet mi. Doen er meerdere dingen pijn, dan wordt het duelen met -n.',
         examples: [
           { target: 'Me duele la cabeza.', nl: 'Ik heb hoofdpijn.' },
           { target: '¿Te duele la cabeza?', nl: 'Heb jij hoofdpijn?' },
@@ -576,6 +586,16 @@ export const guides: Record<string, UnitGuide> = {
           { target: 'Necesito dinero.', nl: 'Ik heb geld nodig.' },
         ],
       },
+      {
+        title: 'Cerca de la plaza',
+        explanation:
+          'Zeg je waar iets dichtbij is, dan komt er de achter cerca: La farmacia está cerca de la plaza. Hetzelfde geldt voor lejos (ver): lejos de la estación. Noem je geen tweede plek, dan laat je de weg.',
+        examples: [
+          { target: 'La farmacia está cerca de la plaza.', nl: 'De apotheek is dicht bij het plein.' },
+          { target: 'El médico está lejos de aquí.', nl: 'De dokter is ver hiervandaan.' },
+          { target: 'La farmacia está cerca.', nl: 'De apotheek is dichtbij.' },
+        ],
+      },
     ],
     phrases: [
       { target: 'Me duele la cabeza.', nl: 'Ik heb hoofdpijn.' },
@@ -585,7 +605,7 @@ export const guides: Record<string, UnitGuide> = {
       { target: '¿Dónde está la farmacia?', nl: 'Waar is de apotheek?' },
       { target: 'Esta medicina es muy buena.', nl: 'Dit medicijn is erg goed.' },
     ],
-    tip: 'Mucho komt direct achter het werkwoord: Me duele mucho la cabeza. Nederlandstaligen zetten "erg" naar het Nederlandse patroon vlak voor pijn, maar in het Spaans schuift het lichaamsdeel juist naar achteren.',
+    tip: 'Mucho komt direct achter het werkwoord: Me duele mucho la cabeza. Nederlandstaligen bewaren "erg" graag voor het eind en maken er "me duele la cabeza mucho" van, maar in het Spaans schuift het lichaamsdeel juist naar achteren.',
   },
 
   'es-u12': {
@@ -625,7 +645,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'En verano, en invierno',
         explanation:
-          'Bij seizoenen gebruik je en zonder lidwoord: en verano, en invierno, en primavera. Alleen als je het seizoen zelf beschrijft komt el of la terug, want dan is het seizoen het onderwerp van de zin.',
+          'Bij seizoenen gebruik je en zonder lidwoord: en verano, en invierno, en primavera. Alleen als je iets over het seizoen zelf zegt, komt el of la terug: La primavera es muy bonita.',
         examples: [
           { target: 'En verano hace calor.', nl: 'In de zomer is het warm.' },
           { target: 'En invierno llueve mucho.', nl: 'In de winter regent het veel.' },
@@ -651,7 +671,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Me gusta of me gustan?',
         explanation:
-          'Me gusta betekent letterlijk "het bevalt mij". Het ding dat je leuk vindt is dus het onderwerp, en dat bepaalt de vorm: bij één ding gusta, bij meerdere dingen gustan. Het woordje me blijft hetzelfde, want dat ben jij.',
+          'Me gusta betekent letterlijk "het bevalt mij". Het ding dat je leuk vindt bepaalt dus de vorm van het werkwoord: bij één ding gusta, bij meerdere dingen gustan. Het woordje me blijft hetzelfde, want dat ben jij.',
         examples: [
           { target: 'Me gusta la música.', nl: 'Ik hou van muziek.' },
           { target: 'Me gustan las fiestas españolas.', nl: 'Ik hou van Spaanse feesten.' },
@@ -661,7 +681,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Het lidwoord blijft staan',
         explanation:
-          'Na me gusta laat je el of la nooit weg: het is Me gusta el teatro en niet "me gusta teatro". Volgt er een werkwoord in plaats van een ding, dan gebruik je de basisvorm en blijft het altijd gusta zonder -n.',
+          'Na me gusta laat je el of la nooit weg: het is Me gusta el teatro en niet "me gusta teatro". Volgt er een werkwoord in plaats van een ding, dan gebruik je de basisvorm, de vorm die in het woordenboek staat, en blijft het altijd gusta zonder -n.',
         examples: [
           { target: 'Me gusta el teatro.', nl: 'Ik hou van theater.' },
           { target: 'Me gusta la música española.', nl: 'Ik hou van Spaanse muziek.' },
@@ -671,11 +691,21 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Español, española, españolas',
         explanation:
-          'Woorden voor een land of een taal krijgen in het Spaans een kleine letter, dus español met een kleine e. Gebruik je zo een woord om iets te beschrijven, dan past het zich aan: la música española, las fiestas españolas, el cine español.',
+          'De naam van een taal en het woord voor een nationaliteit krijgen in het Spaans een kleine letter: español, española. Het land zelf houdt wél een hoofdletter: España. Gebruik je zo een woord om iets te beschrijven, dan past het zich aan: la música española, las fiestas españolas, el cine español.',
         examples: [
           { target: 'La música española es muy bonita.', nl: 'Spaanse muziek is erg mooi.' },
           { target: 'Me gustan las fiestas españolas.', nl: 'Ik hou van Spaanse feesten.' },
-          { target: 'Quiero estudiar español.', nl: 'Ik wil Spaans studeren.' },
+          { target: 'Quiero estudiar español en España.', nl: 'Ik wil Spaans studeren in Spanje.' },
+        ],
+      },
+      {
+        title: 'Empieza a las diez',
+        explanation:
+          'Hoe laat iets begint, zeg je met empieza en a: La película empieza a las nueve. Het lidwoord las blijft staan, en bij één uur wordt het a la una. Vraag je ernaar, dan zeg je ¿A qué hora empieza...?',
+        examples: [
+          { target: 'La fiesta empieza a las diez.', nl: 'Het feest begint om tien uur.' },
+          { target: 'La película empieza a las nueve.', nl: 'De film begint om negen uur.' },
+          { target: '¿A qué hora empieza la fiesta?', nl: 'Hoe laat begint het feest?' },
         ],
       },
     ],
@@ -732,6 +762,16 @@ export const guides: Record<string, UnitGuide> = {
           { target: 'El tren sale a las nueve.', nl: 'De trein vertrekt om negen uur.' },
           { target: 'El autobús llega a las diez.', nl: 'De bus komt om tien uur aan.' },
           { target: 'La película empieza a las nueve.', nl: 'De film begint om negen uur.' },
+        ],
+      },
+      {
+        title: 'Me duele en me gusta werken hetzelfde',
+        explanation:
+          'Bij deze twee draait de zin om: niet jij, maar het ding bepaalt de vorm van het werkwoord. Me gusta la música is letterlijk "de muziek bevalt mij" en me duele la cabeza "het hoofd doet mij pijn". Gaat het om meerdere dingen, dan komt er een -n bij: me gustan las fiestas, me duelen los pies.',
+        examples: [
+          { target: 'Me duele la cabeza.', nl: 'Ik heb hoofdpijn.' },
+          { target: 'Me gusta la música española.', nl: 'Ik hou van Spaanse muziek.' },
+          { target: 'Me duelen los pies.', nl: 'Mijn voeten doen pijn.' },
         ],
       },
     ],
