@@ -48,7 +48,9 @@ type Mode = 'srs' | 'test' | 'fouten'
 type Phase =
   | { name: 'hub' }
   | { name: 'run'; mode: Mode; items: Item[]; label: string }
-  | { name: 'done'; mode: Mode; correct: number; total: number; label: string; passed: boolean }
+  // xp = wat je écht kreeg, inclusief eventuele dubbele XP — het scherm mag
+  // nooit een ander getal tonen dan wat er is bijgeschreven
+  | { name: 'done'; mode: Mode; correct: number; total: number; label: string; passed: boolean; xp: number }
 
 export function ReviewScreen() {
   const courseId = useStore((s) => s.courseId)
@@ -60,6 +62,7 @@ export function ReviewScreen() {
   const mistakes = useStore((s) => s.mistakes)
   const clearMistake = useStore((s) => s.clearMistake)
   const addMistake = useStore((s) => s.addMistake)
+  const boostUntil = useStore((s) => s.boostUntil)
   const curLevel = useStore((s) => levelForXp(totalXp(s)))
   const look = useStore((s) => s.avatarLook)
 
@@ -179,6 +182,7 @@ export function ReviewScreen() {
     if (idx + 1 >= phase.items.length) {
       const total = phase.items.length
       const finalCorrect = correctCount
+      const dubbel = boostUntil > Date.now() ? 2 : 1
       if (phase.mode === 'srs' || phase.mode === 'fouten') {
         // fouten wegwerken levert extra op: dit is het waardevolste oefenwerk
         const xp = phase.mode === 'fouten' ? Math.max(4, finalCorrect * 4) : Math.max(2, finalCorrect * 2)
@@ -186,10 +190,11 @@ export function ReviewScreen() {
         if (phase.mode === 'fouten' && finalCorrect === total && total > 0) {
           confetti({ particleCount: 120, spread: 100, origin: { y: 0.6 }, colors: ['#A855F7', '#EC4899', '#FFC53D', '#22D3EE'], disableForReducedMotion: true })
         }
-        setPhase({ name: 'done', mode: phase.mode, correct: finalCorrect, total, label: phase.label, passed: true })
+        setPhase({ name: 'done', mode: phase.mode, correct: finalCorrect, total, label: phase.label, passed: true, xp: xp * dubbel })
       } else {
         const passed = finalCorrect >= Math.ceil(total * 0.8)
-        addReviewXp(courseId, finalCorrect * 2 + (passed ? 10 : 0))
+        const xp = finalCorrect * 2 + (passed ? 10 : 0)
+        addReviewXp(courseId, xp)
         addTestResult({
           label: phase.label,
           score: finalCorrect,
@@ -200,7 +205,7 @@ export function ReviewScreen() {
         if (passed) {
           confetti({ particleCount: 110, spread: 100, origin: { y: 0.6 }, colors: ['#A855F7', '#EC4899', '#FFC53D', '#22D3EE'], disableForReducedMotion: true })
         }
-        setPhase({ name: 'done', mode: 'test', correct: finalCorrect, total, label: phase.label, passed })
+        setPhase({ name: 'done', mode: 'test', correct: finalCorrect, total, label: phase.label, passed, xp: xp * dubbel })
       }
       sfx('complete')
     } else {
@@ -353,13 +358,7 @@ export function ReviewScreen() {
           </h1>
           <div className="divider-gold" />
           <p className="dim" style={{ fontSize: 16 }}>
-            {phase.correct} van {phase.total} goed · +
-            {phase.mode === 'fouten'
-              ? Math.max(4, phase.correct * 4)
-              : phase.mode === 'srs'
-                ? Math.max(2, phase.correct * 2)
-                : phase.correct * 2 + (phase.passed ? 10 : 0)}{' '}
-            XP
+            {phase.correct} van {phase.total} goed · +{phase.xp} XP
           </p>
           {phase.mode === 'fouten' && (
             <p className="faint" style={{ fontSize: 13, marginTop: 6 }}>

@@ -178,6 +178,76 @@ interface WeekState {
   weekDuels: number
 }
 
+interface ReeksState {
+  streak: number
+  bestStreak: number
+  freezes: number
+  lastDay: string | null
+  activeDays: string[]
+}
+
+/**
+ * De reeks, de bescherming en de kalender bijwerken voor vandaag.
+ *
+ * Dit stond eerst alleen in completeLesson, waardoor een dag vol herhalen,
+ * fouten wegwerken, toetsen of minigames 's nachts alsnog je reeks brak en een
+ * leeg vakje op de kalender achterliet. De app belooft nergens dat alleen
+ * lessen tellen — en een gebroken belofte voelt als straf, precies wat hier
+ * niet mag. Iedere leeractiviteit loopt nu door deze functie.
+ */
+function registreerLeerdag(s: ReeksState, today: string): ReeksState {
+  if (s.lastDay === today) {
+    // vandaag al geteld — alleen de kalender nog zeker stellen
+    return {
+      streak: s.streak,
+      bestStreak: Math.max(s.bestStreak, s.streak),
+      freezes: s.freezes,
+      lastDay: s.lastDay,
+      activeDays: s.activeDays.includes(today) ? s.activeDays : [...s.activeDays.slice(-400), today],
+    }
+  }
+
+  let streak: number
+  let freezes = s.freezes
+  if (s.lastDay === null) {
+    streak = 1
+  } else {
+    const gap = daysBetween(s.lastDay, today)
+    if (gap === 1) {
+      streak = s.streak + 1
+    } else if (gap === 2 && freezes > 0) {
+      freezes -= 1
+      streak = s.streak + 1
+    } else {
+      streak = 1
+    }
+  }
+
+  // elke 7 dagen op rij een bescherming erbij; het maximum groeit mee met je reeks
+  const maxFreezes = streak >= 100 ? 4 : streak >= 30 ? 3 : 2
+  if (streak > 0 && streak % 7 === 0) freezes = Math.min(maxFreezes, freezes + 1)
+  // extra bescherming cadeau op de grote mijlpalen
+  if ([30, 60, 100, 200, 365].includes(streak)) freezes = Math.min(maxFreezes, freezes + 1)
+
+  return {
+    streak,
+    bestStreak: Math.max(s.bestStreak, streak),
+    freezes,
+    lastDay: today,
+    activeDays: s.activeDays.includes(today) ? s.activeDays : [...s.activeDays.slice(-400), today],
+  }
+}
+
+/**
+ * Dubbele XP geldt voor ALLES wat je verdient, niet alleen voor de speelhal.
+ * De bonus werd beloofd bij de dagmissies, bij de weekkist en bij een comeback,
+ * maar werkte tot nu toe niet in een les of een herhaling — dus juist niet waar
+ * de gebruiker hem het hardst verwacht.
+ */
+function metBoost(boostUntil: number, xp: number): number {
+  return boostUntil > Date.now() ? xp * 2 : xp
+}
+
 function rollWeek(s: WeekState): WeekState {
   const now = weekIndex()
   // let op: alleen de weekvelden teruggeven — een spread van de hele state
@@ -272,39 +342,21 @@ export const useStore = create<AureaState>()(
         const prev = s.progress[c] ?? emptyProgress()
         const completed = prev.completed.includes(lessonId) ? prev.completed : [...prev.completed, lessonId]
 
-        // reeks bijwerken — met vergevingsgezinde bevriezing
-        let { streak, freezes, lastDay, bestStreak } = s
-        if (lastDay !== today) {
-          if (lastDay === null) {
-            streak = 1
-          } else {
-            const gap = daysBetween(lastDay, today)
-            if (gap === 1) {
-              streak += 1
-            } else if (gap === 2 && freezes > 0) {
-              freezes -= 1
-              streak += 1
-            } else {
-              streak = 1
-            }
-          }
-          lastDay = today
-          // elke 7 dagen op rij een bescherming erbij; het maximum groeit mee met je reeks
-          const maxFreezes = streak >= 100 ? 4 : streak >= 30 ? 3 : 2
-          if (streak > 0 && streak % 7 === 0) freezes = Math.min(maxFreezes, freezes + 1)
-          // extra bescherming cadeau op de grote mijlpalen
-          if ([30, 60, 100, 200, 365].includes(streak)) freezes = Math.min(maxFreezes, freezes + 1)
-        }
-        if (streak > bestStreak) bestStreak = streak
+        // reeks, bescherming en kalender — gedeeld met herhalen, toetsen en spelen
+        const reeks = registreerLeerdag(s, today)
+        const { streak, bestStreak, freezes, lastDay } = reeks
+
+        // dubbele XP telt ook hier: dat was de hele belofte van de bonus
+        const verdiend = metBoost(s.boostUntil, xp)
 
         const sameDay = s.todayDay === today
-        let todayXp = (sameDay ? s.todayXp : 0) + xp
+        let todayXp = (sameDay ? s.todayXp : 0) + verdiend
         const todayLessons = (sameDay ? s.todayLessons : 0) + 1
         const todayPerfect = (sameDay ? s.todayPerfect : 0) + (perfect ? 1 : 0)
         const todayFixed = sameDay ? s.todayFixed : 0
 
         // dagelijkse missies: doel-XP + 2 lessen + (foutloze les OF 3 fouten rechtgezet) → bonuskist
-        let totalXpForCourse = prev.xp + xp
+        let totalXpForCourse = prev.xp + verdiend
         let questBonusDay = s.questBonusDay
         const allQuestsDone = todayXp >= s.dailyGoalXp && todayLessons >= 2 && (todayPerfect >= 1 || todayFixed >= 3)
         if (allQuestsDone && questBonusDay !== today) {
@@ -358,7 +410,7 @@ export const useStore = create<AureaState>()(
           goals: remaining,
           goalsDone: [...s.goalsDone, ...doneNow],
           perfectLessons: s.perfectLessons + (perfect ? 1 : 0),
-          activeDays: s.activeDays.includes(today) ? s.activeDays : [...s.activeDays.slice(-400), today],
+          activeDays: reeks.activeDays,
           ...league,
           weekXp: league.weekXp + gainedTotal,
           weekLessons: league.weekLessons + 1,
@@ -385,10 +437,18 @@ export const useStore = create<AureaState>()(
         const s = get()
         const today = todayStr()
         const prev = s.progress[c] ?? emptyProgress()
+        const verdiend = metBoost(s.boostUntil, xp)
+        // herhalen, je fouten wegwerken en een toets zijn net zo goed leren als
+        // een les: ze houden je reeks in leven en tellen mee voor je divisie
+        const reeks = registreerLeerdag(s, today)
+        const league = rollWeek(s)
         set({
-          progress: { ...s.progress, [c]: { ...prev, xp: prev.xp + xp } },
+          progress: { ...s.progress, [c]: { ...prev, xp: prev.xp + verdiend } },
+          ...reeks,
           todayDay: today,
-          todayXp: (s.todayDay === today ? s.todayXp : 0) + xp,
+          todayXp: (s.todayDay === today ? s.todayXp : 0) + verdiend,
+          ...league,
+          weekXp: league.weekXp + verdiend,
         })
       },
 
@@ -407,10 +467,13 @@ export const useStore = create<AureaState>()(
         const today = todayStr()
         const c = s.courseId
         const prev = s.progress[c] ?? emptyProgress()
-        const boosted = s.boostUntil > Date.now() ? xp * 2 : xp
+        const boosted = metBoost(s.boostUntil, xp)
+        // ook een potje in de speelhal houdt je reeks in leven
+        const reeks = registreerLeerdag(s, today)
         const league = rollWeek(s)
         set({
           progress: { ...s.progress, [c]: { ...prev, xp: prev.xp + boosted } },
+          ...reeks,
           todayDay: today,
           todayXp: (s.todayDay === today ? s.todayXp : 0) + boosted,
           ...league,
