@@ -10,6 +10,7 @@ import { Avatar } from '../components/Avatar'
 import { Flag } from '../components/Flag'
 import { courseFlagCode } from '../countries'
 import { decodeDuel, duelLink, encodeDuel, seededPick, type DuelPayload } from '../duel'
+import { isHerhaalbaar } from '../mistakes'
 import { FillEx, ListenEx, SelectEx, TypeEx, WordBankEx, type EvalResult, type Registration } from './exercises'
 
 /** Alleen oefeningen waar je een antwoord op kunt geven — geen 'new' en geen 'match' */
@@ -87,12 +88,22 @@ function today(): string {
   return new Date().toISOString().slice(0, 10)
 }
 
-function quizPool(course: Course): QuizEx[] {
-  const out: QuizEx[] = []
+/** Een duelvraag met zijn herkomst, zodat een fout ook in je foutenlijst belandt */
+interface DuelVraag {
+  ex: QuizEx
+  lesId: string
+  exIndex: number
+}
+
+function quizPool(course: Course): DuelVraag[] {
+  const out: DuelVraag[] = []
   for (const s of course.sections)
     for (const u of s.units)
       for (const l of u.lessons)
-        for (const e of l.exercises) if (e.type !== 'new' && e.type !== 'match') out.push(e)
+        l.exercises.forEach((e, i) => {
+          // zelfde regel als bij lessen en toetsen, zodat de drie nooit uit elkaar lopen
+          if (isHerhaalbaar(e)) out.push({ ex: e as QuizEx, lesId: l.id, exIndex: i })
+        })
   return out
 }
 
@@ -253,7 +264,7 @@ function ScoreBar({ you, them, name, total }: { you: number; them: number; name:
 
 type Phase =
   | { name: 'hub' }
-  | { name: 'play'; payload: DuelPayload; items: QuizEx[]; theirScore: number }
+  | { name: 'play'; payload: DuelPayload; items: DuelVraag[]; theirScore: number }
   | { name: 'result'; payload: DuelPayload; score: number; total: number; theirScore: number; xp: number }
   | { name: 'settled'; opponent: string; yours: number; theirs: number; total: number; xp: number }
 
@@ -269,6 +280,7 @@ export function DuelScreen({
   const duelsWon = useStore((s) => s.duelsWon)
   const recordDuel = useStore((s) => s.recordDuel)
   const awardXp = useStore((s) => s.awardXp)
+  const addMistake = useStore((s) => s.addMistake)
   const look = useStore((s) => s.avatarLook)
   const curLevel = useStore((s) => levelForXp(totalXp(s)))
 
@@ -400,6 +412,9 @@ export function DuelScreen({
       setCorrect((c) => c + 1)
     } else {
       sfx('wrong')
+      // ook een misser in een duel hoort in je foutenlijst: dezelfde belofte als bij lessen en toetsen
+      const vraag = phase.items[idx]
+      if (vraag) addMistake(phase.payload.c, vraag.lesId, vraag.exIndex)
     }
   }
 
@@ -451,7 +466,7 @@ export function DuelScreen({
 
   if (phase.name === 'play') {
     const course = courses[phase.payload.c]
-    const ex: QuizEx | undefined = phase.items[idx]
+    const ex: QuizEx | undefined = phase.items[idx]?.ex
     const opponentName = phase.theirScore >= 0 ? phase.payload.n || 'Je vriend' : 'Je vriend'
 
     // zou niet mogen gebeuren, maar liever een nette uitweg dan een wit scherm
