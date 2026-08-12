@@ -11,6 +11,7 @@ import { LEAGUES, standings, weekIndex, yourRank } from '../leagues'
 import { addDaysStr, daysUntil, goalStatus, suggestGoals, todayStr } from '../goals'
 import { Flag } from '../components/Flag'
 import { Avatar } from '../components/Avatar'
+import { GuideSheet } from '../components/GuideSheet'
 import { StreakScreen } from './Streak'
 import { sfx } from '../audio'
 
@@ -101,6 +102,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
   const [picker, setPicker] = useState(false)
   const [goalModal, setGoalModal] = useState(false)
   const [streakOpen, setStreakOpen] = useState(false)
+  const [guideUnit, setGuideUnit] = useState<Unit | null>(null)
 
   const course = courses[courseId]
   const completed = useMemo(() => progressMap[courseId]?.completed ?? [], [progressMap, courseId])
@@ -678,6 +680,29 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
               <span style={{ fontSize: 13, fontWeight: 700 }} className={unitDone ? '' : 'faint'}>
                 {unitDone ? '✓ Voltooid' : `${doneCount}/${unit.lessons.length}`}
               </span>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  sfx('tap')
+                  setGuideUnit(unit)
+                }}
+                aria-label={`Gids bij ${unit.title}`}
+                title="Grammatica-gids"
+                style={{
+                  width: 34,
+                  height: 34,
+                  borderRadius: 10,
+                  flexShrink: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 15,
+                  background: unitDone ? 'rgba(0,0,0,0.18)' : 'var(--surface-2)',
+                  border: '1px solid var(--line)',
+                }}
+              >
+                📖
+              </button>
             </div>
           )
           const unitFirstIncomplete = unit.lessons.find((l) => !completed.includes(l.id))?.id ?? null
@@ -729,6 +754,10 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
       <p className="faint center" style={{ fontSize: 13, marginTop: 26, order: 2 }}>
         Sectie 4 en verder zijn in de maak — jouw reis gaat door tot B2.
       </p>
+
+      {guideUnit && (
+        <GuideSheet unit={guideUnit} courseId={courseId} ttsLang={course.ttsLang} onClose={() => setGuideUnit(null)} />
+      )}
 
       <AnimatePresence>
         {goalModal && (

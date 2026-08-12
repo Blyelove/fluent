@@ -23,6 +23,24 @@ const VOICES: Record<string, string> = {
 
 const OUT_ROOT = path.resolve(import.meta.dirname, '..', 'public', 'audio')
 
+/** Zinnen uit de grammatica-gids van deze taal (voorbeelden + kant-en-klare zinnen) */
+async function collectGuides(courseId: string): Promise<string[]> {
+  try {
+    const mod = (await import(`../src/content/guides/${courseId}`)) as {
+      guides: Record<string, { rules: { examples: { target: string }[] }[]; phrases: { target: string }[] }>
+    }
+    const out: string[] = []
+    for (const g of Object.values(mod.guides ?? {})) {
+      for (const r of g.rules ?? []) for (const e of r.examples ?? []) out.push(e.target)
+      for (const p of g.phrases ?? []) out.push(p.target)
+    }
+    return out
+  } catch {
+    // nog geen gids voor deze taal
+    return []
+  }
+}
+
 function collect(course: Course): Set<string> {
   const texts = new Set<string>()
   for (const s of course.sections)
@@ -81,8 +99,10 @@ async function main() {
     }
     const dir = path.join(OUT_ROOT, course.ttsLang)
     await mkdir(dir, { recursive: true })
-    const texts = [...collect(course)]
-    console.log(`\n${course.flag} ${course.name} (${voice}): ${texts.length} teksten`)
+    const uitCursus = collect(course)
+    for (const zin of await collectGuides(course.id)) uitCursus.add(zin)
+    const texts = [...uitCursus]
+    console.log(`\n${course.flag} ${course.name} (${voice}): ${texts.length} teksten (inclusief gids)`)
 
     let tts = new MsEdgeTTS()
     await tts.setMetadata(voice, OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3)

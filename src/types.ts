@@ -25,6 +25,21 @@ export interface Unit {
   lessons: Lesson[]
 }
 
+/** Nederlandstalige grammatica-gids bij een unit: legt uit wáárom iets zo is */
+export interface UnitGuide {
+  /** Eén of twee zinnen: wat leer je hier en waarom is dat handig */
+  intro: string
+  rules: {
+    title: string
+    explanation: string
+    examples: { target: string; nl: string }[]
+  }[]
+  /** Kant-en-klare zinnen die je meteen kunt gebruiken */
+  phrases: { target: string; nl: string }[]
+  /** Valkuil speciaal voor Nederlandstaligen */
+  tip?: string
+}
+
 export interface Lesson {
   id: string
   title: string

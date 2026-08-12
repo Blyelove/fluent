@@ -72,7 +72,7 @@ export function ProfileScreen() {
         </div>
         <div className="glass stat-card">
           <div className="stat-value">{state.streak}</div>
-          <div className="stat-label">Dagen reeks</div>
+          <div className="stat-label">{state.streak === 1 ? 'Dag reeks' : 'Dagen reeks'}</div>
         </div>
         <div className="glass stat-card">
           <div className="stat-value">{wordsLearned(state, state.courseId)}</div>
@@ -88,7 +88,7 @@ export function ProfileScreen() {
         <div className="spread" style={{ padding: '14px 0', borderBottom: '1px solid var(--line)' }}>
           <span style={{ fontWeight: 500 }}>Beste reeks</span>
           <span className="gold-text" style={{ fontWeight: 700 }}>
-            {state.bestStreak} dagen
+            {state.bestStreak} {state.bestStreak === 1 ? 'dag' : 'dagen'}
           </span>
         </div>
         <div className="spread" style={{ padding: '14px 0', borderBottom: '1px solid var(--line)' }}>
