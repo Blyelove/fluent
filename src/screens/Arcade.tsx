@@ -119,7 +119,7 @@ type Phase =
    Hoofdscherm
    ============================================================ */
 
-export function ArcadeScreen() {
+export function ArcadeScreen({ onPlayingChange }: { onPlayingChange?: (playing: boolean) => void } = {}) {
   const courseId = useStore((s) => s.courseId)
   const progress = useStore((s) => s.progress)
   const srs = useStore((s) => s.srs)
@@ -128,6 +128,12 @@ export function ArcadeScreen() {
   const awardXp = useStore((s) => s.awardXp)
 
   const [phase, setPhase] = useState<Phase>({ name: 'hub' })
+
+  // de speelhal-tabs verbergen zodra een spel begint (volledig spelgevoel)
+  useEffect(() => {
+    onPlayingChange?.(phase.name !== 'hub')
+    return () => onPlayingChange?.(false)
+  }, [phase.name, onPlayingChange])
 
   const course = courses[courseId]
 

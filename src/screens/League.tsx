@@ -27,38 +27,57 @@ const DIVISION_LABEL = [
   'Diamanten divisie',
 ]
 
-const TOTAL_PLAYERS = 30
 const HOURS_PER_WEEK = 168
+/** Aantal spelers in een divisie — jij plus 29 tegenstanders */
+const TOTAL_PLAYERS = 30
+const FALLBACK_COLOR = '#A855F7'
 
 function fmt(n: number): string {
-  return n.toLocaleString('nl-NL')
+  if (!Number.isFinite(n)) return '0'
+  return Math.round(n).toLocaleString('nl-NL')
+}
+
+/** Veilige divisie-index — vangt een oude of kapotte opgeslagen waarde op */
+function clampLeague(id: number): number {
+  if (!Number.isFinite(id)) return 0
+  return Math.min(LEAGUES.length - 1, Math.max(0, Math.floor(id)))
+}
+
+/** Divisienaam met terugval, mocht de lijst ooit langer worden dan de labels */
+function divisionLabel(id: number): string {
+  return DIVISION_LABEL[id] ?? `Divisie ${id + 1}`
+}
+
+/** Hex → rgb, met terugval bij een ongeldige of ontbrekende kleur */
+function rgbOf(hex: string): [number, number, number] {
+  const raw = (hex || FALLBACK_COLOR).replace('#', '')
+  const h = raw.length === 3 ? raw.charAt(0).repeat(2) + raw.charAt(1).repeat(2) + raw.charAt(2).repeat(2) : raw
+  const r = parseInt(h.slice(0, 2), 16)
+  const g = parseInt(h.slice(2, 4), 16)
+  const b = parseInt(h.slice(4, 6), 16)
+  if (!Number.isFinite(r) || !Number.isFinite(g) || !Number.isFinite(b)) return [168, 85, 247]
+  return [r, g, b]
 }
 
 /** Donkere of lichte tekst op een gekleurd vlak — op basis van helderheid */
 function inkOn(hex: string): string {
-  const h = hex.replace('#', '')
-  const r = parseInt(h.slice(0, 2), 16)
-  const g = parseInt(h.slice(2, 4), 16)
-  const b = parseInt(h.slice(4, 6), 16)
+  const [r, g, b] = rgbOf(hex)
   return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.6 ? '#1A1033' : '#FFFFFF'
 }
 
 /** rgba-string uit een hexkleur, voor gloed en zachte vlakken */
 function alpha(hex: string, a: number): string {
-  const h = hex.replace('#', '')
-  const r = parseInt(h.slice(0, 2), 16)
-  const g = parseInt(h.slice(2, 4), 16)
-  const b = parseInt(h.slice(4, 6), 16)
+  const [r, g, b] = rgbOf(hex)
   return `rgba(${r}, ${g}, ${b}, ${a})`
 }
 
 /* ---------------- medaille ---------------- */
 
 function Medal({ leagueId, calm }: { leagueId: number; calm: boolean }) {
-  const league = LEAGUES[leagueId]
-  const c = league.color
+  const id = clampLeague(leagueId)
+  const c = LEAGUES[id]?.color ?? FALLBACK_COLOR
   const ink = inkOn(c)
-  const gid = `medal-face-${leagueId}`
+  const gid = `medal-face-${id}`
   const rays = Array.from({ length: 12 }, (_, i) => i * 30)
 
   return (
@@ -119,7 +138,7 @@ function Medal({ leagueId, calm }: { leagueId: number; calm: boolean }) {
           fill={ink}
           style={{ fontFamily: "'Baloo 2', system-ui, sans-serif", fontSize: 40, fontWeight: 800 }}
         >
-          {leagueId + 1}
+          {id + 1}
         </text>
 
         {/* glans */}
@@ -155,8 +174,8 @@ function DivisionDots({ leagueId }: { leagueId: number }) {
             <div key={l.id} className="col" style={{ alignItems: 'center', gap: 5, width: 28 }}>
               <div style={{ height: 22, display: 'flex', alignItems: 'center' }}>
                 <motion.div
-                  title={DIVISION_LABEL[l.id]}
-                  aria-label={DIVISION_LABEL[l.id]}
+                  title={divisionLabel(l.id)}
+                  aria-label={divisionLabel(l.id)}
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.05 + l.id * 0.02, type: 'spring', stiffness: 320, damping: 18 }}
@@ -309,46 +328,61 @@ function Row({ player, rank, delay }: { player: Competitor; rank: number; delay:
 /* ---------------- scherm ---------------- */
 
 export function LeagueScreen() {
-  const leagueId = useStore((s) => s.leagueId)
-  const weekXp = useStore((s) => s.weekXp)
+  const storedLeagueId = useStore((s) => s.leagueId)
+  const storedWeekXp = useStore((s) => s.weekXp)
   const promotions = useStore((s) => s.promotions)
   const calm = Boolean(useReducedMotion())
+
+  // opgeslagen waarden altijd eerst gezond maken
+  const leagueId = clampLeague(storedLeagueId)
+  const weekXp = Number.isFinite(storedWeekXp) ? Math.max(0, storedWeekXp) : 0
 
   const [hours, setHours] = useState(() => hoursLeftInWeek())
   const [explain, setExplain] = useState(false)
 
-  // aftellen leeft mee: elke minuut opnieuw kijken
+  // aftellen leeft mee: elke minuut opnieuw kijken (interval wordt opgeruimd bij unmount)
   useEffect(() => {
     const t = window.setInterval(() => setHours(hoursLeftInWeek()), 60000)
     return () => window.clearInterval(t)
   }, [])
 
-  const league = LEAGUES[leagueId]
+  const league = LEAGUES[leagueId] ?? LEAGUES[0]
   const color = league.color
-  const list = useMemo(() => standings(leagueId, weekXp), [leagueId, weekXp])
-  const rank = yourRank(list)
-  const zone = zoneFor(leagueId, rank)
+  // `hours` verandert hooguit één keer per uur, dus de ranglijst ververst netjes mee
+  // zonder dat we elke minuut opnieuw rekenen
+  const list = useMemo(() => standings(leagueId, weekXp), [leagueId, weekXp, hours])
+  const total = list.length
+  const empty = total === 0
+  const rawRank = yourRank(list)
+  // yourRank geeft 0 als je (onverwacht) niet in de lijst staat — dan onderaan zetten
+  const rank = rawRank > 0 ? rawRank : total
+  const zone = zoneFor(leagueId, Math.max(1, rank))
   const climb = xpToClimb(list)
-  const above = rank > 1 ? list[rank - 2] : null
+  const above = rank > 1 ? (list[rank - 2] ?? null) : null
+  // nummer 2 (alleen relevant als jij bovenaan staat)
+  const runnerUp = list[1] ?? null
+  // ruwe schatting: ±20 XP per les
+  const lessons = climb !== null ? Math.max(1, Math.ceil(climb / 20)) : 0
 
   const urgent = hours < 24
   const elapsed = Math.min(1, Math.max(0, 1 - hours / HOURS_PER_WEEK))
 
   // namen van de divisie boven en onder je (leeg als die niet bestaat)
-  const nextLabel = leagueId + 1 < LEAGUES.length ? DIVISION_LABEL[leagueId + 1].toLowerCase() : ''
-  const prevLabel = leagueId > 0 ? DIVISION_LABEL[leagueId - 1].toLowerCase() : ''
-  const thisLabel = DIVISION_LABEL[leagueId].toLowerCase()
+  const nextLabel = leagueId + 1 < LEAGUES.length ? divisionLabel(leagueId + 1).toLowerCase() : ''
+  const prevLabel = leagueId > 0 ? divisionLabel(leagueId - 1).toLowerCase() : ''
+  const thisLabel = divisionLabel(leagueId).toLowerCase()
 
   // grens van de degradatiezone (laagste veilige plek)
-  const safeRank = TOTAL_PLAYERS - league.demote
+  const safeRank = Math.max(1, total - league.demote)
   // XP die je nog nodig hebt om de promotiezone te halen / uit de degradatiezone te komen
-  const toPromoZone =
-    league.promote > 0 && rank > league.promote ? Math.max(1, list[league.promote - 1].xp - weekXp + 1) : 0
-  const toSafe = league.demote > 0 && rank > safeRank ? Math.max(1, list[safeRank - 1].xp - weekXp + 1) : 0
+  const promoTarget = league.promote > 0 ? list[league.promote - 1] : undefined
+  const safeTarget = league.demote > 0 ? list[safeRank - 1] : undefined
+  const toPromoZone = promoTarget && rank > league.promote ? Math.max(1, promoTarget.xp - weekXp + 1) : 0
+  const toSafe = safeTarget && rank > safeRank ? Math.max(1, safeTarget.xp - weekXp + 1) : 0
 
   // sta je op promotie? dan een feestje bij het openen van het scherm
   useEffect(() => {
-    if (zone !== 'promotie') return
+    if (empty || zone !== 'promotie') return
     confetti({
       particleCount: 60,
       spread: 85,
@@ -357,7 +391,7 @@ export function LeagueScreen() {
       colors: [color, '#FFC53D', '#FFFFFF', '#EC4899'],
       disableForReducedMotion: true,
     })
-  }, [zone, color])
+  }, [empty, zone, color])
 
   const zoneCard =
     zone === 'promotie'
@@ -407,7 +441,7 @@ export function LeagueScreen() {
           className="display"
           style={{ fontSize: 30, color, textShadow: `0 0 26px ${alpha(color, 0.55)}` }}
         >
-          {DIVISION_LABEL[leagueId]}
+          {divisionLabel(leagueId)}
         </motion.h1>
         <p className="dim" style={{ fontSize: 13.5, marginTop: 2 }}>
           Divisie {leagueId + 1} van {LEAGUES.length}
@@ -421,7 +455,7 @@ export function LeagueScreen() {
       <div className="stat-grid" style={{ gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginTop: 16 }}>
         <div className="glass stat-card" style={{ padding: 14 }}>
           <div className="stat-value hot-text" style={{ fontSize: 26 }}>
-            #{rank}
+            {empty ? '—' : `#${rank}`}
           </div>
           <div className="stat-label">Jouw plek</div>
         </div>
@@ -433,7 +467,7 @@ export function LeagueScreen() {
         </div>
         <div className="glass stat-card" style={{ padding: 14 }}>
           <div className="stat-value" style={{ fontSize: 26, color: 'var(--cyan)' }}>
-            {TOTAL_PLAYERS}
+            {total}
           </div>
           <div className="stat-label">Spelers</div>
         </div>
@@ -485,22 +519,33 @@ export function LeagueScreen() {
           <span className="faint" style={{ fontSize: 11.5, fontWeight: 700 }}>
             {league.promote > 0 && `TOP ${league.promote} PROMOVEERT`}
             {league.promote > 0 && league.demote > 0 && ' · '}
-            {league.demote > 0 && `LAATSTE ${league.demote} ZAKT`}
+            {league.demote > 0 && `LAATSTE ${league.demote} ZAKKEN`}
           </span>
         </div>
 
-        {list.map((p, i) => {
-          const r = i + 1
-          const showPromo = league.promote > 0 && r === league.promote + 1
-          const showDemo = league.demote > 0 && r === safeRank + 1
-          return (
-            <div key={`${p.name}-${i}`}>
-              {showPromo && <ZoneDivider kind="promotie" />}
-              {showDemo && <ZoneDivider kind="degradatie" />}
-              <Row player={p} rank={r} delay={Math.min(0.3, i * 0.01)} />
-            </div>
-          )
-        })}
+        {empty ? (
+          <div className="center" style={{ padding: '26px 12px' }}>
+            <p className="display" style={{ fontSize: 16 }}>
+              De ranglijst wordt klaargezet
+            </p>
+            <p className="faint" style={{ fontSize: 12.5, marginTop: 5 }}>
+              Zodra de week begint zie je hier je tegenstanders.
+            </p>
+          </div>
+        ) : (
+          list.map((p, i) => {
+            const r = i + 1
+            const showPromo = league.promote > 0 && r === league.promote + 1
+            const showDemo = league.demote > 0 && r === safeRank + 1
+            return (
+              <div key={`${p.name}-${i}`}>
+                {showPromo && <ZoneDivider kind="promotie" />}
+                {showDemo && <ZoneDivider kind="degradatie" />}
+                <Row player={p} rank={r} delay={Math.min(0.3, i * 0.01)} />
+              </div>
+            )
+          })
+        )}
       </div>
 
       {/* ---------- motivatie ---------- */}
@@ -523,17 +568,24 @@ export function LeagueScreen() {
         <p className="dim" style={{ fontSize: 13.5, marginTop: 4 }}>
           {zoneCard.body}
         </p>
+        {weekXp === 0 && !empty && (
+          <p className="faint" style={{ fontSize: 12.5, marginTop: 6 }}>
+            Je hebt deze week nog geen XP verdiend — je eerste les zet je meteen in beweging.
+          </p>
+        )}
 
         <div className="divider-gold" style={{ margin: '14px 0', width: 44 }} />
 
         {climb === null || above === null ? (
           <>
             <p className="display" style={{ fontSize: 17 }}>
-              Je staat bovenaan. Verdedig je plek!
+              {empty ? 'Nog geen tegenstanders' : 'Je staat bovenaan. Verdedig je plek!'}
             </p>
-            <p className="faint" style={{ fontSize: 12.5, marginTop: 3 }}>
-              {list.length > 1 && `${list[1].name} zit ${fmt(Math.max(0, weekXp - list[1].xp))} XP achter je.`}
-            </p>
+            {runnerUp && (
+              <p className="faint" style={{ fontSize: 12.5, marginTop: 3 }}>
+                {runnerUp.name} zit {fmt(Math.max(0, weekXp - runnerUp.xp))} XP achter je.
+              </p>
+            )}
           </>
         ) : (
           <>

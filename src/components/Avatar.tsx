@@ -55,8 +55,8 @@ export const DEFAULT_PERSONA: AvatarStyle = { hair: 0, skin: 2, hairColor: 1, ou
  * De 8 vaste personages: 4 huidtinten (licht · medium · bruin · donker) × 2
  * haarstijlen (kort · lang). Elk personage heeft een eigen haarkleur en één
  * klein kenmerk (sproeten, bril, oorbellen) plus een eigen mondvorm.
- * a t/m d zijn bewust identiek gebleven aan de oude vier, zodat bestaande
- * accounts hun personage herkennen.
+ * a t/m d houden bewust de huidtint en haarstijl van de oude vier, zodat
+ * bestaande accounts hun personage blijven herkennen.
  */
 export const AVATAR_PRESETS: Record<Look, AvatarStyle> = {
   // licht + kort, donkerbruin haar — de standaard

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import confetti from 'canvas-confetti'
 import type { Course, CourseId, Fill, Listen, Select, TypeAnswer, WordBank } from '../types'
@@ -32,12 +32,42 @@ interface OpenDuel {
 
 const OPEN_KEY = 'fluent-duels-open'
 
+const MAX_OPEN = 8
+
+/** Streng valideren: opslag kan oud, half of door iets anders beschreven zijn */
+function isOpenDuel(v: unknown): v is OpenDuel {
+  if (typeof v !== 'object' || v === null) return false
+  const d = v as Record<string, unknown>
+  return (
+    typeof d.s === 'number' &&
+    Number.isFinite(d.s) &&
+    typeof d.c === 'string' &&
+    d.c in courses &&
+    typeof d.score === 'number' &&
+    Number.isFinite(d.score) &&
+    typeof d.total === 'number' &&
+    d.total > 0 &&
+    typeof d.link === 'string' &&
+    d.link.length > 0 &&
+    typeof d.day === 'string'
+  )
+}
+
 function readOpen(): OpenDuel[] {
   try {
     const raw = localStorage.getItem(OPEN_KEY)
     if (!raw) return []
     const arr: unknown = JSON.parse(raw)
-    return Array.isArray(arr) ? (arr as OpenDuel[]).filter((d) => typeof d?.s === 'number') : []
+    if (!Array.isArray(arr)) return []
+    const seen = new Set<number>()
+    const out: OpenDuel[] = []
+    // dubbele seeds zouden dubbele React-keys geven — hier meteen filteren
+    for (const v of arr) {
+      if (!isOpenDuel(v) || seen.has(v.s)) continue
+      seen.add(v.s)
+      out.push(v)
+    }
+    return out.slice(-MAX_OPEN)
   } catch {
     return []
   }
@@ -45,7 +75,7 @@ function readOpen(): OpenDuel[] {
 
 function writeOpen(list: OpenDuel[]) {
   try {
-    localStorage.setItem(OPEN_KEY, JSON.stringify(list.slice(-8)))
+    localStorage.setItem(OPEN_KEY, JSON.stringify(list.slice(-MAX_OPEN)))
   } catch {
     /* opslag geblokkeerd of vol — niet erg, je link staat ook in je chat */
   }
@@ -78,10 +108,41 @@ function burst() {
 
 /** Accepteert zowel een losse code als een volledige link */
 function codeFromInput(raw: string): string {
-  const t = raw.trim()
+  // WhatsApp plakt soms regeleindes of spaties mee
+  const t = raw.replace(/\s+/g, '')
   const i = t.indexOf('duel=')
-  if (i >= 0) return t.slice(i + 5).split('&')[0]
-  return t
+  const rest = i >= 0 ? t.slice(i + 5) : t
+  // alles na een & of # hoort niet meer bij de code
+  return rest.split('&')[0]?.split('#')[0] ?? ''
+}
+
+/** Naam uit een link is vreemde data: alleen tekst, kort genoeg voor de layout */
+function safeName(v: unknown, fallback: string): string {
+  if (typeof v !== 'string') return fallback
+  const t = v.replace(/\s+/g, ' ').trim().slice(0, 16)
+  return t || fallback
+}
+
+/** Getal uit een link: nooit NaN, altijd binnen redelijke grenzen */
+function safeInt(v: unknown, fallback: number, min: number, max: number): number {
+  if (typeof v !== 'number' || !Number.isFinite(v)) return fallback
+  return Math.min(max, Math.max(min, Math.round(v)))
+}
+
+/**
+ * Een gedecodeerde duel-link komt van buiten de app. Alles wat we tonen of
+ * opslaan gaat hier eerst doorheen — een kapotte of gerommelde link mag
+ * nooit het scherm laten crashen.
+ */
+function sanitize(p: DuelPayload | null): DuelPayload | null {
+  if (!p || typeof p.c !== 'string' || !(p.c in courses)) return null
+  return {
+    c: p.c,
+    s: safeInt(p.s, 0, 0, 2147483647),
+    n: safeName(p.n, ''),
+    x: safeInt(p.x, -1, -1, 999),
+    q: safeInt(p.q, QUESTIONS, 1, 50),
+  }
 }
 
 async function copyText(text: string): Promise<boolean> {
@@ -97,6 +158,17 @@ async function copyText(text: string): Promise<boolean> {
 
 function ShareBox({ value, waText, copyLabel }: { value: string; waText: string; copyLabel: string }) {
   const [state, setState] = useState<'idle' | 'ok' | 'fail'>('idle')
+  // levend houden zodat we na unmount geen state meer zetten
+  const alive = useRef(true)
+  const timer = useRef<number | null>(null)
+
+  useEffect(() => {
+    alive.current = true
+    return () => {
+      alive.current = false
+      if (timer.current !== null) window.clearTimeout(timer.current)
+    }
+  }, [])
 
   return (
     <div>
@@ -114,8 +186,12 @@ function ShareBox({ value, waText, copyLabel }: { value: string; waText: string;
         onClick={() => {
           sfx('tap')
           void copyText(value).then((ok) => {
+            if (!alive.current) return
             setState(ok ? 'ok' : 'fail')
-            window.setTimeout(() => setState('idle'), 2600)
+            if (timer.current !== null) window.clearTimeout(timer.current)
+            timer.current = window.setTimeout(() => {
+              if (alive.current) setState('idle')
+            }, 2600)
           })
         }}
       >
@@ -179,7 +255,13 @@ type Phase =
   | { name: 'result'; payload: DuelPayload; score: number; total: number; theirScore: number; xp: number }
   | { name: 'settled'; opponent: string; yours: number; theirs: number; total: number; xp: number }
 
-export function DuelScreen({ incoming }: { incoming?: DuelPayload | null }) {
+export function DuelScreen({
+  incoming,
+  onPlayingChange,
+}: {
+  incoming?: DuelPayload | null
+  onPlayingChange?: (playing: boolean) => void
+}) {
   const courseId = useStore((s) => s.courseId)
   const duelHistory = useStore((s) => s.duelHistory)
   const duelsWon = useStore((s) => s.duelsWon)
@@ -189,6 +271,12 @@ export function DuelScreen({ incoming }: { incoming?: DuelPayload | null }) {
   const curLevel = useStore((s) => levelForXp(totalXp(s)))
 
   const [phase, setPhase] = useState<Phase>({ name: 'hub' })
+
+  // tabs verbergen zodra het duel begint — volledig spelgevoel
+  useEffect(() => {
+    onPlayingChange?.(phase.name !== 'hub')
+    return () => onPlayingChange?.(false)
+  }, [phase.name, onPlayingChange])
   const [open, setOpen] = useState<OpenDuel[]>(() => readOpen())
   const [myName, setMyName] = useState('')
   const [codeInput, setCodeInput] = useState('')
