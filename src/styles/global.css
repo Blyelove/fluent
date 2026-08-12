@@ -153,6 +153,14 @@ input, textarea {
 
 /* ============ glass ============ */
 
+/* De vier hoofdkaarten op het startscherm (missies, doelen, wereld). Deze
+   klasse werd al gebruikt maar bestond nooit — de tekst plakte daardoor tegen
+   de rand en de kaarten tegen elkaar. */
+.unit-card {
+  padding: 20px 18px;
+  margin-bottom: 16px;
+}
+
 .glass {
   background: var(--surface);
   border: 1.5px solid var(--line);
