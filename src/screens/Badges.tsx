@@ -6,6 +6,7 @@ import { courses } from '../content'
 import { countryStates } from '../countries'
 import { totalXp, useStore, wordsLearned } from '../store'
 import { sfx } from '../audio'
+import type { Course } from '../types'
 
 /**
  * De verzamelkast: alle 10 badges met 5 tiers elk (50 te verdienen sterren).
@@ -20,19 +21,20 @@ const MAX_POINTS = BADGES.length * MAX_TIER
 
 /** Statistieken uit de store omzetten naar badge-tellers */
 function statsOf(s: State): BadgeStats {
-  const course = courses[s.courseId]
+  // opgeslagen data van een oudere versie kan een cursus bevatten die niet meer bestaat
+  const course = courses[s.courseId] as Course | undefined
   const completedCount = (s.progress[s.courseId]?.completed ?? []).length
   return {
     streak: s.streak,
     xp: totalXp(s),
     words: wordsLearned(s, s.courseId),
     perfect: s.perfectLessons,
-    countries: countryStates(course, completedCount).filter((c) => c.conquered).length,
+    countries: course ? countryStates(course, completedCount).filter((c) => c.conquered).length : 0,
     duels: s.duelsWon,
     league: s.promotions,
     arcade: s.arcadePlays,
-    tests: s.tests.filter((t) => t.passed).length,
-    goals: s.goalsDone.length,
+    tests: (s.tests ?? []).filter((t) => t.passed).length,
+    goals: (s.goalsDone ?? []).length,
   }
 }
 
@@ -40,8 +42,8 @@ function statsOf(s: State): BadgeStats {
 const CTA: Record<string, (n: number) => string> = {
   streak: (n) => `Nog ${n} ${n === 1 ? 'dag' : 'dagen'} op rij leren`,
   xp: (n) => `Nog ${fmt(n)} XP verdienen`,
-  words: (n) => `Nog ${n} ${n === 1 ? 'woord' : 'woorden'} leren`,
-  perfect: (n) => `Nog ${n} foutloze ${n === 1 ? 'les' : 'lessen'}`,
+  words: (n) => `Nog ${fmt(n)} ${n === 1 ? 'woord' : 'woorden'} leren`,
+  perfect: (n) => `Nog ${fmt(n)} foutloze ${n === 1 ? 'les' : 'lessen'}`,
   countries: (n) => `Nog ${n} ${n === 1 ? 'land' : 'landen'} veroveren`,
   duels: (n) => `Nog ${n} ${n === 1 ? 'duel' : 'duels'} winnen`,
   league: (n) => `Nog ${n} keer promoveren`,
@@ -51,7 +53,13 @@ const CTA: Record<string, (n: number) => string> = {
 }
 
 function fmt(n: number): string {
-  return n.toLocaleString('nl-NL')
+  return Number.isFinite(n) ? Math.round(n).toLocaleString('nl-NL') : '0'
+}
+
+/** Percentage veilig maken: nooit NaN en altijd binnen 0-100 */
+function pctOf(frac: number): number {
+  if (!Number.isFinite(frac)) return 0
+  return Math.max(0, Math.min(100, Math.round(frac * 100)))
 }
 
 function ctaFor(b: BadgeState): string {
@@ -65,7 +73,7 @@ function ctaFor(b: BadgeState): string {
 function TierPips({ tier, color }: { tier: number; color: string }) {
   return (
     <span className="row" style={{ gap: 3 }}>
-      {[1, 2, 3, 4, 5].map((t) => (
+      {Array.from({ length: MAX_TIER }, (_, i) => i + 1).map((t) => (
         <span
           key={t}
           style={{
@@ -141,7 +149,7 @@ export function BadgesScreen() {
   const points = badgePoints(list)
 
   // momentopname van "wat had je al gezien" — blijft staan terwijl we hem wegschrijven
-  const seenAtOpen = useRef(state.seenBadgeTiers)
+  const seenAtOpen = useRef<Record<string, number>>(state.seenBadgeTiers ?? {})
   const marked = useRef(false)
 
   useEffect(() => {
@@ -170,21 +178,26 @@ export function BadgesScreen() {
     }
   }, [])
 
+  // Escape sluit het detailvenster — luisteraar wordt netjes opgeruimd
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(null)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [open])
+
   const isNew = (b: BadgeState): boolean => b.tier > (seenAtOpen.current[b.def.id] ?? 0)
 
   // dichtst bij de volgende tier — alleen badges die nog te winnen zijn
-  const almost = useMemo(
-    () =>
-      list
-        .filter((b) => b.next !== null)
-        .slice()
-        .sort((a, b) => b.frac - a.frac)
-        .slice(0, 3),
-    [list]
-  )
+  // (filter geeft al een nieuwe array terug, sorteren is dus veilig)
+  const almost = useMemo(() => list.filter((b) => b.next !== null).sort((a, b) => b.frac - a.frac).slice(0, 3), [list])
 
   const started = list.filter((b) => b.tier > 0).length
   const maxed = list.filter((b) => b.tier === MAX_TIER).length
+  // helemaal verse gebruiker: nergens nog een teller boven nul
+  const heeftData = list.some((b) => b.value > 0)
 
   return (
     <div className="shell">
@@ -230,13 +243,13 @@ export function BadgesScreen() {
           <motion.div
             className="progress-fill"
             initial={{ width: 0 }}
-            animate={{ width: `${Math.round((points / MAX_POINTS) * 100)}%` }}
+            animate={{ width: `${pctOf(points / MAX_POINTS)}%` }}
             transition={{ type: 'spring', stiffness: 60, damping: 18, delay: 0.15 }}
           />
         </div>
 
         <p className="dim" style={{ fontSize: 13, marginTop: 10 }}>
-          {started} van de {BADGES.length} badges gestart
+          {started === 0 ? `Nog geen van de ${BADGES.length} badges gestart` : `${started} van de ${BADGES.length} badges gestart`}
           {maxed > 0 && (
             <>
               {' · '}
@@ -248,15 +261,34 @@ export function BadgesScreen() {
         </p>
       </motion.div>
 
+      {/* ---------- lege staat: nog helemaal niets verzameld ---------- */}
+      {!heeftData && (
+        <motion.div
+          className="glass center"
+          style={{ padding: 18, marginBottom: 26 }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, type: 'spring', stiffness: 220, damping: 24 }}
+        >
+          <span style={{ fontSize: 30, lineHeight: 1 }}>✨</span>
+          <p className="display" style={{ fontSize: 17, marginTop: 8 }}>
+            Nog niets verzameld
+          </p>
+          <p className="dim" style={{ fontSize: 13, marginTop: 6 }}>
+            Rond je eerste les af en de eerste tier is meteen binnen. Hieronder zie je precies wat er te veroveren valt.
+          </p>
+        </motion.div>
+      )}
+
       {/* ---------- bijna binnen ---------- */}
       {almost.length > 0 && (
         <section style={{ marginBottom: 28 }}>
           <div className="spread" style={{ marginBottom: 10 }}>
             <h2 className="display" style={{ fontSize: 19 }}>
-              Bijna binnen!
+              {heeftData ? 'Bijna binnen!' : 'Hier begin je'}
             </h2>
             <span className="faint" style={{ fontSize: 12 }}>
-              dichtstbijzijnde 3
+              {heeftData ? 'dichtstbij' : 'eerste mijlpalen'}
             </span>
           </div>
           <div className="col" style={{ gap: 10 }}>
@@ -286,13 +318,13 @@ export function BadgesScreen() {
                     <motion.span
                       style={{ display: 'block', height: '100%', borderRadius: 999, background: b.def.color }}
                       initial={{ width: 0 }}
-                      animate={{ width: `${Math.round(b.frac * 100)}%` }}
+                      animate={{ width: `${pctOf(b.frac)}%` }}
                       transition={{ type: 'spring', stiffness: 70, damping: 18, delay: 0.2 + 0.08 * i }}
                     />
                   </span>
                 </span>
                 <span className="display" style={{ fontSize: 15, color: b.def.color, fontWeight: 800 }}>
-                  {Math.round(b.frac * 100)}%
+                  {pctOf(b.frac)}%
                 </span>
               </motion.button>
             ))}
@@ -308,7 +340,7 @@ export function BadgesScreen() {
         {list.map((b, i) => {
           const locked = b.tier === 0
           const maxedOut = b.tier === MAX_TIER
-          const pct = Math.round(b.frac * 100)
+          const pct = pctOf(b.frac)
           return (
             <motion.button
               key={b.def.id}
@@ -433,6 +465,9 @@ export function BadgesScreen() {
           >
             <motion.div
               className="modal-panel"
+              role="dialog"
+              aria-modal="true"
+              aria-label={`Badge ${open.name}`}
               initial={{ y: 80 }}
               animate={{ y: 0 }}
               exit={{ y: 120 }}
@@ -441,7 +476,18 @@ export function BadgesScreen() {
             >
               {(() => {
                 const b = list.find((x) => x.def.id === open.id)
-                if (!b) return null
+                // kan in principe niet gebeuren, maar zonder sluitknop zit je vast
+                if (!b)
+                  return (
+                    <div className="col" style={{ gap: 14 }}>
+                      <p className="dim" style={{ fontSize: 14 }}>
+                        Deze badge kon niet worden geladen.
+                      </p>
+                      <button className="btn btn-ghost" onClick={() => setOpen(null)}>
+                        Sluiten
+                      </button>
+                    </div>
+                  )
                 return (
                   <>
                     <div className="row" style={{ gap: 14, marginBottom: 6 }}>
@@ -502,7 +548,7 @@ export function BadgesScreen() {
                                 justifyContent: 'center',
                                 fontSize: 14,
                                 background: done ? b.def.color : 'var(--surface-2)',
-                                color: done ? '#1a1033' : 'var(--text-faint)',
+                                color: done ? 'var(--ink-on-gold)' : 'var(--text-faint)',
                                 fontWeight: 800,
                               }}
                             >

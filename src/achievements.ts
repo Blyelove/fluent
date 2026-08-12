@@ -87,7 +87,7 @@ export const BADGES: BadgeDef[] = [
     color: '#818CF8',
     desc: 'Minigames gespeeld',
     tiers: [1, 10, 30, 75, 200],
-    tierNames: ['Speler', 'Gamer', 'Fanaat', 'Arcade-ratte', 'Legende'],
+    tierNames: ['Speler', 'Gamer', 'Fanaat', 'Arcade-rat', 'Legende'],
   },
   {
     id: 'tests',

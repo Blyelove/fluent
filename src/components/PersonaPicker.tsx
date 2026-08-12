@@ -1,5 +1,8 @@
 import {
   Avatar,
+  AVATAR_PRESETS,
+  AVATAR_STYLES,
+  AVATAR_STYLE_NAMES,
   EXTRA_NAMES,
   GENDER_NAMES,
   HAIR_COLORS,
@@ -8,6 +11,7 @@ import {
   OUTFIT_COLORS,
   SKINS,
   type AvatarStyle,
+  type Look,
 } from './Avatar'
 import { sfx } from '../audio'
 
@@ -40,8 +44,54 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
     </div>
   )
 
+  // snelkeuze: de acht kant-en-klare personages, daarna nog vrij aan te passen
+  const pickPreset = (l: Look) => {
+    sfx('tap')
+    onChange({ ...AVATAR_PRESETS[l] })
+  }
+  const isPreset = (l: Look) => {
+    const q = AVATAR_PRESETS[l]
+    return (
+      q.hair === value.hair &&
+      q.skin === value.skin &&
+      q.hairColor === value.hairColor &&
+      q.outfit === value.outfit &&
+      (q.extra ?? 0) === (value.extra ?? 0) &&
+      (q.gender ?? 0) === (value.gender ?? 0) &&
+      (q.mouth ?? 0) === (value.mouth ?? 0)
+    )
+  }
+
   return (
     <div className="glass" style={{ padding: 16, marginBottom: 16 }}>
+      <p className="eyebrow" style={{ fontSize: 10, marginBottom: 6 }}>
+        Snelkeuze — 8 personages
+      </p>
+      <div className="row" style={{ gap: 6, overflowX: 'auto', paddingBottom: 6, marginBottom: 12 }}>
+        {AVATAR_STYLES.map((l) => (
+          <button
+            key={l}
+            onClick={() => pickPreset(l)}
+            title={AVATAR_STYLE_NAMES[l]}
+            style={{
+              flexShrink: 0,
+              width: 60,
+              minHeight: 76,
+              borderRadius: 14,
+              padding: '3px 0 2px',
+              background: isPreset(l) ? 'rgba(236,72,153,0.16)' : 'var(--surface-2)',
+              border: isPreset(l) ? '2px solid var(--hot2)' : '1.5px solid var(--line)',
+            }}
+          >
+            <div style={{ height: 46, overflow: 'hidden', display: 'flex', justifyContent: 'center' }}>
+              <Avatar size={62} look={l} courseId="es" still />
+            </div>
+            <p style={{ fontSize: 9.5, fontWeight: 700, color: isPreset(l) ? 'var(--hot2)' : 'var(--text-faint)' }}>
+              {AVATAR_STYLE_NAMES[l]}
+            </p>
+          </button>
+        ))}
+      </div>
       <div className="row" style={{ gap: 14, alignItems: 'flex-start' }}>
         <div className="center" style={{ flexShrink: 0 }}>
           <Avatar size={96} look={value} courseId="es" />

@@ -25,6 +25,8 @@ export const GENDER_NAMES = ['Man', 'Vrouw']
 export const SKINS = ['#FFE4C8', '#FFDBB4', '#F2C094', '#D9A066', '#B07B4F', '#9C6644', '#6B4423', '#4A2E1C']
 /** telkens ±15% donkerder dan de huidtint — voor schaduw, sproeten en wangen */
 const SKIN_SHADES = ['#F5D2AC', '#EFC392', '#DFA672', '#C48A50', '#96613C', '#7E4E31', '#5B3A1E', '#38200F']
+/** mondlijn per huidtint: donkerder bij lichte huid, juist lichter bij donkere huid — altijd leesbaar */
+const MOUTH_LINES = ['#C4713A', '#BE6B33', '#B0672E', '#95511F', '#6E3616', '#5E2A0F', '#D0946A', '#BC7F53']
 /** 0-6 natuurlijk · 7-11 geverfd (arcade-kleuren) */
 export const HAIR_COLORS = [
   '#1E1611',
@@ -64,11 +66,11 @@ export const AVATAR_PRESETS: Record<Look, AvatarStyle> = {
   // bruin + kort, zwart haar met bril
   c: { hair: 0, skin: 5, hairColor: 0, outfit: 3, extra: 1, gender: 0, mouth: 0 },
   // bruin + lang, cyaan geverfd haar en oorbellen
-  d: { hair: 1, skin: 5, hairColor: 11, outfit: 6, extra: 2, gender: 1, mouth: 3 },
+  d: { hair: 1, skin: 5, hairColor: 11, outfit: 4, extra: 2, gender: 1, mouth: 3 },
   // medium + kort, roodbruin haar en sproeten
   e: { hair: 0, skin: 3, hairColor: 3, outfit: 5, extra: 3, gender: 0, mouth: 1 },
   // medium + lang, paars geverfd haar en oorbellen
-  f: { hair: 1, skin: 3, hairColor: 10, outfit: 4, extra: 2, gender: 1, mouth: 2 },
+  f: { hair: 1, skin: 3, hairColor: 10, outfit: 6, extra: 2, gender: 1, mouth: 2 },
   // donker + kort, platinawit haar met bril
   g: { hair: 0, skin: 6, hairColor: 6, outfit: 1, extra: 1, gender: 0, mouth: 3 },
   // donker + lang, zwart haar en oorbellen
@@ -154,6 +156,7 @@ export function Avatar({
   const lk = { skin: SKINS[p.skin], shade: SKIN_SHADES[p.skin], hair: HAIR_COLORS[p.hairColor] }
   // geverfd haar? dan houden we de wenkbrauwen natuurlijk — anders vervaagt het gezicht
   const browColor = p.hairColor >= DYED_FROM ? NATURAL_BROW : lk.hair
+  const mouthLine = MOUTH_LINES[p.skin]
   const running = mode === 'run'
   const cheering = mode === 'cheer'
 
@@ -517,11 +520,11 @@ export function Avatar({
           <path d="M89.5 83.6 L110.5 83.6 Q100 89 89.5 83.6 Z" fill="#FFF8F2" />
         </g>
       ) : p.mouth === 2 ? (
-        <path d="M91 85 Q100 89 109 85" stroke="#B0672E" strokeWidth="3" strokeLinecap="round" fill="none" />
+        <path d="M91 85 Q100 89 109 85" stroke={mouthLine} strokeWidth="3" strokeLinecap="round" fill="none" />
       ) : p.mouth === 3 ? (
-        <path d="M88 85 Q100 93 112 79" stroke="#B0672E" strokeWidth="3" strokeLinecap="round" fill="none" />
+        <path d="M88 85 Q100 93 112 79" stroke={mouthLine} strokeWidth="3" strokeLinecap="round" fill="none" />
       ) : (
-        <path d="M89 84 Q100 92 111 84" stroke="#B0672E" strokeWidth="3" strokeLinecap="round" fill="none" />
+        <path d="M89 84 Q100 92 111 84" stroke={mouthLine} strokeWidth="3" strokeLinecap="round" fill="none" />
       )}
       {/* blos */}
       <circle cx="76" cy="78" r="4.5" fill="#E89B6F" opacity="0.55" />

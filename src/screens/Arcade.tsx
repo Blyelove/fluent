@@ -149,7 +149,14 @@ export function ArcadeScreen() {
     return out
   }, [course, courseId, progress, srs])
 
-  const locked = myWords.length < MIN_WORDS
+  /**
+   * Nieuwe spelers meteen laten spelen: heb je nog geen 8 geleerde woorden,
+   * dan pak je de eerste woorden van de cursus — leren terwijl je speelt.
+   * Alleen als de cursus zelf te weinig woorden heeft blijft het spel dicht.
+   */
+  const usingStarter = myWords.length < MIN_WORDS && allWords.length >= MIN_WORDS
+  const playWords = usingStarter ? allWords.slice(0, 16) : myWords
+  const locked = playWords.length < MIN_WORDS
 
   const finish = useCallback(
     (game: GameId, score: number, detail: string) => {
@@ -175,7 +182,7 @@ export function ArcadeScreen() {
   const toHub = useCallback(() => setPhase({ name: 'hub' }), [])
 
   if (phase.name === 'play') {
-    const shared = { words: myWords, all: allWords, ttsLang: course.ttsLang, onExit: toHub }
+    const shared = { words: playWords, all: allWords, ttsLang: course.ttsLang, onExit: toHub }
     if (phase.game === 'bliksem') return <Bliksem {...shared} onFinish={(s, d) => finish('bliksem', s, d)} />
     if (phase.game === 'storm') return <Storm {...shared} onFinish={(s, d) => finish('storm', s, d)} />
     return <Luister {...shared} onFinish={(s, d) => finish('luister', s, d)} />
@@ -212,10 +219,31 @@ export function ArcadeScreen() {
             <span style={{ fontSize: 26, lineHeight: 1 }}>🔒</span>
             <div>
               <p className="display" style={{ fontSize: 16 }}>
-                Speel eerst een paar lessen om dit spel te ontgrendelen
+                Deze cursus heeft nog te weinig woorden
               </p>
               <p className="dim" style={{ fontSize: 13, marginTop: 4 }}>
-                Je hebt {myWords.length} van de {MIN_WORDS} woorden. De spellen gebruiken alleen woorden die jij al kent.
+                Er zijn minstens {MIN_WORDS} woorden nodig om te spelen.
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {usingStarter && (
+        <motion.div
+          className="glass"
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          style={{ padding: 14, marginTop: 18, borderColor: 'var(--line-hot)' }}
+        >
+          <div className="row" style={{ alignItems: 'flex-start', gap: 12 }}>
+            <span style={{ fontSize: 24, lineHeight: 1 }}>✨</span>
+            <div>
+              <p className="display" style={{ fontSize: 15 }}>
+                Je speelt met de startwoorden
+              </p>
+              <p className="dim" style={{ fontSize: 12.5, marginTop: 3 }}>
+                Leer terwijl je speelt — hoe meer lessen je doet, hoe meer eigen woorden in de spellen komen.
               </p>
             </div>
           </div>
