@@ -5,7 +5,7 @@ import type { Course, Exercise, Select, TypeAnswer, Unit } from '../types'
 import { courses } from '../content'
 import { useStore } from '../store'
 import { nextDueDate } from '../srs'
-import { mistakeKey, resolveMistake, sorteerFouten, type MistakeRef } from '../mistakes'
+import { isHerhaalbaar, mistakeKey, resolveMistake, sorteerFouten, type MistakeRef } from '../mistakes'
 import { levelForXp } from '../levels'
 import { totalXp } from '../store'
 import { sfx } from '../audio'
@@ -35,6 +35,9 @@ interface Item {
   key?: string
   /** sleutel van de bewaarde fout — alleen bij de fouten-modus */
   mistakeKey?: string
+  /** waar deze oefening vandaan komt, zodat een fout in een toets ook onthouden wordt */
+  lesId?: string
+  exIndex?: number
   /** waar deze fout vandaan komt, om te tonen tijdens het oefenen */
   bron?: string
   ex: Exercise
@@ -56,6 +59,7 @@ export function ReviewScreen() {
   const tests = useStore((s) => s.tests)
   const mistakes = useStore((s) => s.mistakes)
   const clearMistake = useStore((s) => s.clearMistake)
+  const addMistake = useStore((s) => s.addMistake)
   const curLevel = useStore((s) => levelForXp(totalXp(s)))
   const look = useStore((s) => s.avatarLook)
 
@@ -133,11 +137,16 @@ export function ReviewScreen() {
   }
 
   const startTest = (units: Unit[]) => {
-    const eligible: Exercise[] = []
-    for (const u of units) for (const l of u.lessons) for (const e of l.exercises) if (e.type !== 'new' && e.type !== 'match') eligible.push(e)
+    // herkomst meenemen (les + positie) zodat een fout in de toets ook in je foutenlijst belandt
+    const eligible: { ex: Exercise; lesId: string; exIndex: number }[] = []
+    for (const u of units)
+      for (const l of u.lessons)
+        l.exercises.forEach((e, i) => {
+          if (isHerhaalbaar(e)) eligible.push({ ex: e, lesId: l.id, exIndex: i })
+        })
     const items: Item[] = shuffle(eligible)
       .slice(0, 10)
-      .map((ex) => ({ ex }))
+      .map(({ ex, lesId, exIndex }) => ({ ex, lesId, exIndex }))
     const label = units.length === 1 ? `Toets: ${units[0].title}` : `Toets: ${units.length} onderwerpen`
     startSession('test', items, label)
   }
@@ -150,6 +159,10 @@ export function ReviewScreen() {
     if (phase.mode === 'srs' && item.key) reviewWord(item.key, r.correct)
     // fout eindelijk goed? dan verdwijnt hij uit je foutenlijst
     if (phase.mode === 'fouten' && item.mistakeKey && r.correct) clearMistake(item.mistakeKey)
+    // een fout in een toets telt net zo hard als een fout in een les
+    if (phase.mode === 'test' && !r.correct && item.lesId !== undefined && item.exIndex !== undefined) {
+      addMistake(courseId, item.lesId, item.exIndex)
+    }
     if (r.correct) {
       sfx('correct')
       setCorrectCount((c) => c + 1)
