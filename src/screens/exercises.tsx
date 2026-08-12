@@ -12,6 +12,12 @@ export interface EvalResult {
    * letter verkeerd is niet hetzelfde als het woord niet kennen.
    */
   spellingTip?: string
+  /**
+   * Het juiste antwoord in de DOELTAAL, om na een fout (of tikfout) uit te
+   * spreken. Alleen gevuld als de tekst zeker in de doeltaal is — een
+   * Nederlandse zin door een Spaanse stem is net zo fout als andersom.
+   */
+  speakAnswer?: string
 }
 
 export interface Registration {
@@ -83,16 +89,17 @@ function eenTikfout(a: string, b: string): boolean {
 export function beoordeelTypen(invoer: string, doelen: string[]): EvalResult {
   const gegeven = norm(invoer)
   const hoofd = doelen[0] ?? ''
-  for (const doel of doelen) if (norm(doel) === gegeven) return { correct: true, correctAnswer: hoofd }
+  for (const doel of doelen) if (norm(doel) === gegeven) return { correct: true, correctAnswer: hoofd, speakAnswer: hoofd }
   for (const doel of doelen) {
     const d = norm(doel)
     // accentfout: zonder accenten gelijk
-    if (zonderAccenten(d) === zonderAccenten(gegeven)) return { correct: true, correctAnswer: hoofd, spellingTip: doel }
+    if (zonderAccenten(d) === zonderAccenten(gegeven))
+      return { correct: true, correctAnswer: hoofd, spellingTip: doel, speakAnswer: doel }
     // tikfout: één letter afwijking op een woord dat lang genoeg is om dat te vergeven
     if (d.length >= 4 && eenTikfout(zonderAccenten(d), zonderAccenten(gegeven)))
-      return { correct: true, correctAnswer: hoofd, spellingTip: doel }
+      return { correct: true, correctAnswer: hoofd, spellingTip: doel, speakAnswer: doel }
   }
-  return { correct: false, correctAnswer: hoofd }
+  return { correct: false, correctAnswer: hoofd, speakAnswer: hoofd }
 }
 
 const SpeakerIcon = ({ size = 26 }: { size?: number }) => (
@@ -178,7 +185,12 @@ export function SelectEx({ ex, ttsLang, locked, register }: Common & { ex: Selec
   useEffect(() => {
     register({
       ready: chosen !== null,
-      evaluate: () => ({ correct: chosen === juist, correctAnswer: ex.options[ex.correct] }),
+      evaluate: () => ({
+        correct: chosen === juist,
+        correctAnswer: ex.options[ex.correct],
+        // zonder speak zijn de opties doeltaal — dan mag het juiste antwoord klinken
+        speakAnswer: ex.speak ? undefined : ex.options[ex.correct],
+      }),
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chosen])
@@ -227,6 +239,7 @@ export function WordBankEx({ ex, locked, register }: Common & { ex: WordBank }) 
       evaluate: () => ({
         correct: norm(picked.map((i) => tiles[i]).join(' ')) === norm(ex.target),
         correctAnswer: ex.target,
+        speakAnswer: ex.target,
       }),
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -371,7 +384,7 @@ export function ListenEx({ ex, ttsLang, locked, register }: Common & { ex: Liste
   useEffect(() => {
     register({
       ready: chosen !== null,
-      evaluate: () => ({ correct: chosen === juist, correctAnswer: ex.target }),
+      evaluate: () => ({ correct: chosen === juist, correctAnswer: ex.target, speakAnswer: ex.target }),
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chosen])
@@ -447,6 +460,7 @@ export function FillEx({ ex, locked, register }: Common & { ex: Fill }) {
       evaluate: () => ({
         correct: chosen === juist,
         correctAnswer: `${ex.before} ${ex.options[ex.correct]} ${ex.after}`.replace(/\s+/g, ' ').trim(),
+        speakAnswer: `${ex.before} ${ex.options[ex.correct]} ${ex.after}`.replace(/\s+/g, ' ').trim(),
       }),
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps

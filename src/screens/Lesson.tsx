@@ -122,6 +122,12 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
   const applyResult = (r: EvalResult) => {
     setResult(r)
     setPhase('feedback')
+    // na een fout of tikfout hoor je hoe het juiste antwoord klínkt — lezen
+    // alleen is geen taal leren (bij goed zonder tip zou het dubbel zijn met
+    // de audio die veel oefeningen zelf al afspelen)
+    if (r.speakAnswer && (!r.correct || r.spellingTip)) {
+      setTimeout(() => speak(r.speakAnswer ?? '', course.ttsLang), 420)
+    }
     if (ex.type !== 'new') {
       if (r.correct) {
         sfx('correct')

@@ -57,14 +57,20 @@ interface Manifest {
 }
 
 function audioSleutels(ex: Exercise): string[] {
-  // wat de gebruiker daadwerkelijk te horen kan krijgen
+  // wat de gebruiker daadwerkelijk te horen kan krijgen — sinds ronde 22 ook
+  // het juiste antwoord dat na een fout wordt uitgesproken
   switch (ex.type) {
     case 'new':
       return [ex.word, ...(ex.example ? [ex.example] : [])]
     case 'listen':
       return [ex.target]
     case 'select':
-      return ex.speak ? [ex.speak] : []
+      return ex.speak ? [ex.speak] : [ex.options[ex.correct]]
+    case 'type':
+    case 'wordbank':
+      return [ex.target]
+    case 'fill':
+      return [`${ex.before} ${ex.options[ex.correct]} ${ex.after}`.replace(/\s+/g, ' ').trim()]
     default:
       return []
   }

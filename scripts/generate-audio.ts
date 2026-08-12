@@ -52,8 +52,16 @@ function collect(course: Course): Set<string> {
             if (e.example) texts.add(e.example)
           }
           if (e.type === 'select' && e.speak) texts.add(e.speak)
+          // zonder speak is de prompt Nederlands en zijn de OPTIES doeltaal:
+          // het juiste antwoord wordt na een fout uitgesproken
+          if (e.type === 'select' && !e.speak) texts.add(e.options[e.correct])
           if (e.type === 'listen') texts.add(e.target)
           if (e.type === 'match') for (const p of e.pairs) texts.add(p.target)
+          // de drie types die stil waren: na een fout (of een tikfout) spreekt
+          // de app nu het juiste antwoord uit, dus die zinnen horen in het manifest
+          if (e.type === 'type') texts.add(e.target)
+          if (e.type === 'wordbank') texts.add(e.target)
+          if (e.type === 'fill') texts.add(`${e.before} ${e.options[e.correct]} ${e.after}`.replace(/\s+/g, ' ').trim())
         }
   return texts
 }

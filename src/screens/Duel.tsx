@@ -5,7 +5,7 @@ import type { Course, CourseId, Fill, Listen, Select, TypeAnswer, WordBank } fro
 import { courses } from '../content'
 import { totalXp, useStore } from '../store'
 import { levelForXp } from '../levels'
-import { sfx } from '../audio'
+import { sfx, speak } from '../audio'
 import { Avatar } from '../components/Avatar'
 import { Flag } from '../components/Flag'
 import { courseFlagCode } from '../countries'
@@ -438,6 +438,10 @@ export function DuelScreen({
     const r = evalRef.current()
     setAnswered(r)
     setMarks((m) => [...m, r.correct])
+    // ook in een duel hoor je na een misser hoe het wél klinkt
+    if (r.speakAnswer && (!r.correct || r.spellingTip)) {
+      setTimeout(() => speak(r.speakAnswer ?? '', courses[phase.payload.c]?.ttsLang ?? ''), 420)
+    }
     if (r.correct) {
       sfx('correct')
       setCorrect((c) => c + 1)

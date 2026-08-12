@@ -8,7 +8,7 @@ import { nextDueDate } from '../srs'
 import { isHerhaalbaar, mistakeKey, resolveMistake, sorteerFouten, type MistakeRef } from '../mistakes'
 import { levelForXp } from '../levels'
 import { totalXp } from '../store'
-import { sfx } from '../audio'
+import { sfx, speak } from '../audio'
 import { Avatar } from '../components/Avatar'
 import { FillEx, ListenEx, SelectEx, TypeEx, WordBankEx, type EvalResult, type Registration } from './exercises'
 
@@ -158,6 +158,10 @@ export function ReviewScreen() {
     if (phase.name !== 'run' || !evalRef.current) return
     const r = evalRef.current()
     setAnswered(r)
+    // na een fout of tikfout klinkt het juiste antwoord in de doeltaal
+    if (r.speakAnswer && (!r.correct || r.spellingTip)) {
+      setTimeout(() => speak(r.speakAnswer ?? '', course.ttsLang), 420)
+    }
     const item = phase.items[idx]
     if (phase.mode === 'srs' && item.key) reviewWord(item.key, r.correct)
     // fout eindelijk goed? dan verdwijnt hij uit je foutenlijst
