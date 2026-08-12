@@ -58,6 +58,22 @@ function vraagTekst(ex: Exercise): string {
 const PRAISE = ['Juist.', 'Precies.', 'Uitstekend.', 'Prachtig.', 'Zo hoort het.']
 const GENTLE = ['Bijna.', 'Net niet.', 'Volgende keer.', 'Blijf scherp.']
 
+/**
+ * De regel boven het feedbackpaneel. Een match-oefening is nooit "fout": je
+ * hebt alle paren gevonden, hooguit met een omweg. Daar hoort een andere toon
+ * bij dan bij een gemist antwoord.
+ */
+function kiesFeedback(r: EvalResult): string {
+  if (r.match) {
+    if (r.correct) return 'Alle paren gevonden!'
+    const n = r.misPogingen ?? 0
+    return n === 1 ? 'Gevonden, na één misser.' : `Gevonden, na ${n} missers.`
+  }
+  return r.correct
+    ? PRAISE[Math.floor(Math.random() * PRAISE.length)]
+    : GENTLE[Math.floor(Math.random() * GENTLE.length)]
+}
+
 export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
   /** De unit waar deze les in zit — nodig om de juiste grammatica-gids te laden */
   const unit = useMemo(() => {
@@ -102,6 +118,8 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
   const [pauze, setPauze] = useState(false)
   const [phase, setPhase] = useState<'answer' | 'feedback'>('answer')
   const [result, setResult] = useState<EvalResult | null>(null)
+  /** één keer gekozen bij het antwoord, zodat de tekst niet flikkert */
+  const [feedbackTekst, setFeedbackTekst] = useState('')
   const [ready, setReady] = useState(false)
   const [mistakes, setMistakes] = useState(0)
   const [combo, setCombo] = useState(0)
@@ -130,6 +148,9 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
 
   const applyResult = (r: EvalResult) => {
     setResult(r)
+    // de tekst één keer kiezen: in de render zou hij bij elke hertekening
+    // veranderen, wat als flikkering te zien is
+    setFeedbackTekst(kiesFeedback(r))
     setPhase('feedback')
     // na een fout of tikfout hoor je hoe het juiste antwoord klínkt — lezen
     // alleen is geen taal leren (bij goed zonder tip zou het dubbel zijn met
@@ -172,7 +193,12 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
 
   /** De regel uit de gids die het best past bij deze fout */
   const regel = useMemo(
-    () => (result && !result.correct ? pickRule(guide ?? undefined, result.correctAnswer ?? '', vraagTekst(ex)) : null),
+    () =>
+      // bij een match is er geen enkel antwoord om een regel bij te zoeken;
+      // pickRule zou dan zomaar een willekeurige regel tonen
+      result && !result.correct && !result.match
+        ? pickRule(guide ?? undefined, result.correctAnswer ?? '', vraagTekst(ex))
+        : null,
     [result, guide, ex]
   )
 
@@ -367,14 +393,10 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
             </motion.div>
           ) : (
             <motion.div key="fb" initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 30, opacity: 0 }} transition={{ duration: 0.18 }}>
-              <div className={`sheet-inner ${result?.correct ? 'good' : 'bad'}`}>
+              <div className={`sheet-inner ${result?.correct || result?.match ? 'good' : 'bad'}`}>
                 <div className="spread" style={{ marginBottom: 12 }}>
                   <div>
-                    <p className={`feedback-title ${result?.correct ? 'ok-text' : 'err-text'}`}>
-                      {result?.correct
-                        ? PRAISE[Math.floor(Math.random() * PRAISE.length)]
-                        : GENTLE[Math.floor(Math.random() * GENTLE.length)]}
-                    </p>
+                    <p className={`feedback-title ${result?.correct || result?.match ? 'ok-text' : 'err-text'}`}>{feedbackTekst}</p>
                     {!result?.correct && result?.correctAnswer && (
                       <p className="dim" style={{ fontSize: 15 }}>
                         Juiste antwoord: <strong style={{ color: 'var(--text)' }}>{result.correctAnswer}</strong>

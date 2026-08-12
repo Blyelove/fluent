@@ -18,6 +18,10 @@ export interface EvalResult {
    * Nederlandse zin door een Spaanse stem is net zo fout als andersom.
    */
   speakAnswer?: string
+  /** Kwam dit uit een match-oefening? Alle paren zijn dan hoe dan ook gevonden. */
+  match?: boolean
+  /** Hoeveel keer je een verkeerd paar probeerde voordat alles klopte */
+  misPogingen?: number
 }
 
 export interface Registration {
@@ -328,7 +332,17 @@ export function MatchEx({
         setDone(next)
         sfx('correct')
         if (next.size === ex.pairs.length * 2) {
-          setTimeout(() => onAuto({ correct: wrongCount === 0 }), 500)
+          // je hebt álle paren gevonden, dus dit is nooit een mislukking:
+          // hooguit ging het met een omweg. "Bijna." past daar niet bij.
+          setTimeout(
+            () =>
+              onAuto({
+                correct: wrongCount === 0,
+                match: true,
+                misPogingen: wrongCount,
+              }),
+            500
+          )
         }
       } else {
         sfx('wrong')

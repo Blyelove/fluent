@@ -122,7 +122,7 @@ Fluent heeft een kern die al als topspel voelt — chunky leslus met combo's en 
 
 **Bewijs:** Maak een fout in een les: de balk blijft staan; beantwoord de laatste toetsvraag: de balk loopt vol vóór het klaar-scherm.
 
-### 29. Match-afronding positief framen: MatchEx geeft onAuto zonder correctAnswer (exercises.tsx r317), dus je ziet 'Bijna.' na een voltooide oefening, en vraagTekst geeft '' waardoor pickRule (guides/index.ts r32) een willekeurige regel toont. 'Alle paren gevonden!' met eventueel het foute paar benoemd; geen Waarom-knop bij match en pickRule geeft null bij score 0.
+### 29. ✅ AF (ronde 52) — Match-afronding positief framen: MatchEx geeft onAuto zonder correctAnswer (exercises.tsx r317), dus je ziet 'Bijna.' na een voltooide oefening, en vraagTekst geeft '' waardoor pickRule (guides/index.ts r32) een willekeurige regel toont. 'Alle paren gevonden!' met eventueel het foute paar benoemd; geen Waarom-knop bij match en pickRule geeft null bij score 0.
 
 **Bewijs:** Maak één mis-tik in een match: de afronding blijft positief, benoemt het paar, en er verschijnt geen irrelevante Waarom-uitleg.
 
