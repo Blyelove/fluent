@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   Avatar,
   AVATAR_PRESETS,
@@ -17,6 +18,7 @@ import { sfx } from '../audio'
 
 /** De personage-maker: 10 haarstijlen × 8 huidtinten × 12 haarkleuren × 10 outfits × extra's × monden */
 export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChange: (p: AvatarStyle) => void }) {
+  const [alles, setAlles] = useState(false)
   const set = (patch: Partial<AvatarStyle>) => {
     sfx('tap')
     onChange({ ...value, ...patch })
@@ -62,20 +64,37 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
     )
   }
 
+  // ingeklapt tonen we er acht; is jouw huidige personage er één van verderop,
+  // dan schuift die erbij zodat je selectie nooit onzichtbaar wordt
+  const eersteAcht = AVATAR_STYLES.slice(0, 8)
+  const gekozen = AVATAR_STYLES.find(isPreset)
+  const zichtbaar = alles
+    ? AVATAR_STYLES
+    : gekozen && !eersteAcht.includes(gekozen)
+      ? [...eersteAcht, gekozen]
+      : eersteAcht
+
   return (
     <div className="glass" style={{ padding: 16, marginBottom: 16 }}>
       <p className="eyebrow" style={{ fontSize: 10, marginBottom: 6 }}>
-        Snelkeuze — 8 personages
+        Snelkeuze — {AVATAR_STYLES.length} personages
       </p>
-      <div className="row" style={{ gap: 6, overflowX: 'auto', paddingBottom: 6, marginBottom: 12 }}>
-        {AVATAR_STYLES.map((l) => (
+      {/* een afbrekend raster in plaats van een schuifbalk: alles is zichtbaar
+          zonder te slepen, en er staat nergens een lelijke scrollbalk */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(58px, 1fr))',
+          gap: 6,
+          marginBottom: 10,
+        }}
+      >
+        {zichtbaar.map((l) => (
           <button
             key={l}
             onClick={() => pickPreset(l)}
             title={AVATAR_STYLE_NAMES[l]}
             style={{
-              flexShrink: 0,
-              width: 60,
               minHeight: 76,
               borderRadius: 14,
               padding: '3px 0 2px',
@@ -92,6 +111,16 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
           </button>
         ))}
       </div>
+      <button
+        className="btn btn-ghost"
+        style={{ fontSize: 12.5, padding: 9, marginBottom: 12 }}
+        onClick={() => {
+          sfx('tap')
+          setAlles((a) => !a)
+        }}
+      >
+        {alles ? 'Toon er minder' : `Toon alle ${AVATAR_STYLES.length} personages`}
+      </button>
       <div className="row" style={{ gap: 14, alignItems: 'flex-start' }}>
         <div className="center" style={{ flexShrink: 0 }}>
           <Avatar size={96} look={value} courseId="es" />

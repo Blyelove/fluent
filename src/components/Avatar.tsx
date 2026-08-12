@@ -2,8 +2,11 @@ import { useId } from 'react'
 import { motion } from 'motion/react'
 import type { CourseId } from '../types'
 
-/** De 8 kant-en-klare personages (a t/m h) — ook nog steeds de legacy-waarde in de store */
-export type Look = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h'
+/** De 24 kant-en-klare personages (a t/m x) — ook nog steeds de legacy-waarde in de store */
+export type Look =
+  | 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h'
+  | 'i' | 'j' | 'k' | 'l' | 'm' | 'n' | 'o' | 'p'
+  | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x'
 
 /** Vrij samen te stellen personage — 10×8×12×10×4×4×2 = ruim 300.000 combinaties */
 export interface AvatarStyle {
@@ -53,11 +56,12 @@ export const MOUTH_NAMES = ['Glimlach', 'Brede lach', 'Kalm', 'Grijns']
 export const DEFAULT_PERSONA: AvatarStyle = { hair: 0, skin: 2, hairColor: 1, outfit: 0, extra: 0, gender: 0, mouth: 0 }
 
 /**
- * De 8 vaste personages: 4 huidtinten (licht · medium · bruin · donker) × 2
- * haarstijlen (kort · lang). Elk personage heeft een eigen haarkleur en één
- * klein kenmerk (sproeten, bril, oorbellen) plus een eigen mondvorm.
- * a t/m d houden bewust de huidtint en haarstijl van de oude vier, zodat
- * bestaande accounts hun personage blijven herkennen.
+ * De 24 vaste personages. a t/m h zijn de oorspronkelijke acht en blijven
+ * ongewijzigd, zodat bestaande accounts hun personage herkennen; i t/m x zijn
+ * er later bij gekomen om ALLE tien haarstijlen, alle acht huidtinten, alle
+ * twaalf haarkleuren en alle tien outfits minstens één keer te laten zien.
+ * Wie geen zin heeft om zelf te knutselen, vindt hier meteen iemand die past —
+ * en wie dat wel wil, gebruikt er een als startpunt.
  */
 export const AVATAR_PRESETS: Record<Look, AvatarStyle> = {
   // licht + kort, donkerbruin haar — de standaard
@@ -76,12 +80,44 @@ export const AVATAR_PRESETS: Record<Look, AvatarStyle> = {
   g: { hair: 0, skin: 6, hairColor: 6, outfit: 1, extra: 1, gender: 0, mouth: 3 },
   // donker + lang, zwart haar en oorbellen
   h: { hair: 1, skin: 6, hairColor: 0, outfit: 8, extra: 2, gender: 1, mouth: 1 },
+  // krullen
+  i: { hair: 2, skin: 1, hairColor: 2, outfit: 2, extra: 0, gender: 0, mouth: 3 },
+  j: { hair: 2, skin: 4, hairColor: 1, outfit: 9, extra: 1, gender: 1, mouth: 1 },
+  r: { hair: 2, skin: 0, hairColor: 6, outfit: 9, extra: 3, gender: 1, mouth: 3 },
+  // knot
+  l: { hair: 3, skin: 0, hairColor: 4, outfit: 8, extra: 3, gender: 1, mouth: 0 },
+  t: { hair: 3, skin: 7, hairColor: 0, outfit: 2, extra: 1, gender: 1, mouth: 0 },
+  // buzz
+  k: { hair: 4, skin: 6, hairColor: 0, outfit: 3, extra: 0, gender: 0, mouth: 2 },
+  u: { hair: 4, skin: 4, hairColor: 7, outfit: 9, extra: 0, gender: 0, mouth: 1 },
+  // staart
+  n: { hair: 5, skin: 2, hairColor: 3, outfit: 5, extra: 2, gender: 1, mouth: 1 },
+  v: { hair: 5, skin: 1, hairColor: 10, outfit: 8, extra: 3, gender: 1, mouth: 3 },
+  // afro
+  q: { hair: 6, skin: 5, hairColor: 0, outfit: 4, extra: 1, gender: 0, mouth: 1 },
+  // hanekam
+  m: { hair: 7, skin: 3, hairColor: 9, outfit: 6, extra: 1, gender: 0, mouth: 3 },
+  s: { hair: 7, skin: 7, hairColor: 11, outfit: 6, extra: 2, gender: 0, mouth: 2 },
+  // kuif
+  o: { hair: 8, skin: 1, hairColor: 5, outfit: 1, extra: 0, gender: 0, mouth: 0 },
+  w: { hair: 8, skin: 6, hairColor: 9, outfit: 5, extra: 2, gender: 0, mouth: 1 },
+  // vlechten
+  p: { hair: 9, skin: 4, hairColor: 8, outfit: 7, extra: 2, gender: 1, mouth: 1 },
+  x: { hair: 9, skin: 3, hairColor: 6, outfit: 3, extra: 1, gender: 1, mouth: 2 },
 }
 
-/** Alle vaste personages op volgorde — schermen kunnen hierover itereren */
-export const AVATAR_STYLES: Look[] = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+/**
+ * Alle vaste personages op volgorde — schermen kunnen hierover itereren.
+ * Bewust gegroepeerd op haarstijl, zodat het raster er geordend uitziet
+ * in plaats van als een willekeurige hoop.
+ */
+export const AVATAR_STYLES: Look[] = [
+  'a', 'c', 'e', 'g', 'b', 'd', 'f', 'h',
+  'i', 'j', 'r', 'l', 't', 'k', 'u', 'n',
+  'v', 'q', 'm', 's', 'o', 'w', 'p', 'x',
+]
 
-/** Nederlandse namen bij de acht personages, voor keuzeschermen */
+/** Nederlandse namen bij de personages, voor keuzeschermen */
 export const AVATAR_STYLE_NAMES: Record<Look, string> = {
   a: 'Sem',
   b: 'Noor',
@@ -91,6 +127,22 @@ export const AVATAR_STYLE_NAMES: Record<Look, string> = {
   f: 'Luna',
   g: 'Amir',
   h: 'Zara',
+  i: 'Milan',
+  j: 'Sofia',
+  k: 'Youssef',
+  l: 'Fleur',
+  m: 'Jayden',
+  n: 'Nora',
+  o: 'Liam',
+  p: 'Mila',
+  q: 'Ravi',
+  r: 'Esmee',
+  s: 'Dani',
+  t: 'Aya',
+  u: 'Bo',
+  v: 'Tess',
+  w: 'Sami',
+  x: 'Vera',
 }
 
 export function normalizePersona(p?: AvatarStyle | Look | null): AvatarStyle {

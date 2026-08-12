@@ -39,6 +39,25 @@
 
 html, body { height: 100%; }
 
+/* Schuifbalken in de huisstijl. De grijze systeembalk van Windows viel hard
+   uit de toon in het donkere neon-ontwerp; deze is dun, paars en verdwijnt in
+   de achtergrond. Gebruik .no-scrollbar voor stroken die je met de duim
+   veegt — daar hoort helemaal geen balk te staan. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(168, 85, 247, 0.45) transparent;
+}
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: rgba(168, 85, 247, 0.42);
+  border-radius: 999px;
+}
+*::-webkit-scrollbar-thumb:hover { background: rgba(236, 72, 153, 0.6); }
+
+.no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
 body {
   background: var(--bg);
   background-image:
