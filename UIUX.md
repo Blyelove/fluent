@@ -142,7 +142,7 @@ Fluent heeft een kern die al als topspel voelt — chunky leslus met combo's en 
 
 **Bewijs:** Op 375px scant elke kaart in één blik: getal, tijd, beloning en teaser zichtbaar zonder te lezen.
 
-### 34. Profiel-transformatie als evolutierij: Profile.tsx r195-236 toont het unieke transformatie-idee als 19 tekstregels. Horizontaal swipebare rij met Avatar op niveau 1/5/10/15/20 (level-prop bestaat al), behaalde stadia in kleur, toekomstige als silhouet met '?', huidig stadium met amber ring; tik = itemlijst tot daar.
+### 34. ✅ AF (ronde 51) — Profiel-transformatie als evolutierij: Profile.tsx r195-236 toont het unieke transformatie-idee als 19 tekstregels. Horizontaal swipebare rij met Avatar op niveau 1/5/10/15/20 (level-prop bestaat al), behaalde stadia in kleur, toekomstige als silhouet met '?', huidig stadium met amber ring; tik = itemlijst tot daar.
 
 **Bewijs:** Op niveau 4: stadia 1 in kleur, 5-20 als silhouet, ring op je positie; tik op niveau 10 toont de bijbehorende items.
 

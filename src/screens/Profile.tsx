@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { courses } from '../content'
 import { courseProgress, totalXp, useStore, wordsLearned } from '../store'
-import { levelProgress, levelTitle, wardrobeFor } from '../levels'
+import { levelProgress, levelTitle, nextReward, wardrobeFor } from '../levels'
 import { courseFlagCode } from '../countries'
 import { Flag } from '../components/Flag'
 import { Avatar, normalizePersona } from '../components/Avatar'
@@ -16,6 +16,8 @@ export function ProfileScreen() {
   const lp = levelProgress(totalXp(state))
   const [view, setView] = useState<'profiel' | 'badges'>('profiel')
   const [bewerkt, setBewerkt] = useState(false)
+  /** aangetikt stadium in de evolutierij */
+  const [toonNiveau, setToonNiveau] = useState<number | null>(null)
 
   if (view === 'badges') {
     return (
@@ -228,6 +230,7 @@ export function ProfileScreen() {
 
       {(() => {
         const wardrobe = wardrobeFor(state.courseId)
+        const volgendItem = nextReward(state.courseId, lp.level)
         return (
           <div className="glass" style={{ padding: 18, marginBottom: 24 }}>
             <div className="spread">
@@ -236,35 +239,96 @@ export function ProfileScreen() {
                 {wardrobe.filter((w) => lp.level >= w.level).length} / {wardrobe.length}
               </span>
             </div>
-            <div className="col" style={{ marginTop: 8 }}>
-              {wardrobe.map((w, i) => {
-                const unlocked = lp.level >= w.level
+            {/* de evolutierij: zie in één blik hoe je figuur meegroeit. Dit was
+                een lijst van negentien tekstregels, terwijl juist dit het
+                verhaal van de app vertelt. */}
+            <div
+              className="no-scrollbar row"
+              style={{ gap: 10, overflowX: 'auto', padding: '14px 2px 6px', scrollSnapType: 'x mandatory' }}
+            >
+              {[1, 5, 10, 15, 20].map((niv) => {
+                const bereikt = lp.level >= niv
+                const huidig = lp.level >= niv && lp.level < niv + 5
                 return (
-                  <div
-                    className="spread"
-                    key={w.level}
-                    style={{ padding: '10px 0', borderBottom: i < wardrobe.length - 1 ? '1px solid var(--line)' : 'none' }}
+                  <button
+                    key={niv}
+                    onClick={() => {
+                      sfx('tap')
+                      setToonNiveau(niv === toonNiveau ? null : niv)
+                    }}
+                    style={{
+                      flexShrink: 0,
+                      width: 92,
+                      padding: '10px 4px 8px',
+                      borderRadius: 16,
+                      scrollSnapAlign: 'start',
+                      background: huidig ? 'rgba(255,197,61,0.12)' : 'var(--surface-2)',
+                      border: huidig ? '2px solid var(--gold)' : '1.5px solid var(--line)',
+                    }}
                   >
-                    <span style={{ fontSize: 14, fontWeight: 500, color: unlocked ? 'var(--text)' : 'var(--text-faint)' }}>{w.item}</span>
-                    {unlocked ? (
-                      <span className="gold-text" style={{ fontWeight: 700, fontSize: 14 }}>
-                        ✓
-                      </span>
-                    ) : (
-                      <span className="faint" style={{ fontSize: 12 }}>
-                        Niveau {w.level}
-                      </span>
-                    )}
-                  </div>
+                    <div
+                      style={{
+                        height: 84,
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'flex-end',
+                        // nog niet bereikt? dan een silhouet: je ziet dát er iets
+                        // komt, maar nog niet wát
+                        filter: bereikt ? undefined : 'brightness(0) opacity(0.32)',
+                      }}
+                    >
+                      <Avatar size={78} level={niv} courseId={state.courseId} look={state.avatarLook} still />
+                    </div>
+                    <p
+                      style={{
+                        fontSize: 11.5,
+                        fontWeight: 800,
+                        marginTop: 4,
+                        color: huidig ? 'var(--gold)' : bereikt ? 'var(--text)' : 'var(--text-faint)',
+                      }}
+                    >
+                      {bereikt ? `Niveau ${niv}` : `Niveau ${niv} 🔒`}
+                    </p>
+                  </button>
                 )
               })}
             </div>
-            <div className="center" style={{ marginTop: 16 }}>
-              <Avatar size={110} level={20} courseId={state.courseId} look={state.avatarLook} />
-              <p className="faint" style={{ fontSize: 12, marginTop: 4 }}>
-                Jij op niveau 20 — Ultiem Fluent, volledig {course.name}
-              </p>
-            </div>
+
+            {/* tik een stadium aan en je ziet welke items daarbij horen */}
+            {toonNiveau !== null && (
+              <div className="glass" style={{ padding: '10px 14px', marginTop: 10, background: 'var(--surface-2)' }}>
+                <p className="eyebrow" style={{ fontSize: 10, marginBottom: 6 }}>
+                  Wat je tot niveau {toonNiveau} verdient
+                </p>
+                {wardrobe.filter((w) => w.level <= toonNiveau).length === 0 ? (
+                  <p className="faint" style={{ fontSize: 12.5 }}>
+                    Hier begin je: je eigen personage, nog zonder culturele items.
+                  </p>
+                ) : (
+                  <div className="col" style={{ gap: 5 }}>
+                    {wardrobe
+                      .filter((w) => w.level <= toonNiveau)
+                      .map((w) => (
+                        <div className="spread" key={w.level}>
+                          <span style={{ fontSize: 13, color: lp.level >= w.level ? 'var(--text)' : 'var(--text-faint)' }}>
+                            {lp.level >= w.level ? '✓ ' : ''}
+                            {w.item}
+                          </span>
+                          <span className="faint" style={{ fontSize: 11.5 }}>
+                            nv. {w.level}
+                          </span>
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <p className="faint center" style={{ fontSize: 12, marginTop: 12 }}>
+              {volgendItem
+                ? `Nog ${volgendItem.level - lp.level} ${volgendItem.level - lp.level === 1 ? 'niveau' : 'niveaus'} tot je ${volgendItem.item.toLowerCase()}.`
+                : `Je bent volledig ${course.name}. Niemand die je nog voor een toerist aanziet.`}
+            </p>
           </div>
         )
       })()}
