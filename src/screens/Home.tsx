@@ -13,6 +13,7 @@ import { Flag } from '../components/Flag'
 import { Avatar } from '../components/Avatar'
 import { GuideSheet } from '../components/GuideSheet'
 import { StreakScreen } from './Streak'
+import { WorldMapScreen } from './WorldMap'
 import { sfx } from '../audio'
 
 interface Props {
@@ -107,6 +108,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
   const [picker, setPicker] = useState(false)
   const [goalModal, setGoalModal] = useState(false)
   const [streakOpen, setStreakOpen] = useState(false)
+  const [worldOpen, setWorldOpen] = useState(false)
   const [guideUnit, setGuideUnit] = useState<Unit | null>(null)
 
   const course = courses[courseId]
@@ -143,6 +145,8 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
   }, [course, currentIdx])
 
   if (streakOpen) return <StreakScreen onBack={() => setStreakOpen(false)} />
+
+  if (worldOpen) return <WorldMapScreen course={course} completedCount={completed.length} onBack={() => setWorldOpen(false)} />
 
   return (
     <div className="shell" style={{ display: 'flex', flexDirection: 'column' }}>
@@ -725,6 +729,16 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
                 De hele {course.name}talige wereld is van jou. Meesterlijk.
               </p>
             )}
+            <button
+              className="btn btn-primary"
+              style={{ marginTop: 14, padding: 13, fontSize: 14.5 }}
+              onClick={() => {
+                sfx('tap')
+                setWorldOpen(true)
+              }}
+            >
+              🗺️ Reis verder →
+            </button>
           </div>
         )
       })()}
