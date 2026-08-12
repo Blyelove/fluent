@@ -124,6 +124,38 @@ tekortkomingen. Pak van boven naar beneden. Streep af wat af is en zet erbij
 wat je onderweg zelf vindt.
 ═══════════════════════════════════════════════════════════════
 
+▓▓ DE KERNDIAGNOSE — lees dit voordat je iets kiest.
+   Fluent is verder dan het lijkt: de hele schil staat er (XP-curve tot niveau
+   20, dag- en weekmissies met kist, tien divisies, reeks met kalender, badges,
+   wereldverovering, zes cursussen, 84 gidsen, 1931 moedertaal-opnames).
+   Wat ontbreekt is niet de bréédte maar de EERLIJKHEID: de app belooft luid
+   dingen die de code niet doet. Herhalen en spelen houden je reeks niet in
+   leven, "dubbele XP" verdubbelt geen enkele les, de weekkist is voor iemand
+   zonder vrienden permanent op slot, promotie gebeurt op een verborgen
+   XP-drempel in plaats van de ranglijst die je zeven dagen lang ziet.
+   HET INZICHT: elke gebroken belofte vóélt voor de gebruiker als een straf —
+   precies wat de kernregel verbiedt. De nooit-straffen-regel wordt dus niet
+   geschonden door hartjes of limieten, maar door beloftes die niet uitkomen.
+   Daarom gaan de reparaties vóór de uitbreidingen: pas als de beloningen
+   kloppen, heeft het zin om er een maandmissie, een uitspraakspel of een
+   kledingkast bovenop te bouwen. En bijna elke reparatie hieronder is klein.
+
+▓▓ DE VOLGORDE — zo werk je Blok A af, meest waardevol eerst. Deze rangschikking
+   komt uit de audit en weegt impact tegen moeite; wijk er alleen van af als je
+   iets vindt dat aantoonbaar erger is.
+   1. Alle XP telt echt mee: herhalen, minigames en duels houden je reeks in leven. (klein)
+   2. De competitieweek rolt door zodra je de app opent. (klein)
+   3. Antwoordopties schudden bij kiezen, luisteren en invullen. (klein)
+   4. Dubbele XP verdubbelt ook lessen en herhalingen. (klein)
+   5. Je personage altijd kunnen aanpassen vanuit het profiel. (klein)
+   6. Weekkist ook haalbaar in je eentje: duel tegen een bot. (midden)
+   7. Elke oefening laat de taal horen, en het juiste antwoord wordt voorgelezen. (midden)
+   8. Eén letter verkeerd getypt telt goed, met een vriendelijke spellingtip. (klein)
+   9. De vier hoofdkaarten op het startscherm krijgen hun lucht terug (.unit-card). (klein)
+   10. Niets breekt je potje meer af: onderbalk verbergen tijdens spel en duel. (klein)
+   11. Promotie volgt de ranglijst die je de hele week ziet, met een uitslagscherm op maandag. (midden)
+   12. Daarna pas de uitbreidingen uit blok B t/m G.
+
 ▓▓ BLOK A — BEWEZEN BUGS. Deze gaan vóór alles. Elk hiervan breekt een belofte
    die de app zelf op het scherm doet.
 1.  Twee accounts op één telefoon delen één voortgang: account B erft alles van A. Voortgang moet per account gescheiden worden. Dit kan vandaag, zonder server.
@@ -240,6 +272,7 @@ Stoppen kan met `/loop stop` of door de cron-taak te verwijderen.
 ## Logboek
 
 - **12-08-2026** — Eerste versie. Dekt: verslavendheid, sociaal, personage, leren, techniek, de nooit-straffen-regel, het neon-arcade-design en de vijfvoudige controle. Zelfverbeterstap toegevoegd.
+- **12-08-2026, ronde 15c** — De synthese van de audit toegevoegd, en die legde een scherpere diagnose bloot dan de losse bevindingen: **het probleem is niet de breedte maar de eerlijkheid**. De schil staat er compleet; wat rammelt zijn de beloftes die de code niet nakomt. Het bijbehorende inzicht staat nu bovenaan de bouwlijst: *elke gebroken belofte voelt voor de gebruiker als een straf* — de nooit-straffen-regel wordt hier dus niet geschonden door hartjes of limieten, maar door beloningen die niet uitkomen. Daarmee is ook de werkvolgorde omgedraaid: eerst repareren, dan pas uitbreiden. Er staat nu een **geordende top-12** in het bestand die impact tegen moeite weegt, met acht items die als "klein" zijn beoordeeld — dus haalbaar binnen één kwartierronde. De audit besloeg 50 agents en ruim 1000 gereedschapsaanroepen.
 - **12-08-2026, ronde 15b** — De bouwlijst vervangen door een **audit van zeven agents over de hele app** (verslaving, personage, leren, spellen, mobiel, geluid, techniek), elk met een tegentoets die elke bewering met hoge impact probeerde te weerleggen. Wat overbleef staat nu als Deel 4 in de opdracht — geen ideeënlijst meer maar **21 aangetoonde bugs** plus zes blokken werk, met bewijs uit de code. De hardste vondsten: twee accounts op één telefoon delen één voortgang; alle 71 Duitse invuloefeningen hebben het juiste antwoord op knop 1; de weekmissie "speel 1 duel" maakt de weekkist voor een solospeler permanent onbereikbaar; de klasse `.unit-card` bestaat niet waardoor vier hoofdkaarten nul padding hebben; herhalen en toetsen tellen niet mee voor reeks en divisie terwijl de app het tegendeel belooft; arcade betaalt 7 tot 12 keer beter per minuut dan een les, dus het systeem beloont níet leren; en de contentberg is na ~21 dagen op terwijl de niveauberg 428 dagen duurt. Ook de cadans aangepast: **elke 15 minuten** in plaats van 45, via cron op `7,22,37,52`. Daarbij hoort een nieuwe regel in stap 8: vijftien minuten is kort, dus kies iets dat je in dat venster hélemaal af krijgt, en maak een onaffe ronde eerst áf voordat je iets nieuws begint.
 - **12-08-2026, ronde 15** — Masterprompt volledig herschreven op verzoek van de gebruiker. Grootste toevoeging: **Deel 1, de complete eisenlijst** — alles wat hij in de bouwchat heeft gevraagd staat nu zwart op wit in de opdracht zelf (product, verslavendheid, personage, uitspraak, spel en bediening, zelf toetsen, account en web, publicatie, afwerking), zodat een latere ronde niet stilzwijgend een eis kan laten vallen. Het personagesysteem is verheven tot kernregel: Fluent moet daarin het rijkste van alle taal-apps zijn. Ook nieuw: de lus staat nu op **precies 45 minuten** via ScheduleWakeup in plaats van op 30 via cron (cron kan geen 45 uitdrukken), en stap 8 zorgt dat de lus zichzelf doorzet. Verder toegevoegd aan de werkwijze: een klacht van de gebruiker is de opdracht van die ronde en je lost hem ruim op, niet minimaal; kijk elke ronde ook één keer op een breed scherm; een schuifbalk is bijna altijd een ontwerpfout; `gh` staat niet in het PATH van de Bash-shell. **In dezelfde ronde gebouwd:** het personagescherm ging van **8 naar 24** kant-en-klare personages die samen alle tien haarstijlen, acht huidtinten, twaalf haarkleuren en tien outfits laten zien, en de **lelijke systeem-schuifbalk** onder de personagestrook is weg — het is nu een raster dat vanzelf afbreekt, ingeklapt op acht met een knop "Toon alle 24". Schuifbalken staan app-breed in de huisstijl.
 - **12-08-2026, ronde 14** — Eerst de **herhaalsessie (SRS) voor het eerst helemaal uitgespeeld** en de belofte hard gecontroleerd: van 12 Spaanse kaarten werden er 10 herhaald (`reps` van 0 naar 1) en schoof hun herhaalmoment van 03:12 naar ~08:45, terwijl de 2 niet-behandelde kaarten netjes wachtend bleven. FSRS doet dus echt wat er staat — geen bug. Daarna **deelmomenten op de emotionele pieken** gebouwd, met bij een niveau-sprong **je eigen personage op de kaart** en een tweede knop bij een **veroverd land**. **Drie fouten in eigen werk gevonden door in te zoomen op het eindresultaat:** (1) de kaart toonde nog een ster — het kaart-object werd tijdens het renderen opgebouwd, en dan is de ref naar de SVG nog `null`; (2) een SVG rastert op zijn eigen schermformaat, dus uitvergroot zou het figuur uitgesmeerd zijn; (3) het figuur oogde half zo groot als bedoeld door lege ruimte in de viewBox — nu wordt het echte beeldvlak uitgesneden. Ook krimpt de grote waarde mee als hij buiten de kaart zou lopen. **Lessen, nu in stap 3 en 4:** haal iets uit de pagina pas op het moment van de handeling, en controleer bij beeld niet of het er stáát maar of het de ruimte vúlt.
