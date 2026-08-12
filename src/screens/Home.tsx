@@ -18,6 +18,7 @@ interface Props {
   onStartLesson: (course: Course, lesson: Lesson) => void
   onReview: () => void
   onLeague?: () => void
+  onPlay?: () => void
 }
 
 const StarIcon = ({ filled }: { filled?: boolean }) => (
@@ -70,7 +71,7 @@ function GoalRing({ value, goal }: { value: number; goal: number }) {
   )
 }
 
-export function HomeScreen({ onStartLesson, onReview, onLeague }: Props) {
+export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props) {
   const courseId = useStore((s) => s.courseId)
   const setCourse = useStore((s) => s.setCourse)
   const streak = useStore((s) => s.streak)
@@ -196,9 +197,94 @@ export function HomeScreen({ onStartLesson, onReview, onLeague }: Props) {
       <h1 className="display" style={{ fontSize: 26, marginBottom: 4 }}>
         {activeSection.title}
       </h1>
-      <p className="dim" style={{ fontSize: 14, marginBottom: 20 }}>
+      <p className="dim" style={{ fontSize: 14, marginBottom: 16 }}>
         CEFR-niveau {activeSection.cefr} · {completed.length} van {flat.length} lessen voltooid
       </p>
+
+      {/* Doorgaan-hero: de volgende les start met één tik, zonder scrollen */}
+      {(() => {
+        const next = flat[currentIdx]
+        // alles uitgespeeld? dan geen dood spoor, maar een viering met een vervolgstap
+        if (!next)
+          return (
+            <motion.div
+              className="glass center"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              style={{
+                padding: 20,
+                marginBottom: 18,
+                borderColor: 'var(--line-gold)',
+                background: 'linear-gradient(135deg, rgba(255,197,61,0.16), rgba(236,72,153,0.10))',
+              }}
+            >
+              <div style={{ fontSize: 34, lineHeight: 1 }}>🏆</div>
+              <strong className="display gold-text" style={{ fontSize: 20, display: 'block', margin: '6px 0 4px' }}>
+                Alle lessen voltooid!
+              </strong>
+              <p className="dim" style={{ fontSize: 13.5, marginBottom: 14 }}>
+                Je hebt heel {course.name} tot en met A2 uitgespeeld. Houd het scherp met herhaling en minigames — nieuwe secties zijn in de
+                maak.
+              </p>
+              <div className="row" style={{ gap: 8 }}>
+                <button className="btn btn-primary" style={{ fontSize: 15 }} onClick={onReview}>
+                  ↻ Herhalen
+                </button>
+                {onPlay && (
+                  <button className="btn btn-ghost" style={{ fontSize: 15 }} onClick={onPlay}>
+                    🕹️ Spelen
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          )
+        const unitDone = next.unit.lessons.filter((l) => completed.includes(l.id)).length
+        return (
+          <motion.div
+            className="glass"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            style={{
+              padding: 18,
+              marginBottom: 18,
+              borderColor: 'var(--line-hot)',
+              background: 'linear-gradient(135deg, rgba(168,85,247,0.16), rgba(236,72,153,0.10))',
+              boxShadow: '0 0 28px rgba(236,72,153,0.22)',
+            }}
+          >
+            <div className="row" style={{ gap: 12, marginBottom: 14 }}>
+              <span style={{ fontSize: 30, lineHeight: 1 }}>{next.unit.icon}</span>
+              <span className="col" style={{ gap: 2, flex: 1, minWidth: 0 }}>
+                <span className="eyebrow" style={{ fontSize: 10.5 }}>
+                  {completed.length === 0 ? 'Je eerste les' : 'Verder waar je gebleven was'}
+                </span>
+                <strong style={{ fontSize: 16.5, lineHeight: 1.2 }}>{next.lesson.title}</strong>
+                <span className="faint" style={{ fontSize: 12.5 }}>
+                  {next.unit.title} · les {unitDone + 1} van {next.unit.lessons.length}
+                </span>
+              </span>
+            </div>
+            <motion.button
+              className="btn btn-primary"
+              whileTap={{ scale: 0.98 }}
+              onClick={() => onStartLesson(course, next.lesson)}
+              style={{ fontSize: 17.5 }}
+            >
+              {completed.length === 0 ? '▶  Beginnen' : '▶  Doorgaan'}
+            </motion.button>
+            <button
+              className="btn-quiet center"
+              style={{ width: '100%', fontSize: 12.5, paddingTop: 10, paddingBottom: 0 }}
+              onClick={() => {
+                sfx('tap')
+                document.getElementById('leerpad')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+              }}
+            >
+              Bekijk je hele pad ↓
+            </button>
+          </motion.div>
+        )
+      })()}
 
       {boostUntil > Date.now() && (
         <motion.div
@@ -589,7 +675,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague }: Props) {
           }
         }
         return (
-          <div className="path-wrap">
+          <div className="path-wrap" id="leerpad" style={{ scrollMarginTop: 16 }}>
             <div className="path-line" />
             {elements}
           </div>

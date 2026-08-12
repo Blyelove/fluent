@@ -107,6 +107,7 @@ export default function App() {
           onStartLesson={(course, l) => setLesson({ course, lesson: l })}
           onReview={() => setTab('review')}
           onLeague={() => setTab('league')}
+          onPlay={() => setTab('play')}
         />
       )}
       {tab === 'play' && <PlayScreen incomingDuel={incomingDuel} />}
