@@ -72,6 +72,7 @@ I. AFWERKING
 
 J. MAXIMALE CREATIVITEIT — woordelijk van de gebruiker, en permanent van kracht
    - "Je mag ook constant aan het design werken: verbeteren, vermeerderen qua karakters, keuzes, noem maar op — ga eens los." Designwerk en personage-uitbreiding zijn dus ALTIJD een geldige rondekeuze, ook zonder bug of missend punt op de lijst.
+   - HET DESIGN BLIJFT IN ELK OPZICHT ALTIJD VERBETEREN — expliciete opdracht. Elke ronde wordt het design érgens zichtbaar beter, hoe klein ook: een strakkere spatiëring, een rijkere animatie, een leesbaarder contrast, een leger scherm dat karakter krijgt, een piekmoment dat feestelijker wordt. Stilstand in het design is een bug. Kies je tussen twee gelijkwaardige verbeteringen, dan wint de zichtbaar mooiste.
    - "Maak ons uniek in alles — ook hoe je van landje naar landje beweegt. De hele ervaring moet unieker dan uniek zijn tegenover alle concurrentie die er is. Wij zijn maximaal creatief in elk opzicht." Meet elk scherm hieraan af: als Duolingo of een andere taal-app hetzelfde heeft, is het niet af.
    - "Maak er desnoods ook ergens een videogame-spel-achtig iets van voor die ultieme ervaring en keuzes." Dat wordt DE WERELDREIS (Blok H hieronder): de landenkaart als echte spelwereld waar je personage doorheen reist. Dit is het handelsmerk van Fluent in wording — elke ronde die eraan bouwt is een goede ronde.
 
