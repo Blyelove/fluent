@@ -70,6 +70,11 @@ I. AFWERKING
    - Nooit een loze belofte in de tekst: staat er dat je iets verdient, dan krijg je het ook echt.
    - Visueel nooit saai, plat of leeg. Als het saai oogt, is dat een bug.
 
+J. MAXIMALE CREATIVITEIT — woordelijk van de gebruiker, en permanent van kracht
+   - "Je mag ook constant aan het design werken: verbeteren, vermeerderen qua karakters, keuzes, noem maar op — ga eens los." Designwerk en personage-uitbreiding zijn dus ALTIJD een geldige rondekeuze, ook zonder bug of missend punt op de lijst.
+   - "Maak ons uniek in alles — ook hoe je van landje naar landje beweegt. De hele ervaring moet unieker dan uniek zijn tegenover alle concurrentie die er is. Wij zijn maximaal creatief in elk opzicht." Meet elk scherm hieraan af: als Duolingo of een andere taal-app hetzelfde heeft, is het niet af.
+   - "Maak er desnoods ook ergens een videogame-spel-achtig iets van voor die ultieme ervaring en keuzes." Dat wordt DE WERELDREIS (Blok H hieronder): de landenkaart als echte spelwereld waar je personage doorheen reist. Dit is het handelsmerk van Fluent in wording — elke ronde die eraan bouwt is een goede ronde.
+
 ═══════════════════════════════════════════════════════════════
 DEEL 2 — WAT JE ELKE RONDE DOET, IN DEZE VOLGORDE
 ═══════════════════════════════════════════════════════════════
@@ -241,6 +246,20 @@ wat je onderweg zelf vindt.
 - Niets nodigt uit tot installeren, terwijl installeerbaar juist de eis is.
 - Updates zonder onderbreking: `skipWaiting` kan nu een les breken tijdens een deploy.
 - Linkvoorvertoning voor gedeelde duel-links en deelplaatjes.
+
+▓▓ BLOK H — DE WERELDREIS (het videogame-handelsmerk; uitdrukkelijke wens van de gebruiker: "regel het")
+   De wereldverovering is nu een saaie lijst vlaggetjes onderaan het startscherm,
+   terwijl de data er al ligt (COUNTRIES + countryStates in src/countries.ts,
+   14 landen per taal met veroverdrempels). Dat moet een échte spelwereld worden:
+   een verticale, scrollende kaart met een slingerend pad, jouw eigen personage
+   dat er zichtbaar overheen reist, per land een herkenbaar landmark-silhouet in
+   neonstijl, het volgende land dat lokt, en de veroveringstoets als eindbaas.
+   Een compleet ontwerpplan (vier lenzen: spelgevoel, beloningsritme,
+   haalbaarheid, art direction, samengesmeed tot kwartierfasen) staat in
+   WERELDREIS.md zodra de ontwerpronde klaar is — bouw daarna fase voor fase,
+   elke fase bewijsbaar af binnen één ronde. Tot dat bestand er is: niet zelf
+   improviseren, eerst het plan afwachten of (als het uitblijft) de ontwerpronde
+   opnieuw draaien.
 
 ▓▓ GEBLOKKEERD tot de gebruiker een Supabase-project en sleutels aanlevert:
    echte accounts op een server, "wachtwoord vergeten", vriendenlijsten,
