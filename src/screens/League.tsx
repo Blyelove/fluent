@@ -23,7 +23,7 @@ const DIVISION_LABEL = [
   'Smaragden divisie',
   'Amethisten divisie',
   'Parelen divisie',
-  'Obsidiaanse divisie',
+  'Obsidianen divisie',
   'Diamanten divisie',
 ]
 
@@ -408,11 +408,12 @@ export function LeagueScreen({ onLeren }: { onLeren?: () => void } = {}) {
     })
   }, [empty, zone, color])
 
+  // cyaan is de systeemkleur; goud blijft voor echte beloningen
   const zoneCard = empty
     ? {
-        c: 'var(--gold)',
-        bg: 'rgba(255, 197, 61, 0.12)',
-        glow: 'rgba(255, 197, 61, 0.26)',
+        c: 'var(--cyan)',
+        bg: 'rgba(34, 211, 238, 0.1)',
+        glow: 'rgba(34, 211, 238, 0.25)',
         title: 'De competitie start binnenkort',
         body: 'Zodra de week loopt zie je hier je plek, je tegenstanders en wat je nodig hebt om te klimmen.',
       }
@@ -435,9 +436,9 @@ export function LeagueScreen({ onLeren }: { onLeren?: () => void } = {}) {
             body: `Nog ${fmt(toSafe)} XP en je staat weer veilig op plek ${safeRank}. Eén les kan al genoeg zijn.`,
           }
         : {
-            c: 'var(--gold)',
-            bg: 'rgba(255, 197, 61, 0.12)',
-            glow: 'rgba(255, 197, 61, 0.26)',
+            c: 'var(--cyan)',
+            bg: 'rgba(34, 211, 238, 0.1)',
+            glow: 'rgba(34, 211, 238, 0.25)',
             title: `Veilig in de ${thisLabel}`,
             body:
               league.promote > 0
@@ -468,17 +469,17 @@ export function LeagueScreen({ onLeren }: { onLeren?: () => void } = {}) {
           </p>
           <p className="display" style={{ fontSize: 24, margin: '8px 0 4px' }}>
             {uitslag.uitkomst === 'promotie'
-              ? `🎉 Plek #${uitslag.rank} — gepromoveerd!`
+              ? `🎉 Plek #${uitslag.rank}: gepromoveerd!`
               : uitslag.uitkomst === 'degradatie'
-                ? `Plek #${uitslag.rank} — een stapje terug.`
-                : `Plek #${uitslag.rank} — je blijft ${divisionLabel(uitslag.nieuwLeagueId).toLowerCase()}.`}
+                ? `Plek #${uitslag.rank}, een stapje terug.`
+                : `Plek #${uitslag.rank}: je blijft ${divisionLabel(uitslag.nieuwLeagueId).toLowerCase()}.`}
           </p>
           <p className="dim" style={{ fontSize: 13.5, marginBottom: 14 }}>
             {uitslag.uitkomst === 'promotie'
               ? `Je eindigde in de promotiezone van de ${divisionLabel(uitslag.leagueId).toLowerCase()} en speelt nu in de ${divisionLabel(uitslag.nieuwLeagueId).toLowerCase()}.`
               : uitslag.uitkomst === 'degradatie'
-                ? `Vanuit hier kan het alleen maar omhoog — één goede week en je bent terug in de ${divisionLabel(uitslag.leagueId).toLowerCase()}.`
-                : 'Precies de ranglijst gevolgd die je de hele week zag — deze week pak je die promotiezone.'}
+                ? `Vanuit hier kan het alleen maar omhoog. Eén goede week en je bent terug in de ${divisionLabel(uitslag.leagueId).toLowerCase()}.`
+                : 'Precies de ranglijst gevolgd die je de hele week zag. Deze week pak je die promotiezone.'}
           </p>
           <button
             className="btn btn-primary"
@@ -551,10 +552,10 @@ export function LeagueScreen({ onLeren }: { onLeren?: () => void } = {}) {
             }}
           >
             {zone === 'promotie'
-              ? '▶ Houd je plek vast — doe een les'
+              ? '▶ Houd je plek vast: doe een les'
               : climb !== null && above
                 ? `▶ Nog ${fmt(climb)} XP en je gaat ${above.name} voorbij`
-                : '▶ Pak die plek — start een les'}
+                : '▶ Pak die plek: start een les'}
           </button>
         </div>
       )}
@@ -593,10 +594,74 @@ export function LeagueScreen({ onLeren }: { onLeren?: () => void } = {}) {
         </div>
         <p className="faint" style={{ fontSize: 11.5, marginTop: 7 }}>
           {urgent
-            ? 'De week sluit vanavond — dit is je laatste kans om te klimmen.'
+            ? 'De week sluit vanavond. Dit is je laatste kans om te klimmen.'
             : 'Zondag om middernacht wordt de stand definitief.'}
         </p>
       </motion.div>
+
+      {/* ---------- motivatie ---------- */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.35 }}
+        className="card-hero"
+        style={{
+          padding: 18,
+          marginTop: 16,
+          borderLeft: `4px solid ${zoneCard.c}`,
+          boxShadow: `0 0 28px ${zoneCard.glow}`,
+        }}
+      >
+        <p className="display" style={{ fontSize: 19, color: zoneCard.c }}>
+          {zoneCard.title}
+        </p>
+        <p className="dim" style={{ fontSize: 13.5, marginTop: 4 }}>
+          {zoneCard.body}
+        </p>
+        {weekXp === 0 && !empty && (
+          <p className="faint" style={{ fontSize: 12.5, marginTop: 6 }}>
+            Je hebt deze week nog geen XP verdiend. Je eerste les zet je meteen in beweging.
+          </p>
+        )}
+
+        <div className="divider-gold" style={{ margin: '14px 0', width: 44 }} />
+
+        {climb === null || above === null ? (
+          <>
+            <p className="display" style={{ fontSize: 17 }}>
+              {empty ? 'Nog geen tegenstanders' : 'Je staat bovenaan. Verdedig je plek!'}
+            </p>
+            {runnerUp && (
+              <p className="faint" style={{ fontSize: 12.5, marginTop: 3 }}>
+                {runnerUp.name} zit {fmt(Math.max(0, weekXp - runnerUp.xp))} XP achter je.
+              </p>
+            )}
+          </>
+        ) : (
+          <>
+            <p className="display" style={{ fontSize: 17, lineHeight: 1.3 }}>
+              Nog <span className="gold-text">{fmt(climb)} XP</span> en je gaat {above.name} voorbij!
+            </p>
+            <div className="row" style={{ gap: 10, marginTop: 10 }}>
+              <div className="progress-track" style={{ height: 8 }}>
+                <motion.div
+                  className="progress-fill"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${above.xp > 0 ? Math.round(Math.min(1, weekXp / above.xp) * 100) : 100}%` }}
+                  transition={{ delay: 0.35, duration: 0.8, ease: [0.2, 0.8, 0.2, 1] }}
+                />
+              </div>
+              <span className="faint" style={{ fontSize: 11.5, fontWeight: 700, whiteSpace: 'nowrap' }}>
+                #{rank - 1}: {fmt(above.xp)}
+              </span>
+            </div>
+            <p className="faint" style={{ fontSize: 12.5, marginTop: 8 }}>
+              Dat is ongeveer {lessons} les{lessons === 1 ? '' : 'sen'}, of één potje in de arcade.
+            </p>
+          </>
+        )}
+      </motion.div>
+
 
       {/* ---------- ranglijst ---------- */}
       <div className="glass" style={{ padding: '12px 10px', marginTop: 16 }}>
@@ -633,70 +698,6 @@ export function LeagueScreen({ onLeren }: { onLeren?: () => void } = {}) {
           })
         )}
       </div>
-
-      {/* ---------- motivatie ---------- */}
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3, duration: 0.35 }}
-        className="glass"
-        style={{
-          padding: 18,
-          marginTop: 16,
-          border: `2px solid ${zoneCard.c}`,
-          background: zoneCard.bg,
-          boxShadow: `0 0 28px ${zoneCard.glow}`,
-        }}
-      >
-        <p className="display" style={{ fontSize: 19, color: zoneCard.c }}>
-          {zoneCard.title}
-        </p>
-        <p className="dim" style={{ fontSize: 13.5, marginTop: 4 }}>
-          {zoneCard.body}
-        </p>
-        {weekXp === 0 && !empty && (
-          <p className="faint" style={{ fontSize: 12.5, marginTop: 6 }}>
-            Je hebt deze week nog geen XP verdiend — je eerste les zet je meteen in beweging.
-          </p>
-        )}
-
-        <div className="divider-gold" style={{ margin: '14px 0', width: 44 }} />
-
-        {climb === null || above === null ? (
-          <>
-            <p className="display" style={{ fontSize: 17 }}>
-              {empty ? 'Nog geen tegenstanders' : 'Je staat bovenaan. Verdedig je plek!'}
-            </p>
-            {runnerUp && (
-              <p className="faint" style={{ fontSize: 12.5, marginTop: 3 }}>
-                {runnerUp.name} zit {fmt(Math.max(0, weekXp - runnerUp.xp))} XP achter je.
-              </p>
-            )}
-          </>
-        ) : (
-          <>
-            <p className="display" style={{ fontSize: 17, lineHeight: 1.3 }}>
-              Nog <span className="gold-text">{fmt(climb)} XP</span> en je gaat {above.name} voorbij!
-            </p>
-            <div className="row" style={{ gap: 10, marginTop: 10 }}>
-              <div className="progress-track" style={{ height: 8 }}>
-                <motion.div
-                  className="progress-fill"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${above.xp > 0 ? Math.round(Math.min(1, weekXp / above.xp) * 100) : 100}%` }}
-                  transition={{ delay: 0.35, duration: 0.8, ease: [0.2, 0.8, 0.2, 1] }}
-                />
-              </div>
-              <span className="faint" style={{ fontSize: 11.5, fontWeight: 700, whiteSpace: 'nowrap' }}>
-                #{rank - 1}: {fmt(above.xp)}
-              </span>
-            </div>
-            <p className="faint" style={{ fontSize: 12.5, marginTop: 8 }}>
-              Dat is ongeveer {lessons} les{lessons === 1 ? '' : 'sen'} — of één potje in de arcade.
-            </p>
-          </>
-        )}
-      </motion.div>
 
       {/* ---------- uitleg ---------- */}
       <div className="glass" style={{ padding: '4px 16px', marginTop: 14, marginBottom: 8 }}>

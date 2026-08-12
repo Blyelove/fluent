@@ -6,51 +6,21 @@ import { useStore } from '../store'
 import { courseFlagCode } from '../countries'
 import { Flag } from '../components/Flag'
 import { sfx } from '../audio'
-
-const GOALS = [
-  { xp: 20, label: 'Rustig', sub: '±5 min per dag' },
-  { xp: 40, label: 'Serieus', sub: '±10 min per dag' },
-  { xp: 60, label: 'Gedreven', sub: '±15 min per dag' },
-]
+import { DAGDOELEN } from '../goals'
 
 export function Onboarding({ onKlaar }: { onKlaar?: (c: CourseId) => void }) {
   const completeOnboarding = useStore((s) => s.completeOnboarding)
-  const [step, setStep] = useState(0)
+  const [step, setStep] = useState(1)
   const [courseId, setCourseId] = useState<CourseId | null>(null)
 
   return (
     <div className="shell shell--bare" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '100dvh' }}>
       <AnimatePresence mode="wait">
-        {step === 0 && (
-          <motion.div key="s0" className="center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, y: -14 }} transition={{ duration: 0.4 }}>
-            <motion.div
-              className="orb"
-              style={{ margin: '0 auto 36px' }}
-              animate={{ scale: [1, 1.06, 1], opacity: [0.85, 1, 0.85] }}
-              transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
-            />
-            <p className="eyebrow">Welkom bij</p>
-            <h1 className="display hot-text" style={{ fontSize: 56, letterSpacing: '0.01em', marginTop: 8 }}>
-              Fluent
-            </h1>
-            <p className="dim" style={{ marginTop: 12, fontSize: 17 }}>
-              Taal leren die je niet meer loslaat.
-            </p>
-            <div className="divider-gold" />
-            <p className="faint" style={{ fontSize: 15, maxWidth: 300, margin: '0 auto 36px' }}>
-              Geen hartjes die opraken. Geen straf. Alleen jij, een taal, en een methode die werkt.
-            </p>
-            <button className="btn btn-primary" onClick={() => setStep(1)}>
-              Beginnen
-            </button>
-          </motion.div>
-        )}
-
         {step === 1 && (
           <motion.div key="s1" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -14 }} transition={{ duration: 0.35 }}>
             {/* geen "Stap 1 van 2" meer: het personagescherm telde ook al vanaf
                 stap 1, en twee tellers naast elkaar leest als teruggaan */}
-            <p className="eyebrow center">Nog twee vragen</p>
+            <p className="eyebrow center">Twee korte vragen</p>
             <h2 className="display center" style={{ fontSize: 30, margin: '10px 0 28px' }}>
               Welke taal wordt het?
             </h2>
@@ -79,6 +49,9 @@ export function Onboarding({ onKlaar }: { onKlaar?: (c: CourseId) => void }) {
                 Verder
               </button>
             </div>
+            <p className="faint center" style={{ fontSize: 12.5, marginTop: 18 }}>
+              Geen hartjes die opraken. Geen straf. Alleen jij en een taal.
+            </p>
           </motion.div>
         )}
 
@@ -114,7 +87,7 @@ export function Onboarding({ onKlaar }: { onKlaar?: (c: CourseId) => void }) {
               </button>
             )}
             <div className="col" style={{ gap: 12 }}>
-              {GOALS.map((g) => (
+              {DAGDOELEN.map((g) => (
                 <button
                   key={g.xp}
                   className="opt"

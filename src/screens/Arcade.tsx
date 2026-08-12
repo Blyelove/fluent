@@ -90,7 +90,7 @@ const GAMES: GameDef[] = [
     name: 'Bliksemronde',
     emoji: '⚡',
     tagline: '60 seconden pure snelheid',
-    how: 'Zoveel mogelijk vertalingen goed. Elke 5 op rij verhoogt je multiplier.',
+    how: 'Zoveel mogelijk vertalingen goed. Goed geeft tijd erbij, fout kost 2 seconden.',
     grad: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
     shade: '#6b21a8',
     glow: 'rgba(236, 72, 153, 0.45)',
@@ -134,7 +134,7 @@ function xpFor(game: GameId, score: number): number {
 type Phase =
   | { name: 'hub' }
   | { name: 'play'; game: GameId }
-  | { name: 'done'; game: GameId; score: number; xp: number; boosted: boolean; prevBest: number; record: boolean; detail: string }
+  | { name: 'done'; game: GameId; score: number; xp: number; gained: number; prevBest: number; record: boolean; detail: string }
 
 /* ============================================================
    Hoofdscherm
@@ -195,10 +195,10 @@ export function ArcadeScreen({ onPlayingChange, onDuels }: { onPlayingChange?: (
     (game: GameId, score: number, detail: string) => {
       const st = useStore.getState()
       const prevBest = st.arcadeBest[game] ?? 0
-      const boosted = st.boostUntil > Date.now()
       const record = score > prevBest
       const xp = xpFor(game, score)
-      awardXp(xp, { arcade: game, score })
+      // de store rekent (inclusief boost) en zegt wat er echt is geboekt
+      const gained = awardXp(xp, { arcade: game, score })
       sfx('complete')
       if (record) {
         confetti({ particleCount: 150, spread: 105, origin: { y: 0.62 }, colors: CONFETTI, disableForReducedMotion: true })
@@ -207,7 +207,7 @@ export function ArcadeScreen({ onPlayingChange, onDuels }: { onPlayingChange?: (
           260
         )
       }
-      setPhase({ name: 'done', game, score, xp, boosted, prevBest, record, detail })
+      setPhase({ name: 'done', game, score, xp, gained, prevBest, record, detail })
     },
     [awardXp]
   )
@@ -761,7 +761,7 @@ function Bliksem({ words, all, onExit, onFinish }: GameProps) {
       </div>
 
       {!running && !over ? (
-        <Countdown onDone={start} uitleg="Zoveel mogelijk vertalingen goed in 60 seconden. Elke 5 op rij verhoogt je multiplier — tot 5×." />
+        <Countdown onDone={start} uitleg="Zoveel mogelijk vertalingen goed in 60 seconden. Goed geeft een halve seconde erbij, fout kost 2 seconden. Elke 5 op rij verhoogt je multiplier, tot ×5." />
       ) : (
         <>
           <div className="spread" style={{ marginBottom: 6 }}>
@@ -1316,8 +1316,8 @@ function Result({
   onAgain: () => void
   onHub: () => void
 }) {
-  const best = Math.max(phase.prevBest, phase.score)
-  const shownXp = phase.boosted ? phase.xp * 2 : phase.xp
+  // het record komt uit de store, de enige waarheid
+  const best = useStore((s) => s.arcadeBest[phase.game] ?? 0)
 
   return (
     <div className="shell">
@@ -1366,9 +1366,9 @@ function Result({
             </div>
             <div className="glass stat-card">
               <p className="stat-value hot-text" style={{ fontSize: 26 }}>
-                +{shownXp}
+                +{phase.gained}
               </p>
-              <p className="stat-label">{phase.boosted ? 'XP (2× boost)' : 'XP verdiend'}</p>
+              <p className="stat-label">{phase.gained > phase.xp ? 'XP (2× boost)' : 'XP verdiend'}</p>
             </div>
           </div>
           {/* iets om op te jagen: zonder volgend doel is één potje genoeg geweest */}

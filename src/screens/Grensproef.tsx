@@ -112,12 +112,14 @@ export function GrensproefScreen({
 
   // de beloning valt één keer, bij het bereiken van de uitslag
   const uitbetaald = useRef(false)
+  const [geboekt, setGeboekt] = useState(40)
   useEffect(() => {
     if (fase !== 'uitslag' || uitbetaald.current) return
     uitbetaald.current = true
     if (goed >= NODIG) {
       zetStempel(course.id, land.code)
-      awardXp(40)
+      // de store rekent (inclusief boost) en zegt wat er echt is geboekt
+      setGeboekt(awardXp(40))
       sfx('complete')
       confetti({
         particleCount: 170,
@@ -233,7 +235,7 @@ export function GrensproefScreen({
                 </span>
               </motion.div>
               <p className="gold-text display" style={{ fontSize: 20, marginBottom: 20 }}>
-                +40 XP · stempel verdiend
+                +{geboekt} XP · stempel verdiend
               </p>
               <ShareButton
                 label="Deel je Grensproef"

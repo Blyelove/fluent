@@ -77,7 +77,8 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
         {GENDER_NAMES.map((name, gi) => (
           <button
             key={name}
-            onClick={() => set({ gender: gi, hair: gi === 1 ? 1 : 0 })}
+            // wisselen van geslacht gooit je gekozen kapsel niet meer weg
+            onClick={() => set({ gender: gi })}
             style={{
               flex: 1,
               padding: '11px 10px',
@@ -180,7 +181,9 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
             <p className="eyebrow" style={{ fontSize: 10, marginBottom: 5, color: 'var(--text-faint)' }}>
               Haarstijl, met jouw kleuren
             </p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
+            {/* minimaal 60px per tegel: op 375px werden vijf kolommen te smal
+                voor de 56px-avatar en de 44px-tikgrens */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(60px, 1fr))', gap: 6 }}>
               {HAIR_STYLE_NAMES.map((name, i) => (
                 <button
                   key={name}

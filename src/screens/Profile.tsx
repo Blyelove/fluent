@@ -92,7 +92,7 @@ export function ProfileScreen() {
           <span className="col" style={{ gap: 1 }}>
             <strong className="card-title">Vaardigheden</strong>
             <span className="faint" style={{ fontSize: 12 }}>
-              {course.name} level {skillStand(progress.xp).level} van 99
+              {course.name} niveau {skillStand(progress.xp).level} van 99
             </span>
           </span>
         </span>
@@ -108,7 +108,7 @@ export function ProfileScreen() {
           {/* live opslaan: elke tik past je personage direct aan, overal in de app */}
           <PersonaPicker value={normalizePersona(state.avatarLook)} onChange={state.setAvatarLook} />
           <button className="btn btn-primary" style={{ padding: 13, fontSize: 14.5 }} onClick={() => setBewerkt(false)}>
-            Klaar — zo wil ik eruitzien
+            Klaar, zo wil ik eruitzien
           </button>
         </div>
       )}
@@ -155,7 +155,7 @@ export function ProfileScreen() {
           </span>
         </div>
         <div className="spread" style={{ padding: '14px 0', borderBottom: '1px solid var(--line)' }}>
-          <span style={{ fontWeight: 500 }}>Reeks-bescherming</span>
+          <span style={{ fontWeight: 500 }}>Reeksbescherming</span>
           <span style={{ fontWeight: 600 }}>{'❄'.repeat(Math.max(0, state.freezes)) || '—'}</span>
         </div>
         <div className="spread" style={{ padding: '14px 0', borderBottom: '1px solid var(--line)' }}>

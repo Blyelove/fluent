@@ -8,7 +8,7 @@ import { isDue } from '../srs'
 import { countryStates, courseFlagCode, totalLessons } from '../countries'
 import { levelProgress, levelTitle, nextReward } from '../levels'
 import { LEAGUES, standings, weekIndex, yourRank } from '../leagues'
-import { addDaysStr, daysUntil, goalStatus, suggestGoals, todayStr } from '../goals'
+import { addDaysStr, DAGDOELEN, daysUntil, goalStatus, suggestGoals, todayStr } from '../goals'
 import { Flag } from '../components/Flag'
 import { Avatar } from '../components/Avatar'
 import { GuideSheet } from '../components/GuideSheet'
@@ -214,7 +214,11 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
             <span className={streak > 0 ? 'flame-active' : ''} style={{ lineHeight: 0 }}>
               <FlameIcon />
             </span>
-            <span style={{ fontWeight: 700, fontSize: 15 }}>{streak}</span>
+            {streak > 0 ? (
+              <span className="num" style={{ fontWeight: 700, fontSize: 15 }}>{streak}</span>
+            ) : (
+              <span className="faint" style={{ fontSize: 12, fontWeight: 700 }}>Start je reeks</span>
+            )}
           </button>
           {/* de ring was een dood plaatje; nu opent hij je dagdoel */}
           <button
@@ -254,12 +258,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                 Vandaag {xpShown} van de {dailyGoalXp} XP. Een doel dat past, haal je vaker.
               </p>
               <div className="col" style={{ gap: 10 }}>
-                {[
-                  { xp: 20, label: 'Rustig', sub: '±5 min per dag' },
-                  { xp: 40, label: 'Serieus', sub: '±10 min per dag' },
-                  { xp: 60, label: 'Gedreven', sub: '±15 min per dag' },
-                  { xp: 100, label: 'Fanatiek', sub: '±25 min per dag' },
-                ].map((g) => (
+                {DAGDOELEN.map((g) => (
                   <button
                     key={g.xp}
                     className="opt"
@@ -521,7 +520,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
           {
             key: 'divisie',
             icon: '🏆',
-            label: `Plek ${leagueRank}`,
+            label: weekXp === 0 ? 'Doe mee' : `Plek ${leagueRank}`,
             klaar: false,
             actie: () => {
               sfx('tap')

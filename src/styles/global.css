@@ -411,9 +411,10 @@ input, textarea {
 
 .tile.used { opacity: 0.2; pointer-events: none; }
 
-.tile-gold {
-  background: rgba(255, 197, 61, 0.16);
-  border-color: var(--line-gold);
+/* een gekozen tegel is cyaan (systeemkleur voor selectie); goud is beloning */
+.tile-picked {
+  background: rgba(34, 211, 238, 0.12);
+  border-color: var(--cyan);
 }
 
 /* ============ progress bar ============ */

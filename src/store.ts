@@ -28,6 +28,8 @@ export interface TestResult {
   total: number
   passed: boolean
   day: string
+  /** taal waarin de toets is gemaakt; oude resultaten hebben dit veld niet */
+  courseId?: CourseId
 }
 
 export interface Account {
@@ -150,6 +152,10 @@ interface AureaState {
 
   /** Voltooide gesprekken per cursus (scenario-ids) */
   gesprekken: Partial<Record<CourseId, string[]>>
+
+  /** Naam die je meestuurt met een duel-uitdaging; blijft bewaard */
+  duelName: string
+  setDuelName: (n: string) => void
   /**
    * Rondt een gesprek af: eerste keer 25 XP, elke keer daarna 10 XP
    * (overoefenen blijft lonen, nooit een slot). Geeft terug hoeveel XP er
@@ -164,12 +170,14 @@ interface AureaState {
   completeLesson: (c: CourseId, lessonId: string, xp: number, perfect: boolean) => void
   learnWord: (c: CourseId, word: string, nl: string) => void
   reviewWord: (key: string, good: boolean) => void
-  addReviewXp: (c: CourseId, xp: number) => void
+  /** Geeft terug hoeveel XP er echt is bijgeschreven (inclusief boost) */
+  addReviewXp: (c: CourseId, xp: number) => number
   addGoal: (g: Goal) => void
   removeGoal: (id: string) => void
   addTestResult: (r: TestResult) => void
   /** XP toekennen buiten lessen om (minigames, duels) — telt mee voor competitie */
-  awardXp: (xp: number, opts?: { arcade?: string; score?: number }) => void
+  /** Geeft terug hoeveel XP er echt is bijgeschreven (inclusief boost) */
+  awardXp: (xp: number, opts?: { arcade?: string; score?: number }) => number
   recordDuel: (r: DuelRecord) => void
   /** Grote weekkist openen: +100 XP en 30 minuten dubbele XP */
   claimWeekChest: () => void
@@ -185,6 +193,12 @@ interface AureaState {
   markBadgesSeen: (map: Record<string, number>) => void
   registerAccount: (email: string, passHash: string, remember: boolean, look: AvatarStyle | Look) => 'ok' | 'bestaat'
   loginAccount: (email: string, passHash: string, remember: boolean) => 'ok' | 'fout'
+  /**
+   * Start zonder account: één tik en je leert je eerste woord. De voortgang
+   * leeft onder het gastprofiel en blijft bewaard; wie later een account
+   * maakt neemt hem gewoon mee (registerAccount ruimt de gastsleutel op).
+   */
+  startGuest: (look: AvatarStyle) => void
   logout: () => void
   toggleSound: () => void
   /** Je personage aanpassen — kan altijd, niet alleen bij registratie */
@@ -248,6 +262,7 @@ export type Profiel = Pick<
   | 'botsVerslagen'
   | 'stamps'
   | 'gesprekken'
+  | 'duelName'
 >
 
 /** Een kersvers profiel: waar elk nieuw account mee begint */
@@ -304,6 +319,7 @@ function nieuwProfiel(): Profiel {
     botsVerslagen: [],
     stamps: {},
     gesprekken: {},
+    duelName: '',
   }
 }
 
@@ -582,6 +598,7 @@ export const useStore = create<AureaState>()(
           ...league,
           weekXp: league.weekXp + verdiend,
         })
+        return verdiend
       },
 
       addGoal: (g) => {
@@ -616,6 +633,7 @@ export const useStore = create<AureaState>()(
             ? { ...s.arcadeBest, [opts.arcade]: Math.max(s.arcadeBest[opts.arcade] ?? 0, opts.score ?? 0) }
             : s.arcadeBest,
         })
+        return boosted
       },
 
       recordDuel: (r) => {
@@ -713,18 +731,37 @@ export const useStore = create<AureaState>()(
         } catch {
           /* geen sessionStorage — rememberMe vangt dit op */
         }
+        // een gast die zich registreert neemt zijn voortgang gewoon mee;
+        // iedereen anders begint schoon met het gekozen personage
+        const wasGast = s.currentUser === 'gast'
+        const bewaardeProfielen = s.currentUser && !wasGast ? { ...s.profiles, [s.currentUser]: pakProfiel(s) } : { ...s.profiles }
+        delete bewaardeProfielen['gast']
         set({
           accounts: { ...s.accounts, [key]: { email: email.trim(), passHash, createdAt: todayStr() } },
-          // de voortgang van wie er nu inlogde eerst veilig wegzetten, anders
-          // zou het nieuwe account zijn XP en reeks erven
-          profiles: s.currentUser ? { ...s.profiles, [s.currentUser]: pakProfiel(s) } : s.profiles,
+          profiles: bewaardeProfielen,
           currentUser: key,
           rememberMe: remember,
-          // een nieuw account begint schoon, met het gekozen personage
-          ...nieuwProfiel(),
-          avatarLook: look,
+          ...(wasGast ? {} : { ...nieuwProfiel(), avatarLook: look }),
         })
         return 'ok'
+      },
+
+      startGuest: (look) => {
+        const s = get()
+        try {
+          sessionStorage.setItem('fluent-session', '1')
+        } catch {
+          /* geen sessionStorage — rememberMe vangt dit op */
+        }
+        // kwam de gast eerder langs? dan staat zijn voortgang er nog
+        const bewaard = s.currentUser ? { ...s.profiles, [s.currentUser]: pakProfiel(s) } : s.profiles
+        const eigen = bewaard['gast']
+        set({
+          profiles: bewaard,
+          currentUser: 'gast',
+          rememberMe: true,
+          ...(eigen ?? { ...nieuwProfiel(), avatarLook: look }),
+        })
       },
 
       loginAccount: (email, passHash, remember) => {
@@ -792,6 +829,8 @@ export const useStore = create<AureaState>()(
         }
         return totalXp(get()) - xpVoor
       },
+
+      setDuelName: (n) => set({ duelName: n.slice(0, 24) }),
 
       // eenmaal verslagen blijft verslagen: vrijspelen mag, afpakken nooit
       markBotVerslagen: (naam) => {

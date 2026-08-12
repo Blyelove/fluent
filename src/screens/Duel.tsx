@@ -319,7 +319,8 @@ export function DuelScreen({
     return () => onPlayingChange?.(false)
   }, [phase.name, onPlayingChange])
   const [open, setOpen] = useState<OpenDuel[]>(() => readOpen())
-  const [myName, setMyName] = useState('')
+  const myName = useStore((st) => st.duelName)
+  const setMyName = useStore((st) => st.setDuelName)
   const [codeInput, setCodeInput] = useState('')
   const [codeError, setCodeError] = useState<string | null>(null)
   const [hideIncoming, setHideIncoming] = useState(false)
@@ -400,14 +401,15 @@ export function DuelScreen({
     const tie = yours === theirs
     const xp = won ? 25 : tie ? 15 : 10
     recordDuel({ opponent: p.n || 'Je vriend', yourScore: yours, theirScore: theirs, total, won, day: today() })
-    awardXp(xp)
+    // de store rekent (inclusief boost) en zegt wat er echt is geboekt
+    const geboekt = awardXp(xp)
     markeerDuelAfgerond(p.s)
     saveOpen(open.filter((d) => d.s !== mine.s))
     setCodeInput('')
     setCodeError(null)
     if (won) burst()
     sfx(won ? 'complete' : 'wrong')
-    setPhase({ name: 'settled', opponent: p.n || 'Je vriend', yours, theirs, total, xp })
+    setPhase({ name: 'settled', opponent: p.n || 'Je vriend', yours, theirs, total, xp: geboekt })
   }
 
   const submitCode = () => {
@@ -486,22 +488,22 @@ export function DuelScreen({
       const tie = score === theirs
       const xp = won ? 25 : tie ? 15 : 10
       recordDuel({ opponent: phase.payload.n || 'Je vriend', yourScore: score, theirScore: theirs, total, won, day: today() })
-      awardXp(xp)
+      const geboekt = awardXp(xp)
       // een botduel mag altijd opnieuw; een echte uitdaging telt maar één keer
       if (!isBotNaam(phase.payload.n)) markeerDuelAfgerond(phase.payload.s)
       // een verslagen bot krijgt zijn kroontje, en houdt die voorgoed
       if (won && isBotNaam(phase.payload.n) && phase.payload.n) markBotVerslagen(phase.payload.n)
       if (won) burst()
-      setPhase({ name: 'result', payload: phase.payload, score, total, theirScore: theirs, xp })
+      setPhase({ name: 'result', payload: phase.payload, score, total, theirScore: theirs, xp: geboekt })
     } else {
       // je eigen nieuwe duel: jouw ronde zit erop, nu je vriend nog
       const xp = Math.max(5, score * 2)
-      awardXp(xp)
+      const geboekt = awardXp(xp)
       // r ontbreekt bewust: dit is een uitdaging die je vriend nog moet spelen
       const link = duelLink(encodeDuel({ ...phase.payload, n: nameOrDefault, x: score, r: 0 }))
       saveOpen([...open.filter((d) => d.s !== phase.payload.s), { s: phase.payload.s, c: phase.payload.c, score, total, link, day: today() }])
       burst()
-      setPhase({ name: 'result', payload: phase.payload, score, total, theirScore: -1, xp })
+      setPhase({ name: 'result', payload: phase.payload, score, total, theirScore: -1, xp: geboekt })
     }
   }
 
@@ -714,7 +716,7 @@ export function DuelScreen({
               const allesGehad = won && !volgende
               return (
                 <>
-                  <strong style={{ fontSize: 16 }}>{won ? '👑 Verslagen!' : 'Nog een keer?'}</strong>
+                  <strong className="card-title">{won ? '👑 Verslagen!' : 'Nog een keer?'}</strong>
                   <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 14px' }}>
                     {allesGehad
                       ? 'Je hebt alle drie de bots verslagen. Er is er geen die je nog kan bijhouden: tijd om een echte vriend uit te dagen.'
@@ -745,7 +747,7 @@ export function DuelScreen({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
         >
-          <strong style={{ fontSize: 16 }}>{theirScore >= 0 ? '📨 Stuur je uitslag terug' : '🔗 Stuur de uitdaging door'}</strong>
+          <strong className="card-title">{theirScore >= 0 ? '📨 Stuur je uitslag terug' : '🔗 Stuur de uitdaging door'}</strong>
           <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 14px' }}>
             {theirScore >= 0 ? (
               <>
@@ -939,9 +941,9 @@ export function DuelScreen({
 
       {/* --- oefenduel tegen een bot: de weekmissie is ook zonder vrienden haalbaar --- */}
       {myPoolSize > 0 && (
-        <div className="glass" style={{ padding: 22, marginBottom: 16, borderColor: 'var(--line-hot)' }}>
+        <div className="card-hero" style={{ padding: 22, marginBottom: 16 }}>
           <div className="spread">
-            <strong style={{ fontSize: 16 }}>🤖 Oefenduel</strong>
+            <strong className="card-title">🤖 Oefenduel</strong>
             <span className="faint" style={{ fontSize: 11.5 }}>telt mee voor je weekmissie</span>
           </div>
           <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 14px' }}>
@@ -984,7 +986,7 @@ export function DuelScreen({
 
       {/* --- zelf uitdagen --- */}
       <div className="glass" style={{ padding: 22, marginBottom: 16 }}>
-        <strong style={{ fontSize: 16 }}>⚔️ Daag een vriend uit</strong>
+        <strong className="card-title">⚔️ Daag een vriend uit</strong>
         <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 14px' }}>
           Jij speelt eerst {QUESTIONS} vragen {myCourse ? `in het ${myCourse.name}` : 'in jouw cursus'}. Daarna krijg je een link met
           jouw score erin — stuur die naar je vriend en die krijgt precies dezelfde vragen. Geen account nodig.
@@ -1012,7 +1014,7 @@ export function DuelScreen({
       {/* --- open uitdagingen --- */}
       {open.length > 0 && (
         <div className="glass" style={{ padding: 22, marginBottom: 16 }}>
-          <strong style={{ fontSize: 16 }}>⏳ Wacht op antwoord</strong>
+          <strong className="card-title">⏳ Wacht op antwoord</strong>
           <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 12px' }}>
             Deze uitdagingen staan nog open. Kwijtgeraakt? Kopieer de link hier opnieuw.
           </p>
@@ -1045,7 +1047,7 @@ export function DuelScreen({
 
       {/* --- code invoeren --- */}
       <div className="glass" style={{ padding: 22, marginBottom: 16 }}>
-        <strong style={{ fontSize: 16 }}>📥 Code van je vriend</strong>
+        <strong className="card-title">📥 Code van je vriend</strong>
         <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 12px' }}>
           Link of code gekregen? Plak hem hier. Is het een nieuwe uitdaging, dan speel je meteen. Is het het antwoord op jouw
           uitdaging, dan zie je direct de uitslag.
@@ -1079,7 +1081,7 @@ export function DuelScreen({
 
       {/* --- geschiedenis --- */}
       <div className="glass" style={{ padding: 22 }}>
-        <strong style={{ fontSize: 16 }}>📜 Laatste duels</strong>
+        <strong className="card-title">📜 Laatste duels</strong>
         {history.length === 0 ? (
           <p className="dim" style={{ fontSize: 13.5, marginTop: 8 }}>
             Nog geen duels gespeeld. Daag iemand uit — winnen levert 25 XP op, meedoen altijd nog 10.
@@ -1099,7 +1101,7 @@ export function DuelScreen({
                     {d.opponent}
                   </strong>
                   <p className="faint" style={{ fontSize: 12 }}>
-                    {d.day} · {d.total} vragen
+                    {new Date(`${d.day}T00:00`).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' })} · {d.total} vragen
                   </p>
                 </div>
                 <div className="row" style={{ gap: 8, flexShrink: 0 }}>

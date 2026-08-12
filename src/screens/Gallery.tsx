@@ -294,7 +294,7 @@ export function Gallery() {
             </p>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               <span className="tile">woord</span>
-              <span className="tile tile-gold">gekozen</span>
+              <span className="tile tile-picked">gekozen</span>
               <span className="tile used">gebruikt</span>
             </div>
             <p className="eyebrow" style={{ margin: '20px 0 10px' }}>

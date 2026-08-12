@@ -108,7 +108,7 @@ export function beoordeelTypen(invoer: string, doelen: string[]): EvalResult {
   return { correct: false, correctAnswer: hoofd, speakAnswer: hoofd }
 }
 
-const SpeakerIcon = ({ size = 26 }: { size?: number }) => (
+export const SpeakerIcon = ({ size = 26 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
     <path d="M11 5 6 9H3v6h3l5 4V5z" fill="currentColor" stroke="none" />
     <path d="M15.5 8.5a5 5 0 0 1 0 7" />
@@ -128,22 +128,25 @@ export function NewWordEx({ ex, ttsLang, register }: Common & { ex: NewWord }) {
 
   return (
     <div className="center float-in">
-      <p className="eyebrow" style={{ marginBottom: 20 }}>
-        Nieuw woord
-      </p>
-      <button className="speaker-btn" style={{ color: 'var(--gold-bright)' }} onClick={() => speak(ex.word, ttsLang)} aria-label="Luister">
-        <SpeakerIcon size={34} />
-      </button>
-      <h2 className="display gold-text" style={{ fontSize: 40 }}>
-        {ex.word}
-      </h2>
-      <p className="dim" style={{ fontSize: 19, marginTop: 6 }}>
-        {ex.nl}
-      </p>
+      {/* het nieuwe woord is de held van dit scherm; goud blijft voor beloningen */}
+      <div className="card-hero" style={{ padding: '30px 20px 26px' }}>
+        <p className="eyebrow" style={{ marginBottom: 16, color: '#F0ABFC' }}>
+          Nieuw woord
+        </p>
+        <button className="speaker-btn" onClick={() => speak(ex.word, ttsLang)} aria-label="Luister">
+          <SpeakerIcon size={34} />
+        </button>
+        <h2 className="display hot-text" style={{ fontSize: 40 }}>
+          {ex.word}
+        </h2>
+        <p className="dim" style={{ fontSize: 19, marginTop: 6 }}>
+          {ex.nl}
+        </p>
+      </div>
       {ex.example && (
-        <div className="glass" style={{ marginTop: 26, padding: '16px 18px', textAlign: 'left' }}>
+        <div className="glass" style={{ marginTop: 18, padding: '16px 18px', textAlign: 'left' }}>
           <div className="row" style={{ gap: 10 }}>
-            <button className="speaker-sm" style={{ color: 'var(--gold)' }} onClick={() => speak(ex.example ?? '', ttsLang)} aria-label="Luister voorbeeld">
+            <button className="speaker-sm" onClick={() => speak(ex.example ?? '', ttsLang)} aria-label="Luister voorbeeld">
               <SpeakerIcon size={17} />
             </button>
             <div>
@@ -221,7 +224,7 @@ export function SelectEx({ ex, ttsLang, locked, register }: Common & { ex: Selec
           {ex.prompt}
         </h2>
         {ex.speak && (
-          <button className="speaker-sm" style={{ color: 'var(--gold)' }} onClick={() => speak(ex.speak ?? '', ttsLang)} aria-label="Luister">
+          <button className="speaker-sm" onClick={() => speak(ex.speak ?? '', ttsLang)} aria-label="Luister">
             <SpeakerIcon size={18} />
           </button>
         )}
@@ -273,9 +276,9 @@ export function WordBankEx({ ex, locked, register }: Common & { ex: WordBank }) 
           <motion.button
             layout
             key={`${ti}`}
-            className="tile tile-gold"
+            className="tile tile-picked"
             disabled={locked}
-            onClick={() => setPicked((p) => p.filter((x) => x !== ti))}
+            onClick={() => { sfx('tap'); setPicked((p) => p.filter((x) => x !== ti)) }}
           >
             {tiles[ti]}
           </motion.button>
@@ -372,7 +375,7 @@ export function MatchEx({
       <div className="match-grid">
         <div className="col" style={{ gap: 10 }}>
           {left.map((v) => (
-            <button key={v} className={cls(v, 'l')} style={{ justifyContent: 'center', textAlign: 'center' }} onClick={() => setSelL(v)}>
+            <button key={v} className={cls(v, 'l')} style={{ justifyContent: 'center', textAlign: 'center' }} onClick={() => { sfx('tap'); setSelL(v) }}>
               {v}
             </button>
           ))}
@@ -423,7 +426,7 @@ export function ListenEx({ ex, ttsLang, locked, register }: Common & { ex: Liste
         Wat hoor je?
       </p>
       <div className="row" style={{ gap: 12, justifyContent: 'center' }}>
-        <button className="speaker-btn" style={{ color: 'var(--gold-bright)' }} onClick={() => speak(ex.target, ttsLang)} aria-label="Opnieuw luisteren">
+        <button className="speaker-btn" onClick={() => speak(ex.target, ttsLang)} aria-label="Opnieuw luisteren">
           <SpeakerIcon size={34} />
         </button>
         {/* langzaam luisteren: bij een snelle moedertaalspreker valt een zin
@@ -459,7 +462,17 @@ export function ListenEx({ ex, ttsLang, locked, register }: Common & { ex: Liste
 
 /* ---------- Typ de vertaling ---------- */
 
-export function TypeEx({ ex, locked, register, onSubmit }: Common & { ex: TypeAnswer }) {
+/** Accenttekens per taal, tikbaar boven het typveld: een Nederlands
+ *  toetsenbord heeft geen ñ of ç en zonder deze rij voelt typen als straf */
+const ACCENTEN: Record<string, string[]> = {
+  'es-ES': ['á', 'é', 'í', 'ó', 'ú', 'ñ', '¿', '¡'],
+  'fr-FR': ['é', 'è', 'ê', 'à', 'ç', 'ô', 'û'],
+  'de-DE': ['ä', 'ö', 'ü', 'ß'],
+  'pt-PT': ['ã', 'á', 'é', 'ê', 'ç', 'õ', 'ó'],
+  'it-IT': ['à', 'è', 'é', 'ì', 'ò', 'ù'],
+}
+
+export function TypeEx({ ex, ttsLang, locked, register, onSubmit }: Common & { ex: TypeAnswer }) {
   const [val, setVal] = useState('')
 
   useEffect(() => {
@@ -471,10 +484,29 @@ export function TypeEx({ ex, locked, register, onSubmit }: Common & { ex: TypeAn
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [val])
 
+  const accenten = ACCENTEN[ttsLang]
+
   return (
     <div className="float-in">
       <p className="eyebrow">Typ de vertaling</p>
       <h2 className="prompt-big">{ex.nl}</h2>
+      {accenten && !locked && (
+        <div className="row" style={{ flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
+          {accenten.map((a) => (
+            <button
+              key={a}
+              className="tile"
+              style={{ minWidth: 44, justifyContent: 'center' }}
+              onClick={() => {
+                sfx('tap')
+                setVal((v) => v + a)
+              }}
+            >
+              {a}
+            </button>
+          ))}
+        </div>
+      )}
       <input
         className="type-input"
         value={val}
@@ -525,8 +557,9 @@ export function FillEx({ ex, locked, register }: Common & { ex: Fill }) {
           style={{
             display: 'inline-block',
             minWidth: 70,
-            borderBottom: '2px solid var(--gold)',
-            color: 'var(--gold-bright)',
+            // cyaan = selectie; goud blijft voor beloningen
+            borderBottom: '2px solid var(--cyan)',
+            color: 'var(--cyan)',
             textAlign: 'center',
           }}
         >

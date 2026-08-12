@@ -130,9 +130,14 @@ function PartnerKop({ naam, code, size = 40 }: { naam: string; code: string; siz
 function GesprekSpeler({
   scenario,
   onTerug,
+  volgende,
+  onVolgende,
 }: {
   scenario: GesprekScenario
   onTerug: () => void
+  /** eerstvolgende nog niet gevoerde gesprek: na de confetti staat het klaar */
+  volgende?: GesprekScenario
+  onVolgende?: (sc: GesprekScenario) => void
 }) {
   const courseId = useStore((s) => s.courseId)
   const voltooiGesprek = useStore((s) => s.voltooiGesprek)
@@ -346,9 +351,21 @@ function GesprekSpeler({
               <p className="dim" style={{ fontSize: 13.5 }}>
                 Je hebt een heel gesprek in het {course.name} gevoerd. Dat is precies hoe het straks in het echt gaat.
               </p>
-              <button className="btn btn-primary" style={{ padding: 13 }} onClick={() => { sfx('tap'); onTerug() }}>
-                Verder
-              </button>
+              {volgende && onVolgende ? (
+                <>
+                  {/* het volgende gesprek staat al klaar: de lus blijft draaien */}
+                  <button className="btn btn-primary" style={{ padding: 13 }} onClick={() => { sfx('tap'); onVolgende(volgende) }}>
+                    {volgende.emoji} Volgende gesprek: {volgende.titel}
+                  </button>
+                  <button className="dim" style={{ minHeight: 44, fontSize: 14 }} onClick={() => { sfx('tap'); onTerug() }}>
+                    Terug naar de lijst
+                  </button>
+                </>
+              ) : (
+                <button className="btn btn-primary" style={{ padding: 13 }} onClick={() => { sfx('tap'); onTerug() }}>
+                  Verder
+                </button>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
@@ -746,7 +763,19 @@ export function GesprekkenScreen({ onExit }: { onExit: () => void }) {
   const [actief, setActief] = useState<GesprekScenario | 'vrij' | null>(null)
 
   if (actief === 'vrij') return <VrijSpeler onTerug={() => setActief(null)} />
-  if (actief) return <GesprekSpeler scenario={actief} onTerug={() => setActief(null)} />
+  if (actief) {
+    // na de confetti staat het eerstvolgende ongevoerde gesprek al klaar
+    const volgende = scenarios.find((sc) => sc.id !== actief.id && !klaar.includes(sc.id))
+    return (
+      <GesprekSpeler
+        key={actief.id}
+        scenario={actief}
+        onTerug={() => setActief(null)}
+        volgende={volgende}
+        onVolgende={(sc) => setActief(sc)}
+      />
+    )
+  }
 
   return (
     <div className="shell shell--bare">
@@ -758,10 +787,25 @@ export function GesprekkenScreen({ onExit }: { onExit: () => void }) {
           🗣️ Gesprekken
         </h1>
       </header>
-      <p className="dim" style={{ fontSize: 14, marginBottom: 18 }}>
+      <p className="dim" style={{ fontSize: 14, marginBottom: 14 }}>
         Praat écht in het {course.name}: jouw partner spreekt met een moedertaalstem en jij antwoordt door te kiezen of in te
         spreken. Fout bestaat hier niet.
       </p>
+      {/* de verzameling die om vulling vraagt: hoe ver ben je? */}
+      {(() => {
+        const totaal = scenarios.length + 1
+        const aantal = Math.min(klaar.length, totaal)
+        return (
+          <div style={{ marginBottom: 18 }}>
+            <div className="progress-track" style={{ height: 6 }}>
+              <div className="progress-fill" style={{ width: `${Math.round((aantal / totaal) * 100)}%` }} />
+            </div>
+            <p className="faint num" style={{ fontSize: 12, marginTop: 5 }}>
+              {aantal} van {totaal} gesprekken gevoerd
+            </p>
+          </div>
+        )
+      })()}
       <div className="col" style={{ gap: 12 }}>
         {/* het vrije gesprek: jij kiest het onderwerp, elke keer anders */}
         <motion.button
@@ -774,23 +818,18 @@ export function GesprekkenScreen({ onExit }: { onExit: () => void }) {
           <div className="col" style={{ flex: 1, minWidth: 0 }}>
             <strong style={{ fontSize: 16 }}>
               💬 Vrij gesprek{' '}
-              <span className="gold-text" style={{ fontSize: 11, fontWeight: 900, letterSpacing: '0.06em' }}>
+              <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.06em', color: 'var(--cyan)', border: '1px solid rgba(34,211,238,0.5)', borderRadius: 6, padding: '1px 5px' }}>
                 NIEUW
               </span>
             </strong>
             <span className="dim" style={{ fontSize: 13 }}>
-              Met {vrij.partner} · jij kiest zelf waar het over gaat
+              Met {vrij.partner} · elke keer een ander gesprek
             </span>
           </div>
-          {klaar.includes('vrij') ? (
-            <span className="gold-text" style={{ fontWeight: 800, fontSize: 13, flexShrink: 0 }}>
-              ✓ Gevoerd
-            </span>
-          ) : (
-            <span className="dim" style={{ fontSize: 20, flexShrink: 0 }}>
-              ›
-            </span>
-          )}
+          {/* het vrije gesprek is nooit "af": altijd de uitnodigende chevron */}
+          <span className="dim" style={{ fontSize: 20, flexShrink: 0 }}>
+            ›
+          </span>
         </motion.button>
 
         {scenarios.map((sc) => {
@@ -813,8 +852,13 @@ export function GesprekkenScreen({ onExit }: { onExit: () => void }) {
                 </span>
               </div>
               {af ? (
-                <span className="gold-text" style={{ fontWeight: 800, fontSize: 13, flexShrink: 0 }}>
-                  ✓ Gevoerd
+                <span className="col" style={{ flexShrink: 0, alignItems: 'flex-end', gap: 1 }}>
+                  <span className="gold-text" style={{ fontWeight: 800, fontSize: 13 }}>
+                    ✓ Gevoerd
+                  </span>
+                  <span className="faint" style={{ fontSize: 10.5 }}>
+                    opnieuw voor 10 XP
+                  </span>
                 </span>
               ) : (
                 <span className="dim" style={{ fontSize: 20, flexShrink: 0 }}>

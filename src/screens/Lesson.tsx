@@ -21,6 +21,7 @@ import {
   MatchEx,
   NewWordEx,
   SelectEx,
+  SpeakerIcon,
   TypeEx,
   WordBankEx,
   type EvalResult,
@@ -266,7 +267,9 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
    * waardoor de noemer groeit en je zichtbaar terugging: een straf voor een
    * fout, precies wat hier niet hoort. We houden daarom het hoogste punt vast.
    */
-  const progress = items.length > 0 ? idx / items.length : 0
+  // het laatste goede antwoord zet de balk op 100%: het lekkerste moment van
+  // de les hoort te bestaan, niet weggerekend te worden
+  const progress = items.length > 0 ? (idx + (phase === 'feedback' ? 1 : 0)) / items.length : 0
   const maxProgress = useRef(0)
   maxProgress.current = Math.max(maxProgress.current, progress)
   const restVragen = Math.max(0, items.length - idx)
@@ -297,8 +300,8 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
               </h3>
               <p className="dim" style={{ fontSize: 14.5, marginBottom: 18 }}>
                 {restVragen === 1
-                  ? 'Nog één vraag en je bent er. Zonde om nu te stoppen.'
-                  : `Nog ${restVragen} vragen en je bent er. Je voortgang in deze les gaat verloren als je stopt.`}
+                  ? 'Nog één vraag en je bent er.'
+                  : `Nog ${restVragen} vragen. Stop je nu, dan begin je deze les later gewoon opnieuw.`}
               </p>
               <button
                 className="btn btn-primary"
@@ -397,15 +400,48 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
                 <div className="spread" style={{ marginBottom: 12 }}>
                   <div>
                     <p className={`feedback-title ${result?.correct || result?.match ? 'ok-text' : 'err-text'}`}>{feedbackTekst}</p>
+                    {/* naluisterbaar op het leermoment: tik en hoor het nog eens */}
                     {!result?.correct && result?.correctAnswer && (
-                      <p className="dim" style={{ fontSize: 15 }}>
-                        Juiste antwoord: <strong style={{ color: 'var(--text)' }}>{result.correctAnswer}</strong>
-                      </p>
+                      result.speakAnswer ? (
+                        <button
+                          className="row"
+                          style={{ gap: 8, minHeight: 44, textAlign: 'left' }}
+                          onClick={() => { sfx('tap'); speak(result.speakAnswer ?? '', course.ttsLang) }}
+                          aria-label="Luister het juiste antwoord opnieuw"
+                        >
+                          <span className="speaker-sm" style={{ width: 32, height: 32, flexShrink: 0 }}>
+                            <SpeakerIcon size={16} />
+                          </span>
+                          <span className="dim" style={{ fontSize: 15 }}>
+                            Juiste antwoord: <strong style={{ color: 'var(--text)' }}>{result.correctAnswer}</strong>
+                          </span>
+                        </button>
+                      ) : (
+                        <p className="dim" style={{ fontSize: 15 }}>
+                          Juiste antwoord: <strong style={{ color: 'var(--text)' }}>{result.correctAnswer}</strong>
+                        </p>
+                      )
                     )}
                     {result?.correct && result?.spellingTip && (
-                      <p className="dim" style={{ fontSize: 15 }}>
-                        Let op de spelling: <strong style={{ color: 'var(--text)' }}>{result.spellingTip}</strong>
-                      </p>
+                      result.speakAnswer ? (
+                        <button
+                          className="row"
+                          style={{ gap: 8, minHeight: 44, textAlign: 'left' }}
+                          onClick={() => { sfx('tap'); speak(result.speakAnswer ?? '', course.ttsLang) }}
+                          aria-label="Luister de juiste spelling opnieuw"
+                        >
+                          <span className="speaker-sm" style={{ width: 32, height: 32, flexShrink: 0 }}>
+                            <SpeakerIcon size={16} />
+                          </span>
+                          <span className="dim" style={{ fontSize: 15 }}>
+                            Let op de spelling: <strong style={{ color: 'var(--text)' }}>{result.spellingTip}</strong>
+                          </span>
+                        </button>
+                      ) : (
+                        <p className="dim" style={{ fontSize: 15 }}>
+                          Let op de spelling: <strong style={{ color: 'var(--text)' }}>{result.spellingTip}</strong>
+                        </p>
+                      )
                     )}
                   </div>
                 </div>
@@ -694,8 +730,8 @@ function CompleteView({
               <p className="faint" style={{ fontSize: 12, marginTop: 8 }}>
                 {goalReached
                   ? 'Je reeks is veiliggesteld voor vandaag. Alles hierna is pure winst.'
-                  : `Nog ${dailyGoalXp - todayXp} XP, dat is ongeveer ${Math.max(1, Math.ceil((dailyGoalXp - todayXp) / 12))} ${
-                      Math.ceil((dailyGoalXp - todayXp) / 12) === 1 ? 'les' : 'lessen'
+                  : `Nog ${dailyGoalXp - todayXp} XP, dat is ongeveer ${Math.max(1, Math.ceil((dailyGoalXp - todayXp) / 10))} ${
+                      Math.ceil((dailyGoalXp - todayXp) / 10) === 1 ? 'les' : 'lessen'
                     }.`}
               </p>
             </div>

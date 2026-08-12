@@ -2,6 +2,17 @@ import type { Course, CourseId } from './types'
 import { levelForXp, levelProgress, levelTitle, xpToReach } from './levels'
 import { countryStates } from './countries'
 
+/**
+ * De vier dagdoelen, op één plek: de onboarding en de dagdoel-modal op Home
+ * tonen dezelfde lijst, dus ook de fanatieke starter kan meteen goed kiezen.
+ */
+export const DAGDOELEN = [
+  { xp: 20, label: 'Rustig', sub: '±5 min per dag' },
+  { xp: 40, label: 'Serieus', sub: '±10 min per dag' },
+  { xp: 60, label: 'Gedreven', sub: '±15 min per dag' },
+  { xp: 100, label: 'Fanatiek', sub: '±25 min per dag' },
+] as const
+
 export type GoalType = 'streak' | 'level' | 'country' | 'lessons'
 
 export interface Goal {

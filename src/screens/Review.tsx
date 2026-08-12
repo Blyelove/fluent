@@ -76,7 +76,6 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
   const mistakes = useStore((s) => s.mistakes)
   const clearMistake = useStore((s) => s.clearMistake)
   const addMistake = useStore((s) => s.addMistake)
-  const boostUntil = useStore((s) => s.boostUntil)
   const curLevel = useStore((s) => levelForXp(totalXp(s)))
   const look = useStore((s) => s.avatarLook)
 
@@ -87,6 +86,8 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
   const [ready, setReady] = useState(false)
   const [correctCount, setCorrectCount] = useState(0)
   const [pickedUnits, setPickedUnits] = useState<string[]>([])
+  /** zichtbare uitleg bij een tik op een vergrendeld toetsonderwerp */
+  const [slotHint, setSlotHint] = useState<string | null>(null)
   /** vraagt om bevestiging voordat een halve sessie verloren gaat */
   const [pauze, setPauze] = useState(false)
   const evalRef = useRef<(() => EvalResult) | null>(null)
@@ -243,30 +244,32 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
     if (idx + 1 >= phase.items.length) {
       const total = phase.items.length
       const finalCorrect = correctCount
-      const dubbel = boostUntil > Date.now() ? 2 : 1
       if (phase.mode === 'srs' || phase.mode === 'fouten') {
         // fouten wegwerken levert extra op: dit is het waardevolste oefenwerk
         const xp = phase.mode === 'fouten' ? Math.max(4, finalCorrect * 4) : Math.max(2, finalCorrect * 2)
-        addReviewXp(courseId, xp)
+        // de store rekent (inclusief boost) en zegt wat er echt is geboekt
+        const verdiend = addReviewXp(courseId, xp)
         if (phase.mode === 'fouten' && finalCorrect === total && total > 0) {
           confetti({ particleCount: 120, spread: 100, origin: { y: 0.6 }, colors: ['#A855F7', '#EC4899', '#FFC53D', '#22D3EE'], disableForReducedMotion: true })
         }
-        setPhase({ name: 'done', mode: phase.mode, correct: finalCorrect, total, label: phase.label, passed: true, xp: xp * dubbel })
+        setPhase({ name: 'done', mode: phase.mode, correct: finalCorrect, total, label: phase.label, passed: true, xp: verdiend })
       } else {
         const passed = finalCorrect >= Math.ceil(total * 0.8)
-        const xp = finalCorrect * 2 + (passed ? 10 : 0)
-        addReviewXp(courseId, xp)
+        // de beloofde dubbele punten van een toets bestaan nu echt
+        const xp = passed ? finalCorrect * 4 + 10 : Math.max(2, finalCorrect * 2)
+        const verdiend = addReviewXp(courseId, xp)
         addTestResult({
           label: phase.label,
           score: finalCorrect,
           total,
           passed,
           day: new Date().toISOString().slice(0, 10),
+          courseId,
         })
         if (passed) {
           confetti({ particleCount: 110, spread: 100, origin: { y: 0.6 }, colors: ['#A855F7', '#EC4899', '#FFC53D', '#22D3EE'], disableForReducedMotion: true })
         }
-        setPhase({ name: 'done', mode: 'test', correct: finalCorrect, total, label: phase.label, passed, xp: xp * dubbel, units: phase.units })
+        setPhase({ name: 'done', mode: 'test', correct: finalCorrect, total, label: phase.label, passed, xp: verdiend, units: phase.units })
       }
       sfx('complete')
     } else {
@@ -278,7 +281,8 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
 
   if (phase.name === 'hub') {
     const next = nextDueDate(allCards)
-    const recentTests = [...tests].reverse().slice(0, 3)
+    // oude resultaten zonder taal blijven zichtbaar; nieuwe zijn per taal
+    const recentTests = [...tests].reverse().filter((t) => !t.courseId || t.courseId === courseId).slice(0, 3)
     return (
       <div className="shell">
         <p className="eyebrow">Oefenen</p>
@@ -317,15 +321,19 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
         )}
 
         {mijnFouten.length > 0 && (
-          <div className="glass" style={{ padding: 22, marginBottom: 16, borderColor: 'var(--line-hot)' }}>
+          // dé held van de hub: dit is wat je NU moet doen
+          <div className="card-hero" style={{ padding: 22, marginBottom: 16 }}>
             <div className="spread">
-              <strong style={{ fontSize: 16 }}>🎯 Jouw fouten</strong>
-              <span className="hot-text" style={{ fontWeight: 800 }}>
+              <span className="row" style={{ gap: 10 }}>
+                <span style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(236,72,153,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🎯</span>
+                <strong className="card-title">Jouw fouten</strong>
+              </span>
+              <span className="hot-text num" style={{ fontWeight: 700, fontSize: 16 }}>
                 {mijnFouten.length}
               </span>
             </div>
             <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 12px' }}>
-              Precies de vragen waar jij op struikelde, de hardnekkigste eerst. Heb je er één goed, dan verdwijnt hij uit je lijst —
+              Precies de vragen waar jij op struikelde, de hardnekkigste eerst. Heb je er één goed, dan verdwijnt hij uit je lijst,
               en fouten wegwerken levert dubbele punten op.
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 14 }}>
@@ -339,52 +347,73 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
                 </span>
               ))}
             </div>
-            <button className="btn btn-primary" onClick={startFouten}>
+            <motion.button
+              className="btn btn-primary"
+              animate={{ scale: [1, 1.025, 1] }}
+              transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut', repeatDelay: 0.6 }}
+              onClick={() => { sfx('tap'); startFouten() }}
+            >
               Werk je fouten weg
-            </button>
+            </motion.button>
           </div>
         )}
 
-        <div className="glass" style={{ padding: 22, marginBottom: 16 }}>
+        <div className={mijnFouten.length === 0 && due.length > 0 ? 'card-hero' : 'glass'} style={{ padding: 22, marginBottom: 16 }}>
           <div className="spread">
-            <strong style={{ fontSize: 16 }}>🧠 Herhaling</strong>
-            {due.length > 0 && <span className="gold-text" style={{ fontWeight: 800 }}>{due.length} klaar</span>}
+            <span className="row" style={{ gap: 10 }}>
+              <span style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(168,85,247,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🧠</span>
+              <strong className="card-title">Herhaling</strong>
+            </span>
+            {due.length > 0 && <span className="gold-text num" style={{ fontWeight: 700 }}>{due.length} klaar</span>}
           </div>
           <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 14px' }}>
             {due.length > 0
-              ? 'Herhaal op het perfecte moment — vlak voordat je vergeet. Zo blijft alles hangen.'
+              ? 'Herhaal op het perfecte moment, vlak voordat je vergeet. Zo blijft alles hangen.'
               : allCards.length === 0
-                ? 'Voltooi eerst een les — geleerde woorden verschijnen hier op het perfecte herhaalmoment.'
+                ? 'Voltooi eerst een les. Geleerde woorden verschijnen hier op het perfecte herhaalmoment.'
                 : next
                   ? `Alles zit nog vers. Kom terug rond ${next.toLocaleDateString('nl-NL', { weekday: 'long', hour: '2-digit', minute: '2-digit' })}.`
                   : 'Alles zit nog vers.'}
           </p>
           {due.length > 0 ? (
-            <button className="btn btn-primary" onClick={startSrs}>
+            <button className="btn btn-primary" onClick={() => { sfx('tap'); startSrs() }}>
               Start herhaling
             </button>
           ) : allCards.length === 0 ? (
             // nog geen woorden geleerd: het tabblad mag nooit een dood spoor zijn
             onGoLearn && (
-              <button className="btn btn-primary" onClick={onGoLearn}>
+              <motion.button
+                className="btn btn-primary"
+                animate={{ scale: [1, 1.025, 1] }}
+                transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut', repeatDelay: 0.6 }}
+                onClick={onGoLearn}
+              >
                 ▶ Start je eerste les
-              </button>
+              </motion.button>
             )
           ) : (
             // alles vers, maar wie zin heeft mag altijd oefenen
-            <button className="btn btn-ghost" onClick={startVrij}>
+            <button className="btn btn-ghost" onClick={() => { sfx('tap'); startVrij() }}>
               Oefen toch even
             </button>
           )}
         </div>
 
         <div className="glass" style={{ padding: 22 }}>
-          <strong style={{ fontSize: 16 }}>📝 Eigen toets</strong>
+          <span className="row" style={{ gap: 10 }}>
+            <span style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(34,211,238,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>📝</span>
+            <strong className="card-title">Eigen toets</strong>
+          </span>
           <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 12px' }}>
             {geleerdeUnits.size === 0
               ? 'Zodra je je eerste les hebt gedaan, kun je hier een eigen toets bouwen over wat je geleerd hebt.'
               : 'Kies zelf je onderwerpen, wij bouwen de toets. Haal 80% goed en je slaagt: dubbele punten plus bonus.'}
           </p>
+          {slotHint && (
+            <p className="dim" style={{ fontSize: 12.5, marginBottom: 10 }}>
+              🔒 {slotHint}
+            </p>
+          )}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 14 }}>
             {allUnits.map((u) => {
               const on = pickedUnits.includes(u.id)
@@ -394,8 +423,6 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
                 <button
                   key={u.id}
                   className="tile"
-                  disabled={!geleerd}
-                  title={geleerd ? u.title : `${u.title} — doe hier eerst een les`}
                   style={
                     !geleerd
                       ? { opacity: 0.4, filter: 'grayscale(0.8)' }
@@ -404,8 +431,14 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
                         : undefined
                   }
                   onClick={() => {
-                    if (!geleerd) return
+                    if (!geleerd) {
+                      // op touch bestaat geen title-tooltip: leg het zichtbaar uit
+                      sfx('tap')
+                      setSlotHint(`${u.title}: doe hier eerst een les, dan kan je erover toetsen.`)
+                      return
+                    }
                     sfx('tap')
+                    setSlotHint(null)
                     setPickedUnits((p) => (on ? p.filter((x) => x !== u.id) : [...p, u.id]))
                   }}
                 >
@@ -417,7 +450,7 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
           <button
             className="btn btn-primary"
             disabled={pickedUnits.length === 0}
-            onClick={() => startTest(allUnits.filter((u) => pickedUnits.includes(u.id)))}
+            onClick={() => { sfx('tap'); startTest(allUnits.filter((u) => pickedUnits.includes(u.id))) }}
           >
             Genereer mijn toets
           </button>
@@ -466,11 +499,20 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
                   : 'Weer wat steviger.'
                 : phase.passed
                   ? 'Geslaagd!'
-                  : 'Net niet — probeer opnieuw.'}
+                  : 'Net niet. Probeer het opnieuw!'}
           </h1>
           <div className="divider-gold" />
           <p className="dim" style={{ fontSize: 16 }}>
-            {phase.correct} van {phase.total} goed · +{phase.xp} XP
+            {phase.correct} van {phase.total} goed
+          </p>
+          {/* de verdiende XP straalt goud, want dit is een beloning */}
+          <p style={{ marginTop: 8 }}>
+            <span
+              className="tile"
+              style={{ background: 'rgba(255,197,61,0.12)', borderColor: 'var(--gold)', display: 'inline-flex' }}
+            >
+              <span className="gold-text num" style={{ fontWeight: 800 }}>+{phase.xp} XP</span>
+            </span>
           </p>
           {phase.mode === 'fouten' && (
             <p className="faint" style={{ fontSize: 13, marginTop: 6 }}>
