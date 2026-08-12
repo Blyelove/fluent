@@ -12,6 +12,8 @@ import { addDaysStr, daysUntil, goalStatus, suggestGoals, todayStr } from '../go
 import { Flag } from '../components/Flag'
 import { Avatar } from '../components/Avatar'
 import { GuideSheet } from '../components/GuideSheet'
+import { SkillsSheet } from '../components/SkillsSheet'
+import { skillStand } from '../skills'
 import { StreakScreen } from './Streak'
 import { WorldMapScreen } from './WorldMap'
 import { WorldPeek } from '../components/WorldPeek'
@@ -115,6 +117,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
   const [streakOpen, setStreakOpen] = useState(false)
   const [worldOpen, setWorldOpen] = useState(false)
   const [doelOpen, setDoelOpen] = useState(false)
+  const [skillsOpen, setSkillsOpen] = useState(false)
   const setDailyGoal = useStore((s) => s.setDailyGoal)
   const [guideUnit, setGuideUnit] = useState<Unit | null>(null)
 
@@ -299,7 +302,33 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
         return (
           <div className="glass" style={{ padding: '10px 16px', marginBottom: 16, order: 1 }}>
             <div className="row" style={{ gap: 14 }}>
-              <Avatar size={56} level={lp.level} courseId={courseId} look={look} />
+              {/* op je poppetje drukken opent je vaardigheden, RuneScape-stijl */}
+              <button
+                onClick={() => { sfx('tap'); setSkillsOpen(true) }}
+                aria-label="Bekijk je vaardigheden"
+                style={{ position: 'relative', minWidth: 56, minHeight: 56, flexShrink: 0 }}
+              >
+                <Avatar size={56} level={lp.level} courseId={courseId} look={look} />
+                <span
+                  className="num"
+                  style={{
+                    position: 'absolute',
+                    right: -6,
+                    bottom: -3,
+                    padding: '1px 7px',
+                    borderRadius: 999,
+                    background: 'var(--grad-gold)',
+                    color: 'var(--ink-on-gold)',
+                    fontFamily: 'var(--font-display)',
+                    fontWeight: 800,
+                    fontSize: 11.5,
+                    boxShadow: '0 0 8px rgba(255,197,61,0.5)',
+                  }}
+                  title={`${course.name}: level ${skillStand(progressMap[courseId]?.xp ?? 0).level} van 99`}
+                >
+                  {skillStand(progressMap[courseId]?.xp ?? 0).level}
+                </span>
+              </button>
               <div style={{ flex: 1 }}>
                 <div className="spread">
                   <strong style={{ fontSize: 14 }}>
@@ -1003,6 +1032,8 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
       {guideUnit && (
         <GuideSheet unit={guideUnit} courseId={courseId} ttsLang={course.ttsLang} onClose={() => setGuideUnit(null)} />
       )}
+
+      {skillsOpen && <SkillsSheet onClose={() => setSkillsOpen(false)} />}
 
       <AnimatePresence>
         {goalModal && (

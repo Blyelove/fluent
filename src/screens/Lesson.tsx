@@ -671,7 +671,7 @@ function CompleteView({
             </div>
             {perfect && (
               <p className="gold-text" style={{ marginTop: 18, fontWeight: 600 }}>
-                Foutloze les — uitzonderlijk.
+                Foutloze les. Uitzonderlijk.
               </p>
             )}
 
@@ -694,7 +694,7 @@ function CompleteView({
               <p className="faint" style={{ fontSize: 12, marginTop: 8 }}>
                 {goalReached
                   ? 'Je reeks is veiliggesteld voor vandaag. Alles hierna is pure winst.'
-                  : `Nog ${dailyGoalXp - todayXp} XP — dat is ongeveer ${Math.max(1, Math.ceil((dailyGoalXp - todayXp) / 12))} ${
+                  : `Nog ${dailyGoalXp - todayXp} XP, dat is ongeveer ${Math.max(1, Math.ceil((dailyGoalXp - todayXp) / 12))} ${
                       Math.ceil((dailyGoalXp - todayXp) / 12) === 1 ? 'les' : 'lessen'
                     }.`}
               </p>

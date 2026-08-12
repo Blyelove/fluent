@@ -11,6 +11,7 @@ import path from 'node:path'
 import { MsEdgeTTS, OUTPUT_FORMAT } from 'msedge-tts'
 import { courseList } from '../src/content'
 import { GESPREKKEN } from '../src/content/gesprekken'
+import { RESTAURANT, VRIJ_GESPREK } from '../src/content/gesprekkenExtra'
 import type { Course } from '../src/types'
 
 const VOICES: Record<string, string> = {
@@ -112,12 +113,25 @@ async function main() {
     for (const zin of await collectGuides(course.id)) uitCursus.add(zin)
     // gesprekken: de partner spreekt elke beurt hardop, en wie op een
     // partnerbel tikt hoort hem opnieuw — dus álle gesprekslijnen mee
-    for (const scenario of GESPREKKEN[course.id] ?? []) {
+    for (const scenario of [...(GESPREKKEN[course.id] ?? []), RESTAURANT[course.id]]) {
       for (const stap of scenario.stappen) {
         uitCursus.add(stap.zeg)
         for (const a of stap.antwoorden) uitCursus.add(a.tekst)
       }
       uitCursus.add(scenario.slot.zeg)
+    }
+    // het vrije gesprek: intro, keuzevragen, alle onderwerpbeurten en het slot
+    const vrij = VRIJ_GESPREK[course.id]
+    if (vrij) {
+      const stappen = [vrij.intro, ...vrij.onderwerpen.flatMap((o) => o.stappen)]
+      for (const stap of stappen) {
+        uitCursus.add(stap.zeg)
+        for (const a of stap.antwoorden) uitCursus.add(a.tekst)
+      }
+      uitCursus.add(vrij.keuzevraag.zeg)
+      uitCursus.add(vrij.vervolgvraag.zeg)
+      uitCursus.add(vrij.afscheid.tekst)
+      uitCursus.add(vrij.slot.zeg)
     }
     const texts = [...uitCursus]
     console.log(`\n${course.flag} ${course.name} (${voice}): ${texts.length} teksten (inclusief gids)`)

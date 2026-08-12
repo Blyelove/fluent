@@ -1,7 +1,9 @@
 import { useState } from 'react'
-import { courses } from '../content'
+import { courseList, courses } from '../content'
 import { courseProgress, totalXp, useStore, wordsLearned } from '../store'
 import { levelProgress, levelTitle, nextReward, wardrobeFor } from '../levels'
+import { skillStand } from '../skills'
+import { SkillsSheet } from '../components/SkillsSheet'
 import { courseFlagCode } from '../countries'
 import { Flag } from '../components/Flag'
 import { Avatar, normalizePersona } from '../components/Avatar'
@@ -16,6 +18,7 @@ export function ProfileScreen() {
   const lp = levelProgress(totalXp(state))
   const [view, setView] = useState<'profiel' | 'badges'>('profiel')
   const [bewerkt, setBewerkt] = useState(false)
+  const [skillsOpen, setSkillsOpen] = useState(false)
   /** aangetikt stadium in de evolutierij */
   const [toonNiveau, setToonNiveau] = useState<number | null>(null)
 
@@ -73,7 +76,7 @@ export function ProfileScreen() {
           </span>
         </button>
       </div>
-      <div style={{ margin: '14px 0 24px' }}>
+      <div style={{ margin: '14px 0 18px' }}>
         <div className="progress-track" style={{ height: 8 }}>
           <div className="progress-fill" style={{ width: `${Math.round(lp.frac * 100)}%` }} />
         </div>
@@ -81,6 +84,24 @@ export function ProfileScreen() {
           Nog {lp.needed - lp.current} XP tot niveau {lp.level + 1} · {levelTitle(lp.level + 1)}
         </p>
       </div>
+
+      {/* vaardigheden in RuneScape-stijl: elke taal een level richting 99 */}
+      <button className="glass spread" style={{ width: '100%', padding: '13px 16px', marginBottom: 24, textAlign: 'left' }} onClick={() => { sfx('tap'); setSkillsOpen(true) }}>
+        <span className="row" style={{ gap: 10 }}>
+          <span style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(255,197,61,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🎓</span>
+          <span className="col" style={{ gap: 1 }}>
+            <strong className="card-title">Vaardigheden</strong>
+            <span className="faint" style={{ fontSize: 12 }}>
+              {course.name} level {skillStand(progress.xp).level} van 99
+            </span>
+          </span>
+        </span>
+        <span className="gold-text num" style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 17 }}>
+          Totaal {courseList.reduce((n, c) => n + skillStand(state.progress[c.id]?.xp ?? 0).level, 0)}
+        </span>
+      </button>
+
+      {skillsOpen && <SkillsSheet onClose={() => setSkillsOpen(false)} />}
 
       {bewerkt && (
         <div style={{ marginBottom: 18 }}>

@@ -3,10 +3,12 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 /** Bouwmoment als leesbare stempel, bv. "12-08 21:30" — komt op het profiel
- *  te staan zodat je op de live site kunt zíen welke versie er draait */
+ *  te staan zodat je op de live site kunt zíen welke versie er draait.
+ *  Expliciet in Nederlandse tijd: GitHub Actions bouwt in UTC en dan zou de
+ *  stempel er twee uur naast zitten. */
 const nu = new Date()
-const p2 = (n: number) => String(n).padStart(2, '0')
-const BOUWSTEMPEL = `${p2(nu.getDate())}-${p2(nu.getMonth() + 1)} ${p2(nu.getHours())}:${p2(nu.getMinutes())}`
+const nl = (opties: Intl.DateTimeFormatOptions) => nu.toLocaleString('nl-NL', { timeZone: 'Europe/Amsterdam', ...opties })
+const BOUWSTEMPEL = `${nl({ day: '2-digit' })}-${nl({ month: '2-digit' })} ${nl({ hour: '2-digit', minute: '2-digit' })}`
 
 export default defineConfig({
   define: { __BOUWSTEMPEL__: JSON.stringify(BOUWSTEMPEL) },

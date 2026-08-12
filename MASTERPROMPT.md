@@ -294,6 +294,16 @@ wat je onderweg zelf vindt.
       met SRS · grammatica-gidsen · 1000 personages · de Wereldreis met
       Poortwachters en paspoort · PWA · nooit straffen (hun hartjes-model is
       juist ons wapen).
+   ✅ AF (ronde 59) — HET VRIJE GESPREK: de speler kiest zélf waar het over
+      gaat (uitdrukkelijke wens van de gebruiker). src/content/gesprekkenExtra.ts
+      + VrijSpeler in Gesprek.tsx: na de begroeting kies je uit zes onderwerpen
+      (eten, reizen, muziek, sport, familie, het weer), praat je daar twee
+      beurten over en kies je door of rond je af met een afscheid in de
+      doeltaal. Elk gesprek is anders en oneindig herspeelbaar. Plus een
+      restaurantscenario van vijf beurten in alle zes talen (bestellen,
+      betalen, complimenten aan de kok). UITBREIDEN: nieuwe onderwerpen
+      (werk, huisdieren, films, het weekend) en nieuwe scenario's; op termijn
+      onderwerp-beurten laten meegroeien met je vaardigheidslevel.
    ✅ AF (ronde 57) — GESPREKKEN, ons antwoord op Duolingo Max Roleplay:
       src/content/gesprekken.ts (3 scenario's × 6 talen, elk antwoord is goed,
       fout bestaat niet) + src/screens/Gesprek.tsx (chatscherm met typindicator,
@@ -318,6 +328,30 @@ wat je onderweg zelf vindt.
       Supabase hieronder. De Gesprekken-architectuur is er al klaar voor: een
       vrije chatmodus is één extra bron van partnerbeurten.
    ✕ Bewust niet: hartjes/energie (straf), losse wiskunde- en muziekapps.
+
+▓▓ BLOK R — VAARDIGHEDEN IN RUNESCAPE-STIJL (uitdrukkelijke wens van de
+   gebruiker, ronde 59: "dat je dingen 99 kan halen in talen ... dat je op je
+   poppetje kan drukken en alle skill levels kan zien").
+   ✅ AF (ronde 59) — de kern: src/skills.ts (kwadratische curve 6·(l−1)²,
+      level 2 valt al in je eerste les, level 99 kost 57.624 XP en is een
+      meerjarenprestatie zoals in RuneScape) + SkillsSheet-component met
+      totaalniveau (de som van al je taallevels, RS-stijl) en per taal
+      level /99, voortgangsbalk, XP-stand, mijlpalen (10/25/50/75/90/99) en
+      substats (lessen, woorden, gesprekken, stempels). Te openen door op je
+      poppetje te drukken op Home (met gouden levelbadge op de avatar) en via
+      de Vaardigheden-kaart op het profiel. De XP komt rechtstreeks uit
+      progress[taal].xp: geen aparte boekhouding die uit de pas kan lopen.
+   UITBREIDEN, in deze volgorde:
+   1. Level-up-viering: bij elke levelsprong een korte fanfare + confetti op
+      het lesresultaatscherm ("Spaans is nu level 10!"), bij mijlpalen groter.
+   2. Deelvaardigheden per taal, elk met een eigen level richting 99:
+      Luisteren (luisteroefeningen + Luisterjacht), Spreken (ingesproken
+      gespreksbeurten), Lezen, Schrijven (typ-oefeningen), Gesprekken,
+      Herhalen. Vergt per-oefentype XP-boekhouding in de store; bouw dat als
+      één veld skillXp[taal][vaardigheid] dat elke evaluatie bijwerkt.
+   3. De 99-mantel: wie een taal op 99 krijgt, verdient een gouden mantel als
+      avatar-accessoire (RuneScape-kappe-gevoel), zichtbaar in de galerij.
+   4. Skill-missies: "haal vandaag 3 levels" als extra dagmissie-variant.
 
 ▓▓ GEBLOKKEERD tot de gebruiker een Supabase-project en sleutels aanlevert:
    echte accounts op een server, "wachtwoord vergeten", vriendenlijsten,
@@ -349,6 +383,7 @@ Stoppen kan met `/loop stop` of door de cron-taak te verwijderen.
 
 ## Logboek
 
+- **13-08-2026, ronde 59** — Twee nieuwe wensen van de gebruiker, allebei dezelfde dag gebouwd én live. (1) **Vaardigheden in RuneScape-stijl**: druk op je poppetje en je ziet per taal je level richting 99, met een totaalniveau bovenaan, mijlpalen en substats per taal. De curve (6·(l−1)²) is zo gekozen dat level 2 al in je eerste les valt maar 99 een meerjarenprestatie blijft, precies het RuneScape-gevoel. De XP komt rechtstreeks uit progress[taal].xp, dus historische voortgang telde meteen mee: het testaccount opende op Spaans level 9 met echte cijfers. Uitbreidingspad (level-up-viering, deelvaardigheden, de 99-mantel, skill-missies) staat in Blok R. (2) **Het vrije gesprek**: de speler kiest zelf waar het over gaat. Zes onderwerpen per taal, twee beurten per onderwerp, doorpraten of afronden, plus een restaurantscenario van vijf beurten in alle zes talen. Bewezen: intro → Muziek → terug in de keuze (Muziek weg uit de chips) → Het weer → afronden → +25 XP (465→490) en 'vrij' in de opslag. Ook gefixt: de bouwstempel toonde UTC-tijd omdat GitHub Actions in UTC bouwt; nu expliciet Europe/Amsterdam. **Les:** de bouwstempel maakte de bundelhash niet-deterministisch, waardoor "vergelijk lokale hash met live hash" als bewijs stierf op het moment dat de stempel erin kwam; het nieuwe bewijs is de stempel zélf uit de live bundel lezen. Wie een controle bouwt, moet checken welke oude controle hij daarmee sloopt.
 - **12-08-2026, ronde 58** — **"Ik zie niet veel veranderen op de live link" bleek een cache-illusie, en die is nu structureel opgelost.** Er gingen die dag acht versies live, maar de PWA-service-worker stond op autoUpdate: hij haalt een nieuwe versie stilletjes binnen terwijl de speler nog naar de vórige uit de cache kijkt, dus je moest altijd twee keer laden om iets te zien. Nu: (1) registerType 'prompt' met een gouden zwevende knop "⚡ Nieuwe versie klaar, tik om te verversen"; de wissel gebeurt pas na een tik, dus een deploy breekt nooit meer een lopende les (dat risico stond al als zorg in Blok G); (2) de service worker checkt elke minuut én bij het terugkeren naar het tabblad of er een deploy is, dus ook een openstaande telefoon ontdekt hem binnen een minuut; (3) onderaan het profiel staat een bouwstempel ("Fluent · versie van 12-08 21:12", gezet via define in vite.config.ts), zodat iedereen op de live site kan zíen welke versie draait in plaats van te moeten raden. LES, nu bindend bij stap 5: live zetten is pas af als de gebruiker de verandering ook zonder harde refresh te zien krijgt; controleer voortaan de bouwstempel op het profiel in plaats van alleen de bundelhash in de HTML. Eenmalige overgangskost: wie nog op de oude autoUpdate-worker zit, ziet deze deploy pas na het sluiten en heropenen van het tabblad; daarna geldt het nieuwe gedrag voor altijd.
 - **12-08-2026, ronde 57** — De grootste ronde tot nu toe, gestuurd door drie live-opdrachten. (1) **GESPREKKEN: praten met een personage in de doeltaal**, ons antwoord op Duolingo Max. Drie scenario's (café, nieuwe vrienden, de weg vragen) in alle zes talen, als chat met typindicator, moedertaal-audio per beurt (218 nieuwe fragmenten gegenereerd, manifest op 2698, 0 mislukt), NL-vertaaltoggle, en je antwoord inspreken via SpeechRecognition waar de browser dat kan. Elk antwoord is goed, fout bestaat niet. Bewezen: heel gesprek uitgespeeld, +25 XP exact geboekt (440→465), `gesprekken: {es: ["cafe"]}` in de opslag. Eigen bug direct gevonden en gefixt: een selector met `?? []` gaf elke render een nieuwe array (oneindige lus), precies de valkuil uit stap 4e. (2) **De designsprong "verlichte arcadehal"**: zes ontwerplenzen + hoofdontwerper (55 findings) leverden een 14-stappenplan dat nu op Home en app-breed staat: getint glas met lichtrand, echte neon-gloed (kern+halo), zwevend arcade-dock, één held per scherm (.card-hero met goudroze rand), Gouden Draad met scheve stempel-knopen mét lesletter, jouw personage wachtend op de huidige knoop, goud exclusief voor beloningen, motion-budget van 10+ naar 3, staggered entrance, grabber op elk paneel. (3) **Opzij scrollen bestaat niet meer**: html { overflow-x: clip }. LES, duur betaald: de eerste fix zette de overflow óók op body, en een overflow op body maakt bódy het scrollvak waardoor window.scrollTo stilletjes niets meer doet en de pagina raar rendert. Overflow-knippen hoort op html, nergens anders. Verder Home geveegd op middenstreepjes in zichtbare tekst, en Blok P (Duolingo-pariteit) toegevoegd met de resterende gaten: verhalen, luisterverhalen, spreekoefeningen in de les; vrije AI-chat geblokkeerd op een API-sleutel van de gebruiker.
 - **12-08-2026, ronde 56** — **Wereldreis fase 8 én 9 af, allebei live.** (1) **Het paspoort.** Elke Grensproef die je doorstaat laat nu een echte afdruk achter: `src/components/PassportStamp.tsx` tekent een inktstempel met de vlag in het midden, de landnaam gebogen langs de rand via `textPath`, de datum eronder en een scheefstand die uit de landcode wordt afgeleid — Spanje staat op 7°, Mexico op 10°, en herladen verandert daar niets aan. Het paspoort zelf opent met de 🛂-knop in de kaartheader: een raster van drie kolommen over alle veertien landen, verdiende stempels in goud, de rest als stippellijn met een "?", en onderaan "2 van de 14 stempels · volgende: Colombia". Een verzameling die om vulling vraagt, nooit een slot. (2) **Het wereldblok op Home is een stukje route geworden.** Veertien vlaggetjes op een rij vertelden je niets over waar je stond; nu zie je de bocht waar je op loopt, met het land achter je in kleur, jouw eigen personage precies zo ver als je lessen reiken (`getPointAtLength` op hetzelfde pad, `etappeFrac` uit dezelfde functie als de grote kaart) en het volgende land dat voor je uit lonkt met een amber randje. Teller en lessenstand bleven exact gelijk aan de oude weergave, want beide lezen uit `countryStates`. **Les, nu in stap 4:** bij een miniatuur is "het staat er" niet genoeg — de eerste versie had de afgelegde route wél getekend, maar hij viel volledig weg achter de vlagcirkel en het personage. Meet bij elk klein beeld of het betekenisvolle deel ook echt zíchtbaar overblijft naast alles wat eroverheen staat. **Tweede les, nu in stap 8:** het logboek is niet de nette afsluiting maar het bewijsstuk van de ronde — tussen ronde 30 en 55 is er gebouwd zonder te loggen, en daardoor is niet meer na te lezen wat er is besloten. Een ronde zonder logboekregel telt niet als af.
