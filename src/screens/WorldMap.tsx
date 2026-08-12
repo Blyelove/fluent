@@ -594,7 +594,7 @@ export function WorldMapScreen({
               const doel = knopen.find((k) => k.isVolgende)
               if (!doel) return '▶ Verder leren'
               const rest = Math.max(0, doel.threshold - completedCount)
-              return `▶ Verder leren — nog ${rest} ${rest === 1 ? 'les' : 'lessen'} tot ${doel.name}`
+              return `▶ Verder leren · nog ${rest} ${rest === 1 ? 'les' : 'lessen'} tot ${doel.name}`
             })()}
           </button>
         </motion.div>

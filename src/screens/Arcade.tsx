@@ -101,7 +101,7 @@ const GAMES: GameDef[] = [
     name: 'Woordstorm',
     emoji: '🌀',
     tagline: '8 paren, zo snel als je kunt',
-    how: 'Tik twee tegels die bij elkaar horen. De klok tikt door — missen kost 3 seconden.',
+    how: 'Tik twee tegels die bij elkaar horen. De klok tikt door en missen kost 3 seconden.',
     grad: 'linear-gradient(135deg, #22d3ee 0%, #6366f1 100%)',
     shade: '#0e7490',
     glow: 'rgba(34, 211, 238, 0.42)',
