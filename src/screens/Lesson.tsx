@@ -105,6 +105,8 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
   const [maxCombo, setMaxCombo] = useState(0)
   const [finished, setFinished] = useState<{
     xp: number
+    /** was dubbele XP actief? dan verdient dat een eigen vermelding */
+    dubbel: boolean
     perfect: boolean
     newLevel: number | null
     conquered: CountryState[]
@@ -191,7 +193,11 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
       const completedAfter = (after.progress[course.id]?.completed ?? []).length
       const levelAfter = levelForXp(xpAfter)
       setFinished({
-        xp,
+        // wat er écht is bijgeschreven, inclusief dubbele XP, missiebonus en
+        // gehaalde doelen. Zelf narekenen loog tijdens een boost: je zag +10
+        // en kreeg er 20.
+        xp: Math.max(0, xpAfter - xpBefore),
+        dubbel: before.boostUntil > Date.now(),
         perfect,
         newLevel: levelAfter > levelForXp(xpBefore) ? levelAfter : null,
         conquered: countryStates(course, completedAfter).filter((c) => c.conquered && c.threshold > completedBefore),
@@ -207,6 +213,7 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
     return (
       <CompleteView
         xp={finished.xp}
+        dubbel={finished.dubbel}
         perfect={finished.perfect}
         newLevel={finished.newLevel}
         conquered={finished.conquered}
@@ -444,6 +451,7 @@ const GOLD_CONFETTI = ['#EED9A0', '#D4AF6A', '#B08D4C', '#F2ECDF']
 
 function CompleteView({
   xp,
+  dubbel,
   perfect,
   newLevel,
   conquered,
@@ -455,6 +463,7 @@ function CompleteView({
   onNext,
 }: {
   xp: number
+  dubbel: boolean
   perfect: boolean
   newLevel: number | null
   conquered: CountryState[]
@@ -577,9 +586,9 @@ function CompleteView({
             </h1>
             <div className="divider-gold" />
             <div className="row" style={{ justifyContent: 'center', gap: 14, marginTop: 16 }}>
-              <div className="glass stat-card" style={{ minWidth: 120 }}>
+              <div className="glass stat-card" style={{ minWidth: 120, borderColor: dubbel ? 'var(--line-gold)' : undefined }}>
                 <div className="stat-value gold-text">+{shown}</div>
-                <div className="stat-label">XP verdiend</div>
+                <div className="stat-label">{dubbel ? '⚡ XP × 2' : 'XP verdiend'}</div>
               </div>
               <div className="glass stat-card" style={{ minWidth: 120 }}>
                 <div className="stat-value">{streak}</div>

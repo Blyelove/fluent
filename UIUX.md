@@ -50,7 +50,7 @@ Fluent heeft een kern die al als topspel voelt — chunky leslus met combo's en 
 
 **Bewijs:** Doorloop de flow: nummering loopt 1-2-3 zonder reset, en vanaf stap 3 kun je terug naar de taalkeuze.
 
-### 11. Toon de écht uitbetaalde XP: Lesson.tsx r179-197 toont lokaal berekende xp terwijl store.completeLesson via metBoost (store.ts r386) verdubbelt — tijdens een boost zie je +10 maar krijg je 20. Gebruik xpAfter − xpBefore (al beschikbaar in advance) en toon bij actieve boost een gouden chip '+20 XP · ×2 boost ⚡'; laat de dagdoel-balk animeren vanaf todayXp-vóór-de-les.
+### 11. ✅ AF (ronde 34) — Toon de écht uitbetaalde XP: Lesson.tsx r179-197 toont lokaal berekende xp terwijl store.completeLesson via metBoost (store.ts r386) verdubbelt — tijdens een boost zie je +10 maar krijg je 20. Gebruik xpAfter − xpBefore (al beschikbaar in advance) en toon bij actieve boost een gouden chip '+20 XP · ×2 boost ⚡'; laat de dagdoel-balk animeren vanaf todayXp-vóór-de-les.
 
 **Bewijs:** Activeer een boost, rond een les af: het getal op het resultaatscherm is exact gelijk aan de XP-stijging in de store.
 
