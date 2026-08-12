@@ -1,6 +1,6 @@
 # Masterprompt — Fluent naar het hoogste niveau
 
-Deze prompt draait automatisch **elke 45 minuten** en verbetert zichzelf elke ronde.
+Deze prompt draait automatisch **elke 15 minuten** en verbetert zichzelf elke ronde.
 Hij dekt alles wat in de bouwchat is afgesproken, zodat er niets uit kan vallen.
 
 ```
@@ -104,9 +104,8 @@ DEEL 2 — WAT JE ELKE RONDE DOET, IN DEZE VOLGORDE
 
 7. JEZELF VERBETEREN. Werk als laatste stap dit bestand bij: voeg toe wat je miste, schrap wat niet werkte, scherp aan wat vaag bleek, streep af wat af is en zet er nieuwe ideeën bij die je tijdens het testen bedacht. Zet onderaan een korte logregel met de datum en wat je verbeterde. Commit het mee. De volgende ronde leest de nieuwe versie — zo wordt de opdracht elke keer scherper.
 
-8. DE LUS DOORZETTEN. Roep als allerlaatste handeling ScheduleWakeup aan met delaySeconds 2700 (precies 45 minuten) en als prompt letterlijk:
-   /loop Lees C:\Users\Blye\Desktop\aurea\MASTERPROMPT.md volledig en voer de instructies in het codeblok daarin uit, inclusief de laatste stap waarin je dit bestand zelf verbetert en meecommit.
-   Vergeet je dit, dan stopt de lus. Doe het altijd, ook als de ronde tegenviel.
+8. DE LUS LOOPT DOOR VIA CRON, elke 15 minuten. Je hoeft zelf niets opnieuw in te plannen. Een ronde vuurt alleen als de vorige klaar is, dus een zware ronde vertraagt hooguit de volgende — hij slaat niets over.
+   PAS JE RONDE AAN OP HET VENSTER. Vijftien minuten is kort. Kies dus iets dat je in die tijd hélemaal af krijgt: één bewezen bug, één klein scherm, één regel content. Kom je er toch niet uit, maak het dan de volgende ronde eerst áf voordat je iets nieuws begint — half werk in de repo is erger dan een gemiste ronde.
 
 ═══════════════════════════════════════════════════════════════
 DEEL 3 — KERNREGELS DIE NOOIT VERANDEREN
@@ -118,16 +117,106 @@ DEEL 3 — KERNREGELS DIE NOOIT VERANDEREN
 - Het personagesysteem moet het rijkste van alle taal-apps zijn. Dat is een doel, geen bijzaak.
 
 ═══════════════════════════════════════════════════════════════
-DEEL 4 — DE BOUWLIJST (meest waardevol eerst)
-Streep af wat af is, zet er bij wat je onderweg bedenkt.
+DEEL 4 — DE BOUWLIJST
+Uit een audit van zeven agents over de hele app (ronde 15), elk met een
+tegentoets op hun bevindingen. Dit zijn geen ideeën maar aangetoonde
+tekortkomingen. Pak van boven naar beneden. Streep af wat af is en zet erbij
+wat je onderweg zelf vindt.
 ═══════════════════════════════════════════════════════════════
-- PERSONAGE: een echte kledingkast waarin je zelf combineert; zeldzame items die je alleen met prestaties verdient; meer animaties per niveau; per taal herkenbaardere culturele items; een "hoe zie ik eruit op niveau 20"-voorvertoning.
-- VERSLAVING: verrassingskisten, seizoenen met een eindbeloning, meer dubbel-XP-momenten, een eindspel voor wie niveau 20 haalt.
-- SPEL: een vierde minigame (uitspraakspel of tijdrace tegen je eigen record), moeilijkheidsgraden binnen een spel, power-ups.
-- LEREN: cursussen richting B1/B2, verhalen en luisterfragmenten, een AI-gesprekspartner, spreekoefeningen.
-- DELEN: deelmoment bij een gehaalde toets en bij promotie naar een hogere divisie.
-- TECHNIEK: sneller laden, kleinere bundel, betere offline-ervaring.
-- GEBLOKKEERD tot de gebruiker een Supabase-project en sleutels aanlevert: echte accounts op een server, vriendenlijsten, ranglijst tussen vrienden, synchronisatie tussen apparaten, het welkomstmailtje en meldingen die je reeks redden. Ik mag zelf geen account voor hem aanmaken. Vraag er niet elke ronde naar; noem het één keer in het rapport als het relevant is.
+
+▓▓ BLOK A — BEWEZEN BUGS. Deze gaan vóór alles. Elk hiervan breekt een belofte
+   die de app zelf op het scherm doet.
+1.  Twee accounts op één telefoon delen één voortgang: account B erft alles van A. Voortgang moet per account gescheiden worden. Dit kan vandaag, zonder server.
+2.  Alle 71 Duitse invuloefeningen hebben het juiste antwoord op knop 1. Schud de antwoordopties bij het renderen en bouw een controle die scheve content tegenhoudt.
+3.  De weekmissie "Speel 1 duel" is voor een solospeler onmogelijk, dus de weekkist zit permanent op slot. Geef een alternatieve route, net als bij de dagmissie.
+4.  De klasse `.unit-card` bestaat niet in de CSS: vier hoofdkaarten hebben nul padding en plakken aan elkaar. Definiëren, en daarna de `order`-lapmiddelen opruimen.
+5.  Herhalen, fouten wegwerken en toetsen tellen niet mee voor je reeks, je missies en je divisie — terwijl de app het tegendeel belooft. Eén gedeelde activiteitsregistratie waar álles doorheen gaat.
+6.  "Dubbele XP" verdubbelt alleen arcade en duels, geen lessen. Precies omgekeerd aan de bedoeling.
+7.  De competitieweek rolt niet door bij het openen van de app: maandagochtend zie je nog vorige week, en de weekkist van vorige week kan die van deze week opbranden.
+8.  Promotie en degradatie negeren de ranglijst die je de hele week te zien krijgt.
+9.  De herhaalsessie gooit de goedgekeurde alternatieve antwoorden weg en rekent accenten hard fout.
+10. Eén keer goed haalt een fout permanent uit je foutenlijst, terwijl de antwoordpositie vast staat — je onthoudt de plek, niet het woord. Laat een fout pas verdwijnen na twee keer goed op verschillende momenten.
+11. Nieuwe woorden staan direct na de les al op "herhaling klaar". Laat ze pas de volgende dag opduiken.
+12. Alles wat je goed doet buiten de herhaalsessie raakt de FSRS-kaart niet. Voed het geheugenmodel vanuit elke oefening.
+13. De onderbalk blijft actief tijdens een minigame: één randveeg en je run is weg. Verbergen tijdens spel en duel.
+14. Het toetsenbord bedekt de knop Controleren bij typoefeningen, en Enter doet niets.
+15. Van tab wisselen behoudt de scrollpositie, dus je landt midden in het volgende scherm. De missie-chip katapulteert je 5.615px omlaag zonder terugweg.
+16. Acht veelgebruikte raakvlakken zijn kleiner dan 44px, tegen de eigen regel in.
+17. Reeks-bescherming vangt maar één gemiste dag op, hoeveel bescherming je ook hebt.
+18. Op "Vrouw" tikken wist je haarstijl en forceert oorbellen.
+19. Je personage is na registratie nooit meer te wijzigen, en het dagdoel evenmin — terwijl de onboarding belooft van wel.
+20. De persist-store heeft geen `version` en geen `migrate`: de eerste datawijziging kost iedereen zijn voortgang.
+21. Spelfout in zichtbare tekst: "volledig spaans".
+
+▓▓ BLOK B — HET PERSONAGE. Hier wil de gebruiker de beste ter wereld in zijn.
+   De audit is hier het hardst: per taal bestaan er maar twee unieke visuele
+   objecten (één hoed, één handitem), de "Flamenco-outfit" is in werkelijkheid
+   één gekleurde balk van 10px, en vanaf niveau 11 zien álle zes talen er
+   identiek uit. "Man én vrouw" is in de code vier streepjes wimper.
+- Tien extra kledingstukken per taal in plaats van één hoed en één item, en niveau 11-20 ook per taal maken.
+- Een echte kledingkast waarin je zelf items aan- en uitzet.
+- Man en vrouw echt verschillend tekenen; baard, hoofddoek, meer brilmodellen, kapsellengte en lichaamstype toevoegen.
+- Zeldzame items koppelen aan de 50 badge-tiers die er al liggen — nu geeft geen enkele prestatie een item.
+- Niveau per taal in plaats van globaal, zodat je bij je tweede taal niet gratis de complete cultuur-outfit krijgt.
+- Onthullings-animatie bij niveau-omhoog in plaats van het item stilletjes tonen.
+- Je tegenstander in een duel en je divisiegenoten een echt personage geven.
+- De personage-maker herbouwen voor één duim; hij is nu niet met één hand te bedienen.
+- De culturele items nalopen: het zijn toeristenclichés en deels het verkeerde land.
+
+▓▓ BLOK C — VERSLAVENDHEID
+   Kern van het probleem: de contentberg is na ~21 dagen op terwijl de
+   niveauberg 428 dagen duurt, arcade betaalt 7 tot 12 keer beter per minuut
+   dan een les (het systeem beloont dus níet leren), en boven niveau 20
+   verandert er niets meer.
+- De XP-economie omdraaien zodat leren de snelste route is.
+- Een kistensysteem met echte willekeur — nu is er één kistsoort met een vast bedrag.
+- Een seizoenspas van twaalf weken met tiers: de haak voor dag 30 tot 90.
+- Prestige na niveau 20 (Fluent-sterren) als eindspel.
+- Doelen met inzet, een vroeg-bonus en een echte afloop.
+- Landen echt uitspeelbaar maken met een veroveringstoets — nu liggen 6 van de 14 landen achter content die niet bestaat.
+- Aangekondigde dubbel-XP-uren, een maandmissie op basis van de al opgeslagen actieve dagen, en een instelbaar dagdoel.
+
+▓▓ BLOK D — SPEL
+- Napraat: de uitspraak-arcade. De app laat je nu nooit iets zeggen.
+- Toren van Woorden: zinnen bouwen met verdiepingen en power-ups.
+- Spookrace: een duel waarin je je vriend live ziet racen. Een duel is nu letterlijk een les met een scorebord — geen klok, geen spanning.
+- Spelmodificatoren: drie kaarten kiezen vóór elk potje.
+- Duelklok en snelheidspunten; revanche-knop; een bot-uitdager voor wie niemand heeft.
+- Spelen houdt je reeks in leven. Duelvragen afstemmen op wat de uitdager al gedaan heeft.
+- Twee van de drie minigames zijn volledig stil terwijl er 1931 moedertaal-fragmenten klaarstaan.
+
+▓▓ BLOK E — LEREN
+- Dictee-oefening (hoor de zin, typ hem) en een spreekoefening met de Web Speech API, zonder straf.
+- Accent- en typefouttolerantie met een vriendelijke correctie in plaats van hard fout.
+- Uitleg ook bij goede antwoorden, ook in de herhaalsessie, en nooit de verkeerde regel.
+- Een vierde woordenschatles per unit, zodat het A2-label klopt: er zijn nu 104 woorden per taal terwijl het scherm "tot en met A2 uitgespeeld" claimt.
+- Toetsen beperken tot bestudeerde stof, plus een instaptoets voor wie al iets kan.
+- Herhaling uitbreiden van losse woorden naar zinnen, in beide richtingen.
+
+▓▓ BLOK F — GELUID
+- Meer dan de helft van alle oefeningen is muisstil; het generatie-script verzamelt drie van de zeven oefeningtypes niet. Uitbreiden en in één run de ontbrekende fragmenten bijgenereren.
+- Het juiste antwoord wordt getoond maar nooit voorgelezen. Bij een fout automatisch laten klinken.
+- Langzaam afspelen bestaat nergens: een tweede, langzame opname per zin met lange-druk.
+- Eén herbruikbare luisterknop in alle zeven oefeningtypes, minstens 44px.
+- Een bouwcontrole die faalt als een zichtbare doeltaalzin geen audio heeft.
+- De terugval kiest op taalprefix en pakt dus pt-BR voor een pt-PT-cursus; en de geluid-uit-schakelaar zet de stem niet uit.
+
+▓▓ BLOK G — TECHNIEK
+- Herstelcode plus exporteren/importeren: een back-up die vandaag al werkt, zonder sleutels. Er is nu geen enkele.
+- Eerste verf onder een seconde: 963 KB JS en 433 KB CSS, met tot die tijd een leeg zwart scherm. Inline splash, cursussen splitsen, de 142 vlag-SVG's uitdunnen naar de ~62 die je gebruikt.
+- Offline echt af: de 24 MB moedertaal-audio staat niet in de precache, dus een luisteroefening wordt offline onbeantwoordbaar. Audiopakket per cursus downloaden met zichtbare voortgang.
+- Niets nodigt uit tot installeren, terwijl installeerbaar juist de eis is.
+- Updates zonder onderbreking: `skipWaiting` kan nu een les breken tijdens een deploy.
+- Linkvoorvertoning voor gedeelde duel-links en deelplaatjes.
+
+▓▓ GEBLOKKEERD tot de gebruiker een Supabase-project en sleutels aanlevert:
+   echte accounts op een server, "wachtwoord vergeten", vriendenlijsten,
+   ranglijst tussen vrienden, synchronisatie tussen apparaten, het
+   welkomstmailtje en meldingen die je reeks redden. Ik mag zelf geen account
+   voor hem aanmaken. Vraag er niet elke ronde naar; noem het hooguit één keer
+   in het rapport als het echt relevant is. Wat je wél mag doen: het schema,
+   de beveiligingsregels en de synchronisatiecode klaarzetten zodat het
+   aanzetten straks één handeling is.
 
 ✅ AL AF (niet opnieuw bouwen): vrienden-duels via deel-link · deelbare resultaatplaatjes, ook met je eigen personage erop · Nederlandstalige grammaticagidsen per unit · "Waarom?"-uitleg bij een fout antwoord · jouw-fouten-oefening gevoed door lessen, toetsen én duels · comeback-beloning na afwezigheid · "nog één les"-haakje · dagmissies met bonuskist · weekmissies · divisies · drie minigames · zelf samengestelde toetsen · 24 kant-en-klare personages plus een vrije personage-maker · PWA · automatische publicatie.
 
@@ -142,15 +231,16 @@ De lus krijgt bewust een korte startopdracht die naar dit bestand verwijst. Omda
 /loop Lees C:\Users\Blye\Desktop\aurea\MASTERPROMPT.md volledig en voer de instructies in het codeblok daarin uit, inclusief de laatste stap waarin je dit bestand zelf verbetert en meecommit.
 ```
 
-Het interval is **precies 45 minuten** (2700 seconden), gezet via ScheduleWakeup aan het eind van elke ronde. Cron kan geen 45 minuten uitdrukken — `*/45` zou vuren op :00 en :45 en dus gaten van 45 en 15 minuten geven — daarom wordt de lus na elke ronde opnieuw op 2700 seconden gezet. Stap 8 in de opdracht hierboven is dus geen bijzaak: zonder die stap stopt de lus.
+Het interval is **elke 15 minuten**, als cron-taak op `7,22,37,52 * * * *` — dus op :07, :22, :37 en :52. Bewust niet op :00 en :30, want daar landt de halve wereld tegelijk op de API. Een ronde vuurt alleen als de vorige klaar is, dus een zware ronde vertraagt de volgende maar slaat hem niet over.
 
-Stoppen kan met `/loop stop`.
+Stoppen kan met `/loop stop` of door de cron-taak te verwijderen.
 
 ---
 
 ## Logboek
 
 - **12-08-2026** — Eerste versie. Dekt: verslavendheid, sociaal, personage, leren, techniek, de nooit-straffen-regel, het neon-arcade-design en de vijfvoudige controle. Zelfverbeterstap toegevoegd.
+- **12-08-2026, ronde 15b** — De bouwlijst vervangen door een **audit van zeven agents over de hele app** (verslaving, personage, leren, spellen, mobiel, geluid, techniek), elk met een tegentoets die elke bewering met hoge impact probeerde te weerleggen. Wat overbleef staat nu als Deel 4 in de opdracht — geen ideeënlijst meer maar **21 aangetoonde bugs** plus zes blokken werk, met bewijs uit de code. De hardste vondsten: twee accounts op één telefoon delen één voortgang; alle 71 Duitse invuloefeningen hebben het juiste antwoord op knop 1; de weekmissie "speel 1 duel" maakt de weekkist voor een solospeler permanent onbereikbaar; de klasse `.unit-card` bestaat niet waardoor vier hoofdkaarten nul padding hebben; herhalen en toetsen tellen niet mee voor reeks en divisie terwijl de app het tegendeel belooft; arcade betaalt 7 tot 12 keer beter per minuut dan een les, dus het systeem beloont níet leren; en de contentberg is na ~21 dagen op terwijl de niveauberg 428 dagen duurt. Ook de cadans aangepast: **elke 15 minuten** in plaats van 45, via cron op `7,22,37,52`. Daarbij hoort een nieuwe regel in stap 8: vijftien minuten is kort, dus kies iets dat je in dat venster hélemaal af krijgt, en maak een onaffe ronde eerst áf voordat je iets nieuws begint.
 - **12-08-2026, ronde 15** — Masterprompt volledig herschreven op verzoek van de gebruiker. Grootste toevoeging: **Deel 1, de complete eisenlijst** — alles wat hij in de bouwchat heeft gevraagd staat nu zwart op wit in de opdracht zelf (product, verslavendheid, personage, uitspraak, spel en bediening, zelf toetsen, account en web, publicatie, afwerking), zodat een latere ronde niet stilzwijgend een eis kan laten vallen. Het personagesysteem is verheven tot kernregel: Fluent moet daarin het rijkste van alle taal-apps zijn. Ook nieuw: de lus staat nu op **precies 45 minuten** via ScheduleWakeup in plaats van op 30 via cron (cron kan geen 45 uitdrukken), en stap 8 zorgt dat de lus zichzelf doorzet. Verder toegevoegd aan de werkwijze: een klacht van de gebruiker is de opdracht van die ronde en je lost hem ruim op, niet minimaal; kijk elke ronde ook één keer op een breed scherm; een schuifbalk is bijna altijd een ontwerpfout; `gh` staat niet in het PATH van de Bash-shell. **In dezelfde ronde gebouwd:** het personagescherm ging van **8 naar 24** kant-en-klare personages die samen alle tien haarstijlen, acht huidtinten, twaalf haarkleuren en tien outfits laten zien, en de **lelijke systeem-schuifbalk** onder de personagestrook is weg — het is nu een raster dat vanzelf afbreekt, ingeklapt op acht met een knop "Toon alle 24". Schuifbalken staan app-breed in de huisstijl.
 - **12-08-2026, ronde 14** — Eerst de **herhaalsessie (SRS) voor het eerst helemaal uitgespeeld** en de belofte hard gecontroleerd: van 12 Spaanse kaarten werden er 10 herhaald (`reps` van 0 naar 1) en schoof hun herhaalmoment van 03:12 naar ~08:45, terwijl de 2 niet-behandelde kaarten netjes wachtend bleven. FSRS doet dus echt wat er staat — geen bug. Daarna **deelmomenten op de emotionele pieken** gebouwd, met bij een niveau-sprong **je eigen personage op de kaart** en een tweede knop bij een **veroverd land**. **Drie fouten in eigen werk gevonden door in te zoomen op het eindresultaat:** (1) de kaart toonde nog een ster — het kaart-object werd tijdens het renderen opgebouwd, en dan is de ref naar de SVG nog `null`; (2) een SVG rastert op zijn eigen schermformaat, dus uitvergroot zou het figuur uitgesmeerd zijn; (3) het figuur oogde half zo groot als bedoeld door lege ruimte in de viewBox — nu wordt het echte beeldvlak uitgesneden. Ook krimpt de grote waarde mee als hij buiten de kaart zou lopen. **Lessen, nu in stap 3 en 4:** haal iets uit de pagina pas op het moment van de handeling, en controleer bij beeld niet of het er stáát maar of het de ruimte vúlt.
 - **12-08-2026, ronde 13** — De belofte "precies de vragen waar jij op struikelde" nu op **alle drie de plekken** waargemaakt: fouten in een **duel** telden als laatste nog niet mee. Duelvragen dragen nu hun herkomst mee (les-id + positie), net als lessen (ronde 7) en toetsen (ronde 12), en alle drie gebruiken dezelfde functie `isHerhaalbaar()`. Getest: een duel met 2 van de 10 goed leverde 8 onthouden fouten op. **Belangrijkste controle:** ik veranderde de vragenpoel die de duels voedt, dus moest ik bewijzen dat beide spelers nog steeds identieke vragen krijgen — dezelfde seed twee keer gespeeld en vergeleken: exact gelijk. Die regel staat nu in stap 2.
