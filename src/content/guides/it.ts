@@ -8,7 +8,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Ciao of buongiorno?',
         explanation:
-          'Ciao gebruik je bij mensen die je kent: vrienden, familie, leeftijdsgenoten. Tegen onbekenden, in een winkel of tegen iemand die duidelijk ouder is zeg je buongiorno (overdag) of buonasera (vanaf een uur of vier in de middag). Ciao betekent bovendien zowel hallo als dag, terwijl buongiorno alleen een begroeting is.',
+          'Ciao gebruik je bij mensen die je kent: vrienden, familie, leeftijdsgenoten. Tegen onbekenden, in een winkel of tegen iemand die duidelijk ouder is zeg je buongiorno (overdag) of buonasera (vanaf een uur of vier in de middag). Ciao betekent bovendien zowel hallo als dag: je kunt het bij aankomst én bij vertrek gebruiken. Neem je afscheid van iemand die je niet kent, zeg dan arrivederci.',
         examples: [
           { target: 'Ciao, come stai?', nl: 'Hallo, hoe gaat het?' },
           { target: 'Buongiorno, signora Rossi!', nl: 'Goedemorgen, mevrouw Rossi!' },
@@ -18,7 +18,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Mi chiamo: ik noem mij',
         explanation:
-          'Het werkwoord chiamarsi betekent letterlijk "zich noemen". Je zegt dus niet "ik heet", maar "ik noem mij": mi chiamo. Gaat het over iemand anders, dan verandert er twee dingen tegelijk: het woordje ervoor wordt si en de uitgang van het werkwoord wordt -a. Zo hoort mi bij chiamo en si bij chiama.',
+          'Het werkwoord chiamarsi betekent letterlijk "zich noemen". Je zegt dus niet "ik heet", maar "ik noem mij": mi chiamo. Gaat het over iemand anders, dan veranderen er twee dingen tegelijk: het woordje ervoor wordt si en de uitgang van het werkwoord wordt -a. Zo hoort mi bij chiamo en si bij chiama.',
         examples: [
           { target: 'Mi chiamo Marco.', nl: 'Ik heet Marco.' },
           { target: 'Mi chiamo Anna, piacere!', nl: 'Ik heet Anna, aangenaam!' },
@@ -53,7 +53,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Mannelijk of vrouwelijk?',
         explanation:
-          "Elk Italiaans zelfstandig naamwoord (een woord voor een ding of een persoon) is mannelijk of vrouwelijk. Woorden op -o zijn meestal mannelijk en krijgen il ervoor; woorden op -a zijn meestal vrouwelijk en krijgen la. Il en la betekenen allebei de of het — welke je kiest hangt af van het woord, niet van de betekenis. Begint het woord met een klinker, dan worden il en la allebei ingekort tot l'.",
+          "Elk Italiaans zelfstandig naamwoord (een woord voor een ding of een persoon) is mannelijk of vrouwelijk. Woorden op -o zijn meestal mannelijk en krijgen il ervoor; woorden op -a zijn meestal vrouwelijk en krijgen la. Il en la betekenen allebei de of het — welke je kiest hangt af van het woord, niet van de betekenis. Begint het woord met een klinker (a, e, i, o of u), dan worden il en la allebei ingekort tot l'.",
         examples: [
           { target: 'Vorrei la pizza margherita.', nl: 'Ik wil graag de pizza margherita.' },
           { target: 'Il conto, per favore!', nl: 'De rekening, alsjeblieft!' },
@@ -97,7 +97,7 @@ export const guides: Record<string, UnitGuide> = {
       { target: 'La pizza e il vino, per favore.', nl: 'De pizza en de wijn, alsjeblieft.' },
     ],
     tip:
-      'Un caffè is in Italië altijd een espresso, nooit een kop filterkoffie. Wil je iets wat op onze koffie lijkt, vraag dan om un caffè lungo of un americano. Let ook op het streepje op de è van caffè: dat betekent dat de klemtoon achteraan valt, dus "kaf-FÈ" en niet "KAF-fe".',
+      'Un caffè is in Italië altijd een espresso, nooit een kop filterkoffie. Wil je iets wat op onze koffie lijkt, vraag dan om un caffè lungo of un caffè americano. Let ook op het streepje op de è van caffè: dat betekent dat de klemtoon achteraan valt, dus "kaf-FÈ" en niet "KAF-fe".',
   },
 
   'it-u3': {
@@ -107,7 +107,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Mio of mia?',
         explanation:
-          '"Mijn" heet mio bij een mannelijk woord en mia bij een vrouwelijk woord. Belangrijk: het richt zich naar de persoon of het ding dat bezeten wordt, niet naar wie de bezitter is. Een man zegt dus ook mia madre, en een vrouw zegt ook mio padre.',
+          '"Mijn" heet mio bij een mannelijk woord en mia bij een vrouwelijk woord. Belangrijk: je kiest op grond van het woord dat erachter komt, niet op grond van wie de eigenaar is. Een man zegt dus ook mia madre, en een vrouw zegt ook mio padre.',
         examples: [
           { target: 'Mio padre è di Roma.', nl: 'Mijn vader komt uit Rome.' },
           { target: 'Mia madre si chiama Elena.', nl: 'Mijn moeder heet Elena.' },
@@ -117,7 +117,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Familie krijgt geen lidwoord',
         explanation:
-          'Normaal staat er bij "mijn" nog een lidwoord (het woordje de of het) voor: la mia casa. Maar bij één familielid in het enkelvoud valt dat lidwoord weg: mia madre, mio fratello, mia sorella. Bij famiglia, dat over de hele familie gaat, blijft het lidwoord wél staan.',
+          'Normaal staat er bij "mijn" nog een lidwoord (het woordje de of het) voor: la mia casa. Maar gaat het over één familielid, dan valt dat lidwoord weg: mia madre, mio fratello, mia sorella. Bij famiglia, dat over de hele familie gaat, blijft het lidwoord wél staan.',
         examples: [
           { target: 'Mia sorella si chiama Sara.', nl: 'Mijn zus heet Sara.' },
           { target: 'La mia famiglia è grande.', nl: 'Mijn familie is groot.' },
@@ -182,7 +182,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Links en rechts met a',
         explanation:
-          'Richtingen krijgen het voorzetsel a: a destra (rechts) en a sinistra (links). Dat blijft hetzelfde of je nu vertelt waar iets ligt of waar iemand heen moet — het Italiaans maakt daar geen verschil tussen, terwijl wij kiezen tussen "aan de rechterkant" en "naar rechts".',
+          'Richtingen krijgen het voorzetsel a: a destra (rechts) en a sinistra (links). Een voorzetsel is een klein woordje dat een plaats of richting aangeeft, zoals a, di, in en su. Dat blijft hetzelfde of je nu vertelt waar iets ligt of waar iemand heen moet — het Italiaans maakt daar geen verschil tussen, terwijl wij kiezen tussen "aan de rechterkant" en "naar rechts".',
         examples: [
           { target: 'Il museo è a destra.', nl: 'Het museum is aan de rechterkant.' },
           { target: 'La stazione è a sinistra.', nl: 'Het station is aan de linkerkant.' },
@@ -264,7 +264,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Euro blijft euro',
         explanation:
-          'Bij een bedrag krijgt euro geen meervoudsvorm: je zegt dieci euro, nooit "dieci euri". Dat is in heel Europa zo afgesproken toen de munt werd ingevoerd. Andere Italiaanse woorden krijgen wél een meervoud, meestal met -i of -e: il biglietto wordt i biglietti.',
+          'Bij een bedrag krijgt euro geen meervoudsvorm: je zegt dieci euro, nooit "dieci euri". Euro is daarin een uitzondering. Gewone Italiaanse woorden krijgen namelijk wél een meervoud: een -o wordt -i (il biglietto wordt i biglietti) en een -a wordt -e (la sorella wordt le sorelle).',
         examples: [
           { target: 'Il formaggio costa dieci euro.', nl: 'De kaas kost tien euro.' },
           { target: 'Il caffè costa un euro.', nl: 'De koffie kost één euro.' },
@@ -273,7 +273,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'A + il = al',
         explanation:
-          "Voorzetsels en lidwoorden plakken in het Italiaans aan elkaar vast. A (op, naar) plus il (de) wordt al: al mercato. Dat is geen keuze maar een regel, want a il mercato bestaat niet. Op dezelfde manier krijg je a + la = alla en a + l' = all'.",
+          "Voorzetsels (woordjes als a, di, in en su) en lidwoorden plakken in het Italiaans aan elkaar vast. A (op, naar) plus il (de) wordt al: al mercato. Dat is geen keuze maar een regel, want a il mercato bestaat niet. Op dezelfde manier krijg je a + la = alla en a + l' = all'.",
         examples: [
           { target: 'Compro il pane al mercato.', nl: 'Ik koop het brood op de markt.' },
           { target: 'Il mercato è vicino alla stazione.', nl: 'De markt is dicht bij het station.' },
@@ -373,11 +373,22 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Studio of studia?',
         explanation:
-          'De uitgang van het werkwoord vertelt wie er iets doet — dat heet vervoegen, het aanpassen van het werkwoord aan de persoon. De uitgang -o hoort bij ik: studio, abito. De uitgang -a hoort bij hij, zij of een naam: studia, abita. Je hoeft er geen woord voor ik of hij bij te zetten, de uitgang doet dat werk al.',
+          'De uitgang van het werkwoord vertelt wie er iets doet — dat heet vervoegen, het aanpassen van het werkwoord aan de persoon. De uitgang -o hoort bij ik: studio, abito. De uitgang -i hoort bij jij: studi, abiti, parli. De uitgang -a hoort bij hij, zij of een naam: studia, abita. Je hoeft er geen woord voor ik, jij of hij bij te zetten, de uitgang doet dat werk al.',
         examples: [
           { target: 'Studio italiano a scuola.', nl: 'Ik studeer Italiaans op school.' },
+          { target: 'Perché studi italiano?', nl: 'Waarom studeer je Italiaans?' },
           { target: 'Lo studente studia italiano.', nl: 'De student studeert Italiaans.' },
           { target: 'Anche mio fratello abita a Roma.', nl: 'Mijn broer woont ook in Rome.' },
+        ],
+      },
+      {
+        title: 'In centro, a scuola',
+        explanation:
+          'Bij een paar veelgebruikte plekken zeg je in of a zónder lidwoord ertussen: in centro (in het centrum), in ufficio (op kantoor), a scuola (op school), a casa (thuis). Wij zetten er wel de of het tussen, het Italiaans niet. Welke van de twee woordjes het is, ligt per plek vast, dus leer ze als geheel: in centro, a scuola.',
+        examples: [
+          { target: 'La scuola è in centro.', nl: 'De school is in het centrum.' },
+          { target: "L'ufficio è in centro.", nl: 'Het kantoor is in het centrum.' },
+          { target: 'Studio italiano a scuola.', nl: 'Ik studeer Italiaans op school.' },
         ],
       },
       {
@@ -408,7 +419,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Vragen zonder hulpwoordje',
         explanation:
-          'Een vraag maak je door het vraagwoord vooraan te zetten en verder niets te veranderen: Quando parte il treno? Je hoeft geen extra woord toe te voegen zoals het Engelse "does". Zonder vraagwoord werkt het net zo: je laat je stem aan het eind omhoog gaan en zet een vraagteken, en klaar.',
+          'Een vraag begint met het vraagwoord, daarna komt het werkwoord en pas daarna het onderwerp: Quando parte il treno? Je hoeft er geen hulpwoord bij te verzinnen zoals het Engelse "does". Heb je geen vraagwoord nodig, dan houd je gewoon de volgorde van een gewone zin aan en laat je je stem aan het eind omhoog gaan: Parli italiano?',
         examples: [
           { target: 'Quando parte il treno?', nl: 'Wanneer vertrekt de trein?' },
           { target: 'Chi è quella donna?', nl: 'Wie is die vrouw?' },
@@ -427,7 +438,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Come si chiama?',
         explanation:
-          'Vraag je hoe iemand anders heet, dan gebruik je si chiama: Come si chiama tua madre? Er staat letterlijk "hoe noemt zich jouw moeder?". Over jezelf zeg je mi chiamo, en tegen iemand die je tutoyeert ti chiami. Het woordje ervoor verandert dus mee met de persoon: mi, ti, si.',
+          'Vraag je hoe iemand anders heet, dan gebruik je si chiama: Come si chiama tua madre? Er staat letterlijk "hoe noemt zich jouw moeder?". Over jezelf zeg je mi chiamo, en vraag je het rechtstreeks aan iemand, dan is het ti chiami. Het woordje ervoor verandert dus mee met de persoon: mi, ti, si.',
         examples: [
           { target: 'Come si chiama tua madre?', nl: 'Hoe heet jouw moeder?' },
           { target: 'Come ti chiami?', nl: 'Hoe heet je?' },
@@ -437,7 +448,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: "Un po' met apostrof",
         explanation:
-          "Un po' betekent een beetje en is een afkorting van un poco. De apostrof laat zien dat er letters zijn weggevallen, dus hij hoort er echt bij en je mag hem niet vergeten. Wil je zeggen dat je een beetje van iets kunt, dan komt er di achter: un po' di italiano.",
+          "Un po' betekent een beetje en is een afkorting van un poco. De apostrof laat zien dat er letters zijn weggevallen, dus hij hoort er echt bij en je mag hem niet vergeten. Zet je er een woord achter voor een ding of een taal, dan komt di ertussen: un po' di italiano, un po' di pane.",
         examples: [
           { target: "Parlo un po' di italiano.", nl: 'Ik spreek een beetje Italiaans.' },
           { target: "Parlo anche un po' di italiano.", nl: 'Ik spreek ook een beetje Italiaans.' },
@@ -537,7 +548,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Lo: het derde lidwoord',
         explanation:
-          "Naast il en la bestaat er ook lo. Dat gebruik je bij mannelijke woorden die beginnen met een s plus een medeklinker (st-, sp-, sc-) of met een z: lo stomaco, lo studente, lo zio. De reden is de uitspraak, want il stomaco levert drie medeklinkers achter elkaar op. Voor een klinker wordt lo weer l', zoals in l'ufficio.",
+          "Naast il en la bestaat er ook lo. Dat gebruik je bij mannelijke woorden die beginnen met een s plus een medeklinker (st-, sp-, sc-) of met een z: lo stomaco, lo studente, lo zio. De reden is de uitspraak, want il stomaco levert drie medeklinkers achter elkaar op. Bij precies diezelfde woorden wordt un ook langer: uno studente, uno stomaco. Voor een klinker wordt lo weer l', zoals in l'ufficio.",
         examples: [
           { target: 'Mi fa male lo stomaco.', nl: 'Mijn maag doet pijn.' },
           { target: 'Lo studente studia italiano.', nl: 'De student studeert Italiaans.' },

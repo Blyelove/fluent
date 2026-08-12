@@ -18,7 +18,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Ich bin: jezelf voorstellen',
         explanation:
-          'Het werkwoord sein (zijn) verandert van vorm per persoon, net als bij ons: ich bin, du bist, er of sie ist. Om jezelf voor te stellen zeg je ich bin plus je naam, precies zoals wij ik ben zeggen. Heb je het over iemand anders, dan wordt bin vanzelf bist of ist.',
+          'Het werkwoord sein (zijn) verandert van vorm per persoon, net als bij ons: ich bin, du bist, er of sie ist. Om jezelf voor te stellen zeg je ich bin plus je naam, precies zoals wij ik ben zeggen. Praat je tegen iemand, dan wordt bin een bist; heb je het over een ander, dan wordt het ist.',
         examples: [
           { target: 'Hallo, ich bin Anna.', nl: 'Hallo, ik ben Anna.' },
           { target: 'Du bist Stefan.', nl: 'Jij bent Stefan.' },
@@ -54,7 +54,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Der, die of das?',
         explanation:
-          'Waar wij de en het hebben, heeft het Duits er drie: der (mannelijk), die (vrouwelijk) en das (onzijdig). Welk lidwoord, het woordje vóór een zelfstandig naamwoord, erbij hoort kun je meestal niet aan het woord zien: der Kaffee, die Milch, das Brot. Leer daarom nooit het kale woord, maar altijd het woord mét zijn lidwoord, alsof het samen één woord is.',
+          'Waar wij de en het hebben, heeft het Duits er drie: der (mannelijk), die (vrouwelijk) en das (onzijdig). Zulke woordjes vóór een naamwoord heten lidwoorden. Welk lidwoord erbij hoort, kun je meestal niet aan het woord zelf zien: der Kaffee, die Milch, das Brot. Leer daarom nooit het kale woord, maar altijd het woord mét zijn lidwoord, alsof het samen één woord is.',
         examples: [
           { target: 'Der Kaffee ist heiß.', nl: 'De koffie is heet.' },
           { target: 'Die Milch ist kalt.', nl: 'De melk is koud.' },
@@ -95,7 +95,7 @@ export const guides: Record<string, UnitGuide> = {
 
   'de-u3': {
     intro:
-      'Je vertelt wie er bij je horen: moeder, vader, broer, zus en vrienden. Daarbij leer je zeggen dat je iemand hébt, en waarom mijn in het Duits twee vormen heeft.',
+      'Je vertelt wie er bij je horen: moeder, vader, broer, zus en vrienden. Daarbij leer je zeggen dat je iemand hébt, en waarom mijn in het Duits van vorm verandert.',
     rules: [
       {
         title: 'Mein of meine?',
@@ -130,7 +130,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Ein, eine of einen',
         explanation:
-          'Een is ein bij der- en das-woorden en eine bij die-woorden: ein Kind, eine Schwester. Staat het woord achter een werkwoord als haben, dan is het het lijdend voorwerp, dus het ding of de persoon waar de handeling op gericht is, en wordt ein bij mannelijke woorden einen: ich habe einen Bruder. Alleen die mannelijke vorm verandert; eine en ein blijven zoals ze zijn.',
+          'Een is ein bij der- en das-woorden en eine bij die-woorden: ein Kind, eine Schwester. Staat het woord achter een werkwoord als haben, dan is het het lijdend voorwerp, dus het ding of de persoon waar de handeling op gericht is, en wordt ein bij mannelijke woorden einen: ich habe einen Bruder. Alleen die mannelijke vorm verandert; eine en ein blijven zoals ze zijn. Mein volgt ein op de voet, dus zo ontstaat ook meinen: mein Bruder, maar ich habe meinen Bruder.',
         examples: [
           { target: 'Ich habe einen Bruder und eine Schwester.', nl: 'Ik heb een broer en een zus.' },
           { target: 'Mein Bruder hat ein Kind.', nl: 'Mijn broer heeft een kind.' },
@@ -156,7 +156,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Vragen met wo',
         explanation:
-          'Begin je een vraag met een vraagwoord als wo (waar) of was (wat), dan komt het werkwoord er direct achter en pas daarna de persoon of het ding: Wo ist der Bahnhof? Dat is dezelfde volgorde als in het Nederlands, dus hier kun je op je gevoel varen. Het lidwoord blijft in zo een vraag gewoon staan: der Bahnhof, das Hotel.',
+          'Begin je een vraag met een vraagwoord als wo (waar) of was (wat), dan komt het werkwoord er direct achter en pas daarna de persoon of het ding: Wo ist der Bahnhof? Dat is dezelfde volgorde als in het Nederlands, dus hier kun je op je gevoel varen. Het lidwoord blijft in zulke vragen gewoon staan: der Bahnhof, das Hotel.',
         examples: [
           { target: 'Wo ist der Bahnhof?', nl: 'Waar is het station?' },
           { target: 'Wo ist das Hotel?', nl: 'Waar is het hotel?' },
@@ -222,10 +222,20 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Es ist zwei Uhr: de klok',
         explanation:
-          'De tijd zeg je met es ist plus het getal plus Uhr: Es ist zwei Uhr. Dat es is een loos onderwerp, net als het in het is twee uur; het verwijst nergens naar, maar het Duits kan er niet zonder. Uhr blijft altijd enkelvoud, ook bij tien: es ist zehn Uhr, nooit zehn Uhren.',
+          'De tijd zeg je met es ist plus het getal plus Uhr: Es ist zwei Uhr. Dat es is een loos onderwerp, net als het in het is twee uur; het verwijst nergens naar, maar het Duits kan er niet zonder. Bij het klokkijken blijft Uhr enkelvoud, ook bij tien: es ist zehn Uhr, nooit zehn Uhren.',
         examples: [
           { target: 'Es ist zwei Uhr.', nl: 'Het is twee uur.' },
           { target: 'Es ist zehn Uhr.', nl: 'Het is tien uur.' },
+        ],
+      },
+      {
+        title: 'Wie doet het? Daar kijkt het werkwoord naar',
+        explanation:
+          'Gaat je zin over één andere persoon of over één ding, zoals meine Schwester of der Zug, dan gedraagt dat zich als er of sie en krijgt het werkwoord een -t: meine Schwester trinkt, der Zug fährt. Praat je over jezelf, dan is het weer -e (ich trinke). Zoek dus eerst wie of wat er iets doet en kies daarna pas de uitgang.',
+        examples: [
+          { target: 'Meine Schwester trinkt jetzt Tee.', nl: 'Mijn zus drinkt nu thee.' },
+          { target: 'Mein Bruder isst um fünf Uhr.', nl: 'Mijn broer eet om vijf uur.' },
+          { target: 'Heute trinke ich Kaffee.', nl: 'Vandaag drink ik koffie.' },
         ],
       },
     ],
@@ -257,7 +267,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Was kostet das?',
         explanation:
-          'Kosten past zich aan bij wat er kost: één ding kostet, meerdere dingen kosten. Omdat de stam op een t eindigt, komt er een extra e tussen, want kostt is niet uit te spreken. Naar de prijs vraag je met Was kostet ...? of Wie viel kostet ...?; allebei is goed Duits.',
+          'Kosten past zich aan bij wat er kost: één ding kostet, meerdere dingen kosten. Het stuk dat overblijft als je -en weghaalt heet de stam, hier dus kost-. Die eindigt al op een t, en daarom komt er een extra e tussen: kostt zou niemand kunnen uitspreken. Naar de prijs vraag je met Was kostet ...? of Wie viel kostet ...?; allebei is goed Duits.',
         examples: [
           { target: 'Was kostet der Apfel?', nl: 'Wat kost de appel?' },
           { target: 'Das Brot kostet zwei Euro.', nl: 'Het brood kost twee euro.' },
@@ -288,7 +298,7 @@ export const guides: Record<string, UnitGuide> = {
 
   'de-u7': {
     intro:
-      'Je vertelt waar en hoe je woont, en benoemt de kamers en meubels om je heen. Je krijgt hier bovendien twee trucjes om het geslacht van een woord te raden.',
+      'Je vertelt waar en hoe je woont, en benoemt de kamers en meubels om je heen. Je krijgt hier bovendien een paar trucjes om het geslacht van een woord te raden.',
     rules: [
       {
         title: 'Het woordeinde verraadt het lidwoord',
@@ -339,7 +349,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Een extra e bij arbeiten',
         explanation:
-          'Eindigt de stam van een werkwoord op een t of een d, dan schuift er een e tussen de stam en de uitgang: du arbeitest, er arbeitet. Zonder die e zou je arbeitst moeten uitspreken, en dat lukt niemand. Bij ich en wir verandert er niets: ich arbeite, wir arbeiten.',
+          'Eindigt de stam van een werkwoord op een t of een d, dan schuift er een e tussen de stam en de uitgang. De stam is wat er overblijft als je -en weghaalt, bij arbeiten dus arbeit-. Zo krijg je du arbeitest en er arbeitet; zonder die e zou je arbeitst moeten uitspreken, en dat lukt niemand. Bij ich en wir verandert er niets: ich arbeite, wir arbeiten.',
         examples: [
           { target: 'Ich arbeite in Berlin.', nl: 'Ik werk in Berlijn.' },
           { target: 'Du arbeitest heute.', nl: 'Jij werkt vandaag.' },
@@ -440,7 +450,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Werkwoorden die in tweeën breken',
         explanation:
-          'Sommige werkwoorden bestaan uit een klein voorzetsel plus een werkwoord: ab plus fahren, an plus kommen. In een gewone zin springt dat eerste stukje naar het einde: Der Zug fährt um neun Uhr ab. Precies zoals wij het met aankomen doen: de trein komt om negen uur aan.',
+          'Sommige werkwoorden bestaan uit een klein woordje plus een werkwoord: ab plus fahren, an plus kommen. In een gewone zin springt dat eerste stukje naar het einde: Der Zug fährt um neun Uhr ab. Precies zoals wij het met aankomen doen: de trein komt om negen uur aan.',
         examples: [
           { target: 'Der Zug fährt um neun Uhr ab.', nl: 'De trein vertrekt om negen uur.' },
           { target: 'Wir kommen um zehn Uhr an.', nl: 'Wij komen om tien uur aan.' },
@@ -450,7 +460,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Nach of zum?',
         explanation:
-          'Nach gebruik je bij steden en landen: nach München, nach Wien. Zu gebruik je bij gebouwen en personen, en dat smelt samen met het lidwoord: zu plus dem wordt zum, zu plus der wordt zur. Vandaar wir fahren zum Flughafen, want het is der Flughafen.',
+          'Nach gebruik je bij steden en landen: nach München, nach Wien. Zu gebruik je als je naar een plek of een persoon toe gaat, en dat smelt samen met het lidwoord: zu plus dem wordt zum, zu plus der wordt zur. Vandaar wir fahren zum Flughafen, want het is der Flughafen.',
         examples: [
           { target: 'Das Flugzeug fliegt nach Wien.', nl: 'Het vliegtuig vliegt naar Wenen.' },
           { target: 'Wir fahren zum Flughafen.', nl: 'Wij rijden naar het vliegveld.' },
@@ -506,7 +516,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Zum Arzt, zur Apotheke',
         explanation:
-          'Ga je naar een persoon of een gebouw, dan gebruik je zu, en dat versmelt met het lidwoord: bij der- en das-woorden wordt het zum, bij die-woorden zur. Der Arzt geeft dus zum Arzt en die Apotheke geeft zur Apotheke. Nach past hier niet; dat bewaar je voor steden en landen.',
+          'Ga je naar een persoon of naar een plek toe, dan gebruik je zu, en dat versmelt met het lidwoord: bij der- en das-woorden wordt het zum, bij die-woorden zur. Der Arzt geeft dus zum Arzt en die Apotheke geeft zur Apotheke. Nach past hier niet; dat bewaar je voor steden en landen.',
         examples: [
           { target: 'Ich gehe morgen zum Arzt.', nl: 'Ik ga morgen naar de dokter.' },
           { target: 'Ich gehe zur Apotheke.', nl: 'Ik ga naar de apotheek.' },
@@ -552,7 +562,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Het regent: es regnet',
         explanation:
-          'Weerzinnen beginnen met es, net zoals bij ons met het: es regnet, es schneit, es ist kalt. Dat es verwijst nergens naar, maar je mag het nooit weglaten. Zet je een ander woord vooraan, dan schuift es achter het werkwoord: Im Winter ist es kalt.',
+          'Een zin over het weer heeft altijd es als onderwerp, net zoals bij ons het: es regnet, es schneit, es ist kalt. Dat es verwijst nergens naar, maar je mag het nooit weglaten. Zet je een ander woord vooraan, dan blijft es staan en schuift het achter het werkwoord: Im Winter ist es kalt.',
         examples: [
           { target: 'Es regnet und es ist kalt.', nl: 'Het regent en het is koud.' },
           { target: 'Im Winter ist es kalt.', nl: 'In de winter is het koud.' },
@@ -598,7 +608,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Gern: iets graag doen',
         explanation:
-          'Doe je iets graag, dan zet je gern vlak achter het werkwoord: ich höre gern Musik. Een apart werkwoord voor houden van heb je hier niet nodig, want gern doet al het werk. Let er ook op dat hören geen voorzetsel krijgt: in het Duits luister je Musik, niet naar Musik.',
+          'Doe je iets graag, dan zet je gern vlak achter het werkwoord: ich höre gern Musik. Een apart werkwoord voor houden van heb je hier niet nodig, want gern doet al het werk. Let er ook op dat er in het Duits geen naar bij hören hoort: het is ich höre Musik, en niet ich höre nach Musik.',
         examples: [
           { target: 'Ich höre gern Musik.', nl: 'Ik luister graag naar muziek.' },
           { target: 'Wir gehen gern ins Kino.', nl: 'Wij gaan graag naar de bioscoop.' },
@@ -644,7 +654,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Nach, zum, ins of im?',
         explanation:
-          'Het Duits heeft vier woordjes waar wij naar of in zeggen. Nach hoort bij steden en landen, zum en zur bij gebouwen en personen, ins als je een ruimte binnengaat en im als je er al bent. Vraag jezelf dus af: is het een plaatsnaam, ga ik ergens heen, of ben ik er?',
+          'Het Duits heeft vier woordjes waar wij naar of in zeggen. Nach hoort bij steden en landen: nach Berlin. Zum en zur gebruik je als je ergens naartoe gaat en dat naar binnen er niet toe doet: zum Arzt, zum Bahnhof, zur Apotheke. Ins zeg je juist als je een gebouw binnengaat om er iets te doen: ins Kino, ins Restaurant. En im is helemaal geen beweging maar een plek waar je al bent: wir essen im Restaurant.',
         examples: [
           { target: 'Wir fahren mit dem Zug nach Berlin.', nl: 'Wij reizen met de trein naar Berlijn.' },
           { target: 'Ich gehe zum Arzt.', nl: 'Ik ga naar de dokter.' },
@@ -654,7 +664,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Het losse stukje komt achteraan',
         explanation:
-          'Werkwoorden als ankommen en abfahren vallen in een gewone zin uit elkaar: het voorvoegsel schuift naar het einde en alles wat erbij hoort staat ertussen. Der Bus kommt in zehn Minuten an. Vergeet je dat stukje, dan verandert de betekenis, want kommen is komen en ankommen is aankomen.',
+          'Werkwoorden als ankommen en abfahren vallen in een gewone zin uit elkaar: het kleine woordje vooraan, an of ab, schuift naar het einde en alles wat erbij hoort staat ertussen. Der Bus kommt in zehn Minuten an. Vergeet je dat stukje, dan verandert de betekenis, want kommen is komen en ankommen is aankomen.',
         examples: [
           { target: 'Der Bus kommt in zehn Minuten an.', nl: 'De bus komt over tien minuten aan.' },
           { target: 'Der Zug fährt um acht Uhr ab.', nl: 'De trein vertrekt om acht uur.' },

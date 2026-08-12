@@ -18,7 +18,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Tudo bem, niet tudo bom',
         explanation:
-          'Bom is een bijvoeglijk naamwoord, een woord dat iets over een ding zegt: o pão é bom, het brood is lekker. Bem is een bijwoord en zegt hoe iets gáát. Vraag je hoe het met iemand is, dan gaat het over hoe iets gaat, dus zeg je tudo bem — en dat is meteen ook het antwoord.',
+          'Bom zegt iets over een ding: o pão é bom, het brood is lekker. Bem zegt hoe iets gáát, en niet hoe iets is. Vraag je hoe het met iemand gaat, dan heb je dus bem nodig: tudo bem. Datzelfde tudo bem is meteen ook het antwoord.',
         examples: [
           { target: 'Olá, tudo bem?', nl: 'Hallo, alles goed?' },
           { target: 'Sim, tudo bem, obrigado.', nl: 'Ja, alles goed, dank je.' },
@@ -124,7 +124,7 @@ export const guides: Record<string, UnitGuide> = {
         examples: [
           { target: 'O Pedro é o meu amigo.', nl: 'Pedro is mijn vriend.' },
           { target: 'A Ana é a minha amiga.', nl: 'Ana is mijn vriendin.' },
-          { target: 'O meu irmão é alto.', nl: 'Mijn broer is groot.' },
+          { target: 'O meu irmão é alto.', nl: 'Mijn broer is lang.' },
         ],
       },
       {
@@ -186,7 +186,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Onde é...? Vragen zonder extra woorden',
         explanation:
-          'Een vraag bouw je door het vraagwoord vooraan te zetten en daarna gewoon het werkwoord: Onde é a estação? Je hoeft niets om te draaien en er komt geen hulpwerkwoord bij. Het lidwoord blijft altijd staan, dus je vraagt letterlijk "waar is het station".',
+          'Een vraag bouw je door het vraagwoord vooraan te zetten en daarna het werkwoord: Onde é a estação? De volgorde is dus dezelfde als bij ons. Let wel op het lidwoord: dat blijft in het Portugees altijd staan, ook waar wij het zouden weglaten. Dus Onde é a rua?, nooit "Onde é rua?".',
         examples: [
           { target: 'Onde é a estação?', nl: 'Waar is het station?' },
           { target: 'Onde é a rua?', nl: 'Waar is de straat?' },
@@ -236,12 +236,13 @@ export const guides: Record<string, UnitGuide> = {
         examples: [
           { target: 'O comboio para o Porto é às dez horas.', nl: 'De trein naar Porto is om tien uur.' },
           { target: 'O autocarro é às cinco.', nl: 'De bus gaat om vijf uur.' },
+          { target: 'O comboio é à uma hora.', nl: 'De trein gaat om één uur.' },
         ],
       },
       {
         title: 'Dois of duas, um of uma',
         explanation:
-          'Alleen de getallen één en twee veranderen mee met het geslacht van het woord erna: um café maar uma água, dois cafés maar duas horas. Alle andere getallen blijven altijd hetzelfde: três, cinco en dez veranderen nooit. Het woord na het getal krijgt wel een -s, want er zijn er meerdere.',
+          'Van de getallen tot en met tien veranderen alleen één en twee mee met het geslacht van het woord erna: um café maar uma água, dois cafés maar duas horas. De rest blijft precies zoals hij is: três, cinco en dez veranderen nooit. Het woord ná het getal krijgt wel een -s, want er zijn er meerdere: dois cafés, dez horas.',
         examples: [
           { target: 'Dois cafés, por favor.', nl: 'Twee koffies, alsjeblieft.' },
           { target: 'São duas horas.', nl: 'Het is twee uur.' },
@@ -295,9 +296,19 @@ export const guides: Record<string, UnitGuide> = {
         ],
       },
       {
+        title: 'Tenho, tens, tem: hebben',
+        explanation:
+          'Ter (hebben) volgt geen vast patroon, dus deze drie vormen leer je uit je hoofd: eu tenho, tu tens, ele of ela tem. Ook hier verklapt de vorm al wie het is, dus eu mag weg: Não tenho dinheiro. Let op: bij leeftijd gebruikt het Portugees ter waar wij "zijn" zeggen — a minha irmã tem dez anos, letterlijk "mijn zus heeft tien jaar".',
+        examples: [
+          { target: 'Não tenho dinheiro.', nl: 'Ik heb geen geld.' },
+          { target: 'A casa tem dois quartos.', nl: 'Het huis heeft twee slaapkamers.' },
+          { target: 'A minha irmã tem dez anos.', nl: 'Mijn zus is tien jaar.' },
+        ],
+      },
+      {
         title: 'Não: nee, niet en geen in één woord',
         explanation:
-          'Het Portugees heeft maar één ontkennend woord: não. Het staat altijd vlak vóór het werkwoord. Waar wij "geen" gebruiken, zetten Portugezen dus gewoon não voor het werkwoord: Não tenho dinheiro is letterlijk "ik niet heb geld". Als antwoord op een vraag betekent datzelfde não simpelweg "nee".',
+          'Waar wij drie woorden hebben — nee, niet en geen — heeft het Portugees er één: não. Als ontkenning staat het altijd vlak vóór het werkwoord. Waar wij "geen" gebruiken, zetten Portugezen dus gewoon não voor het werkwoord: Não tenho dinheiro is letterlijk "ik niet heb geld". Als antwoord op een vraag betekent datzelfde não simpelweg "nee".',
         examples: [
           { target: 'Não tenho dinheiro.', nl: 'Ik heb geen geld.' },
           { target: 'O pão não é caro.', nl: 'Het brood is niet duur.' },
@@ -445,7 +456,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Onde, como, quando, quanto',
         explanation:
-          'Een vraag maak je door het vraagwoord vooraan te zetten en daarna gewoon de zin te laten volgen: Quando é o comboio? Er komt geen hulpwerkwoord bij, zoals wij soms "doen" gebruiken. Op schrift staat er alleen aan het eind een vraagteken, en in spraak gaat je stem omhoog.',
+          'Onde (waar), como (hoe), quando (wanneer) en quanto (hoeveel) zet je vooraan, en daarna laat je gewoon de zin volgen: Quando é o comboio? Er komt geen extra woord bij en de volgorde verandert niet. Op schrift staat er alleen aan het eind een vraagteken, en in spraak gaat je stem omhoog.',
         examples: [
           { target: 'Quando é o comboio para Lisboa?', nl: 'Wanneer gaat de trein naar Lissabon?' },
           { target: 'Como está?', nl: 'Hoe gaat het met u?' },
@@ -455,7 +466,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Desculpe of desculpa',
         explanation:
-          'Desculpe is de beleefde vorm die je tegen onbekenden gebruikt, en desculpa zeg je tegen vrienden, familie of kinderen. Dat onderscheid loopt door bijna het hele Portugees: bij werkwoorden op -ar hoort de vorm op -e bij u en de vorm op -a bij jij. In een winkel of op straat kies je dus altijd desculpe.',
+          'Desculpe is de beleefde vorm die je tegen onbekenden gebruikt, en desculpa zeg je tegen vrienden, familie of kinderen. Bij korte verzoeken en verontschuldigingen van werkwoorden op -ar eindigt de beleefde vorm op -e en de vertrouwde vorm op -a. In een winkel of op straat kies je dus altijd desculpe.',
         examples: [
           { target: 'Desculpe, onde é o mercado?', nl: 'Pardon, waar is de markt?' },
           { target: 'Desculpe, que horas são?', nl: 'Pardon, hoe laat is het?' },
@@ -471,7 +482,7 @@ export const guides: Record<string, UnitGuide> = {
       { target: 'Quando é o comboio para Lisboa?', nl: 'Wanneer gaat de trein naar Lissabon?' },
       { target: 'Até amanhã!', nl: 'Tot morgen!' },
     ],
-    tip: 'Ons "houden van" heeft geen extra woordje nodig, het Portugees wél: zeg nooit "gosto café", maar altijd gosto de café. En também betekent "ook", maar het staat vlak vóór het werkwoord: Eu também gosto de vinho — niet achteraan de zin, zoals wij het vaak plakken.',
+    tip: 'Ons "houden van" heeft zijn eigen woordje van, en het Portugees wil er precies zo één: de. Zeg dus nooit "gosto café", maar altijd gosto de café. En também betekent "ook", maar het staat vlak vóór het werkwoord: Eu também gosto de vinho — niet achteraan de zin, zoals wij het vaak plakken.',
   },
 
   'pt-u10': {
@@ -481,7 +492,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Perto da estação: dicht bij',
         explanation:
-          'Perto betekent "dichtbij" en longe betekent "ver weg". Er hoort altijd de achter, en die versmelt met het lidwoord: perto de plus a estação wordt perto da estação, perto de plus o cinema wordt perto do cinema. Zonder die de valt de zin uit elkaar.',
+          'Perto betekent "dichtbij" en longe betekent "ver weg". Zeg je erbij waar iets dicht bij of ver van ligt, dan komt daar altijd de tussen, en die versmelt met het lidwoord: perto de plus a estação wordt perto da estação, perto de plus o cinema wordt perto do cinema.',
         examples: [
           { target: 'O hotel é perto da estação.', nl: 'Het hotel is dicht bij het station.' },
           { target: 'O hotel é perto da praia.', nl: 'Het hotel is dicht bij het strand.' },
@@ -703,6 +714,16 @@ export const guides: Record<string, UnitGuide> = {
         ],
       },
       {
+        title: 'Parte of partem: het werkwoord telt mee',
+        explanation:
+          'Het werkwoord past zich aan aan wie of wat er iets doet. De ik-vorm eindigt altijd op -o: moro, falo, parto. Voor hij, zij of een ding eindigt hij op -a bij werkwoorden op -ar (fala, mora, começa) en op -e bij werkwoorden op -er en -ir (aprende, parte). Gaat het om meerdere, dan komt daar nog een -m achter: os comboios partem, os bilhetes custam.',
+        examples: [
+          { target: 'O avião parte às dez.', nl: 'Het vliegtuig vertrekt om tien uur.' },
+          { target: 'O filme começa às oito.', nl: 'De film begint om acht uur.' },
+          { target: 'Os bilhetes custam dez euros.', nl: 'De kaartjes kosten tien euro.' },
+        ],
+      },
+      {
         title: 'Vou, vais, vai, vamos',
         explanation:
           'Ir (gaan) is onregelmatig: de vormen lijken niet op de basisvorm en die leer je uit je hoofd. Eu vou, tu vais, ele of ela vai, nós vamos. Wil je zeggen dat je ergens níet heen gaat, dan zet je não vlak vóór het werkwoord: No inverno não vamos à praia.',
@@ -715,7 +736,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Rápido, longa, caras: alles past zich aan',
         explanation:
-          'Beschrijvende woorden nemen het geslacht en het aantal over van het woord waar ze bij horen. O comboio é rápido is mannelijk, a viagem é longa is vrouwelijk en as lojas são caras is vrouwelijk meervoud. Kijk dus eerst naar het lidwoord o of a, dan weet je meteen welke uitgang je nodig hebt.',
+          'Beschrijvende woorden nemen het geslacht en het aantal over van het woord waar ze bij horen. O comboio é rápido is mannelijk, a viagem é longa is vrouwelijk en as lojas são caras is vrouwelijk meervoud. Bij meerdere dingen krijgt alles een -s: het lidwoord o wordt os en a wordt as, en het beschrijvende woord gaat mee. Kijk dus eerst naar het lidwoord, dan weet je meteen welke uitgang je nodig hebt.',
         examples: [
           { target: 'O comboio para o Porto é rápido.', nl: 'De trein naar Porto is snel.' },
           { target: 'A viagem é longa.', nl: 'De reis is lang.' },

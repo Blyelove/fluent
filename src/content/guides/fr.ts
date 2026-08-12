@@ -179,7 +179,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Où est… ? — de weg vragen',
         explanation:
-          'Een vraag naar een plek bouw je heel simpel: où (waar) + est (is) + het ding. Anders dan in het Nederlands komt er geen extra woordje bij, en het lidwoord blijft gewoon staan: où est la gare. In geschreven Frans zet je bovendien een spatie vóór het vraagteken.',
+          'Een vraag naar een plek bouw je heel simpel: où (waar) + est (is) + het ding, precies in die volgorde. Het lidwoord laat je nooit weg: je zegt où est la gare, nooit “où est gare”. In geschreven Frans zet je bovendien een spatie vóór het vraagteken.',
         examples: [
           { target: 'Où est la gare ?', nl: 'Waar is het station?' },
           { target: 'Où est le musée ?', nl: 'Waar is het museum?' },
@@ -189,7 +189,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Est, es of et?',
         explanation:
-          'Deze drie klinken precies hetzelfde, maar ze doen iets heel anders. Est is de hij/zij-vorm van zijn (la gare est…), es hoort bij tu (tu es), en et betekent gewoon “en”. Bij het schrijven moet je dus denken aan de betekenis, want je oor helpt je niet.',
+          'Est en es klinken precies hetzelfde, en et scheelt daar zo weinig van dat je oor je nauwelijks helpt. Toch doen ze iets heel anders: est is de hij/zij-vorm van zijn (la gare est…), es hoort bij tu (tu es), en et betekent gewoon “en”. Bij het schrijven moet je dus denken aan de betekenis.',
         examples: [
           { target: 'La gare est à gauche.', nl: 'Het station is links.' },
           { target: 'Le musée est à droite.', nl: 'Het museum is rechts.' },
@@ -209,7 +209,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'La gare est grande',
         explanation:
-          'Een beschrijvend woord zoals grand (groot) past zich aan bij het woord waar het over gaat. Bij een vrouwelijk woord komt er een -e achter: la gare est grande, la ville est grande. Bij een mannelijk woord blijft het grand: le musée est grand.',
+          'Een beschrijvend woord zoals grand (groot) past zich aan bij het woord waar het over gaat. Bij een vrouwelijk woord komt er een -e achter: la gare est grande, la ville est grande. Bij een mannelijk woord blijft het grand: le musée est grand. Een enkel woord verandert meer dan alleen die -e: beau (mooi) wordt bij een vrouwelijk woord belle, zoals in une belle ville.',
         examples: [
           { target: 'La gare est grande.', nl: 'Het station is groot.' },
           { target: 'Le musée est grand.', nl: 'Het museum is groot.' },
@@ -255,7 +255,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: "'s Ochtends = le matin",
         explanation:
-          "Waar wij een apart woordje maken (’s ochtends, ’s avonds), zet het Frans er gewoon het lidwoord le voor: le matin, le soir. Er komt géén voorzetsel bij, dus niet “à le matin”. Je kunt het vooraan of achteraan in de zin zetten.",
+          "Waar wij een apart woordje maken (’s ochtends, ’s avonds), zet het Frans er gewoon het lidwoord le voor: le matin, le soir. Er komt géén extra woordje bij, dus niet “à le matin”. Je kunt het vooraan of achteraan in de zin zetten.",
         examples: [
           { target: 'Le matin, je prends un café.', nl: "'s Ochtends neem ik een koffie." },
           { target: 'Le soir, je prends un thé.', nl: "'s Avonds neem ik een thee." },
@@ -312,7 +312,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Hoeveel kost het?',
         explanation:
-          'Er zijn twee gewone manieren: c’est combien (wat is het) en ça coûte combien (wat kost het). Bij één ding krijgt coûter de uitgang -e: ça coûte. Gaat het om meerdere dingen, dan wordt dat -ent: les légumes coûtent — die uitgang schrijf je wel, maar hoor je niet.',
+          'Er zijn twee gewone manieren: c’est combien (letterlijk “het is hoeveel”) en ça coûte combien (“het kost hoeveel”). Bij één ding krijgt coûter de uitgang -e: ça coûte. Gaat het om meerdere dingen, dan wordt dat -ent: les légumes coûtent — die uitgang schrijf je wel, maar hoor je niet.',
         examples: [
           { target: "C'est combien, le fromage ?", nl: 'Hoeveel kost de kaas?' },
           { target: 'Ça coûte deux euros.', nl: 'Het kost twee euro.' },
@@ -322,7 +322,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Trop cher: te duur',
         explanation:
-          'Trop betekent “te” en zet je vlak vóór het beschrijvende woord: trop cher, trop grand. Cher past zich net als andere beschrijvende woorden aan: bij een vrouwelijk woord wordt het chère, met een extra -e. Uitspreken doe je ze allebei hetzelfde.',
+          'Trop betekent “te” en zet je vlak vóór het beschrijvende woord: trop cher, trop grand. Cher past zich net als andere beschrijvende woorden aan: bij een vrouwelijk woord wordt het chère — er komt een -e achter en de e ervóór krijgt een accentstreepje. Uitspreken doe je cher en chère precies hetzelfde.',
         examples: [
           { target: "C'est trop cher !", nl: 'Dat is te duur!' },
           { target: 'Le fromage est cher.', nl: 'De kaas is duur.' },
@@ -379,7 +379,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Une grande maison: waar staat het beschrijvende woord?',
         explanation:
-          'Anders dan bij ons komt een beschrijvend woord in het Frans meestal achter het zelfstandig naamwoord: la musique française, une ville magnifique. Maar een klein groepje veelgebruikte korte woorden staat er juist vóór, net als in het Nederlands: grand, petit, beau, bon en joli. Die uitzonderingen kom je zo vaak tegen dat ze snel vertrouwd zijn.',
+          'Anders dan bij ons komt een beschrijvend woord in het Frans meestal achter het zelfstandig naamwoord: la musique française, une ville magnifique. Maar een klein groepje veelgebruikte korte woorden staat er juist vóór, net als in het Nederlands: grand, petit, beau, bon en joli. Die uitzonderingen kom je zo vaak tegen dat ze snel vertrouwd zijn. In une grande maison zie je alles samenkomen: maison is vrouwelijk, dus wordt het une én grande.',
         examples: [
           { target: "J'habite dans une grande maison.", nl: 'Ik woon in een groot huis.' },
           { target: 'Paris est une belle ville.', nl: 'Parijs is een mooie stad.' },
@@ -426,7 +426,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Le français: talen krijgen een lidwoord',
         explanation:
-          'Bij talen en schoolvakken zet het Frans le ervoor, waar wij niets zetten: j’étudie le français. Na parler (spreken) laat je het meestal juist weg: je parle français. Namen van talen krijgen bovendien geen hoofdletter, anders dan bij ons.',
+          'Bij talen, schoolvakken en dingen die je in het algemeen bedoelt, zet het Frans le of la ervoor waar wij niets zetten: j’étudie le français, j’aime la musique. Na parler (spreken) laat je het bij een taal juist weg: je parle français. Namen van talen krijgen bovendien geen hoofdletter, anders dan bij ons.',
         examples: [
           { target: "J'étudie le français.", nl: 'Ik studeer Frans.' },
           { target: "J'aime la musique.", nl: 'Ik hou van muziek.' },
@@ -463,7 +463,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Vragen stellen zonder iets om te draaien',
         explanation:
-          'In alledaags gesproken Frans laat je de zin gewoon staan en ga je met je stem omhoog: tu parles français ? Het vraagwoord mag je zelfs achteraan zetten: tu travailles quand ? Alleen in nette, geschreven taal draai je om (quand travailles-tu ?), maar dat hoef je zelf nog niet te doen.',
+          'In alledaags gesproken Frans laat je de zin gewoon staan en ga je met je stem omhoog: tu parles français ? Het vraagwoord mag je zelfs achteraan zetten: tu travailles quand ? Alleen in nette, geschreven taal draai je om (quand travailles-tu ?), maar dat hoef je zelf nog niet te doen. Let wel op de tu-vorm: bij werkwoorden op -er krijgt die altijd een -s die je niet uitspreekt — tu parles, tu travailles, ook in een vraag.',
         examples: [
           { target: 'Tu travailles quand ?', nl: 'Wanneer werk je?' },
           { target: 'Pourquoi tu travailles le soir ?', nl: "Waarom werk je 's avonds?" },
@@ -644,7 +644,7 @@ export const guides: Record<string, UnitGuide> = {
       {
         title: 'Il pleut: één woord voor “het regent”',
         explanation:
-          'Sommige weerwerkwoorden bestaan alleen in de il-vorm, want er is geen persoon die het doet: il pleut (het regent), il neige (het sneeuwt). Naast il neige heb je het zelfstandig naamwoord la neige (de sneeuw). En de zon doet gewoon iets zelf: le soleil brille.',
+          'Sommige weerwerkwoorden bestaan alleen in de il-vorm, want er is geen persoon die het doet: il pleut (het regent), il neige (het sneeuwt). Naast il neige heb je het woord la neige (de sneeuw). De zon doet wél zelf iets: briller (schijnen) is een gewoon werkwoord op -er, dus achter le soleil krijgt het de uitgang -e: le soleil brille.',
         examples: [
           { target: "Il pleut à Paris aujourd'hui.", nl: 'Het regent vandaag in Parijs.' },
           { target: 'Il neige en hiver.', nl: 'Het sneeuwt in de winter.' },
