@@ -39,7 +39,7 @@ Werk door tot de ronde af is. Vraag niets, wacht nergens op, en stop pas als de 
 De loop krijgt bewust een korte startopdracht die naar dit bestand verwijst. Omdat elke ronde dit bestand ook verbétert, wordt de opdracht zelf steeds beter — zonder dat je de loop opnieuw hoeft in te stellen:
 
 ```
-/loop 45m Lees C:\Users\Blye\Desktop\aurea\MASTERPROMPT.md volledig en voer de instructies in het codeblok daarin uit, inclusief de laatste stap waarin je dit bestand zelf verbetert en meecommit.
+/loop 30m Lees C:\Users\Blye\Desktop\aurea\MASTERPROMPT.md volledig en voer de instructies in het codeblok daarin uit, inclusief de laatste stap waarin je dit bestand zelf verbetert en meecommit.
 ```
 
 Stoppen kan met `/loop stop`.
