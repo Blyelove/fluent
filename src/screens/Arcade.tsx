@@ -1,0 +1,1144 @@
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
+import confetti from 'canvas-confetti'
+import type { Course } from '../types'
+import { courses } from '../content'
+import { useStore } from '../store'
+import { sfx, speak } from '../audio'
+
+/* ============================================================
+   De speelhal: drie minigames met woorden uit je eigen cursus.
+   ============================================================ */
+
+type GameId = 'bliksem' | 'storm' | 'luister'
+
+/** Een woordpaar: het woord in de doeltaal + de Nederlandse vertaling */
+interface Pair {
+  word: string
+  nl: string
+}
+
+/** Minimaal aantal geleerde woorden voordat een spel speelbaar is */
+const MIN_WORDS = 8
+
+const CONFETTI = ['#A855F7', '#EC4899', '#FFC53D', '#22D3EE', '#4ADE80']
+
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr]
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[a[i], a[j]] = [a[j], a[i]]
+  }
+  return a
+}
+
+function pick<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)]
+}
+
+/** Alle woordparen uit de cursus; met `only` beperk je het tot bepaalde lessen */
+function vocabFrom(course: Course, only?: Set<string>): Pair[] {
+  const out: Pair[] = []
+  const seen = new Set<string>()
+  for (const s of course.sections) {
+    for (const u of s.units) {
+      for (const l of u.lessons) {
+        if (only && !only.has(l.id)) continue
+        for (const e of l.exercises) {
+          if (e.type !== 'new') continue
+          const key = e.word.toLowerCase()
+          if (seen.has(key)) continue
+          seen.add(key)
+          out.push({ word: e.word, nl: e.nl })
+        }
+      }
+    }
+  }
+  return out
+}
+
+interface GameDef {
+  id: GameId
+  name: string
+  emoji: string
+  tagline: string
+  /** Korte uitleg op de spelkaart */
+  how: string
+  grad: string
+  /** Donkere onderrand voor het 3D-effect */
+  shade: string
+  glow: string
+}
+
+const GAMES: GameDef[] = [
+  {
+    id: 'bliksem',
+    name: 'Bliksemronde',
+    emoji: '⚡',
+    tagline: '60 seconden pure snelheid',
+    how: 'Zoveel mogelijk vertalingen goed. Combo’s verdubbelen je punten.',
+    grad: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
+    shade: '#6b21a8',
+    glow: 'rgba(236, 72, 153, 0.45)',
+  },
+  {
+    id: 'storm',
+    name: 'Woordstorm',
+    emoji: '🌀',
+    tagline: '8 paren, zo snel als je kunt',
+    how: 'Tik twee tegels die bij elkaar horen. De klok tikt door — missen kost 3 seconden.',
+    grad: 'linear-gradient(135deg, #22d3ee 0%, #6366f1 100%)',
+    shade: '#0e7490',
+    glow: 'rgba(34, 211, 238, 0.42)',
+  },
+  {
+    id: 'luister',
+    name: 'Luisterjacht',
+    emoji: '🎧',
+    tagline: '10 rondes op je gehoor',
+    how: 'Je hoort een woord en kiest razendsnel de juiste betekenis.',
+    grad: 'linear-gradient(135deg, #ffe08a 0%, #f59e0b 100%)',
+    shade: '#b45309',
+    glow: 'rgba(255, 197, 61, 0.45)',
+  },
+]
+
+/** XP-formule per spel — zo blijft de beloning tussen de spellen in balans */
+function xpFor(game: GameId, score: number): number {
+  if (game === 'bliksem') return Math.max(2, score * 2)
+  if (game === 'storm') return Math.max(5, Math.round(score / 6))
+  return Math.max(5, Math.round(score / 3))
+}
+
+type Phase =
+  | { name: 'hub' }
+  | { name: 'play'; game: GameId }
+  | { name: 'done'; game: GameId; score: number; xp: number; boosted: boolean; prevBest: number; record: boolean; detail: string }
+
+/* ============================================================
+   Hoofdscherm
+   ============================================================ */
+
+export function ArcadeScreen() {
+  const courseId = useStore((s) => s.courseId)
+  const progress = useStore((s) => s.progress)
+  const srs = useStore((s) => s.srs)
+  const arcadeBest = useStore((s) => s.arcadeBest)
+  const arcadePlays = useStore((s) => s.arcadePlays)
+  const awardXp = useStore((s) => s.awardXp)
+
+  const [phase, setPhase] = useState<Phase>({ name: 'hub' })
+
+  const course = courses[courseId]
+
+  /** Alle woorden van de cursus — prima als afleiders, ook de nog niet geleerde */
+  const allWords = useMemo(() => vocabFrom(course), [course])
+
+  /** Woorden die je écht al gezien hebt: uit afgeronde lessen + je herhaalkaarten */
+  const myWords = useMemo(() => {
+    const done = new Set(progress[courseId]?.completed ?? [])
+    const out = vocabFrom(course, done)
+    const seen = new Set(out.map((p) => p.word.toLowerCase()))
+    for (const e of Object.values(srs)) {
+      if (e.courseId !== courseId) continue
+      const key = e.word.toLowerCase()
+      if (seen.has(key)) continue
+      seen.add(key)
+      out.push({ word: e.word, nl: e.nl })
+    }
+    return out
+  }, [course, courseId, progress, srs])
+
+  const locked = myWords.length < MIN_WORDS
+
+  const finish = useCallback(
+    (game: GameId, score: number, detail: string) => {
+      const st = useStore.getState()
+      const prevBest = st.arcadeBest[game] ?? 0
+      const boosted = st.boostUntil > Date.now()
+      const record = score > prevBest
+      const xp = xpFor(game, score)
+      awardXp(xp, { arcade: game, score })
+      sfx('complete')
+      if (record) {
+        confetti({ particleCount: 150, spread: 105, origin: { y: 0.62 }, colors: CONFETTI, disableForReducedMotion: true })
+        window.setTimeout(
+          () => confetti({ particleCount: 90, spread: 120, origin: { y: 0.5 }, colors: CONFETTI, disableForReducedMotion: true }),
+          260
+        )
+      }
+      setPhase({ name: 'done', game, score, xp, boosted, prevBest, record, detail })
+    },
+    [awardXp]
+  )
+
+  const toHub = useCallback(() => setPhase({ name: 'hub' }), [])
+
+  if (phase.name === 'play') {
+    const shared = { words: myWords, all: allWords, ttsLang: course.ttsLang, onExit: toHub }
+    if (phase.game === 'bliksem') return <Bliksem {...shared} onFinish={(s, d) => finish('bliksem', s, d)} />
+    if (phase.game === 'storm') return <Storm {...shared} onFinish={(s, d) => finish('storm', s, d)} />
+    return <Luister {...shared} onFinish={(s, d) => finish('luister', s, d)} />
+  }
+
+  if (phase.name === 'done') {
+    const def = GAMES.find((g) => g.id === phase.game) ?? GAMES[0]
+    return <Result phase={phase} def={def} onAgain={() => setPhase({ name: 'play', game: phase.game })} onHub={toHub} />
+  }
+
+  return (
+    <div className="shell">
+      <div className="ambient-orb orb-a" />
+      <div className="ambient-orb orb-b" />
+
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+        <p className="eyebrow">Speelhal</p>
+        <h1 className="display" style={{ fontSize: 30, marginTop: 4 }}>
+          Leren dat <span className="hot-text">niet voelt</span> als leren
+        </h1>
+        <p className="dim" style={{ fontSize: 14, marginTop: 6 }}>
+          {arcadePlays > 0 ? `Je speelde al ${arcadePlays} ${arcadePlays === 1 ? 'potje' : 'potjes'}. Nog één dan?` : 'Kies een spel en verdien XP terwijl je speelt.'}
+        </p>
+      </motion.div>
+
+      {locked && (
+        <motion.div
+          className="glass"
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          style={{ padding: 16, marginTop: 18, borderColor: 'var(--line-gold)', background: 'rgba(255, 197, 61, 0.09)' }}
+        >
+          <div className="row" style={{ alignItems: 'flex-start', gap: 12 }}>
+            <span style={{ fontSize: 26, lineHeight: 1 }}>🔒</span>
+            <div>
+              <p className="display" style={{ fontSize: 16 }}>
+                Speel eerst een paar lessen om dit spel te ontgrendelen
+              </p>
+              <p className="dim" style={{ fontSize: 13, marginTop: 4 }}>
+                Je hebt {myWords.length} van de {MIN_WORDS} woorden. De spellen gebruiken alleen woorden die jij al kent.
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      <div className="col" style={{ gap: 16, marginTop: 20 }}>
+        {GAMES.map((g, i) => {
+          const best = arcadeBest[g.id] ?? 0
+          return (
+            <motion.button
+              key={g.id}
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: locked ? 0.55 : 1, y: 0 }}
+              transition={{ duration: 0.34, delay: 0.06 * i }}
+              whileTap={locked ? undefined : { scale: 0.975, y: 4 }}
+              disabled={locked}
+              onClick={() => {
+                sfx('tap')
+                setPhase({ name: 'play', game: g.id })
+              }}
+              style={{
+                display: 'block',
+                width: '100%',
+                textAlign: 'left',
+                padding: '20px 20px 18px',
+                borderRadius: 26,
+                background: g.grad,
+                color: '#fff',
+                position: 'relative',
+                overflow: 'hidden',
+                cursor: locked ? 'default' : 'pointer',
+                boxShadow: `0 7px 0 ${g.shade}, 0 16px 36px ${g.glow}`,
+                textShadow: '0 1px 2px rgba(0,0,0,0.25)',
+              }}
+            >
+              {/* glans over de kaart */}
+              <span
+                aria-hidden
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'linear-gradient(120deg, rgba(255,255,255,0.28) 0%, transparent 42%)',
+                  pointerEvents: 'none',
+                }}
+              />
+              <span
+                aria-hidden
+                style={{ position: 'absolute', right: -12, bottom: -22, fontSize: 108, opacity: 0.24, lineHeight: 1, pointerEvents: 'none' }}
+              >
+                {g.emoji}
+              </span>
+
+              <span style={{ position: 'relative', display: 'block' }}>
+                <span style={{ fontSize: 34, lineHeight: 1, display: 'block' }}>{g.emoji}</span>
+                <span className="display" style={{ fontSize: 25, display: 'block', marginTop: 8 }}>
+                  {g.name}
+                </span>
+                <span style={{ display: 'block', fontSize: 13.5, fontWeight: 700, opacity: 0.92 }}>{g.tagline}</span>
+                <span style={{ display: 'block', fontSize: 13, marginTop: 8, opacity: 0.85, maxWidth: 260, lineHeight: 1.45 }}>{g.how}</span>
+
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    marginTop: 14,
+                    padding: '7px 13px',
+                    borderRadius: 999,
+                    background: 'rgba(0,0,0,0.26)',
+                    fontSize: 12.5,
+                    fontWeight: 800,
+                    letterSpacing: '0.04em',
+                  }}
+                >
+                  {locked ? '🔒 Vergrendeld' : best > 0 ? `🏆 Beste score: ${best}` : '✨ Nog niet gespeeld'}
+                </span>
+              </span>
+            </motion.button>
+          )
+        })}
+      </div>
+
+      <p className="faint center" style={{ fontSize: 12.5, marginTop: 22, lineHeight: 1.5 }}>
+        Alle spellen gebruiken woorden uit je cursus {course.name}.
+        <br />
+        Punten worden omgezet in XP voor je divisie.
+      </p>
+    </div>
+  )
+}
+
+/* ============================================================
+   Gedeelde onderdelen
+   ============================================================ */
+
+interface GameProps {
+  words: Pair[]
+  all: Pair[]
+  ttsLang: string
+  onExit: () => void
+  onFinish: (score: number, detail: string) => void
+}
+
+function CloseBtn({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      aria-label="Terug naar de speelhal"
+      onClick={() => {
+        sfx('tap')
+        onClick()
+      }}
+      style={{
+        width: 46,
+        height: 46,
+        borderRadius: 15,
+        flexShrink: 0,
+        background: 'var(--surface-2)',
+        border: '1.5px solid var(--line)',
+        color: 'var(--text-dim)',
+        fontSize: 24,
+        fontWeight: 700,
+        lineHeight: 1,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      ×
+    </button>
+  )
+}
+
+/** Balk die leegloopt; onder de 25% wordt hij rood en pulseert hij */
+function TimerBar({ pct, danger }: { pct: number; danger: boolean }) {
+  return (
+    <div
+      style={{
+        height: 18,
+        borderRadius: 999,
+        background: 'rgba(255,255,255,0.1)',
+        overflow: 'hidden',
+        boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.45)',
+      }}
+    >
+      <div
+        style={{
+          width: `${Math.max(0, Math.min(1, pct)) * 100}%`,
+          height: '100%',
+          borderRadius: 999,
+          transition: 'width 0.12s linear, background 0.3s ease',
+          background: danger ? 'linear-gradient(90deg, #f43f5e, #fb7185)' : 'var(--grad-gold)',
+          boxShadow: danger ? '0 0 20px rgba(251,113,133,0.65)' : 'var(--glow-gold)',
+          animation: danger ? 'breathe 0.7s ease-in-out infinite' : undefined,
+        }}
+      />
+    </div>
+  )
+}
+
+function SpeakerIcon({ size = 34 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M11 5L6 9H3v6h3l5 4z" />
+      <path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" />
+    </svg>
+  )
+}
+
+/** Aftellen voordat de klok gaat lopen — 3, 2, 1, GO! */
+function Countdown({ onDone }: { onDone: () => void }) {
+  const [n, setN] = useState(3)
+
+  useEffect(() => {
+    const iv = window.setInterval(() => setN((v) => v - 1), 700)
+    return () => window.clearInterval(iv)
+  }, [])
+
+  useEffect(() => {
+    if (n > -1) return
+    onDone()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [n])
+
+  return (
+    <div className="center" style={{ padding: '70px 0' }}>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={n}
+          initial={{ scale: 0.3, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 1.8, opacity: 0 }}
+          transition={{ duration: 0.28 }}
+          className="display gold-text"
+          style={{ fontSize: n <= 0 ? 62 : 96, lineHeight: 1 }}
+        >
+          {n > 0 ? n : 'GO!'}
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  )
+}
+
+/* ============================================================
+   Spel 1 — Bliksemronde
+   ============================================================ */
+
+const ROUND_MS = 60000
+
+interface Question {
+  prompt: string
+  answer: string
+  options: string[]
+  /** true = je ziet Nederlands en kiest de doeltaal */
+  toTarget: boolean
+  word: string
+}
+
+function makeQuestion(words: Pair[], all: Pair[], avoid: string, optionCount: number): Question {
+  const cands = words.length > 1 ? words.filter((p) => p.word !== avoid) : words
+  const target = pick(cands)
+  const toTarget = Math.random() < 0.5
+  const answer = toTarget ? target.word : target.nl
+  const prompt = toTarget ? target.nl : target.word
+
+  const others: string[] = []
+  for (const p of shuffle(all)) {
+    if (p.word.toLowerCase() === target.word.toLowerCase()) continue
+    const v = toTarget ? p.word : p.nl
+    if (v.toLowerCase() === answer.toLowerCase()) continue
+    if (others.some((o) => o.toLowerCase() === v.toLowerCase())) continue
+    others.push(v)
+    if (others.length >= optionCount - 1) break
+  }
+
+  const options = shuffle([answer, ...others])
+  return { prompt, answer, options, toTarget, word: target.word }
+}
+
+function Bliksem({ words, all, onExit, onFinish }: GameProps) {
+  const [running, setRunning] = useState(false)
+  const [remaining, setRemaining] = useState(ROUND_MS)
+  const [score, setScore] = useState(0)
+  const [combo, setCombo] = useState(0)
+  const [bestCombo, setBestCombo] = useState(0)
+  const [picked, setPicked] = useState<number | null>(null)
+  const [pop, setPop] = useState<{ id: number; text: string; good: boolean } | null>(null)
+  const [q, setQ] = useState<Question>(() => makeQuestion(words, all, '', 3))
+
+  const endRef = useRef(0)
+  const scoreRef = useRef(0)
+  const comboRef = useRef(0)
+  const bestComboRef = useRef(0)
+  const doneRef = useRef(false)
+  const timers = useRef<number[]>([])
+
+  const later = (fn: () => void, ms: number) => {
+    timers.current.push(window.setTimeout(fn, ms))
+  }
+
+  useEffect(() => {
+    const list = timers
+    return () => {
+      for (const t of list.current) window.clearTimeout(t)
+      list.current = []
+    }
+  }, [])
+
+  const stop = useCallback(() => {
+    if (doneRef.current) return
+    doneRef.current = true
+    setRunning(false)
+    onFinish(scoreRef.current, `${scoreRef.current} punten · beste combo ${bestComboRef.current}`)
+  }, [onFinish])
+
+  // de klok: telt af en stopt het spel op nul
+  useEffect(() => {
+    if (!running) return
+    const iv = window.setInterval(() => {
+      const left = endRef.current - Date.now()
+      setRemaining(Math.max(0, left))
+      if (left <= 0) {
+        window.clearInterval(iv)
+        stop()
+      }
+    }, 100)
+    return () => window.clearInterval(iv)
+  }, [running, stop])
+
+  const start = () => {
+    endRef.current = Date.now() + ROUND_MS
+    setRemaining(ROUND_MS)
+    setRunning(true)
+  }
+
+  const multiplier = Math.min(5, 1 + Math.floor(combo / 5))
+
+  const answer = (i: number) => {
+    if (picked !== null || !running || doneRef.current) return
+    setPicked(i)
+    const good = q.options[i] === q.answer
+
+    if (good) {
+      const mult = Math.min(5, 1 + Math.floor(comboRef.current / 5))
+      const gain = mult
+      scoreRef.current += gain
+      comboRef.current += 1
+      bestComboRef.current = Math.max(bestComboRef.current, comboRef.current)
+      endRef.current += 500 // een halve seconde erbij als beloning
+      setScore(scoreRef.current)
+      setCombo(comboRef.current)
+      setBestCombo(bestComboRef.current)
+      setPop({ id: Date.now(), text: `+${gain}`, good: true })
+      sfx('correct')
+    } else {
+      comboRef.current = 0
+      endRef.current -= 2000 // twee seconden straf
+      setCombo(0)
+      setPop({ id: Date.now(), text: '−2s', good: false })
+      sfx('wrong')
+    }
+
+    later(() => {
+      setPop(null)
+      setPicked(null)
+      setQ(makeQuestion(words, all, q.word, 3))
+    }, good ? 260 : 520)
+  }
+
+  const secs = Math.ceil(remaining / 1000)
+  const danger = remaining <= 10000
+
+  return (
+    <div className="shell">
+      <div className="ambient-orb orb-a" />
+
+      <div className="row" style={{ gap: 14, marginBottom: 18 }}>
+        <CloseBtn onClick={onExit} />
+        <div style={{ flex: 1 }}>
+          <TimerBar pct={remaining / ROUND_MS} danger={danger} />
+        </div>
+        <div
+          className="display"
+          style={{ fontSize: 22, minWidth: 46, textAlign: 'right', color: danger ? 'var(--err)' : 'var(--gold)' }}
+        >
+          {secs}s
+        </div>
+      </div>
+
+      {!running ? (
+        <Countdown onDone={start} />
+      ) : (
+        <>
+          <div className="spread" style={{ marginBottom: 6 }}>
+            <div>
+              <p className="eyebrow">Punten</p>
+              <motion.p key={score} initial={{ scale: 1.35 }} animate={{ scale: 1 }} className="display gold-text" style={{ fontSize: 40, lineHeight: 1 }}>
+                {score}
+              </motion.p>
+            </div>
+
+            <div style={{ position: 'relative', textAlign: 'right' }}>
+              <AnimatePresence>
+                {pop && (
+                  <motion.div
+                    key={pop.id}
+                    initial={{ opacity: 0, y: 6, scale: 0.7 }}
+                    animate={{ opacity: 1, y: -22, scale: 1 }}
+                    exit={{ opacity: 0, y: -40 }}
+                    className="display"
+                    style={{ position: 'absolute', right: 0, top: -6, fontSize: 24, color: pop.good ? 'var(--ok)' : 'var(--err)' }}
+                  >
+                    {pop.text}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              {combo >= 2 && (
+                <motion.div
+                  key={multiplier}
+                  initial={{ scale: 0.6, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="display"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    padding: '8px 14px',
+                    borderRadius: 999,
+                    background: multiplier > 1 ? 'var(--grad-hot)' : 'var(--surface-2)',
+                    boxShadow: multiplier > 1 ? '0 0 22px rgba(236,72,153,0.5)' : undefined,
+                    fontSize: 16,
+                    color: '#fff',
+                  }}
+                >
+                  🔥 {combo} op rij {multiplier > 1 && <span style={{ fontSize: 18 }}>×{multiplier}</span>}
+                </motion.div>
+              )}
+            </div>
+          </div>
+
+          <motion.div key={q.prompt + q.word} initial={{ opacity: 0, x: 26 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.18 }}>
+            <div
+              className="glass center"
+              style={{ padding: '26px 18px', marginTop: 14, marginBottom: 18, borderColor: 'var(--line-hot)', background: 'rgba(168,85,247,0.1)' }}
+            >
+              <p className="eyebrow">{q.toTarget ? 'Hoe zeg je dit?' : 'Wat betekent dit?'}</p>
+              <p className="display" style={{ fontSize: 30, marginTop: 8 }}>
+                {q.prompt}
+              </p>
+            </div>
+
+            <div className="col" style={{ gap: 12 }}>
+              {q.options.map((opt, i) => {
+                const isRight = opt === q.answer
+                const cls = picked === null ? 'opt' : isRight ? 'opt correct' : picked === i ? 'opt wrong' : 'opt dimmed'
+                return (
+                  <button
+                    key={opt + i}
+                    className={cls}
+                    style={{ justifyContent: 'center', textAlign: 'center', minHeight: 62, fontSize: 18 }}
+                    onClick={() => answer(i)}
+                  >
+                    {opt}
+                  </button>
+                )
+              })}
+            </div>
+          </motion.div>
+
+          <p className="faint center" style={{ fontSize: 12, marginTop: 18 }}>
+            Goed = +0,5 seconde · fout = −2 seconden · elke 5 op rij verdubbelt je punten
+          </p>
+          {bestCombo > 0 && (
+            <p className="faint center" style={{ fontSize: 12, marginTop: 4 }}>
+              Beste combo deze ronde: {bestCombo}
+            </p>
+          )}
+        </>
+      )}
+    </div>
+  )
+}
+
+/* ============================================================
+   Spel 2 — Woordstorm
+   ============================================================ */
+
+interface StormTile {
+  id: number
+  pairId: number
+  text: string
+  side: 'nl' | 't'
+  done: boolean
+}
+
+const STORM_PAIRS = 8
+const STORM_PENALTY = 3000
+
+function buildTiles(words: Pair[]): StormTile[] {
+  // korte woorden passen netter in het raster
+  const short = words.filter((p) => p.word.length <= 13 && p.nl.length <= 13)
+  const source = short.length >= STORM_PAIRS ? short : words
+  const chosen = shuffle(source).slice(0, STORM_PAIRS)
+  const tiles: StormTile[] = []
+  chosen.forEach((p, i) => {
+    tiles.push({ id: i * 2, pairId: i, text: p.nl, side: 'nl', done: false })
+    tiles.push({ id: i * 2 + 1, pairId: i, text: p.word, side: 't', done: false })
+  })
+  return shuffle(tiles)
+}
+
+function Storm({ words, onExit, onFinish }: GameProps) {
+  const [running, setRunning] = useState(false)
+  const [tiles, setTiles] = useState<StormTile[]>(() => buildTiles(words))
+  const [selected, setSelected] = useState<number | null>(null)
+  const [wrong, setWrong] = useState<number[]>([])
+  const [matched, setMatched] = useState(0)
+  const [misses, setMisses] = useState(0)
+  const [elapsed, setElapsed] = useState(0)
+
+  const startRef = useRef(0)
+  const penaltyRef = useRef(0)
+  const doneRef = useRef(false)
+  const timers = useRef<number[]>([])
+
+  useEffect(() => {
+    const list = timers
+    return () => {
+      for (const t of list.current) window.clearTimeout(t)
+      list.current = []
+    }
+  }, [])
+
+  // de klok telt op zolang je bezig bent
+  useEffect(() => {
+    if (!running) return
+    const iv = window.setInterval(() => {
+      setElapsed(Date.now() - startRef.current + penaltyRef.current)
+    }, 100)
+    return () => window.clearInterval(iv)
+  }, [running])
+
+  const start = () => {
+    startRef.current = Date.now()
+    penaltyRef.current = 0
+    setElapsed(0)
+    setRunning(true)
+  }
+
+  const tap = (t: StormTile) => {
+    if (!running || doneRef.current || t.done || wrong.length > 0) return
+    if (selected === t.id) {
+      setSelected(null)
+      return
+    }
+    if (selected === null) {
+      sfx('tap')
+      setSelected(t.id)
+      return
+    }
+    const first = tiles.find((x) => x.id === selected)
+    if (!first) {
+      setSelected(t.id)
+      return
+    }
+
+    if (first.pairId === t.pairId) {
+      sfx('correct')
+      setTiles((prev) => prev.map((x) => (x.pairId === t.pairId ? { ...x, done: true } : x)))
+      setSelected(null)
+      const n = matched + 1
+      setMatched(n)
+      if (n >= STORM_PAIRS) {
+        doneRef.current = true
+        setRunning(false)
+        const total = Date.now() - startRef.current + penaltyRef.current
+        const secs = Math.max(1, Math.round(total / 1000))
+        const score = Math.max(10, 300 - secs * 3)
+        timers.current.push(window.setTimeout(() => onFinish(score, `${secs} seconden · ${misses} ${misses === 1 ? 'misser' : 'missers'}`), 460))
+      }
+    } else {
+      sfx('wrong')
+      penaltyRef.current += STORM_PENALTY
+      setMisses((m) => m + 1)
+      setWrong([first.id, t.id])
+      setSelected(null)
+      timers.current.push(window.setTimeout(() => setWrong([]), 520))
+    }
+  }
+
+  const secs = elapsed / 1000
+
+  return (
+    <div className="shell">
+      <div className="ambient-orb orb-b" />
+
+      <div className="row" style={{ gap: 14, marginBottom: 20 }}>
+        <CloseBtn onClick={onExit} />
+        <div style={{ flex: 1 }}>
+          <p className="eyebrow">Woordstorm</p>
+          <p className="dim" style={{ fontSize: 13 }}>
+            {matched} van {STORM_PAIRS} paren
+          </p>
+        </div>
+        <div className="display" style={{ fontSize: 26, color: 'var(--cyan)', minWidth: 76, textAlign: 'right' }}>
+          {secs.toFixed(1)}s
+        </div>
+      </div>
+
+      {!running ? (
+        <Countdown onDone={start} />
+      ) : (
+        <>
+          <div className="progress-track" style={{ marginBottom: 18 }}>
+            <div
+              className="progress-fill"
+              style={{ width: `${(matched / STORM_PAIRS) * 100}%`, background: 'linear-gradient(90deg,#22d3ee,#6366f1)', transition: 'width 0.3s ease' }}
+            />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 9 }}>
+            {tiles.map((t) => {
+              const isSel = selected === t.id
+              const isWrong = wrong.includes(t.id)
+              const nl = t.side === 'nl'
+              return (
+                <motion.button
+                  key={t.id}
+                  onClick={() => tap(t)}
+                  animate={
+                    t.done
+                      ? { scale: [1, 1.22, 0], opacity: [1, 1, 0] }
+                      : isWrong
+                        ? { x: [0, -7, 7, -5, 5, 0], scale: 1, opacity: 1 }
+                        : { scale: isSel ? 1.06 : 1, opacity: 1, x: 0 }
+                  }
+                  transition={{ duration: t.done ? 0.38 : isWrong ? 0.42 : 0.16 }}
+                  style={{
+                    aspectRatio: '1 / 1',
+                    borderRadius: 16,
+                    padding: 4,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    textAlign: 'center',
+                    fontWeight: 700,
+                    lineHeight: 1.15,
+                    overflowWrap: 'anywhere',
+                    hyphens: 'auto',
+                    fontSize: t.text.length > 10 ? 10.5 : t.text.length > 7 ? 12 : 13.5,
+                    pointerEvents: t.done ? 'none' : 'auto',
+                    color: isSel ? '#fff' : 'var(--text)',
+                    background: isSel
+                      ? 'var(--grad-hot)'
+                      : isWrong
+                        ? 'var(--err-bg)'
+                        : nl
+                          ? 'rgba(168,85,247,0.14)'
+                          : 'rgba(34,211,238,0.13)',
+                    border: `2px solid ${isSel ? 'transparent' : isWrong ? 'var(--err)' : nl ? 'rgba(168,85,247,0.42)' : 'rgba(34,211,238,0.42)'}`,
+                    boxShadow: isSel ? '0 4px 0 #6b21a8, 0 0 20px rgba(236,72,153,0.45)' : '0 4px 0 rgba(0,0,0,0.35)',
+                  }}
+                >
+                  {t.text}
+                </motion.button>
+              )
+            })}
+          </div>
+
+          <div className="row" style={{ justifyContent: 'center', gap: 18, marginTop: 20 }}>
+            <span className="faint" style={{ fontSize: 12 }}>
+              <span style={{ color: 'var(--hot1)' }}>■</span> Nederlands
+            </span>
+            <span className="faint" style={{ fontSize: 12 }}>
+              <span style={{ color: 'var(--cyan)' }}>■</span> Vertaling
+            </span>
+          </div>
+          <p className="faint center" style={{ fontSize: 12, marginTop: 6 }}>
+            Elke misser kost 3 seconden{misses > 0 ? ` · ${misses} tot nu toe` : ''}
+          </p>
+        </>
+      )}
+    </div>
+  )
+}
+
+/* ============================================================
+   Spel 3 — Luisterjacht
+   ============================================================ */
+
+const LUISTER_ROUNDS = 10
+const LUISTER_MS = 8000
+
+interface ListenQ {
+  word: string
+  nl: string
+  options: string[]
+}
+
+function buildRounds(words: Pair[], all: Pair[]): ListenQ[] {
+  const base = shuffle(words)
+  const out: ListenQ[] = []
+  for (let i = 0; i < LUISTER_ROUNDS; i++) {
+    const target = base[i % base.length]
+    const others: string[] = []
+    for (const p of shuffle(all)) {
+      if (p.nl.toLowerCase() === target.nl.toLowerCase()) continue
+      if (others.some((o) => o.toLowerCase() === p.nl.toLowerCase())) continue
+      others.push(p.nl)
+      if (others.length >= 3) break
+    }
+    out.push({ word: target.word, nl: target.nl, options: shuffle([target.nl, ...others]) })
+  }
+  return out
+}
+
+function Luister({ words, all, ttsLang, onExit, onFinish }: GameProps) {
+  const [rounds] = useState<ListenQ[]>(() => buildRounds(words, all))
+  const [started, setStarted] = useState(false)
+  const [idx, setIdx] = useState(0)
+  const [state, setState] = useState<'ask' | 'feedback'>('ask')
+  const [picked, setPicked] = useState<number | null>(null)
+  const [remaining, setRemaining] = useState(LUISTER_MS)
+  const [correct, setCorrect] = useState(0)
+  const [bonus, setBonus] = useState(0)
+
+  const endRef = useRef(0)
+  const correctRef = useRef(0)
+  const bonusRef = useRef(0)
+  const doneRef = useRef(false)
+
+  const q = rounds[Math.min(idx, rounds.length - 1)]
+
+  // ronde starten: woord uitspreken en de klok laten lopen
+  useEffect(() => {
+    if (!started || state !== 'ask' || doneRef.current) return
+    endRef.current = Date.now() + LUISTER_MS
+    setRemaining(LUISTER_MS)
+    const t = window.setTimeout(() => speak(q.word, ttsLang), 220)
+    const iv = window.setInterval(() => {
+      const left = endRef.current - Date.now()
+      setRemaining(Math.max(0, left))
+      if (left <= 0) {
+        window.clearInterval(iv)
+        setPicked(null)
+        setState('feedback')
+        sfx('wrong')
+      }
+    }, 100)
+    return () => {
+      window.clearTimeout(t)
+      window.clearInterval(iv)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idx, state, started])
+
+  // korte terugkoppeling, daarna door naar de volgende ronde
+  useEffect(() => {
+    if (state !== 'feedback' || doneRef.current) return
+    const t = window.setTimeout(() => {
+      if (idx + 1 >= rounds.length) {
+        doneRef.current = true
+        const score = correctRef.current * 10 + bonusRef.current
+        onFinish(score, `${correctRef.current} van ${rounds.length} goed · ${bonusRef.current} tijdbonus`)
+      } else {
+        setPicked(null)
+        setIdx(idx + 1)
+        setState('ask')
+      }
+    }, 1050)
+    return () => window.clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state, idx])
+
+  const answer = (i: number) => {
+    if (state !== 'ask' || picked !== null || doneRef.current) return
+    setPicked(i)
+    const good = q.options[i] === q.nl
+    if (good) {
+      const gain = Math.max(0, Math.ceil((endRef.current - Date.now()) / 1000))
+      correctRef.current += 1
+      bonusRef.current += gain
+      setCorrect(correctRef.current)
+      setBonus(bonusRef.current)
+      sfx('correct')
+    } else {
+      sfx('wrong')
+    }
+    setState('feedback')
+  }
+
+  if (!started) {
+    return (
+      <div className="shell">
+        <div className="ambient-orb orb-a" />
+        <div className="row" style={{ marginBottom: 10 }}>
+          <CloseBtn onClick={onExit} />
+        </div>
+        <Countdown onDone={() => setStarted(true)} />
+        <p className="dim center" style={{ fontSize: 14 }}>
+          Zet je geluid aan — je hoort steeds één woord.
+        </p>
+      </div>
+    )
+  }
+
+  const pctRound = remaining / LUISTER_MS
+
+  return (
+    <div className="shell">
+      <div className="ambient-orb orb-a" />
+
+      <div className="row" style={{ gap: 14, marginBottom: 16 }}>
+        <CloseBtn onClick={onExit} />
+        <div style={{ flex: 1 }}>
+          <div className="spread" style={{ marginBottom: 6 }}>
+            <span className="eyebrow">
+              Ronde {idx + 1}/{rounds.length}
+            </span>
+            <span className="display gold-text" style={{ fontSize: 16 }}>
+              {correct * 10 + bonus} pnt
+            </span>
+          </div>
+          <TimerBar pct={pctRound} danger={remaining <= 3000} />
+        </div>
+      </div>
+
+      <div className="center" style={{ marginTop: 8 }}>
+        <motion.button
+          key={idx}
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          whileTap={{ scale: 0.93 }}
+          className="speaker-btn"
+          style={{ color: 'var(--gold-bright)', width: 104, height: 104, marginBottom: 18 }}
+          onClick={() => speak(q.word, ttsLang)}
+          aria-label="Woord opnieuw afspelen"
+        >
+          <SpeakerIcon size={42} />
+        </motion.button>
+        <p className="eyebrow" style={{ marginBottom: 16 }}>
+          {state === 'feedback' ? q.word : 'Wat hoor je?'}
+        </p>
+      </div>
+
+      <div className="col" style={{ gap: 12 }}>
+        {q.options.map((opt, i) => {
+          const isRight = opt === q.nl
+          const cls =
+            state === 'ask' ? 'opt' : isRight ? 'opt correct' : picked === i ? 'opt wrong' : 'opt dimmed'
+          return (
+            <button
+              key={opt + i}
+              className={cls}
+              style={{ justifyContent: 'center', textAlign: 'center', minHeight: 60, fontSize: 17 }}
+              onClick={() => answer(i)}
+            >
+              {opt}
+            </button>
+          )
+        })}
+      </div>
+
+      <p className="faint center" style={{ fontSize: 12, marginTop: 18 }}>
+        Goed = 10 punten + 1 punt per resterende seconde
+      </p>
+    </div>
+  )
+}
+
+/* ============================================================
+   Eindscherm
+   ============================================================ */
+
+function Result({
+  phase,
+  def,
+  onAgain,
+  onHub,
+}: {
+  phase: Extract<Phase, { name: 'done' }>
+  def: GameDef
+  onAgain: () => void
+  onHub: () => void
+}) {
+  const best = Math.max(phase.prevBest, phase.score)
+  const shownXp = phase.boosted ? phase.xp * 2 : phase.xp
+
+  return (
+    <div className="shell">
+      <div className="ambient-orb orb-a" />
+      <div className="ambient-orb orb-b" />
+
+      <div className="row" style={{ marginBottom: 8 }}>
+        <CloseBtn onClick={onHub} />
+      </div>
+
+      <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="center" style={{ marginTop: 14 }}>
+        <motion.div
+          initial={{ scale: 0.4, rotate: -20 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ type: 'spring', stiffness: 220, damping: 12 }}
+          style={{ fontSize: 74, lineHeight: 1 }}
+        >
+          {phase.record ? '🏆' : def.emoji}
+        </motion.div>
+
+        <h1 className="display" style={{ fontSize: 28, marginTop: 10 }}>
+          {phase.record ? <span className="gold-text">Nieuw record!</span> : 'Goed gespeeld!'}
+        </h1>
+        <p className="dim" style={{ fontSize: 14, marginTop: 4 }}>
+          {def.name} · {phase.detail}
+        </p>
+
+        <motion.div
+          initial={{ scale: 0.7, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.14, type: 'spring', stiffness: 200, damping: 14 }}
+          className="glass"
+          style={{ padding: '26px 18px', marginTop: 22, background: 'rgba(255,255,255,0.05)' }}
+        >
+          <p className="eyebrow">Jouw score</p>
+          <p className="display gold-text" style={{ fontSize: 62, lineHeight: 1.05 }}>
+            {phase.score}
+          </p>
+          <div className="divider-gold" />
+          <div className="stat-grid">
+            <div className="glass stat-card">
+              <p className="stat-value" style={{ fontSize: 26 }}>
+                {best}
+              </p>
+              <p className="stat-label">Beste ooit</p>
+            </div>
+            <div className="glass stat-card">
+              <p className="stat-value hot-text" style={{ fontSize: 26 }}>
+                +{shownXp}
+              </p>
+              <p className="stat-label">{phase.boosted ? 'XP (2× boost)' : 'XP verdiend'}</p>
+            </div>
+          </div>
+        </motion.div>
+
+        <div className="col" style={{ gap: 12, marginTop: 26 }}>
+          <button
+            className="btn btn-primary"
+            onClick={() => {
+              sfx('tap')
+              onAgain()
+            }}
+          >
+            🔁 Nog een keer
+          </button>
+          <button
+            className="btn btn-ghost"
+            onClick={() => {
+              sfx('tap')
+              onHub()
+            }}
+          >
+            Terug naar de speelhal
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  )
+}

@@ -1,7 +1,17 @@
-import { Avatar, EXTRA_NAMES, GENDER_NAMES, HAIR_COLORS, HAIR_STYLE_NAMES, OUTFIT_COLORS, SKINS, type AvatarStyle } from './Avatar'
+import {
+  Avatar,
+  EXTRA_NAMES,
+  GENDER_NAMES,
+  HAIR_COLORS,
+  HAIR_STYLE_NAMES,
+  MOUTH_NAMES,
+  OUTFIT_COLORS,
+  SKINS,
+  type AvatarStyle,
+} from './Avatar'
 import { sfx } from '../audio'
 
-/** De personage-maker: 6 haarstijlen × 6 huidskleuren × 6 haarkleuren × 6 outfits = 1.296 combinaties */
+/** De personage-maker: 10 haarstijlen × 8 huidtinten × 12 haarkleuren × 10 outfits × extra's × monden */
 export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChange: (p: AvatarStyle) => void }) {
   const set = (patch: Partial<AvatarStyle>) => {
     sfx('tap')
@@ -118,6 +128,30 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
           </div>
           <div>
             <p className="eyebrow" style={{ fontSize: 10, marginBottom: 5 }}>
+              Mond
+            </p>
+            <div className="row" style={{ gap: 6, flexWrap: 'wrap' }}>
+              {MOUTH_NAMES.map((name, i) => (
+                <button
+                  key={name}
+                  onClick={() => set({ mouth: i })}
+                  style={{
+                    padding: '5px 10px',
+                    borderRadius: 999,
+                    fontSize: 11.5,
+                    fontWeight: 700,
+                    background: (value.mouth ?? 0) === i ? 'var(--grad-hot)' : 'var(--surface-2)',
+                    color: (value.mouth ?? 0) === i ? '#fff' : 'var(--text-dim)',
+                    border: (value.mouth ?? 0) === i ? 'none' : '1.5px solid var(--line)',
+                  }}
+                >
+                  {name}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <p className="eyebrow" style={{ fontSize: 10, marginBottom: 5 }}>
               Huidskleur
             </p>
             <Swatches colors={SKINS} active={value.skin} pick={(i) => set({ skin: i })} />
@@ -137,7 +171,7 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
         </div>
       </div>
       <p className="faint center" style={{ fontSize: 11, marginTop: 10 }}>
-        32.000+ combinaties — maak jezelf, en zie jezelf per niveau vetter worden
+        300.000+ combinaties — maak jezelf, en zie jezelf per niveau vetter worden
       </p>
     </div>
   )

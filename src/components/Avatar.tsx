@@ -1,9 +1,10 @@
 import { motion } from 'motion/react'
 import type { CourseId } from '../types'
 
-export type Look = 'a' | 'b' | 'c' | 'd'
+/** De 8 kant-en-klare personages (a t/m h) — ook nog steeds de legacy-waarde in de store */
+export type Look = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h'
 
-/** Vrij samen te stellen personage — 10×8×10×10×4 = 32.000 combinaties */
+/** Vrij samen te stellen personage — 10×8×12×10×4×4×2 = ruim 300.000 combinaties */
 export interface AvatarStyle {
   /** 0 kort · 1 lang · 2 krullen · 3 knot · 4 buzz · 5 staart · 6 afro · 7 hanekam · 8 kuif · 9 vlechten */
   hair: number
@@ -14,28 +15,84 @@ export interface AvatarStyle {
   extra?: number
   /** 0 man · 1 vrouw */
   gender?: number
+  /** 0 glimlach · 1 brede lach · 2 kalm · 3 grijns */
+  mouth?: number
 }
 
 export const GENDER_NAMES = ['Man', 'Vrouw']
 
-export const SKINS = ['#FFE4C8', '#FFDBB4', '#F2C094', '#D9A066', '#B07B4F', '#9C6644', '#6E452C', '#4A2E1C']
-const SKIN_SHADES = ['#F5D2AC', '#EFC392', '#DFA672', '#C48A50', '#96613C', '#7E4E31', '#57351F', '#38200F']
-export const HAIR_COLORS = ['#1E1611', '#3A2A1E', '#6B4423', '#B3502E', '#E0B75C', '#9A93A8', '#F2F0F5', '#4FA3E3', '#F06AA8', '#4FC780']
+/** index 2 licht · 3 medium · 5 bruin · 6 donker = de vier tinten van de vaste personages */
+export const SKINS = ['#FFE4C8', '#FFDBB4', '#F2C094', '#D9A066', '#B07B4F', '#9C6644', '#6B4423', '#4A2E1C']
+/** telkens ±15% donkerder dan de huidtint — voor schaduw, sproeten en wangen */
+const SKIN_SHADES = ['#F5D2AC', '#EFC392', '#DFA672', '#C48A50', '#96613C', '#7E4E31', '#5B3A1E', '#38200F']
+/** 0-6 natuurlijk · 7-11 geverfd (arcade-kleuren) */
+export const HAIR_COLORS = [
+  '#1E1611',
+  '#3A2A1E',
+  '#6B4423',
+  '#A0522D',
+  '#D9A441',
+  '#9A93A8',
+  '#F2F0F5',
+  '#4FA3E3',
+  '#F06AA8',
+  '#4FC780',
+  '#A855F7',
+  '#22D3EE',
+]
+/** vanaf deze index is het haar duidelijk geverfd — wenkbrauwen blijven dan natuurlijk */
+const DYED_FROM = 7
+const NATURAL_BROW = '#4A3728'
 export const OUTFIT_COLORS = ['#7C7694', '#3E5C9A', '#B33A4B', '#2E7D5B', '#8A5BB8', '#C77B3F', '#22D3EE', '#EC4899', '#E8CB2A', '#232733']
 export const HAIR_STYLE_NAMES = ['Kort', 'Lang', 'Krullen', 'Knot', 'Buzz', 'Staart', 'Afro', 'Hanekam', 'Kuif', 'Vlechten']
 export const EXTRA_NAMES = ['Geen', 'Bril', 'Oorbellen', 'Sproeten']
-export const DEFAULT_PERSONA: AvatarStyle = { hair: 0, skin: 2, hairColor: 1, outfit: 0, extra: 0 }
+export const MOUTH_NAMES = ['Glimlach', 'Brede lach', 'Kalm', 'Grijns']
+export const DEFAULT_PERSONA: AvatarStyle = { hair: 0, skin: 2, hairColor: 1, outfit: 0, extra: 0, gender: 0, mouth: 0 }
 
-const LEGACY: Record<Look, AvatarStyle> = {
-  a: { hair: 0, skin: 2, hairColor: 1, outfit: 0, extra: 0 },
-  b: { hair: 1, skin: 2, hairColor: 2, outfit: 0, extra: 0 },
-  c: { hair: 0, skin: 5, hairColor: 0, outfit: 0, extra: 0 },
-  d: { hair: 1, skin: 5, hairColor: 0, outfit: 0, extra: 0 },
+/**
+ * De 8 vaste personages: 4 huidtinten (licht · medium · bruin · donker) × 2
+ * haarstijlen (kort · lang). Elk personage heeft een eigen haarkleur en één
+ * klein kenmerk (sproeten, bril, oorbellen) plus een eigen mondvorm.
+ * a t/m d zijn bewust identiek gebleven aan de oude vier, zodat bestaande
+ * accounts hun personage herkennen.
+ */
+export const AVATAR_PRESETS: Record<Look, AvatarStyle> = {
+  // licht + kort, donkerbruin haar — de standaard
+  a: { hair: 0, skin: 2, hairColor: 1, outfit: 0, extra: 0, gender: 0, mouth: 0 },
+  // licht + lang, blond haar en sproeten
+  b: { hair: 1, skin: 2, hairColor: 4, outfit: 7, extra: 3, gender: 1, mouth: 1 },
+  // bruin + kort, zwart haar met bril
+  c: { hair: 0, skin: 5, hairColor: 0, outfit: 3, extra: 1, gender: 0, mouth: 0 },
+  // bruin + lang, cyaan geverfd haar en oorbellen
+  d: { hair: 1, skin: 5, hairColor: 11, outfit: 6, extra: 2, gender: 1, mouth: 3 },
+  // medium + kort, roodbruin haar en sproeten
+  e: { hair: 0, skin: 3, hairColor: 3, outfit: 5, extra: 3, gender: 0, mouth: 1 },
+  // medium + lang, paars geverfd haar en oorbellen
+  f: { hair: 1, skin: 3, hairColor: 10, outfit: 4, extra: 2, gender: 1, mouth: 2 },
+  // donker + kort, platinawit haar met bril
+  g: { hair: 0, skin: 6, hairColor: 6, outfit: 1, extra: 1, gender: 0, mouth: 3 },
+  // donker + lang, zwart haar en oorbellen
+  h: { hair: 1, skin: 6, hairColor: 0, outfit: 8, extra: 2, gender: 1, mouth: 1 },
+}
+
+/** Alle vaste personages op volgorde — schermen kunnen hierover itereren */
+export const AVATAR_STYLES: Look[] = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+
+/** Nederlandse namen bij de acht personages, voor keuzeschermen */
+export const AVATAR_STYLE_NAMES: Record<Look, string> = {
+  a: 'Sem',
+  b: 'Noor',
+  c: 'Kian',
+  d: 'Yara',
+  e: 'Finn',
+  f: 'Luna',
+  g: 'Amir',
+  h: 'Zara',
 }
 
 export function normalizePersona(p?: AvatarStyle | Look | null): AvatarStyle {
   if (!p) return DEFAULT_PERSONA
-  if (typeof p === 'string') return LEGACY[p] ?? DEFAULT_PERSONA
+  if (typeof p === 'string') return AVATAR_PRESETS[p] ?? DEFAULT_PERSONA
   const clamp = (v: number | undefined, max: number, fallback: number) =>
     typeof v === 'number' && v >= 0 && v <= max ? Math.floor(v) : fallback
   return {
@@ -45,6 +102,7 @@ export function normalizePersona(p?: AvatarStyle | Look | null): AvatarStyle {
     outfit: clamp(p.outfit, OUTFIT_COLORS.length - 1, 0),
     extra: clamp(p.extra, EXTRA_NAMES.length - 1, 0),
     gender: clamp(p.gender, 1, 0),
+    mouth: clamp(p.mouth, MOUTH_NAMES.length - 1, 0),
   }
 }
 
@@ -94,6 +152,8 @@ export function Avatar({
   const s = STYLE[courseId]
   const p = normalizePersona(look)
   const lk = { skin: SKINS[p.skin], shade: SKIN_SHADES[p.skin], hair: HAIR_COLORS[p.hairColor] }
+  // geverfd haar? dan houden we de wenkbrauwen natuurlijk — anders vervaagt het gezicht
+  const browColor = p.hairColor >= DYED_FROM ? NATURAL_BROW : lk.hair
   const running = mode === 'run'
   const cheering = mode === 'cheer'
 
@@ -422,8 +482,8 @@ export function Avatar({
         </g>
       )}
       {/* wenkbrauwen */}
-      <rect x="80" y="52" width="14" height="3.5" rx="1.75" fill={lk.hair} transform="rotate(-4 87 54)" />
-      <rect x="106" y="52" width="14" height="3.5" rx="1.75" fill={lk.hair} transform="rotate(4 113 54)" />
+      <rect x="80" y="52" width="14" height="3.5" rx="1.75" fill={browColor} transform="rotate(-4 87 54)" />
+      <rect x="106" y="52" width="14" height="3.5" rx="1.75" fill={browColor} transform="rotate(4 113 54)" />
       {/* oren */}
       <circle cx="66" cy="68" r="6" fill={lk.skin} />
       <circle cx="134" cy="68" r="6" fill={lk.skin} />
@@ -450,8 +510,19 @@ export function Avatar({
           <path d="M119 56.5 L122 53" />
         </g>
       )}
-      {/* mond */}
-      <path d="M89 84 Q100 92 111 84" stroke="#B0672E" strokeWidth="3" strokeLinecap="round" fill="none" />
+      {/* mond — 4 vormen, blijft ook op 56px leesbaar */}
+      {p.mouth === 1 ? (
+        <g>
+          <path d="M87 82 Q100 98 113 82 Z" fill="#8E3B22" />
+          <path d="M89.5 83.6 L110.5 83.6 Q100 89 89.5 83.6 Z" fill="#FFF8F2" />
+        </g>
+      ) : p.mouth === 2 ? (
+        <path d="M91 85 Q100 89 109 85" stroke="#B0672E" strokeWidth="3" strokeLinecap="round" fill="none" />
+      ) : p.mouth === 3 ? (
+        <path d="M88 85 Q100 93 112 79" stroke="#B0672E" strokeWidth="3" strokeLinecap="round" fill="none" />
+      ) : (
+        <path d="M89 84 Q100 92 111 84" stroke="#B0672E" strokeWidth="3" strokeLinecap="round" fill="none" />
+      )}
       {/* blos */}
       <circle cx="76" cy="78" r="4.5" fill="#E89B6F" opacity="0.55" />
       <circle cx="124" cy="78" r="4.5" fill="#E89B6F" opacity="0.55" />
