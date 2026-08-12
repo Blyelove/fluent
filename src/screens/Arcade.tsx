@@ -4,7 +4,7 @@ import confetti from 'canvas-confetti'
 import type { Course } from '../types'
 import { courses } from '../content'
 import { useStore } from '../store'
-import { sfx, speak } from '../audio'
+import { kanKlinken, sfx, speak } from '../audio'
 import { ShareButton } from '../components/ShareButton'
 
 /* ============================================================
@@ -1121,11 +1121,18 @@ function Luister({ words, all, ttsLang, onExit, onFinish }: GameProps) {
 
   const q = rounds[Math.min(idx, rounds.length - 1)]
 
+  /** kan dit toestel de doeltaal überhaupt laten klinken? */
+  const stil = useMemo(() => (q ? !kanKlinken(q.word, ttsLang) : false), [q, ttsLang])
+  /** vangnet bij stilte: na drie seconden zie je het woord alsnog */
+  const [toonWoord, setToonWoord] = useState(false)
+
   // ronde starten: woord uitspreken en de klok laten lopen
   useEffect(() => {
     if (!q || !started || state !== 'ask' || doneRef.current) return
     endRef.current = Date.now() + LUISTER_MS
     setRemaining(LUISTER_MS)
+    setToonWoord(false)
+    const vangnet = stil ? window.setTimeout(() => setToonWoord(true), 3000) : null
     const t = window.setTimeout(() => speak(q.word, ttsLang), 220)
     const iv = window.setInterval(() => {
       const left = endRef.current - Date.now()
@@ -1140,6 +1147,7 @@ function Luister({ words, all, ttsLang, onExit, onFinish }: GameProps) {
     return () => {
       window.clearTimeout(t)
       window.clearInterval(iv)
+      if (vangnet !== null) window.clearTimeout(vangnet)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idx, state, started])
@@ -1189,9 +1197,22 @@ function Luister({ words, all, ttsLang, onExit, onFinish }: GameProps) {
           <CloseBtn onClick={onExit} />
         </div>
         <Countdown onDone={() => setStarted(true)} uitleg="Je hoort een woord en kiest de juiste betekenis. Elke ronde duurt 8 seconden: hoe sneller je kiest, hoe meer tijdbonus." />
-        <p className="dim center" style={{ fontSize: 14 }}>
-          Zet je geluid aan — je hoort steeds één woord.
-        </p>
+        {stil ? (
+          // zonder geluid is dit spel onspeelbaar; dat zeggen we vóór de klok loopt
+          <div
+            className="glass"
+            style={{ padding: 14, marginTop: 6, borderColor: 'var(--line-gold)', background: 'rgba(255,197,61,0.09)' }}
+          >
+            <p style={{ fontSize: 13.5, fontWeight: 700 }}>🔇 Geen geluid beschikbaar</p>
+            <p className="faint" style={{ fontSize: 12.5, marginTop: 4 }}>
+              Je toestel heeft hiervoor geen stem. Het woord verschijnt na drie seconden in beeld, zodat je toch kunt spelen.
+            </p>
+          </div>
+        ) : (
+          <p className="dim center" style={{ fontSize: 14 }}>
+            Zet je geluid aan — je hoort steeds één woord.
+          </p>
+        )}
       </div>
     )
   }
@@ -1231,7 +1252,7 @@ function Luister({ words, all, ttsLang, onExit, onFinish }: GameProps) {
           <SpeakerIcon size={42} />
         </motion.button>
         <p className="eyebrow" style={{ marginBottom: 16 }}>
-          {state === 'feedback' ? q.word : 'Wat hoor je?'}
+          {state === 'feedback' || (stil && toonWoord) ? q.word : 'Wat hoor je?'}
         </p>
       </div>
 

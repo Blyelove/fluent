@@ -58,7 +58,7 @@ Fluent heeft een kern die al als topspel voelt — chunky leslus met combo's en 
 
 **Bewijs:** Verse gebruiker passeert het personagescherm in twee tikken (Verras me → verder); de galerij opent nog volledig via de inklap en via Profiel.
 
-### 13. Luisterjacht mag nooit geluidloos zijn: audio.ts r122-129 kiest bewust stilte zonder stem, maar Arcade.tsx start toch de 8s-timer met 'Wat hoor je?'. Check vóór start op manifest-hit of pickVoice != null; zo niet: melding op het startscherm en het woord na 3s visueel laten flitsen als vangnet.
+### 13. ✅ AF (ronde 46) — Luisterjacht mag nooit geluidloos zijn: audio.ts r122-129 kiest bewust stilte zonder stem, maar Arcade.tsx start toch de 8s-timer met 'Wat hoor je?'. Check vóór start op manifest-hit of pickVoice != null; zo niet: melding op het startscherm en het woord na 3s visueel laten flitsen als vangnet.
 
 **Bewijs:** Forceer pickVoice op null: het startscherm waarschuwt en elke ronde blijft speelbaar via de visuele flits.
 

@@ -101,6 +101,15 @@ function pickVoice(lang: string): SpeechSynthesisVoice | null {
   return [...cands].sort((a, b) => score(b) - score(a))[0]
 }
 
+/**
+ * Is deze tekst hoorbaar te maken? Een luisterspel dat stil blijft is
+ * onspeelbaar, dus dat willen we weten vóórdat de klok gaat lopen.
+ */
+export function kanKlinken(text: string, lang: string): boolean {
+  if (manifest[`${lang}|${text}`]) return true
+  return pickVoice(lang) !== null
+}
+
 export function speak(text: string, lang: string, rate = 1) {
   // 1) Vooraf gegenereerde neurale moedertaal-audio (altijd het juiste accent)
   const src = manifest[`${lang}|${text}`]
