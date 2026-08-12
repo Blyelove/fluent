@@ -659,7 +659,7 @@ export function WorldMapScreen({
                 </p>
               ) : (
                 <p className="dim" style={{ fontSize: 14, marginBottom: 16 }}>
-                  🔭 Dit land komt met nieuwe lessen — jouw wereld groeit vanzelf. Geen slot, alleen toekomst.
+                  🔭 Dit land komt met nieuwe lessen. Jouw wereld groeit vanzelf: geen slot, alleen toekomst.
                 </p>
               )}
 

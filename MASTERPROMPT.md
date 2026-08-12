@@ -63,10 +63,11 @@ H. PUBLICATIE
    - De app heet Fluent, overal, ook op de live link.
    - Er is één permanente publieke link waar iedereen op kan (niet alleen deze pc):
      https://blyelove.github.io/fluent/
-   - Elke wijziging komt daar automatisch op te staan.
+   - ALLES GAAT ALTIJD DIRECT LIVE OP DIE LINK. Een ronde is pas af als de wijziging gepusht is, de bouwstraat groen is en de nieuwe bundel aantoonbaar op de link staat. Werk dat alleen lokaal staat telt niet als af. Nooit werk laten liggen tot een volgende ronde als het al bewezen werkt.
 
 I. AFWERKING
    - Alles wat de gebruiker ziet is foutloos, natuurlijk Nederlands.
+   - SCHRIJF GEEN AI-TAAL. Vermijd gedachtestreepjes waar een gewone zin kan staan; los het op met een punt, een komma of een dubbele punt. Dit geldt voor alle teksten in de app, voor commitberichten én voor rapportages aan de gebruiker. Korte, natuurlijke zinnen winnen altijd.
    - Nooit een loze belofte in de tekst: staat er dat je iets verdient, dan krijg je het ook echt.
    - Visueel nooit saai, plat of leeg. Als het saai oogt, is dat een bug.
 

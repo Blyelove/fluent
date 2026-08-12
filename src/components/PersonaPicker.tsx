@@ -58,7 +58,7 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
   return (
     <div className="glass" style={{ padding: 16, marginBottom: 16 }}>
       <p className="eyebrow" style={{ fontSize: 10, marginBottom: 5 }}>
-        Stap 1 · Ik ben een...
+        Stap 1: ik ben een...
       </p>
       <div className="row" style={{ gap: 8, marginBottom: 14 }}>
         {GENDER_NAMES.map((name, gi) => (
@@ -83,10 +83,10 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
       </div>
 
       <p className="eyebrow" style={{ fontSize: 10, marginBottom: 6 }}>
-        Stap 2 · Kies je held — {helden.length} {geslacht === 0 ? 'mannen' : 'vrouwen'}
+        Stap 2: kies je held ({helden.length} karakters)
       </p>
       <p className="faint" style={{ fontSize: 11.5, marginBottom: 10 }}>
-        Allemaal uniek, allemaal direct te kiezen — en onderaan stel je hem zelf samen uit ruim 300.000 combinaties.
+        Allemaal uniek en direct te kiezen. Onderaan stel je hem zelf samen uit ruim 300.000 combinaties.
       </p>
       {/* de helden van jouw keuze in één raster; .galerij-cel rendert alleen
           wat in beeld is, dus ook honderden figuren scrollen soepel */}
@@ -141,10 +141,10 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
         <div className="col" style={{ gap: 10, flex: 1, minWidth: 0 }}>
           <div>
             <p className="eyebrow" style={{ fontSize: 10, marginBottom: 5 }}>
-              Stap 3 (mag ook) · Maak hem helemaal eigen
+              Stap 3 (mag ook): maak hem helemaal eigen
             </p>
             <p className="eyebrow" style={{ fontSize: 10, marginBottom: 5, color: 'var(--text-faint)' }}>
-              Haarstijl — met jouw kleuren
+              Haarstijl, met jouw kleuren
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
               {HAIR_STYLE_NAMES.map((name, i) => (
@@ -237,7 +237,7 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
         </div>
       </div>
       <p className="faint center" style={{ fontSize: 11, marginTop: 10 }}>
-        300.000+ combinaties — maak jezelf, en zie jezelf per niveau vetter worden
+        Ruim 300.000 combinaties. Maak jezelf, en zie jezelf per niveau vetter worden.
       </p>
     </div>
   )
