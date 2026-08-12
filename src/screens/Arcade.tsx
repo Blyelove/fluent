@@ -32,7 +32,9 @@ function shuffle<T>(arr: T[]): T[] {
   return a
 }
 
-function pick<T>(arr: T[]): T {
+/** Willekeurig element; `undefined` bij een lege lijst zodat de aanroeper dat afvangt */
+function pick<T>(arr: T[]): T | undefined {
+  if (arr.length === 0) return undefined
   return arr[Math.floor(Math.random() * arr.length)]
 }
 
@@ -76,7 +78,7 @@ const GAMES: GameDef[] = [
     name: 'Bliksemronde',
     emoji: '⚡',
     tagline: '60 seconden pure snelheid',
-    how: 'Zoveel mogelijk vertalingen goed. Combo’s verdubbelen je punten.',
+    how: 'Zoveel mogelijk vertalingen goed. Elke 5 op rij verhoogt je multiplier.',
     grad: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
     shade: '#6b21a8',
     glow: 'rgba(236, 72, 153, 0.45)',
@@ -103,10 +105,14 @@ const GAMES: GameDef[] = [
   },
 ]
 
-/** XP-formule per spel — zo blijft de beloning tussen de spellen in balans */
+/**
+ * XP-formule per spel — zo blijft de beloning tussen de spellen in balans.
+ * Een sterke ronde levert overal grofweg 55-70 XP op; geen enkel spel is
+ * dus veel lucratiever dan de andere twee.
+ */
 function xpFor(game: GameId, score: number): number {
-  if (game === 'bliksem') return Math.max(2, score * 2)
-  if (game === 'storm') return Math.max(5, Math.round(score / 6))
+  if (game === 'bliksem') return Math.max(3, Math.round(score * 0.5))
+  if (game === 'storm') return Math.max(5, Math.round(score / 4))
   return Math.max(5, Math.round(score / 3))
 }
 
@@ -161,7 +167,12 @@ export function ArcadeScreen({ onPlayingChange }: { onPlayingChange?: (playing: 
    * Alleen als de cursus zelf te weinig woorden heeft blijft het spel dicht.
    */
   const usingStarter = myWords.length < MIN_WORDS && allWords.length >= MIN_WORDS
-  const playWords = usingStarter ? allWords.slice(0, 16) : myWords
+  // gememoiseerd: anders krijgt elk spel bij elke render een nieuwe array-referentie
+  // binnen, wat de timer-effects daar onnodig opnieuw laat opstarten
+  const playWords = useMemo(
+    () => (usingStarter ? allWords.slice(0, 16) : myWords),
+    [usingStarter, allWords, myWords]
+  )
   const locked = playWords.length < MIN_WORDS
 
   const finish = useCallback(
@@ -419,9 +430,34 @@ function SpeakerIcon({ size = 34 }: { size?: number }) {
   )
 }
 
+/** Vangnet: zonder woorden valt er niets te spelen — nooit een leeg of vastgelopen scherm */
+function NoWords({ onExit }: { onExit: () => void }) {
+  return (
+    <div className="shell">
+      <div className="ambient-orb orb-a" />
+      <div className="row" style={{ marginBottom: 24 }}>
+        <CloseBtn onClick={onExit} />
+      </div>
+      <div className="glass center" style={{ padding: '30px 20px', borderColor: 'var(--line-gold)' }}>
+        <p style={{ fontSize: 42, lineHeight: 1 }}>🔒</p>
+        <p className="display" style={{ fontSize: 18, marginTop: 12 }}>
+          Nog te weinig woorden
+        </p>
+        <p className="dim" style={{ fontSize: 13.5, marginTop: 6, lineHeight: 1.5 }}>
+          Doe eerst een paar lessen — daarna vullen de spellen zich vanzelf met jouw woorden.
+        </p>
+      </div>
+      <button className="btn btn-ghost" style={{ marginTop: 20 }} onClick={onExit}>
+        Terug naar de speelhal
+      </button>
+    </div>
+  )
+}
+
 /** Aftellen voordat de klok gaat lopen — 3, 2, 1, GO! */
 function Countdown({ onDone }: { onDone: () => void }) {
   const [n, setN] = useState(3)
+  const firedRef = useRef(false)
 
   useEffect(() => {
     const iv = window.setInterval(() => setN((v) => v - 1), 700)
@@ -429,7 +465,9 @@ function Countdown({ onDone }: { onDone: () => void }) {
   }, [])
 
   useEffect(() => {
-    if (n > -1) return
+    // mag hoogstens één keer afgaan: de teller loopt door tot dit scherm verdwijnt
+    if (n > -1 || firedRef.current) return
+    firedRef.current = true
     onDone()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [n])
@@ -468,9 +506,10 @@ interface Question {
   word: string
 }
 
-function makeQuestion(words: Pair[], all: Pair[], avoid: string, optionCount: number): Question {
+function makeQuestion(words: Pair[], all: Pair[], avoid: string, optionCount: number): Question | null {
   const cands = words.length > 1 ? words.filter((p) => p.word !== avoid) : words
-  const target = pick(cands)
+  const target = pick(cands) ?? pick(words)
+  if (!target) return null
   const toTarget = Math.random() < 0.5
   const answer = toTarget ? target.word : target.nl
   const prompt = toTarget ? target.nl : target.word
@@ -491,13 +530,14 @@ function makeQuestion(words: Pair[], all: Pair[], avoid: string, optionCount: nu
 
 function Bliksem({ words, all, onExit, onFinish }: GameProps) {
   const [running, setRunning] = useState(false)
+  const [over, setOver] = useState(false)
   const [remaining, setRemaining] = useState(ROUND_MS)
   const [score, setScore] = useState(0)
   const [combo, setCombo] = useState(0)
   const [bestCombo, setBestCombo] = useState(0)
   const [picked, setPicked] = useState<number | null>(null)
   const [pop, setPop] = useState<{ id: number; text: string; good: boolean } | null>(null)
-  const [q, setQ] = useState<Question>(() => makeQuestion(words, all, '', 3))
+  const [q, setQ] = useState<Question | null>(() => makeQuestion(words, all, '', 3))
 
   const endRef = useRef(0)
   const scoreRef = useRef(0)
@@ -507,7 +547,13 @@ function Bliksem({ words, all, onExit, onFinish }: GameProps) {
   const timers = useRef<number[]>([])
 
   const later = (fn: () => void, ms: number) => {
-    timers.current.push(window.setTimeout(fn, ms))
+    // afgelopen timers meteen uit de lijst halen: over 60 seconden lopen er
+    // anders tientallen id's op te hopen die nooit worden opgeruimd
+    const id = window.setTimeout(() => {
+      timers.current = timers.current.filter((t) => t !== id)
+      fn()
+    }, ms)
+    timers.current.push(id)
   }
 
   useEffect(() => {
@@ -521,6 +567,8 @@ function Bliksem({ words, all, onExit, onFinish }: GameProps) {
   const stop = useCallback(() => {
     if (doneRef.current) return
     doneRef.current = true
+    // `over` apart van `running`: anders valt het scherm terug op de aftelling
+    setOver(true)
     setRunning(false)
     onFinish(scoreRef.current, `${scoreRef.current} punten · beste combo ${bestComboRef.current}`)
   }, [onFinish])
@@ -548,7 +596,7 @@ function Bliksem({ words, all, onExit, onFinish }: GameProps) {
   const multiplier = Math.min(5, 1 + Math.floor(combo / 5))
 
   const answer = (i: number) => {
-    if (picked !== null || !running || doneRef.current) return
+    if (!q || picked !== null || !running || doneRef.current) return
     setPicked(i)
     const good = q.options[i] === q.answer
 
@@ -582,6 +630,8 @@ function Bliksem({ words, all, onExit, onFinish }: GameProps) {
   const secs = Math.ceil(remaining / 1000)
   const danger = remaining <= 10000
 
+  if (!q) return <NoWords onExit={onExit} />
+
   return (
     <div className="shell">
       <div className="ambient-orb orb-a" />
@@ -599,7 +649,7 @@ function Bliksem({ words, all, onExit, onFinish }: GameProps) {
         </div>
       </div>
 
-      {!running ? (
+      {!running && !over ? (
         <Countdown onDone={start} />
       ) : (
         <>
@@ -680,7 +730,7 @@ function Bliksem({ words, all, onExit, onFinish }: GameProps) {
           </motion.div>
 
           <p className="faint center" style={{ fontSize: 12, marginTop: 18 }}>
-            Goed = +0,5 seconde · fout = −2 seconden · elke 5 op rij verdubbelt je punten
+            Goed = +0,5 seconde · fout = −2 seconden · elke 5 goed op rij verhoogt je multiplier (tot ×5)
           </p>
           {bestCombo > 0 && (
             <p className="faint center" style={{ fontSize: 12, marginTop: 4 }}>
@@ -723,6 +773,7 @@ function buildTiles(words: Pair[]): StormTile[] {
 
 function Storm({ words, onExit, onFinish }: GameProps) {
   const [running, setRunning] = useState(false)
+  const [over, setOver] = useState(false)
   const [tiles, setTiles] = useState<StormTile[]>(() => buildTiles(words))
   const [selected, setSelected] = useState<number | null>(null)
   const [wrong, setWrong] = useState<number[]>([])
@@ -733,7 +784,13 @@ function Storm({ words, onExit, onFinish }: GameProps) {
   const startRef = useRef(0)
   const penaltyRef = useRef(0)
   const doneRef = useRef(false)
+  const matchedRef = useRef(0)
+  const missesRef = useRef(0)
   const timers = useRef<number[]>([])
+
+  // écht aantal paren op het bord: met een kleine cursus kunnen dat er minder
+  // dan STORM_PAIRS zijn — dan mag de eindvoorwaarde daar niet op wachten
+  const totalPairs = tiles.length / 2
 
   useEffect(() => {
     const list = timers
@@ -780,20 +837,27 @@ function Storm({ words, onExit, onFinish }: GameProps) {
       sfx('correct')
       setTiles((prev) => prev.map((x) => (x.pairId === t.pairId ? { ...x, done: true } : x)))
       setSelected(null)
-      const n = matched + 1
+      // via een ref geteld: twee tikken binnen één frame zouden anders
+      // dezelfde `matched`-waarde lezen en een match kwijtraken
+      matchedRef.current += 1
+      const n = matchedRef.current
       setMatched(n)
-      if (n >= STORM_PAIRS) {
+      if (n >= totalPairs) {
         doneRef.current = true
+        setOver(true)
         setRunning(false)
         const total = Date.now() - startRef.current + penaltyRef.current
         const secs = Math.max(1, Math.round(total / 1000))
         const score = Math.max(10, 300 - secs * 3)
-        timers.current.push(window.setTimeout(() => onFinish(score, `${secs} seconden · ${misses} ${misses === 1 ? 'misser' : 'missers'}`), 460))
+        const m = missesRef.current
+        setElapsed(total) // eindtijd op het scherm gelijk aan de gerapporteerde tijd
+        timers.current.push(window.setTimeout(() => onFinish(score, `${secs} seconden · ${m} ${m === 1 ? 'misser' : 'missers'}`), 460))
       }
     } else {
       sfx('wrong')
       penaltyRef.current += STORM_PENALTY
-      setMisses((m) => m + 1)
+      missesRef.current += 1
+      setMisses(missesRef.current)
       setWrong([first.id, t.id])
       setSelected(null)
       timers.current.push(window.setTimeout(() => setWrong([]), 520))
@@ -801,6 +865,8 @@ function Storm({ words, onExit, onFinish }: GameProps) {
   }
 
   const secs = elapsed / 1000
+
+  if (totalPairs < 2) return <NoWords onExit={onExit} />
 
   return (
     <div className="shell">
@@ -811,7 +877,7 @@ function Storm({ words, onExit, onFinish }: GameProps) {
         <div style={{ flex: 1 }}>
           <p className="eyebrow">Woordstorm</p>
           <p className="dim" style={{ fontSize: 13 }}>
-            {matched} van {STORM_PAIRS} paren
+            {matched} van {totalPairs} paren
           </p>
         </div>
         <div className="display" style={{ fontSize: 26, color: 'var(--cyan)', minWidth: 76, textAlign: 'right' }}>
@@ -819,14 +885,14 @@ function Storm({ words, onExit, onFinish }: GameProps) {
         </div>
       </div>
 
-      {!running ? (
+      {!running && !over ? (
         <Countdown onDone={start} />
       ) : (
         <>
           <div className="progress-track" style={{ marginBottom: 18 }}>
             <div
               className="progress-fill"
-              style={{ width: `${(matched / STORM_PAIRS) * 100}%`, background: 'linear-gradient(90deg,#22d3ee,#6366f1)', transition: 'width 0.3s ease' }}
+              style={{ width: `${(matched / totalPairs) * 100}%`, background: 'linear-gradient(90deg,#22d3ee,#6366f1)', transition: 'width 0.3s ease' }}
             />
           </div>
 
@@ -912,6 +978,7 @@ interface ListenQ {
 function buildRounds(words: Pair[], all: Pair[]): ListenQ[] {
   const base = shuffle(words)
   const out: ListenQ[] = []
+  if (base.length === 0) return out // anders wordt `i % 0` NaN en crasht de ronde
   for (let i = 0; i < LUISTER_ROUNDS; i++) {
     const target = base[i % base.length]
     const others: string[] = []
@@ -945,7 +1012,7 @@ function Luister({ words, all, ttsLang, onExit, onFinish }: GameProps) {
 
   // ronde starten: woord uitspreken en de klok laten lopen
   useEffect(() => {
-    if (!started || state !== 'ask' || doneRef.current) return
+    if (!q || !started || state !== 'ask' || doneRef.current) return
     endRef.current = Date.now() + LUISTER_MS
     setRemaining(LUISTER_MS)
     const t = window.setTimeout(() => speak(q.word, ttsLang), 220)
@@ -968,7 +1035,7 @@ function Luister({ words, all, ttsLang, onExit, onFinish }: GameProps) {
 
   // korte terugkoppeling, daarna door naar de volgende ronde
   useEffect(() => {
-    if (state !== 'feedback' || doneRef.current) return
+    if (state !== 'feedback' || doneRef.current || rounds.length === 0) return
     const t = window.setTimeout(() => {
       if (idx + 1 >= rounds.length) {
         doneRef.current = true
@@ -985,7 +1052,7 @@ function Luister({ words, all, ttsLang, onExit, onFinish }: GameProps) {
   }, [state, idx])
 
   const answer = (i: number) => {
-    if (state !== 'ask' || picked !== null || doneRef.current) return
+    if (!q || state !== 'ask' || picked !== null || doneRef.current) return
     setPicked(i)
     const good = q.options[i] === q.nl
     if (good) {
@@ -1000,6 +1067,8 @@ function Luister({ words, all, ttsLang, onExit, onFinish }: GameProps) {
     }
     setState('feedback')
   }
+
+  if (!q) return <NoWords onExit={onExit} />
 
   if (!started) {
     return (

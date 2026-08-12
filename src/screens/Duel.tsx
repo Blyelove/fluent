@@ -222,7 +222,7 @@ function ScoreBar({ you, them, name, total }: { you: number; them: number; name:
         initial={{ scale: 0.94 }}
         animate={{ scale: 1 }}
         transition={{ type: 'spring', stiffness: 420, damping: 16 }}
-        style={{ flex: 1, padding: '10px 12px', borderColor: 'var(--line-hot)' }}
+        style={{ flex: 1, minWidth: 0, padding: '10px 12px', borderColor: 'var(--line-hot)' }}
       >
         <p className="eyebrow" style={{ fontSize: 10 }}>
           Jij
@@ -234,7 +234,7 @@ function ScoreBar({ you, them, name, total }: { you: number; them: number; name:
       <span className="faint display" style={{ fontSize: 17 }}>
         vs
       </span>
-      <div className="glass" style={{ flex: 1, padding: '10px 12px', textAlign: 'right' }}>
+      <div className="glass" style={{ flex: 1, minWidth: 0, padding: '10px 12px', textAlign: 'right' }}>
         <p className="eyebrow" style={{ fontSize: 10, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {name}
         </p>
@@ -291,7 +291,14 @@ export function DuelScreen({
   const [marks, setMarks] = useState<boolean[]>([])
   const evalRef = useRef<(() => EvalResult) | null>(null)
 
-  const nameOrDefault = myName.trim() || 'Uitdager'
+  const nameOrDefault = myName.trim().slice(0, 16) || 'Uitdager'
+
+  // de uitnodiging komt uit de URL: pas na opschonen vertrouwen we hem
+  const safeIncoming = useMemo(() => sanitize(incoming ?? null), [incoming])
+
+  const myCourse = courses[courseId]
+  // hele cursusboom doorlopen is niet gratis — één keer per cursus is genoeg
+  const myPoolSize = useMemo(() => (myCourse ? quizPool(myCourse).length : 0), [myCourse])
 
   const register = useCallback((r: Registration) => {
     evalRef.current = r.evaluate
@@ -299,8 +306,10 @@ export function DuelScreen({
   }, [])
 
   const saveOpen = (list: OpenDuel[]) => {
-    setOpen(list)
-    writeOpen(list)
+    // zelfde grens als de opslag, anders toont het scherm meer dan er bewaard blijft
+    const capped = list.slice(-MAX_OPEN)
+    setOpen(capped)
+    writeOpen(capped)
   }
 
   /* ---- een duel starten ---- */
@@ -337,8 +346,9 @@ export function DuelScreen({
 
   const settle = (p: DuelPayload, mine: OpenDuel) => {
     const total = Math.max(mine.total, p.q > 0 ? p.q : QUESTIONS)
-    const yours = mine.score
-    const theirs = Math.max(0, p.x)
+    const yours = Math.min(mine.score, total)
+    // score uit een link mag nooit buiten 0..total vallen
+    const theirs = Math.min(Math.max(0, p.x), total)
     const won = yours > theirs
     const tie = yours === theirs
     const xp = won ? 25 : tie ? 15 : 10
@@ -353,7 +363,7 @@ export function DuelScreen({
   }
 
   const submitCode = () => {
-    const p = decodeDuel(codeFromInput(codeInput))
+    const p = sanitize(decodeDuel(codeFromInput(codeInput)))
     if (!p) {
       sfx('wrong')
       setCodeError('Deze code klopt niet. Plak hem helemaal — de hele link mag ook.')
@@ -371,7 +381,9 @@ export function DuelScreen({
   /* ---- antwoord controleren / doorgaan ---- */
 
   const onCheck = () => {
-    if (phase.name !== 'play' || !evalRef.current) return
+    // answered-check vangt een dubbele tik op: anders telt één vraag twee keer
+    if (phase.name !== 'play' || answered !== null || !evalRef.current) return
+    if (idx >= phase.items.length) return
     const r = evalRef.current()
     setAnswered(r)
     setMarks((m) => [...m, r.correct])
@@ -384,7 +396,9 @@ export function DuelScreen({
   }
 
   const advance = () => {
-    if (phase.name !== 'play') return
+    // answered-check voorkomt dat een dubbele tik tijdens de exit-animatie
+    // de uitslag twee keer opslaat (en dus twee keer XP geeft)
+    if (phase.name !== 'play' || answered === null) return
     setAnswered(null)
     setReady(false)
     evalRef.current = null
@@ -428,15 +442,29 @@ export function DuelScreen({
 
   if (phase.name === 'play') {
     const course = courses[phase.payload.c]
-    const ex = phase.items[idx]
+    const ex: QuizEx | undefined = phase.items[idx]
     const opponentName = phase.theirScore >= 0 ? phase.payload.n || 'Je vriend' : 'Je vriend'
+
+    // zou niet mogen gebeuren, maar liever een nette uitweg dan een wit scherm
+    if (!course || !ex) {
+      return (
+        <div className="shell center" style={{ paddingTop: 40 }}>
+          <p className="dim" style={{ fontSize: 15, marginBottom: 18 }}>
+            Er ging iets mis met dit duel. Probeer het opnieuw.
+          </p>
+          <button className="btn btn-primary" onClick={() => setPhase({ name: 'hub' })}>
+            Terug
+          </button>
+        </div>
+      )
+    }
 
     return (
       <div className="shell shell--bare" style={{ paddingBottom: 180 }}>
         <div className="lesson-top" style={{ marginBottom: 16 }}>
           <button
             className="btn-quiet"
-            style={{ padding: 8, fontSize: 22, lineHeight: 1 }}
+            style={{ minWidth: 44, minHeight: 44, fontSize: 22, lineHeight: 1, padding: 8 }}
             onClick={() => setPhase({ name: 'hub' })}
             aria-label="Duel stoppen"
           >
@@ -448,7 +476,7 @@ export function DuelScreen({
           <div className="progress-track">
             <motion.div
               className="progress-fill"
-              animate={{ width: `${Math.max(4, (idx / phase.items.length) * 100)}%` }}
+              animate={{ width: `${Math.max(4, ((answered !== null ? idx + 1 : idx) / phase.items.length) * 100)}%` }}
               transition={{ type: 'spring', stiffness: 160, damping: 22 }}
             />
           </div>
@@ -543,7 +571,15 @@ export function DuelScreen({
             {theirScore >= 0 ? 'Duel afgerond' : 'Jouw ronde zit erop'}
           </p>
           <h1 className="display" style={{ fontSize: 34, margin: '8px 0' }}>
-            {won ? 'Jij wint! 🏆' : tie ? 'Gelijkspel!' : lost ? 'Verloren — nipt.' : 'Netjes gespeeld!'}
+            {won
+              ? 'Jij wint! 🏆'
+              : tie
+                ? 'Gelijkspel!'
+                : lost
+                  ? theirScore - score === 1
+                    ? 'Nipt verloren.'
+                    : 'Verloren.'
+                  : 'Netjes gespeeld!'}
           </h1>
 
           {theirScore >= 0 ? (
@@ -634,7 +670,7 @@ export function DuelScreen({
           <p className="eyebrow" style={{ marginTop: 8 }}>
             Antwoord binnen van {phase.opponent}
           </p>
-          <h1 className="display" style={{ fontSize: 34, margin: '8px 0' }}>
+          <h1 className="display" style={{ fontSize: 34, margin: '8px 0', overflowWrap: 'anywhere' }}>
             {won ? 'Jij wint! 🏆' : tie ? 'Gelijkspel!' : `${phase.opponent} wint.`}
           </h1>
           <div className="row" style={{ justifyContent: 'center', gap: 14, margin: '6px 0' }}>
@@ -667,8 +703,8 @@ export function DuelScreen({
 
   /* ================= HUB ================= */
 
-  const openForIncoming = incoming ? open.find((d) => d.s === incoming.s) : undefined
-  const showIncoming = !!incoming && !hideIncoming
+  const openForIncoming = safeIncoming ? open.find((d) => d.s === safeIncoming.s) : undefined
+  const showIncoming = !!safeIncoming && !hideIncoming
   const history = [...duelHistory].reverse().slice(0, 6)
 
   return (
@@ -696,7 +732,7 @@ export function DuelScreen({
       </div>
 
       {/* --- uitnodiging uit de link --- */}
-      {showIncoming && incoming && (
+      {showIncoming && safeIncoming && (
         <motion.div
           className="glass"
           initial={{ opacity: 0, scale: 0.96 }}
@@ -710,11 +746,11 @@ export function DuelScreen({
         >
           <div className="row" style={{ gap: 10, marginBottom: 6 }}>
             <span style={{ fontSize: 26 }}>⚔️</span>
-            <div>
-              <strong style={{ fontSize: 17 }}>{incoming.n || 'Een vriend'} daagt je uit!</strong>
+            <div style={{ minWidth: 0 }}>
+              <strong style={{ fontSize: 17 }}>{safeIncoming.n || 'Een vriend'} daagt je uit!</strong>
               <p className="dim" style={{ fontSize: 13 }}>
-                <Flag code={courseFlagCode[incoming.c]} size={13} /> {courses[incoming.c]?.name ?? 'Onbekende cursus'} ·{' '}
-                {incoming.q > 0 ? incoming.q : QUESTIONS} vragen
+                <Flag code={courseFlagCode[safeIncoming.c]} size={13} /> {courses[safeIncoming.c]?.name ?? 'Onbekende cursus'} ·{' '}
+                {safeIncoming.q} vragen
               </p>
             </div>
           </div>
@@ -724,23 +760,30 @@ export function DuelScreen({
                 Dit is het antwoord op jouw uitdaging. Jij scoorde {openForIncoming.score} van de {openForIncoming.total} — benieuwd of
                 dat genoeg was?
               </p>
-              <button className="btn btn-primary" onClick={() => settle(incoming, openForIncoming)}>
+              <button className="btn btn-primary" onClick={() => settle(safeIncoming, openForIncoming)}>
                 🥁 Toon de uitslag
               </button>
             </>
           ) : (
             <>
               <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 14px' }}>
-                {incoming.x >= 0
-                  ? `${incoming.n || 'Je vriend'} scoorde ${incoming.x} van de ${incoming.q > 0 ? incoming.q : QUESTIONS}. Jij krijgt exact dezelfde vragen — versla die score.`
+                {safeIncoming.x >= 0
+                  ? `${safeIncoming.n || 'Je vriend'} scoorde ${safeIncoming.x} van de ${safeIncoming.q}. Jij krijgt exact dezelfde vragen — versla die score.`
                   : 'Jij krijgt exact dezelfde vragen als je vriend. Wie scoort er hoger?'}
               </p>
-              <button className="btn btn-primary" onClick={() => startPlay(incoming)}>
+              <button className="btn btn-primary" onClick={() => startPlay(safeIncoming)}>
                 Neem de uitdaging aan
               </button>
             </>
           )}
-          <button className="btn-quiet" style={{ width: '100%', marginTop: 4 }} onClick={() => setHideIncoming(true)}>
+          {codeError && (
+            <p style={{ color: 'var(--err)', fontSize: 13.5, margin: '12px 0 0', fontWeight: 600 }}>{codeError}</p>
+          )}
+          <button
+            className="btn-quiet"
+            style={{ width: '100%', marginTop: 4, minHeight: 44 }}
+            onClick={() => setHideIncoming(true)}
+          >
             Later
           </button>
         </motion.div>
@@ -750,8 +793,8 @@ export function DuelScreen({
       <div className="glass" style={{ padding: 22, marginBottom: 16 }}>
         <strong style={{ fontSize: 16 }}>⚔️ Daag een vriend uit</strong>
         <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 14px' }}>
-          Jij speelt eerst {QUESTIONS} vragen in het {courses[courseId].name.toLowerCase()}. Daarna krijg je een link met jouw score
-          erin — stuur die naar je vriend en hij krijgt precies dezelfde vragen. Geen account nodig.
+          Jij speelt eerst {QUESTIONS} vragen {myCourse ? `in het ${myCourse.name}` : 'in jouw cursus'}. Daarna krijg je een link met
+          jouw score erin — stuur die naar je vriend en die krijgt precies dezelfde vragen. Geen account nodig.
         </p>
         <input
           className="type-input"
@@ -762,9 +805,15 @@ export function DuelScreen({
           style={{ marginBottom: 12, fontSize: 16 }}
           aria-label="Jouw naam"
         />
-        <button className="btn btn-primary" onClick={challengeFriend}>
-          <Flag code={courseFlagCode[courseId]} size={16} /> Start mijn ronde
-        </button>
+        {myPoolSize === 0 ? (
+          <p className="dim" style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--err)' }}>
+            Er zijn nog geen vragen in deze cursus. Doe eerst een les.
+          </p>
+        ) : (
+          <button className="btn btn-primary" onClick={challengeFriend}>
+            {myCourse && <Flag code={courseFlagCode[courseId]} size={16} />} Start mijn ronde
+          </button>
+        )}
       </div>
 
       {/* --- open uitdagingen --- */}
@@ -783,7 +832,7 @@ export function DuelScreen({
                   </span>
                   <button
                     className="btn-quiet"
-                    style={{ padding: '4px 8px', fontSize: 18, lineHeight: 1 }}
+                    style={{ minWidth: 44, minHeight: 44, padding: '4px 8px', fontSize: 18, lineHeight: 1, flexShrink: 0 }}
                     onClick={() => saveOpen(open.filter((x) => x.s !== d.s))}
                     aria-label="Uitdaging verwijderen"
                   >
@@ -850,13 +899,17 @@ export function DuelScreen({
                 className="spread"
                 style={{ padding: '9px 0', borderTop: i === 0 ? 'none' : '1.5px solid var(--line)' }}
               >
-                <div>
-                  <strong style={{ fontSize: 14.5 }}>{d.opponent}</strong>
+                <div style={{ minWidth: 0 }}>
+                  <strong
+                    style={{ fontSize: 14.5, display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                  >
+                    {d.opponent}
+                  </strong>
                   <p className="faint" style={{ fontSize: 12 }}>
                     {d.day} · {d.total} vragen
                   </p>
                 </div>
-                <div className="row" style={{ gap: 8 }}>
+                <div className="row" style={{ gap: 8, flexShrink: 0 }}>
                   <span
                     className="display"
                     style={{ fontSize: 18, fontWeight: 800, color: d.won ? 'var(--ok)' : d.yourScore === d.theirScore ? 'var(--gold)' : 'var(--err)' }}

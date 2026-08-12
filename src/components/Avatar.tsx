@@ -1,3 +1,4 @@
+import { useId } from 'react'
 import { motion } from 'motion/react'
 import type { CourseId } from '../types'
 
@@ -93,8 +94,10 @@ export const AVATAR_STYLE_NAMES: Record<Look, string> = {
 }
 
 export function normalizePersona(p?: AvatarStyle | Look | null): AvatarStyle {
-  if (!p) return DEFAULT_PERSONA
-  if (typeof p === 'string') return AVATAR_PRESETS[p] ?? DEFAULT_PERSONA
+  // altijd een kopie teruggeven — anders kan een aanroeper per ongeluk
+  // DEFAULT_PERSONA of een preset aanpassen en zijn alle personages stuk
+  if (!p) return { ...DEFAULT_PERSONA }
+  if (typeof p === 'string') return { ...(AVATAR_PRESETS[p] ?? DEFAULT_PERSONA) }
   const clamp = (v: number | undefined, max: number, fallback: number) =>
     typeof v === 'number' && v >= 0 && v <= max ? Math.floor(v) : fallback
   return {
@@ -110,9 +113,12 @@ export function normalizePersona(p?: AvatarStyle | Look | null): AvatarStyle {
 
 /**
  * Jouw personage — wordt per taal steeds meer "van die cultuur" naarmate je
- * niveau stijgt. Per niveau komt er een cultureel item bij:
+ * niveau stijgt. Per niveau komt er iets bij:
  * 2 halsdoek · 3 hoofddeksel · 4 outfit · 5 attribuut · 6 zonnebril ·
- * 7 embleem · 8 vlaggen-cape · 9 gouden aura · 10 kroon + vlag
+ * 7 embleem · 8 vlaggen-cape · 9 gouden aura · 10 kroon + vlag ·
+ * 11 gouden ketting · 12 neon-rand · 13 vuur-aura · 14 diamanten horloge ·
+ * 15 platina kroon · 16 energievleugels · 17 bliksem · 18 sterrencape ·
+ * 19 kosmische aura · 20 halo (het maximum, zie MAX_LEVEL in levels.ts)
  */
 
 interface CourseStyle {
@@ -142,17 +148,30 @@ export function Avatar({
   courseId = 'es',
   look = 'a',
   still = false,
+  label,
 }: {
   size?: number
   mode?: 'idle' | 'run' | 'cheer'
   level?: number
   courseId?: CourseId
-  /** legacy: a-d; nieuw: AvatarStyle-object uit de personage-maker */
+  /** legacy: los personage a t/m h; nieuw: AvatarStyle-object uit de personage-maker */
   look?: AvatarStyle | Look
+  /** Geen entree-animatie en geen sfeer-animaties (voor miniaturen en de galerij) */
   still?: boolean
+  /** Voorleestekst; zonder label is het personage decoratief en slaat de schermlezer het over */
+  label?: string
 }) {
-  const s = STYLE[courseId]
+  // unieke id's per personage — anders botsen de gradiënten en het clip-pad
+  // zodra er meerdere personages tegelijk op het scherm staan (galerij, maker)
+  const uid = useId().replace(/[^a-zA-Z0-9]/g, '')
+  // courseId kan uit een gedeelde duel-link of uit oude opslag komen en dus
+  // onzin zijn — dan vallen we terug op Spaans in plaats van te crashen
+  const s: CourseStyle = STYLE[courseId] ?? STYLE.es
+  // een negatieve of ontbrekende maat maakt de SVG ongeldig
+  const w = typeof size === 'number' && size > 0 ? size : 120
   const p = normalizePersona(look)
+  // bij `still` staan de eindeloze sfeer-animaties uit; 'run' en 'cheer' blijven wel bewegen
+  const amb = <T,>(a: T): T | undefined => (still ? undefined : a)
   const lk = { skin: SKINS[p.skin], shade: SKIN_SHADES[p.skin], hair: HAIR_COLORS[p.hairColor] }
   // geverfd haar? dan houden we de wenkbrauwen natuurlijk — anders vervaagt het gezicht
   const browColor = p.hairColor >= DYED_FROM ? NATURAL_BROW : lk.hair
@@ -184,8 +203,8 @@ export function Avatar({
 
   return (
     <motion.svg
-      width={size}
-      height={size * 1.15}
+      width={w}
+      height={w * 1.15}
       viewBox="0 0 200 230"
       initial={still ? false : { scale: 0, rotate: -6 }}
       animate={{
@@ -198,19 +217,22 @@ export function Avatar({
         y: { duration: running ? 0.32 : 0.7, repeat: running || cheering ? Infinity : 0, ease: 'easeInOut' },
       }}
       style={{ overflow: 'visible' }}
+      role={label ? 'img' : undefined}
+      aria-label={label}
+      aria-hidden={label ? undefined : true}
     >
       <defs>
-        <radialGradient id={`av-glow-${courseId}`}>
+        <radialGradient id={`av-glow-${uid}`}>
           <stop offset="0%" stopColor="#FFC53D" stopOpacity="0.5" />
           <stop offset="60%" stopColor="#EC4899" stopOpacity="0.15" />
           <stop offset="100%" stopColor="#EC4899" stopOpacity="0" />
         </radialGradient>
-        <radialGradient id={`av-cosmic-${courseId}`}>
+        <radialGradient id={`av-cosmic-${uid}`}>
           <stop offset="0%" stopColor="#22D3EE" stopOpacity="0.5" />
           <stop offset="55%" stopColor="#A855F7" stopOpacity="0.25" />
           <stop offset="100%" stopColor="#A855F7" stopOpacity="0" />
         </radialGradient>
-        <clipPath id={`av-torso-${courseId}`}>
+        <clipPath id={`av-torso-${uid}`}>
           <rect x="68" y="106" width="64" height="66" rx="20" />
         </clipPath>
       </defs>
@@ -221,8 +243,8 @@ export function Avatar({
           cx="100"
           cy="110"
           r="95"
-          fill={cosmic ? `url(#av-cosmic-${courseId})` : `url(#av-glow-${courseId})`}
-          animate={{ opacity: [0.7, 1, 0.7] }}
+          fill={cosmic ? `url(#av-cosmic-${uid})` : `url(#av-glow-${uid})`}
+          animate={amb({ opacity: [0.7, 1, 0.7] })}
           transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
         />
       )}
@@ -230,7 +252,7 @@ export function Avatar({
       {/* vuur-aura (niveau 13+) */}
       {hasFire && (
         <motion.g
-          animate={{ opacity: [0.65, 1, 0.65], scaleY: [1, 1.08, 1] }}
+          animate={amb({ opacity: [0.65, 1, 0.65], scaleY: [1, 1.08, 1] })}
           transition={{ duration: 0.6, repeat: Infinity, ease: 'easeInOut' }}
           style={{ originX: '100px', originY: '170px' }}
         >
@@ -244,7 +266,7 @@ export function Avatar({
       {/* energievleugels (niveau 16+) */}
       {hasWings && (
         <motion.g
-          animate={{ rotate: [-4, 4, -4] }}
+          animate={amb({ rotate: [-4, 4, -4] })}
           transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
           style={{ originX: '100px', originY: '118px' }}
         >
@@ -255,7 +277,7 @@ export function Avatar({
 
       {/* bliksem-aura (niveau 17+) */}
       {hasLightning && (
-        <motion.g animate={{ opacity: [0, 1, 0] }} transition={{ duration: 0.45, repeat: Infinity, repeatDelay: 0.7 }}>
+        <motion.g animate={amb({ opacity: [0, 1, 0] })} transition={{ duration: 0.45, repeat: Infinity, repeatDelay: 0.7 }}>
           <path d="M38 94 l-7 13 h5 l-8 16" stroke="#FFE95E" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
           <path d="M164 90 l-7 13 h5 l-8 16" stroke="#FFE95E" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
         </motion.g>
@@ -264,7 +286,7 @@ export function Avatar({
       {/* kosmische ster in een baan (niveau 19+) */}
       {cosmic && (
         <motion.g
-          animate={{ rotate: 360 }}
+          animate={amb({ rotate: 360 })}
           transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
           style={{ originX: '100px', originY: '110px' }}
         >
@@ -284,7 +306,7 @@ export function Avatar({
       {/* vlaggen-cape (niveau 8+), achter het lijf */}
       {hasCape && (
         <motion.g
-          animate={{ rotate: running ? [0, 4, 0] : [0, 1.5, 0] }}
+          animate={running ? { rotate: [0, 4, 0] } : amb({ rotate: [0, 1.5, 0] })}
           transition={{ duration: running ? 0.32 : 2.6, repeat: Infinity, ease: 'easeInOut' }}
           style={{ originX: '100px', originY: '110px' }}
         >
@@ -340,7 +362,7 @@ export function Avatar({
         height="46"
         rx="6.5"
         fill={shirtFill}
-        animate={running ? { rotate: [-28, 28, -28] } : cheering ? { rotate: [-150, -170, -150] } : { rotate: [0, 3, 0] }}
+        animate={running ? { rotate: [-28, 28, -28] } : cheering ? { rotate: [-150, -170, -150] } : amb({ rotate: [0, 3, 0] })}
         transition={{ duration: running || cheering ? (running ? 0.32 : 0.7) : 3, repeat: Infinity, ease: 'easeInOut' }}
         style={{ originX: '62.5px', originY: '116px' }}
       />
@@ -351,7 +373,7 @@ export function Avatar({
         height="46"
         rx="6.5"
         fill={shirtFill}
-        animate={running ? { rotate: [28, -28, 28] } : cheering ? { rotate: [150, 170, 150] } : { rotate: [0, -3, 0] }}
+        animate={running ? { rotate: [28, -28, 28] } : cheering ? { rotate: [150, 170, 150] } : amb({ rotate: [0, -3, 0] })}
         transition={{ duration: running || cheering ? (running ? 0.32 : 0.7) : 3, repeat: Infinity, ease: 'easeInOut' }}
         style={{ originX: '137.5px', originY: '116px' }}
       />
@@ -371,7 +393,7 @@ export function Avatar({
       <ellipse cx="100" cy="168" rx="30" ry="8" fill="rgba(0,0,0,0.16)" />
       <path d="M90 106 L100 116 L110 106 Z" fill="rgba(0,0,0,0.22)" />
       {hasOutfit && s.stripes && (
-        <g clipPath={`url(#av-torso-${courseId})`}>
+        <g clipPath={`url(#av-torso-${uid})`}>
           <rect x="68" y="114" width="64" height="9" fill={s.accent} />
           <rect x="68" y="132" width="64" height="9" fill={s.accent} />
           <rect x="68" y="150" width="64" height="9" fill={s.accent} />
@@ -418,7 +440,7 @@ export function Avatar({
       {/* hoofd */}
       <circle cx="100" cy="66" r="34" fill={lk.skin} />
       <path d="M126 44 A34 34 0 0 1 126 88 A44 44 0 0 0 126 44 Z" fill={lk.shade} opacity="0.4" />
-      {/* haar — 6 stijlen */}
+      {/* haar — 10 stijlen, zie HAIR_STYLE_NAMES */}
       {p.hair === 0 && <path d="M66 62 Q66 30 100 30 Q134 30 134 62 Q126 44 100 44 Q74 44 66 62 Z" fill={lk.hair} />}
       {p.hair === 1 && (
         <g>
@@ -491,14 +513,14 @@ export function Avatar({
       <circle cx="66" cy="68" r="6" fill={lk.skin} />
       <circle cx="134" cy="68" r="6" fill={lk.skin} />
 
-      {/* ogen */}
-      <ellipse cx="87" cy="66" rx="7.5" ry="8.5" fill="#fff" />
-      <ellipse cx="113" cy="66" rx="7.5" ry="8.5" fill="#fff" />
+      {/* ogen — het oogwit knippert mee, anders verdwijnen alleen de pupillen */}
       <motion.g
-        animate={{ scaleY: [1, 1, 0.1, 1] }}
+        animate={amb({ scaleY: [1, 1, 0.1, 1] })}
         transition={{ duration: 3.4, repeat: Infinity, times: [0, 0.88, 0.94, 1] }}
         style={{ originX: '100px', originY: '66px' }}
       >
+        <ellipse cx="87" cy="66" rx="7.5" ry="8.5" fill="#fff" />
+        <ellipse cx="113" cy="66" rx="7.5" ry="8.5" fill="#fff" />
         <circle cx="89" cy="67.5" r="4" fill="#2B1A4D" />
         <circle cx="115" cy="67.5" r="4" fill="#2B1A4D" />
         <circle cx="90.5" cy="65.8" r="1.5" fill="#fff" />
@@ -599,7 +621,7 @@ export function Avatar({
           fill="none"
           stroke="#FFE08A"
           strokeWidth="4.5"
-          animate={{ y: [0, -4, 0], opacity: [0.8, 1, 0.8] }}
+          animate={amb({ y: [0, -4, 0], opacity: [0.8, 1, 0.8] })}
           transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
         />
       )}
@@ -627,7 +649,7 @@ export function Avatar({
 
       {/* sparkles bij feest of maximale status */}
       {(cheering || hasCrown) && (
-        <motion.g animate={{ opacity: [0, 1, 0] }} transition={{ duration: 0.9, repeat: Infinity }}>
+        <motion.g animate={cheering ? { opacity: [0, 1, 0] } : amb({ opacity: [0, 1, 0] })} transition={{ duration: 0.9, repeat: Infinity }}>
           <path d="M158 34 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3 z" fill="#FFE08A" />
           <path d="M36 26 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 z" fill="#EC4899" />
           <path d="M170 110 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 z" fill="#22D3EE" />
@@ -684,6 +706,8 @@ function Hat({ type }: { type: CourseStyle['hat'] }) {
           <rect x="70" y="38" width="60" height="9" rx="4.5" fill="#2C3B5E" />
         </g>
       )
+    default:
+      return null
   }
 }
 
@@ -743,5 +767,7 @@ function HandItem({ type }: { type: CourseStyle['item'] }) {
           <circle cx="158" cy="158" r="2.2" fill="#22252B" />
         </g>
       )
+    default:
+      return null
   }
 }

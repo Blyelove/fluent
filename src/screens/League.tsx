@@ -28,8 +28,6 @@ const DIVISION_LABEL = [
 ]
 
 const HOURS_PER_WEEK = 168
-/** Aantal spelers in een divisie — jij plus 29 tegenstanders */
-const TOTAL_PLAYERS = 30
 const FALLBACK_COLOR = '#A855F7'
 
 function fmt(n: number): string {
@@ -393,8 +391,15 @@ export function LeagueScreen() {
     })
   }, [empty, zone, color])
 
-  const zoneCard =
-    zone === 'promotie'
+  const zoneCard = empty
+    ? {
+        c: 'var(--gold)',
+        bg: 'rgba(255, 197, 61, 0.12)',
+        glow: 'rgba(255, 197, 61, 0.26)',
+        title: 'De competitie start binnenkort',
+        body: 'Zodra de week loopt zie je hier je plek, je tegenstanders en wat je nodig hebt om te klimmen.',
+      }
+    : zone === 'promotie'
       ? {
           c: 'var(--ok)',
           bg: 'var(--ok-bg)',
@@ -606,8 +611,7 @@ export function LeagueScreen() {
               </span>
             </div>
             <p className="faint" style={{ fontSize: 12.5, marginTop: 8 }}>
-              Dat is ongeveer {Math.max(1, Math.ceil(climb / 20))} les{Math.ceil(climb / 20) === 1 ? '' : 'sen'} — of één
-              potje in de arcade.
+              Dat is ongeveer {lessons} les{lessons === 1 ? '' : 'sen'} — of één potje in de arcade.
             </p>
           </>
         )}
@@ -616,8 +620,9 @@ export function LeagueScreen() {
       {/* ---------- uitleg ---------- */}
       <div className="glass" style={{ padding: '4px 16px', marginTop: 14, marginBottom: 8 }}>
         <button
+          type="button"
           className="spread"
-          style={{ width: '100%', padding: '14px 0', minHeight: 48 }}
+          style={{ width: '100%', padding: '14px 0', minHeight: 48, textAlign: 'left' }}
           onClick={() => {
             sfx('tap')
             setExplain((v) => !v)
@@ -639,7 +644,7 @@ export function LeagueScreen() {
               style={{ overflow: 'hidden' }}
             >
               <ul className="dim" style={{ fontSize: 13.5, paddingLeft: 18, paddingBottom: 16, display: 'grid', gap: 7 }}>
-                <li>Je speelt elke week tegen {TOTAL_PLAYERS - 1} andere leerlingen in de {thisLabel}.</li>
+                <li>Je speelt elke week tegen {Math.max(1, total - 1)} andere leerlingen in de {thisLabel}.</li>
                 <li>Alle XP telt mee: lessen, herhalen, minigames en duels.</li>
                 {league.promote > 0 && (
                   <li>
