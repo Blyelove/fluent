@@ -42,7 +42,7 @@ Fluent heeft een kern die al als topspel voelt — chunky leslus met combo's en 
 
 **Bewijs:** Zet lastActive kunstmatig 3 dagen terug: Home toont één primaire CTA, niet twee.
 
-### 9. Botduels uit de verstopte 'Vrienden'-tab halen: hernoem de tab in Play.tsx r36 naar '⚔️ Duels' en zet in Arcade.tsx onder de drie spelkaarten een vierde chunky kaart 'Botduel — versla Robo Rens' die naar de duel-tab springt.
+### 9. ✅ AF (ronde 45) — Botduels uit de verstopte 'Vrienden'-tab halen: hernoem de tab in Play.tsx r36 naar '⚔️ Duels' en zet in Arcade.tsx onder de drie spelkaarten een vierde chunky kaart 'Botduel — versla Robo Rens' die naar de duel-tab springt.
 
 **Bewijs:** Nieuwe gebruiker ziet in de Minigames-hub een duel-ingang; één tik landt op de botkeuze.
 
@@ -114,7 +114,7 @@ Fluent heeft een kern die al als topspel voelt — chunky leslus met combo's en 
 
 **Bewijs:** Score net onder een drempel: eindscherm toont de exacte afstand; haal de drempel en de kaart in de hub draagt de nieuwe medaille.
 
-### 27. Countdown tapbaar en regels op het juiste moment: de 2,8s-countdown (Arcade.tsx r459-493) is niet te skippen, ook niet na 'Nog een keer', en de multiplier-regels staan in 12px onderaan tijdens het potje (r733-735). Countdown: 'tik om te starten' → direct GO; spelregels groot óp het countdown-scherm.
+### 27. ✅ AF (ronde 45) — Countdown tapbaar en regels op het juiste moment: de 2,8s-countdown (Arcade.tsx r459-493) is niet te skippen, ook niet na 'Nog een keer', en de multiplier-regels staan in 12px onderaan tijdens het potje (r733-735). Countdown: 'tik om te starten' → direct GO; spelregels groot óp het countdown-scherm.
 
 **Bewijs:** Vanaf het eindscherm: 'Nog een keer' + één tik = binnen een seconde spelen, en de regels zijn vóór de start leesbaar.
 

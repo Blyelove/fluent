@@ -140,7 +140,7 @@ type Phase =
    Hoofdscherm
    ============================================================ */
 
-export function ArcadeScreen({ onPlayingChange }: { onPlayingChange?: (playing: boolean) => void } = {}) {
+export function ArcadeScreen({ onPlayingChange, onDuels }: { onPlayingChange?: (playing: boolean) => void; onDuels?: () => void } = {}) {
   const courseId = useStore((s) => s.courseId)
   const progress = useStore((s) => s.progress)
   const srs = useStore((s) => s.srs)
@@ -394,6 +394,43 @@ export function ArcadeScreen({ onPlayingChange }: { onPlayingChange?: (playing: 
         })}
       </div>
 
+      {/* de botduels zaten achter een tab die "Vrienden" heette; wie geen vriend
+          met de app heeft, keek daar nooit */}
+      {onDuels && !locked && (
+        <motion.button
+          className="glass"
+          whileTap={{ scale: 0.98 }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+          onClick={() => {
+            sfx('tap')
+            onDuels()
+          }}
+          style={{
+            width: '100%',
+            marginTop: 14,
+            padding: '16px 18px',
+            textAlign: 'left',
+            borderColor: 'var(--line-hot)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 14,
+          }}
+        >
+          <span style={{ fontSize: 30, lineHeight: 1 }}>🤖</span>
+          <span className="col" style={{ gap: 3, flex: 1, minWidth: 0 }}>
+            <strong style={{ fontSize: 15.5 }}>Duel tegen een bot</strong>
+            <span className="faint" style={{ fontSize: 12.5 }}>
+              Versla Robo Rens, Turbo Tessa of Meester Milan. Telt mee voor je weekkist.
+            </span>
+          </span>
+          <span className="hot-text" style={{ fontSize: 20, fontWeight: 800 }}>
+            ›
+          </span>
+        </motion.button>
+      )}
+
       <p className="faint center" style={{ fontSize: 12.5, marginTop: 22, lineHeight: 1.5 }}>
         Alle spellen gebruiken woorden uit je cursus {course.name}.
         <br />
@@ -504,10 +541,20 @@ function NoWords({ onExit }: { onExit: () => void }) {
   )
 }
 
-/** Aftellen voordat de klok gaat lopen — 3, 2, 1, GO! */
-function Countdown({ onDone }: { onDone: () => void }) {
+/**
+ * Aftellen voordat de klok gaat lopen. Tikken slaat het over: wie net op
+ * "Nog een keer" drukte, wil spelen en niet wachten. De spelregels staan hier
+ * groot, want tijdens het potje leest niemand meer.
+ */
+function Countdown({ onDone, uitleg }: { onDone: () => void; uitleg?: string }) {
   const [n, setN] = useState(3)
   const firedRef = useRef(false)
+
+  const start = useCallback(() => {
+    if (firedRef.current) return
+    firedRef.current = true
+    onDone()
+  }, [onDone])
 
   useEffect(() => {
     const iv = window.setInterval(() => setN((v) => v - 1), 700)
@@ -515,15 +562,21 @@ function Countdown({ onDone }: { onDone: () => void }) {
   }, [])
 
   useEffect(() => {
-    // mag hoogstens één keer afgaan: de teller loopt door tot dit scherm verdwijnt
-    if (n > -1 || firedRef.current) return
-    firedRef.current = true
-    onDone()
+    if (n > -1) return
+    start()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [n])
 
   return (
-    <div className="center" style={{ padding: '70px 0' }}>
+    <button
+      className="center"
+      onClick={() => {
+        sfx('tap')
+        start()
+      }}
+      style={{ padding: '48px 16px', width: '100%', display: 'block' }}
+      aria-label="Nu starten"
+    >
       <AnimatePresence mode="wait">
         <motion.div
           key={n}
@@ -537,7 +590,15 @@ function Countdown({ onDone }: { onDone: () => void }) {
           {n > 0 ? n : 'GO!'}
         </motion.div>
       </AnimatePresence>
-    </div>
+      {uitleg && (
+        <p className="dim" style={{ fontSize: 15, maxWidth: 300, margin: '18px auto 0', lineHeight: 1.45 }}>
+          {uitleg}
+        </p>
+      )}
+      <p className="faint" style={{ fontSize: 12.5, marginTop: 16 }}>
+        Tik om meteen te beginnen
+      </p>
+    </button>
   )
 }
 
@@ -700,7 +761,7 @@ function Bliksem({ words, all, onExit, onFinish }: GameProps) {
       </div>
 
       {!running && !over ? (
-        <Countdown onDone={start} />
+        <Countdown onDone={start} uitleg="Zoveel mogelijk vertalingen goed in 60 seconden. Elke 5 op rij verhoogt je multiplier — tot 5×." />
       ) : (
         <>
           <div className="spread" style={{ marginBottom: 6 }}>
@@ -936,7 +997,7 @@ function Storm({ words, onExit, onFinish }: GameProps) {
       </div>
 
       {!running && !over ? (
-        <Countdown onDone={start} />
+        <Countdown onDone={start} uitleg="Tik twee tegels die bij elkaar horen. Hoe sneller je alle 8 paren vindt, hoe hoger je score — missen kost 3 seconden." />
       ) : (
         <>
           <div className="progress-track" style={{ marginBottom: 18 }}>
@@ -1127,7 +1188,7 @@ function Luister({ words, all, ttsLang, onExit, onFinish }: GameProps) {
         <div className="row" style={{ marginBottom: 10 }}>
           <CloseBtn onClick={onExit} />
         </div>
-        <Countdown onDone={() => setStarted(true)} />
+        <Countdown onDone={() => setStarted(true)} uitleg="Je hoort een woord en kiest de juiste betekenis. Elke ronde duurt 8 seconden: hoe sneller je kiest, hoe meer tijdbonus." />
         <p className="dim center" style={{ fontSize: 14 }}>
           Zet je geluid aan — je hoort steeds één woord.
         </p>

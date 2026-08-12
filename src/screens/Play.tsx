@@ -33,7 +33,8 @@ export function PlayScreen({
             {(
               [
                 ['arcade', '🕹️', 'Minigames'],
-                ['duel', '⚔️', 'Vrienden'],
+                // "Vrienden" verborg dat je hier ook alleen tegen een bot kunt duelleren
+                ['duel', '⚔️', 'Duels'],
               ] as const
             ).map(([id, icon, label]) => (
               <button
@@ -53,7 +54,7 @@ export function PlayScreen({
       )}
       <motion.div key={tab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22 }}>
         {tab === 'arcade' ? (
-          <ArcadeScreen onPlayingChange={onPlayingChange} />
+          <ArcadeScreen onPlayingChange={onPlayingChange} onDuels={() => setTab('duel')} />
         ) : (
           <DuelScreen incoming={incomingDuel} onPlayingChange={onPlayingChange} />
         )}
