@@ -82,7 +82,7 @@ Fluent heeft een kern die al als topspel voelt — chunky leslus met combo's en 
 
 **Bewijs:** Meet elk genoemd element in devtools: geen interactief raakvlak onder 44px; doel wissen is 5s terug te draaien.
 
-### 19. Dagdoel-ring wordt een knop: de GoalRing in de Home-header (r190) is een dode div en dailyGoalXp is na onboarding nooit meer aanpasbaar (alleen gezet in store.ts r366; Profile.tsx r142-145 is onklikbare tekst). Ring (min. 44px) opent een sheet met vandaag-XP en dagdoel-keuzes 20/40/60/100 als arcade-kaartjes; dezelfde picker achter de Profiel-regel.
+### 19. ✅ AF (ronde 44) — Dagdoel-ring wordt een knop: de GoalRing in de Home-header (r190) is een dode div en dailyGoalXp is na onboarding nooit meer aanpasbaar (alleen gezet in store.ts r366; Profile.tsx r142-145 is onklikbare tekst). Ring (min. 44px) opent een sheet met vandaag-XP en dagdoel-keuzes 20/40/60/100 als arcade-kaartjes; dezelfde picker achter de Profiel-regel.
 
 **Bewijs:** Tik op de ring: sheet opent, kies 60 XP en de ring en Profiel tonen direct het nieuwe doel.
 

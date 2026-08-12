@@ -141,6 +141,8 @@ interface AureaState {
   markWorldSeen: (c: CourseId, count: number) => void
 
   completeOnboarding: (c: CourseId, goalXp: number) => void
+  /** Je dagdoel aanpassen — kan altijd, niet alleen tijdens de onboarding */
+  setDailyGoal: (xp: number) => void
   setCourse: (c: CourseId) => void
   completeLesson: (c: CourseId, lessonId: string, xp: number, perfect: boolean) => void
   learnWord: (c: CourseId, word: string, nl: string) => void
@@ -437,6 +439,9 @@ export const useStore = create<AureaState>()(
       ...nieuwProfiel(),
 
       completeOnboarding: (c, goalXp) => set({ onboarded: true, courseId: c, dailyGoalXp: goalXp }),
+
+      // je dagdoel mag altijd mee veranderen met je leven, niet alleen bij de start
+      setDailyGoal: (xp) => set({ dailyGoalXp: Math.min(200, Math.max(10, Math.round(xp))) }),
 
       setCourse: (c) => set({ courseId: c }),
 

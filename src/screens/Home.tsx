@@ -109,6 +109,8 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
   const [goalModal, setGoalModal] = useState(false)
   const [streakOpen, setStreakOpen] = useState(false)
   const [worldOpen, setWorldOpen] = useState(false)
+  const [doelOpen, setDoelOpen] = useState(false)
+  const setDailyGoal = useStore((s) => s.setDailyGoal)
   const [guideUnit, setGuideUnit] = useState<Unit | null>(null)
 
   const course = courses[courseId]
@@ -200,9 +202,83 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
             </span>
             <span style={{ fontWeight: 700, fontSize: 15 }}>{streak}</span>
           </button>
-          <GoalRing value={xpShown} goal={dailyGoalXp} />
+          {/* de ring was een dood plaatje; nu opent hij je dagdoel */}
+          <button
+            onClick={() => {
+              sfx('tap')
+              setDoelOpen(true)
+            }}
+            aria-label="Dagdoel aanpassen"
+            style={{ minWidth: 44, minHeight: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            <GoalRing value={xpShown} goal={dailyGoalXp} />
+          </button>
         </div>
       </header>
+
+      <AnimatePresence>
+        {doelOpen && (
+          <motion.div
+            className="modal-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setDoelOpen(false)}
+          >
+            <motion.div
+              className="modal-panel"
+              initial={{ y: 80 }}
+              animate={{ y: 0 }}
+              exit={{ y: 110 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="display" style={{ fontSize: 23, marginBottom: 4 }}>
+                Jouw dagdoel
+              </h3>
+              <p className="dim" style={{ fontSize: 13.5, marginBottom: 16 }}>
+                Vandaag {xpShown} van de {dailyGoalXp} XP. Een doel dat past, haal je vaker.
+              </p>
+              <div className="col" style={{ gap: 10 }}>
+                {[
+                  { xp: 20, label: 'Rustig', sub: '±5 min per dag' },
+                  { xp: 40, label: 'Serieus', sub: '±10 min per dag' },
+                  { xp: 60, label: 'Gedreven', sub: '±15 min per dag' },
+                  { xp: 100, label: 'Fanatiek', sub: '±25 min per dag' },
+                ].map((g) => (
+                  <button
+                    key={g.xp}
+                    className="opt"
+                    style={
+                      dailyGoalXp === g.xp
+                        ? { borderColor: 'var(--gold)', background: 'rgba(255,197,61,0.12)' }
+                        : undefined
+                    }
+                    onClick={() => {
+                      sfx('tap')
+                      setDailyGoal(g.xp)
+                      setDoelOpen(false)
+                    }}
+                  >
+                    <span className="col" style={{ gap: 2, flex: 1 }}>
+                      <strong>{g.label}</strong>
+                      <span className="faint" style={{ fontSize: 13 }}>
+                        {g.sub}
+                      </span>
+                    </span>
+                    <span className="gold-text" style={{ fontWeight: 700 }}>
+                      {g.xp} XP
+                    </span>
+                  </button>
+                ))}
+              </div>
+              <button className="btn btn-ghost" style={{ marginTop: 14, padding: 12, fontSize: 14 }} onClick={() => setDoelOpen(false)}>
+                Sluiten
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {(() => {
         const lp = levelProgress(xpAll)

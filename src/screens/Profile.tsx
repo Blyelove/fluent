@@ -139,9 +139,33 @@ export function ProfileScreen() {
           <span style={{ fontWeight: 500 }}>Doelen gehaald</span>
           <span className="gold-text" style={{ fontWeight: 700 }}>{state.goalsDone.length}</span>
         </div>
-        <div className="spread" style={{ padding: '14px 0' }}>
+        {/* stond hier als dode tekst; nu draai je er zo doorheen */}
+        <div className="spread" style={{ padding: '10px 0' }}>
           <span style={{ fontWeight: 500 }}>Dagelijks doel</span>
-          <span style={{ fontWeight: 600 }}>{state.dailyGoalXp} XP</span>
+          <div className="row" style={{ gap: 6 }}>
+            {[20, 40, 60, 100].map((xp) => (
+              <button
+                key={xp}
+                onClick={() => {
+                  sfx('tap')
+                  state.setDailyGoal(xp)
+                }}
+                style={{
+                  minWidth: 44,
+                  minHeight: 34,
+                  padding: '6px 10px',
+                  borderRadius: 999,
+                  fontSize: 12.5,
+                  fontWeight: 800,
+                  background: state.dailyGoalXp === xp ? 'var(--grad-gold)' : 'var(--surface-2)',
+                  color: state.dailyGoalXp === xp ? 'var(--ink-on-gold)' : 'var(--text-dim)',
+                  border: state.dailyGoalXp === xp ? 'none' : '1.5px solid var(--line)',
+                }}
+              >
+                {xp}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
