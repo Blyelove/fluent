@@ -4,6 +4,7 @@ import confetti from 'canvas-confetti'
 import type { Course } from '../types'
 import { countryStates, etappeFrac, type CountryState } from '../countries'
 import { Flag } from '../components/Flag'
+import { PassportStamp } from '../components/PassportStamp'
 import { Avatar } from '../components/Avatar'
 import { levelForXp } from '../levels'
 import { totalXp, useStore } from '../store'
@@ -76,7 +77,9 @@ export function WorldMapScreen({
   const [gekozen, setGekozen] = useState<Knoop | null>(null)
   /** land waarvan de Grensproef nu gespeeld wordt */
   const [proef, setProef] = useState<Knoop | null>(null)
+  const [paspoort, setPaspoort] = useState(false)
   const stempels = useStore((s) => s.stamps[course.id] ?? GEEN_STEMPELS)
+  const aantalStempels = Object.keys(stempels).length
   const scroller = useRef<HTMLDivElement | null>(null)
   const actiefPad = useRef<SVGPathElement | null>(null)
   const renPad = useRef<SVGPathElement | null>(null)
@@ -90,6 +93,8 @@ export function WorldMapScreen({
   const hoogte = KOP + VOET + Math.max(1, landen.length - 1) * STAP + 80
   const knopen = useMemo(() => bouwKnopen(landen, hoogte), [landen, hoogte])
   const veroverd = landen.filter((c) => c.conquered).length
+  /** eerste land zonder stempel: dat is wat het paspoort nog van je vraagt */
+  const volgendLand = landen.find((c) => !stempels[c.code])
 
   /**
    * De veroveringsviering: is er sinds je laatste bezoek een land bij gekomen,
@@ -338,9 +343,28 @@ export function WorldMapScreen({
             {course.name}
           </p>
         </div>
-        <span className="gold-text" style={{ fontWeight: 800, fontSize: 14, minWidth: 44, textAlign: 'right' }}>
-          {veroverd}/{landen.length}
-        </span>
+        {/* het paspoort: je verzameling stempels, altijd bij de hand */}
+        <button
+          onClick={() => {
+            sfx('tap')
+            setPaspoort(true)
+          }}
+          aria-label="Paspoort openen"
+          style={{
+            minWidth: 44,
+            minHeight: 44,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 1,
+          }}
+        >
+          <span style={{ fontSize: 17, lineHeight: 1 }}>🛂</span>
+          <span className="gold-text" style={{ fontWeight: 800, fontSize: 11 }}>
+            {veroverd}/{landen.length}
+          </span>
+        </button>
       </div>
 
       {/* de kaart zelf */}
@@ -600,6 +624,63 @@ export function WorldMapScreen({
             <span className="display" style={{ fontSize: 17, color: '#fff' }}>
               🏆 {banner}
             </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* het paspoort: alle stempels op één plek */}
+      <AnimatePresence>
+        {paspoort && (
+          <motion.div
+            className="modal-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setPaspoort(false)}
+            style={{ zIndex: 75 }}
+          >
+            <motion.div
+              className="modal-panel"
+              initial={{ y: 90 }}
+              animate={{ y: 0 }}
+              exit={{ y: 130 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              onClick={(e) => e.stopPropagation()}
+              style={{ maxHeight: '82dvh', overflowY: 'auto' }}
+              // eigen scrollvak: het paspoort kan lang worden
+            >
+              <div style={{ width: 44, height: 5, borderRadius: 999, background: 'var(--line)', margin: '0 auto 14px' }} />
+              <h3 className="display" style={{ fontSize: 24, marginBottom: 4 }}>
+                🛂 Jouw paspoort
+              </h3>
+              <p className="dim" style={{ fontSize: 13.5, marginBottom: 18 }}>
+                {aantalStempels === 0
+                  ? 'Nog geen stempels. Versla een Poortwachter en je eerste stempel staat erin.'
+                  : `${aantalStempels} van de ${landen.length} stempels. Elke Grensproef die je doorstaat laat een afdruk achter.`}
+              </p>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gap: 14,
+                  justifyItems: 'center',
+                  marginBottom: 16,
+                }}
+              >
+                {landen.map((c) => (
+                  <PassportStamp key={c.code + c.threshold} code={c.code} naam={c.name} datum={stempels[c.code]} size={92} />
+                ))}
+              </div>
+              <p className="dim" style={{ fontSize: 12.5, textAlign: 'center', marginBottom: 12 }}>
+                <b className="gold-text">
+                  {aantalStempels} van de {landen.length} stempels
+                </b>
+                {volgendLand ? ` · volgende: ${volgendLand.name}` : ' · de hele route staat erin'}
+              </p>
+              <button className="btn btn-ghost" style={{ padding: 12, fontSize: 14 }} onClick={() => setPaspoort(false)}>
+                Sluiten
+              </button>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
