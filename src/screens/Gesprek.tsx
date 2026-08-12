@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import confetti from 'canvas-confetti'
 import { courses } from '../content'
@@ -127,6 +127,334 @@ function PartnerKop({ naam, code, size = 40 }: { naam: string; code: string; siz
   )
 }
 
+/* ---------- gedeeld door beide spelers ---------- */
+
+/**
+ * De chat zelf: de berichtenlijst, de typindicator en de timers. Wie een beurt
+ * van de partner wil laten vallen roept `partnerZegt` aan, zodat de opbouw
+ * (eerst even "aan het typen", dan de tekst met audio) op één plek staat. Alle
+ * timers gaan door `later`, zodat het opruimen bij verlaten er niet één mist.
+ */
+function useChat(ttsLang: string) {
+  const [berichten, setBerichten] = useState<Bericht[]>([])
+  const [typend, setTypend] = useState(true)
+  const timers = useRef<number[]>([])
+
+  // opruimen bij verlaten: geen enkele timer mag na dit scherm nog afgaan
+  useEffect(
+    () => () => {
+      timers.current.forEach(clearTimeout)
+      timers.current = []
+    },
+    []
+  )
+
+  const later = useCallback((ms: number, fn: () => void) => {
+    timers.current.push(window.setTimeout(fn, ms))
+  }, [])
+
+  /** partner zegt een regel: eerst even "aan het typen", dan de tekst met audio */
+  const partnerZegt = useCallback(
+    (tekst: string, nl: string, daarna?: () => void) => {
+      setTypend(true)
+      later(900, () => {
+        setTypend(false)
+        setBerichten((b) => [...b, { van: 'partner', tekst, nl }])
+        speak(tekst, ttsLang)
+        daarna?.()
+      })
+    },
+    [later, ttsLang]
+  )
+
+  return { berichten, setBerichten, typend, partnerZegt, later }
+}
+
+/** Waar de luisteraar de antwoordopties van dit moment vandaan haalt */
+type OptieBron = { readonly current: GesprekAntwoord[] } | (() => GesprekAntwoord[])
+
+/**
+ * De microfoon. De opties komen uit een getter en niet uit een gekopieerde
+ * lijst, want tussen het starten van de herkenner en zijn antwoord kan het
+ * gesprek al een stap verder zijn: zo leest `onresult` altijd de huidige stap.
+ */
+function useLuisteraar(ttsLang: string, bron: OptieBron, opAntwoord: (antwoord: GesprekAntwoord) => void) {
+  const [luistert, setLuistert] = useState(false)
+  const [micHint, setMicHint] = useState<string | null>(null)
+  const [kanSpreken] = useState(() => maakHerkenner() !== null)
+  const herkenner = useRef<Herkenner | null>(null)
+
+  // altijd de nieuwste bron en afhandeling, nooit die van een vorige stap
+  const bronRef = useRef(bron)
+  bronRef.current = bron
+  const opAntwoordRef = useRef(opAntwoord)
+  opAntwoordRef.current = opAntwoord
+
+  // opruimen bij verlaten: een lopende herkenner luistert anders door
+  useEffect(
+    () => () => {
+      herkenner.current?.abort()
+    },
+    []
+  )
+
+  const opties = useCallback((): GesprekAntwoord[] => {
+    const b = bronRef.current
+    return (typeof b === 'function' ? b() : b.current) ?? []
+  }, [])
+
+  const luister = useCallback(() => {
+    if (luistert || opties().length === 0) return
+    const rec = maakHerkenner()
+    if (!rec) return
+    herkenner.current = rec
+    rec.lang = ttsLang
+    rec.interimResults = false
+    rec.maxAlternatives = 4
+    setLuistert(true)
+    setMicHint(null)
+    rec.onresult = (e) => {
+      const nu = opties()
+      const kandidaten = Array.from(e.results[0] ?? [])
+      const raak = kandidaten.map((k) => matchGesproken(k.transcript, nu)).find(Boolean)
+      if (raak) {
+        opAntwoordRef.current(raak)
+      } else {
+        const gehoord = kandidaten[0]?.transcript
+        setMicHint(gehoord ? `Ik verstond "${gehoord}". Probeer het nog eens, of tik je antwoord.` : 'Ik verstond je niet. Probeer het nog eens, of tik je antwoord.')
+      }
+    }
+    rec.onerror = () => setMicHint('De microfoon deed het even niet. Tik je antwoord, dat is net zo goed.')
+    rec.onend = () => setLuistert(false)
+    try {
+      rec.start()
+    } catch {
+      setLuistert(false)
+    }
+  }, [luistert, opties, ttsLang])
+
+  return { luistert, micHint, setMicHint, kanSpreken, luister }
+}
+
+/** Kop van een gesprek: terug, wie je spreekt, en de vertaalknop */
+function ChatKop({
+  partner,
+  vlag,
+  ondertitel,
+  vertaling,
+  opVertaling,
+  onTerug,
+}: {
+  partner: string
+  vlag: string
+  ondertitel: string
+  vertaling: boolean
+  opVertaling: () => void
+  onTerug: () => void
+}) {
+  return (
+    <header className="row" style={{ gap: 12, paddingBottom: 12, borderBottom: '1px solid var(--line)' }}>
+      <button onClick={() => { sfx('tap'); onTerug() }} aria-label="Terug" style={{ minWidth: 44, minHeight: 44, fontSize: 22 }}>
+        ←
+      </button>
+      <PartnerKop naam={partner} code={vlag} />
+      <div className="col" style={{ flex: 1, minWidth: 0 }}>
+        <strong style={{ fontSize: 16 }}>{partner}</strong>
+        <span className="dim" style={{ fontSize: 12.5 }}>
+          {ondertitel}
+        </span>
+      </div>
+      <button
+        onClick={() => { sfx('tap'); opVertaling() }}
+        className={vertaling ? 'gold-text' : 'dim'}
+        aria-label="Vertaling aan of uit"
+        style={{ minWidth: 44, minHeight: 44, fontWeight: 800, fontSize: 13, border: '1.5px solid', borderColor: vertaling ? 'var(--gold)' : 'var(--line)', borderRadius: 12 }}
+      >
+        NL
+      </button>
+    </header>
+  )
+}
+
+/** De bellen van het gesprek, plus de partner die aan het typen is */
+function Berichtenlijst({
+  berichten,
+  typend,
+  partner,
+  vlag,
+  ttsLang,
+  vertaling,
+}: {
+  berichten: Bericht[]
+  typend: boolean
+  partner: string
+  vlag: string
+  ttsLang: string
+  vertaling: boolean
+}) {
+  return (
+    <>
+      {berichten.map((b, i) => (
+        <motion.div
+          key={i}
+          initial={{ opacity: 0, y: 10, scale: 0.97 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 380, damping: 26 }}
+          className="row"
+          style={{ alignItems: 'flex-end', gap: 8, justifyContent: b.van === 'ik' ? 'flex-end' : 'flex-start' }}
+        >
+          {b.van === 'partner' && <PartnerKop naam={partner} code={vlag} size={30} />}
+          <button
+            onClick={() => { if (b.van === 'partner') speak(b.tekst, ttsLang) }}
+            style={{
+              maxWidth: '78%',
+              textAlign: 'left',
+              padding: '11px 14px',
+              fontSize: 15.5,
+              lineHeight: 1.4,
+              borderRadius: b.van === 'ik' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
+              background: b.van === 'ik' ? 'linear-gradient(135deg, var(--hot1), var(--hot2))' : 'var(--surface-2)',
+              border: b.van === 'ik' ? 'none' : '1px solid var(--line)',
+              color: '#fff',
+              cursor: b.van === 'partner' ? 'pointer' : 'default',
+            }}
+          >
+            {b.gesproken && <span style={{ marginRight: 6 }}>🎤</span>}
+            {b.tekst}
+            {vertaling && (
+              <span className="dim" style={{ display: 'block', fontSize: 12.5, marginTop: 3 }}>
+                {b.nl}
+              </span>
+            )}
+          </button>
+        </motion.div>
+      ))}
+
+      {typend && (
+        <div className="row" style={{ alignItems: 'flex-end', gap: 8 }}>
+          <PartnerKop naam={partner} code={vlag} size={30} />
+          <div className="row" style={{ gap: 4, padding: '14px 16px', borderRadius: '18px 18px 18px 4px', background: 'var(--surface-2)', border: '1px solid var(--line)' }}>
+            {[0, 1, 2].map((i) => (
+              <motion.span
+                key={i}
+                animate={{ opacity: [0.25, 1, 0.25] }}
+                transition={{ duration: 1.1, repeat: Infinity, delay: i * 0.18 }}
+                style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--text-dim)' }}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+
+/** Jouw beurt: de antwoorden, de microfoon en de regel die uitlegt hoe het werkt */
+function AntwoordPaneel({
+  antwoorden,
+  onKies,
+  micHint,
+  kanSpreken,
+  luistert,
+  onLuister,
+}: {
+  antwoorden: GesprekAntwoord[]
+  onKies: (antwoord: GesprekAntwoord) => void
+  micHint: string | null
+  kanSpreken: boolean
+  luistert: boolean
+  onLuister: () => void
+}) {
+  if (antwoorden.length === 0) return null
+  return (
+    <div className="col" style={{ gap: 8, paddingTop: 10, borderTop: '1px solid var(--line)' }}>
+      {micHint && (
+        <p className="dim" style={{ fontSize: 12.5, textAlign: 'center' }}>
+          {micHint}
+        </p>
+      )}
+      <div className="row" style={{ gap: 8, alignItems: 'stretch' }}>
+        <div className="col" style={{ flex: 1, gap: 8 }}>
+          {antwoorden.map((a) => (
+            <button
+              key={a.tekst}
+              className="glass"
+              onClick={() => onKies(a)}
+              style={{ padding: '11px 14px', textAlign: 'left', fontSize: 15, minHeight: 44 }}
+            >
+              {a.tekst}
+              <span className="faint" style={{ display: 'block', fontSize: 12 }}>
+                {a.nl}
+              </span>
+            </button>
+          ))}
+        </div>
+        {kanSpreken && (
+          <button
+            onClick={onLuister}
+            aria-label="Spreek je antwoord in"
+            style={{
+              width: 62,
+              borderRadius: 18,
+              fontSize: 24,
+              background: luistert ? 'linear-gradient(135deg, var(--hot1), var(--hot2))' : 'var(--surface-2)',
+              border: luistert ? 'none' : '1.5px solid var(--line)',
+              boxShadow: luistert ? '0 0 18px rgba(236, 72, 153, 0.55)' : 'none',
+            }}
+          >
+            {luistert ? (
+              <motion.span animate={{ scale: [1, 1.25, 1] }} transition={{ duration: 0.9, repeat: Infinity }} style={{ display: 'inline-block' }}>
+                🎤
+              </motion.span>
+            ) : (
+              '🎤'
+            )}
+          </button>
+        )}
+      </div>
+      <p className="faint center" style={{ fontSize: 11.5 }}>
+        {kanSpreken ? 'Tik een antwoord of spreek het in met de microfoon' : 'Tik het antwoord dat jij zou geven'}
+      </p>
+    </div>
+  )
+}
+
+/** De kaart na afloop: de beloning en de vervolgkeuzes */
+function KlaarKaart({
+  emoji,
+  titel,
+  tekst,
+  xp,
+  children,
+}: {
+  emoji: string
+  titel: string
+  tekst: ReactNode
+  xp: number
+  children: ReactNode
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="glass center col"
+      style={{ gap: 10, padding: 20, marginTop: 10, borderColor: 'var(--line-gold)' }}
+    >
+      <span style={{ fontSize: 34 }}>{emoji}</span>
+      <strong className="display" style={{ fontSize: 20 }}>
+        {titel}
+      </strong>
+      <span className="gold-text" style={{ fontWeight: 900, fontSize: 24 }}>
+        +{xp} XP
+      </span>
+      <p className="dim" style={{ fontSize: 13.5 }}>
+        {tekst}
+      </p>
+      {children}
+    </motion.div>
+  )
+}
+
 function GesprekSpeler({
   scenario,
   onTerug,
@@ -144,43 +472,20 @@ function GesprekSpeler({
   const course = courses[courseId]
   const vlag = courseFlagCode[courseId]
 
-  const [berichten, setBerichten] = useState<Bericht[]>([])
   const [stap, setStap] = useState(0)
-  const [typend, setTypend] = useState(true)
   const [klaar, setKlaar] = useState(false)
   const [verdiend, setVerdiend] = useState(0)
   const [vertaling, setVertaling] = useState(false)
-  const [luistert, setLuistert] = useState(false)
-  const [micHint, setMicHint] = useState<string | null>(null)
-  const herkenner = useRef<Herkenner | null>(null)
   const scroller = useRef<HTMLDivElement | null>(null)
   const uitbetaald = useRef(false)
-  const timers = useRef<number[]>([])
-  const kanSpreken = useRef(maakHerkenner() !== null)
 
-  const later = (ms: number, fn: () => void) => {
-    timers.current.push(window.setTimeout(fn, ms))
-  }
-
-  // opruimen bij verlaten: timers en een eventueel lopende microfoon
-  useEffect(
-    () => () => {
-      timers.current.forEach(clearTimeout)
-      herkenner.current?.abort()
-    },
-    []
+  const { berichten, setBerichten, typend, partnerZegt, later } = useChat(course.ttsLang)
+  // de getter zorgt dat de microfoon de opties van de huidige stap leest
+  const mic = useLuisteraar(
+    course.ttsLang,
+    () => scenario.stappen[stap]?.antwoorden ?? [],
+    (antwoord) => beantwoord(antwoord, true)
   )
-
-  /** partner zegt een regel: eerst even "aan het typen", dan de tekst met audio */
-  const partnerZegt = (tekst: string, nl: string, daarna?: () => void) => {
-    setTypend(true)
-    later(900, () => {
-      setTypend(false)
-      setBerichten((b) => [...b, { van: 'partner', tekst, nl }])
-      speak(tekst, course.ttsLang)
-      daarna?.()
-    })
-  }
 
   // openingszin
   useEffect(() => {
@@ -196,7 +501,7 @@ function GesprekSpeler({
   const beantwoord = (antwoord: GesprekAntwoord, gesproken: boolean) => {
     if (typend || klaar) return
     sfx(gesproken ? 'correct' : 'tap')
-    setMicHint(null)
+    mic.setMicHint(null)
     setBerichten((b) => [...b, { van: 'ik', ...antwoord, gesproken }])
     const volgende = stap + 1
     setStap(volgende)
@@ -219,138 +524,53 @@ function GesprekSpeler({
     }
   }
 
-  const luister = () => {
-    const opties = scenario.stappen[stap]?.antwoorden
-    if (!opties || luistert) return
-    const rec = maakHerkenner()
-    if (!rec) return
-    herkenner.current = rec
-    rec.lang = course.ttsLang
-    rec.interimResults = false
-    rec.maxAlternatives = 4
-    setLuistert(true)
-    setMicHint(null)
-    rec.onresult = (e) => {
-      const kandidaten = Array.from(e.results[0] ?? [])
-      const raak = kandidaten.map((k) => matchGesproken(k.transcript, opties)).find(Boolean)
-      if (raak) {
-        beantwoord(raak, true)
-      } else {
-        const gehoord = kandidaten[0]?.transcript
-        setMicHint(gehoord ? `Ik verstond "${gehoord}". Probeer het nog eens, of tik je antwoord.` : 'Ik verstond je niet. Probeer het nog eens, of tik je antwoord.')
-      }
-    }
-    rec.onerror = () => setMicHint('De microfoon deed het even niet. Tik je antwoord, dat is net zo goed.')
-    rec.onend = () => setLuistert(false)
-    try {
-      rec.start()
-    } catch {
-      setLuistert(false)
-    }
-  }
-
   const antwoorden = !klaar && !typend && stap < scenario.stappen.length ? scenario.stappen[stap].antwoorden : []
+  const totaal = scenario.stappen.length
+  const voortgang = Math.round((Math.min(stap, totaal) / totaal) * 100)
 
   return (
     <div className="shell shell--bare" style={{ display: 'flex', flexDirection: 'column', height: '100dvh', paddingBottom: 12 }}>
       {/* kop: wie spreek je, en de vertaalknop */}
-      <header className="row" style={{ gap: 12, paddingBottom: 12, borderBottom: '1px solid var(--line)' }}>
-        <button onClick={() => { sfx('tap'); onTerug() }} aria-label="Terug" style={{ minWidth: 44, minHeight: 44, fontSize: 22 }}>
-          ←
-        </button>
-        <PartnerKop naam={scenario.partner} code={vlag} />
-        <div className="col" style={{ flex: 1, minWidth: 0 }}>
-          <strong style={{ fontSize: 16 }}>{scenario.partner}</strong>
-          <span className="dim" style={{ fontSize: 12.5 }}>
-            {scenario.titel} · {course.name}
-          </span>
-        </div>
-        <button
-          onClick={() => { sfx('tap'); setVertaling((v) => !v) }}
-          className={vertaling ? 'gold-text' : 'dim'}
-          aria-label="Vertaling aan of uit"
-          style={{ minWidth: 44, minHeight: 44, fontWeight: 800, fontSize: 13, border: '1.5px solid', borderColor: vertaling ? 'var(--gold)' : 'var(--line)', borderRadius: 12 }}
+      <ChatKop
+        partner={scenario.partner}
+        vlag={vlag}
+        ondertitel={`${scenario.titel} · ${course.name}`}
+        vertaling={vertaling}
+        opVertaling={() => setVertaling((v) => !v)}
+        onTerug={onTerug}
+      />
+
+      {/* hoe ver ben je in dit gesprek? de CSS-overgang doet de beweging */}
+      <div style={{ flexShrink: 0, paddingTop: 8 }}>
+        <div
+          className="progress-track"
+          style={{ height: 5 }}
+          role="progressbar"
+          aria-label="Voortgang in dit gesprek"
+          aria-valuemin={0}
+          aria-valuemax={totaal}
+          aria-valuenow={Math.min(stap, totaal)}
         >
-          NL
-        </button>
-      </header>
+          <div className="progress-fill" style={{ width: `${voortgang}%` }} />
+        </div>
+      </div>
 
       {/* het gesprek */}
       <div ref={scroller} style={{ flex: 1, overflowY: 'auto', padding: '16px 2px', display: 'flex', flexDirection: 'column', gap: 10 }} className="no-scrollbar">
         <p className="faint center" style={{ fontSize: 12.5, marginBottom: 6 }}>
           {scenario.emoji} {scenario.plek}
         </p>
-        {berichten.map((b, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, y: 10, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ type: 'spring', stiffness: 380, damping: 26 }}
-            className="row"
-            style={{ alignItems: 'flex-end', gap: 8, justifyContent: b.van === 'ik' ? 'flex-end' : 'flex-start' }}
-          >
-            {b.van === 'partner' && <PartnerKop naam={scenario.partner} code={vlag} size={30} />}
-            <button
-              onClick={() => { if (b.van === 'partner') speak(b.tekst, course.ttsLang) }}
-              style={{
-                maxWidth: '78%',
-                textAlign: 'left',
-                padding: '11px 14px',
-                fontSize: 15.5,
-                lineHeight: 1.4,
-                borderRadius: b.van === 'ik' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
-                background: b.van === 'ik' ? 'linear-gradient(135deg, var(--hot1), var(--hot2))' : 'var(--surface-2)',
-                border: b.van === 'ik' ? 'none' : '1px solid var(--line)',
-                color: '#fff',
-                cursor: b.van === 'partner' ? 'pointer' : 'default',
-              }}
-            >
-              {b.gesproken && <span style={{ marginRight: 6 }}>🎤</span>}
-              {b.tekst}
-              {vertaling && (
-                <span className="dim" style={{ display: 'block', fontSize: 12.5, marginTop: 3 }}>
-                  {b.nl}
-                </span>
-              )}
-            </button>
-          </motion.div>
-        ))}
-
-        {typend && (
-          <div className="row" style={{ alignItems: 'flex-end', gap: 8 }}>
-            <PartnerKop naam={scenario.partner} code={vlag} size={30} />
-            <div className="row" style={{ gap: 4, padding: '14px 16px', borderRadius: '18px 18px 18px 4px', background: 'var(--surface-2)', border: '1px solid var(--line)' }}>
-              {[0, 1, 2].map((i) => (
-                <motion.span
-                  key={i}
-                  animate={{ opacity: [0.25, 1, 0.25] }}
-                  transition={{ duration: 1.1, repeat: Infinity, delay: i * 0.18 }}
-                  style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--text-dim)' }}
-                />
-              ))}
-            </div>
-          </div>
-        )}
+        <Berichtenlijst berichten={berichten} typend={typend} partner={scenario.partner} vlag={vlag} ttsLang={course.ttsLang} vertaling={vertaling} />
 
         {/* afgerond: de beloning en de vervolgkeuzes */}
         <AnimatePresence>
           {klaar && (
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="glass center col"
-              style={{ gap: 10, padding: 20, marginTop: 10, borderColor: 'var(--line-gold)' }}
+            <KlaarKaart
+              emoji="🗣️"
+              titel="Gesprek voltooid!"
+              xp={verdiend}
+              tekst={`Je hebt een heel gesprek in het ${course.name} gevoerd. Dat is precies hoe het straks in het echt gaat.`}
             >
-              <span style={{ fontSize: 34 }}>🗣️</span>
-              <strong className="display" style={{ fontSize: 20 }}>
-                Gesprek voltooid!
-              </strong>
-              <span className="gold-text" style={{ fontWeight: 900, fontSize: 24 }}>
-                +{verdiend} XP
-              </span>
-              <p className="dim" style={{ fontSize: 13.5 }}>
-                Je hebt een heel gesprek in het {course.name} gevoerd. Dat is precies hoe het straks in het echt gaat.
-              </p>
               {volgende && onVolgende ? (
                 <>
                   {/* het volgende gesprek staat al klaar: de lus blijft draaien */}
@@ -366,63 +586,20 @@ function GesprekSpeler({
                   Verder
                 </button>
               )}
-            </motion.div>
+            </KlaarKaart>
           )}
         </AnimatePresence>
       </div>
 
       {/* jouw beurt: kiezen of inspreken */}
-      {antwoorden.length > 0 && (
-        <div className="col" style={{ gap: 8, paddingTop: 10, borderTop: '1px solid var(--line)' }}>
-          {micHint && (
-            <p className="dim" style={{ fontSize: 12.5, textAlign: 'center' }}>
-              {micHint}
-            </p>
-          )}
-          <div className="row" style={{ gap: 8, alignItems: 'stretch' }}>
-            <div className="col" style={{ flex: 1, gap: 8 }}>
-              {antwoorden.map((a) => (
-                <button
-                  key={a.tekst}
-                  className="glass"
-                  onClick={() => beantwoord(a, false)}
-                  style={{ padding: '11px 14px', textAlign: 'left', fontSize: 15, minHeight: 44 }}
-                >
-                  {a.tekst}
-                  <span className="faint" style={{ display: 'block', fontSize: 12 }}>
-                    {a.nl}
-                  </span>
-                </button>
-              ))}
-            </div>
-            {kanSpreken.current && (
-              <button
-                onClick={luister}
-                aria-label="Spreek je antwoord in"
-                style={{
-                  width: 62,
-                  borderRadius: 18,
-                  fontSize: 24,
-                  background: luistert ? 'linear-gradient(135deg, var(--hot1), var(--hot2))' : 'var(--surface-2)',
-                  border: luistert ? 'none' : '1.5px solid var(--line)',
-                  boxShadow: luistert ? '0 0 18px rgba(236, 72, 153, 0.55)' : 'none',
-                }}
-              >
-                {luistert ? (
-                  <motion.span animate={{ scale: [1, 1.25, 1] }} transition={{ duration: 0.9, repeat: Infinity }} style={{ display: 'inline-block' }}>
-                    🎤
-                  </motion.span>
-                ) : (
-                  '🎤'
-                )}
-              </button>
-            )}
-          </div>
-          <p className="faint center" style={{ fontSize: 11.5 }}>
-            {kanSpreken.current ? 'Tik een antwoord of spreek het in met de microfoon' : 'Tik het antwoord dat jij zou geven'}
-          </p>
-        </div>
-      )}
+      <AntwoordPaneel
+        antwoorden={antwoorden}
+        onKies={(a) => beantwoord(a, false)}
+        micHint={mic.micHint}
+        kanSpreken={mic.kanSpreken}
+        luistert={mic.luistert}
+        onLuister={mic.luister}
+      />
     </div>
   )
 }
@@ -440,8 +617,6 @@ function VrijSpeler({ onTerug }: { onTerug: () => void }) {
   const vlag = courseFlagCode[courseId]
   const vrij = VRIJ_GESPREK[courseId]
 
-  const [berichten, setBerichten] = useState<Bericht[]>([])
-  const [typend, setTypend] = useState(true)
   const [fase, setFase] = useState<'intro' | 'kies' | 'onderwerp'>('intro')
   const [huidigeStap, setHuidigeStap] = useState<GesprekStap | null>(null)
   const [wachtrij, setWachtrij] = useState<GesprekStap[]>([])
@@ -449,35 +624,16 @@ function VrijSpeler({ onTerug }: { onTerug: () => void }) {
   const [klaar, setKlaar] = useState(false)
   const [verdiend, setVerdiend] = useState(0)
   const [vertaling, setVertaling] = useState(false)
-  const [luistert, setLuistert] = useState(false)
-  const [micHint, setMicHint] = useState<string | null>(null)
-  const herkenner = useRef<Herkenner | null>(null)
   const scroller = useRef<HTMLDivElement | null>(null)
   const uitbetaald = useRef(false)
-  const timers = useRef<number[]>([])
-  const kanSpreken = useRef(maakHerkenner() !== null)
 
-  const later = (ms: number, fn: () => void) => {
-    timers.current.push(window.setTimeout(fn, ms))
-  }
-
-  useEffect(
-    () => () => {
-      timers.current.forEach(clearTimeout)
-      herkenner.current?.abort()
-    },
-    []
+  const { berichten, setBerichten, typend, partnerZegt, later } = useChat(course.ttsLang)
+  // de getter zorgt dat de microfoon de opties van de huidige stap leest
+  const mic = useLuisteraar(
+    course.ttsLang,
+    () => huidigeStap?.antwoorden ?? [],
+    (antwoord) => beantwoord(antwoord, true)
   )
-
-  const partnerZegt = (tekst: string, nl: string, daarna?: () => void) => {
-    setTypend(true)
-    later(900, () => {
-      setTypend(false)
-      setBerichten((b) => [...b, { van: 'partner', tekst, nl }])
-      speak(tekst, course.ttsLang)
-      daarna?.()
-    })
-  }
 
   useEffect(() => {
     partnerZegt(vrij.intro.zeg, vrij.intro.nl)
@@ -492,7 +648,7 @@ function VrijSpeler({ onTerug }: { onTerug: () => void }) {
   const beantwoord = (antwoord: GesprekAntwoord, gesproken: boolean) => {
     if (typend || klaar || !huidigeStap) return
     sfx(gesproken ? 'correct' : 'tap')
-    setMicHint(null)
+    mic.setMicHint(null)
     setBerichten((b) => [...b, { van: 'ik', ...antwoord, gesproken }])
     setHuidigeStap(null)
     if (fase === 'intro') {
@@ -535,193 +691,57 @@ function VrijSpeler({ onTerug }: { onTerug: () => void }) {
     )
   }
 
-  const luister = () => {
-    const opties = huidigeStap?.antwoorden
-    if (!opties || luistert) return
-    const rec = maakHerkenner()
-    if (!rec) return
-    herkenner.current = rec
-    rec.lang = course.ttsLang
-    rec.interimResults = false
-    rec.maxAlternatives = 4
-    setLuistert(true)
-    setMicHint(null)
-    rec.onresult = (e) => {
-      const kandidaten = Array.from(e.results[0] ?? [])
-      const raak = kandidaten.map((k) => matchGesproken(k.transcript, opties)).find(Boolean)
-      if (raak) {
-        beantwoord(raak, true)
-      } else {
-        const gehoord = kandidaten[0]?.transcript
-        setMicHint(gehoord ? `Ik verstond "${gehoord}". Probeer het nog eens, of tik je antwoord.` : 'Ik verstond je niet. Probeer het nog eens, of tik je antwoord.')
-      }
-    }
-    rec.onerror = () => setMicHint('De microfoon deed het even niet. Tik je antwoord, dat is net zo goed.')
-    rec.onend = () => setLuistert(false)
-    try {
-      rec.start()
-    } catch {
-      setLuistert(false)
-    }
-  }
-
   const antwoorden = !klaar && !typend && huidigeStap ? huidigeStap.antwoorden : []
   const openOnderwerpen = vrij.onderwerpen.filter((o) => !gedaan.includes(o.id))
+  // een vrij gesprek heeft geen vast einde, dus geen balk: wel de teller zodra
+  // er iets besproken is
+  const ondertitel =
+    gedaan.length > 0
+      ? `Vrij gesprek · ${gedaan.length} ${gedaan.length === 1 ? 'onderwerp' : 'onderwerpen'}`
+      : `Vrij gesprek · ${course.name}`
 
   return (
     <div className="shell shell--bare" style={{ display: 'flex', flexDirection: 'column', height: '100dvh', paddingBottom: 12 }}>
-      <header className="row" style={{ gap: 12, paddingBottom: 12, borderBottom: '1px solid var(--line)' }}>
-        <button onClick={() => { sfx('tap'); onTerug() }} aria-label="Terug" style={{ minWidth: 44, minHeight: 44, fontSize: 22 }}>
-          ←
-        </button>
-        <PartnerKop naam={vrij.partner} code={vlag} />
-        <div className="col" style={{ flex: 1, minWidth: 0 }}>
-          <strong style={{ fontSize: 16 }}>{vrij.partner}</strong>
-          <span className="dim" style={{ fontSize: 12.5 }}>
-            Vrij gesprek · {course.name}
-          </span>
-        </div>
-        <button
-          onClick={() => { sfx('tap'); setVertaling((v) => !v) }}
-          className={vertaling ? 'gold-text' : 'dim'}
-          aria-label="Vertaling aan of uit"
-          style={{ minWidth: 44, minHeight: 44, fontWeight: 800, fontSize: 13, border: '1.5px solid', borderColor: vertaling ? 'var(--gold)' : 'var(--line)', borderRadius: 12 }}
-        >
-          NL
-        </button>
-      </header>
+      <ChatKop
+        partner={vrij.partner}
+        vlag={vlag}
+        ondertitel={ondertitel}
+        vertaling={vertaling}
+        opVertaling={() => setVertaling((v) => !v)}
+        onTerug={onTerug}
+      />
 
       <div ref={scroller} style={{ flex: 1, overflowY: 'auto', padding: '16px 2px', display: 'flex', flexDirection: 'column', gap: 10 }} className="no-scrollbar">
         <p className="faint center" style={{ fontSize: 12.5, marginBottom: 6 }}>
           💬 Jij kiest waar dit gesprek over gaat
         </p>
-        {berichten.map((b, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, y: 10, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ type: 'spring', stiffness: 380, damping: 26 }}
-            className="row"
-            style={{ alignItems: 'flex-end', gap: 8, justifyContent: b.van === 'ik' ? 'flex-end' : 'flex-start' }}
-          >
-            {b.van === 'partner' && <PartnerKop naam={vrij.partner} code={vlag} size={30} />}
-            <button
-              onClick={() => { if (b.van === 'partner') speak(b.tekst, course.ttsLang) }}
-              style={{
-                maxWidth: '78%',
-                textAlign: 'left',
-                padding: '11px 14px',
-                fontSize: 15.5,
-                lineHeight: 1.4,
-                borderRadius: b.van === 'ik' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
-                background: b.van === 'ik' ? 'linear-gradient(135deg, var(--hot1), var(--hot2))' : 'var(--surface-2)',
-                border: b.van === 'ik' ? 'none' : '1px solid var(--line)',
-                color: '#fff',
-                cursor: b.van === 'partner' ? 'pointer' : 'default',
-              }}
-            >
-              {b.gesproken && <span style={{ marginRight: 6 }}>🎤</span>}
-              {b.tekst}
-              {vertaling && (
-                <span className="dim" style={{ display: 'block', fontSize: 12.5, marginTop: 3 }}>
-                  {b.nl}
-                </span>
-              )}
-            </button>
-          </motion.div>
-        ))}
-
-        {typend && (
-          <div className="row" style={{ alignItems: 'flex-end', gap: 8 }}>
-            <PartnerKop naam={vrij.partner} code={vlag} size={30} />
-            <div className="row" style={{ gap: 4, padding: '14px 16px', borderRadius: '18px 18px 18px 4px', background: 'var(--surface-2)', border: '1px solid var(--line)' }}>
-              {[0, 1, 2].map((i) => (
-                <motion.span
-                  key={i}
-                  animate={{ opacity: [0.25, 1, 0.25] }}
-                  transition={{ duration: 1.1, repeat: Infinity, delay: i * 0.18 }}
-                  style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--text-dim)' }}
-                />
-              ))}
-            </div>
-          </div>
-        )}
+        <Berichtenlijst berichten={berichten} typend={typend} partner={vrij.partner} vlag={vlag} ttsLang={course.ttsLang} vertaling={vertaling} />
 
         <AnimatePresence>
           {klaar && (
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="glass center col"
-              style={{ gap: 10, padding: 20, marginTop: 10, borderColor: 'var(--line-gold)' }}
+            <KlaarKaart
+              emoji="💬"
+              titel="Wat een gesprek!"
+              xp={verdiend}
+              tekst={`Jullie hadden het over ${gedaan.length} ${gedaan.length === 1 ? 'onderwerp' : 'onderwerpen'}. Volgende keer kiest ${vrij.partner} vast weer iets nieuws uit.`}
             >
-              <span style={{ fontSize: 34 }}>💬</span>
-              <strong className="display" style={{ fontSize: 20 }}>
-                Wat een gesprek!
-              </strong>
-              <span className="gold-text" style={{ fontWeight: 900, fontSize: 24 }}>
-                +{verdiend} XP
-              </span>
-              <p className="dim" style={{ fontSize: 13.5 }}>
-                Jullie hadden het over {gedaan.length} {gedaan.length === 1 ? 'onderwerp' : 'onderwerpen'}. Volgende keer kiest {vrij.partner} vast weer iets nieuws uit.
-              </p>
               <button className="btn btn-primary" style={{ padding: 13 }} onClick={() => { sfx('tap'); onTerug() }}>
                 Verder
               </button>
-            </motion.div>
+            </KlaarKaart>
           )}
         </AnimatePresence>
       </div>
 
       {/* jouw beurt: antwoorden, of het volgende onderwerp kiezen */}
-      {antwoorden.length > 0 && (
-        <div className="col" style={{ gap: 8, paddingTop: 10, borderTop: '1px solid var(--line)' }}>
-          {micHint && (
-            <p className="dim" style={{ fontSize: 12.5, textAlign: 'center' }}>
-              {micHint}
-            </p>
-          )}
-          <div className="row" style={{ gap: 8, alignItems: 'stretch' }}>
-            <div className="col" style={{ flex: 1, gap: 8 }}>
-              {antwoorden.map((a) => (
-                <button
-                  key={a.tekst}
-                  className="glass"
-                  onClick={() => beantwoord(a, false)}
-                  style={{ padding: '11px 14px', textAlign: 'left', fontSize: 15, minHeight: 44 }}
-                >
-                  {a.tekst}
-                  <span className="faint" style={{ display: 'block', fontSize: 12 }}>
-                    {a.nl}
-                  </span>
-                </button>
-              ))}
-            </div>
-            {kanSpreken.current && (
-              <button
-                onClick={luister}
-                aria-label="Spreek je antwoord in"
-                style={{
-                  width: 62,
-                  borderRadius: 18,
-                  fontSize: 24,
-                  background: luistert ? 'linear-gradient(135deg, var(--hot1), var(--hot2))' : 'var(--surface-2)',
-                  border: luistert ? 'none' : '1.5px solid var(--line)',
-                  boxShadow: luistert ? '0 0 18px rgba(236, 72, 153, 0.55)' : 'none',
-                }}
-              >
-                {luistert ? (
-                  <motion.span animate={{ scale: [1, 1.25, 1] }} transition={{ duration: 0.9, repeat: Infinity }} style={{ display: 'inline-block' }}>
-                    🎤
-                  </motion.span>
-                ) : (
-                  '🎤'
-                )}
-              </button>
-            )}
-          </div>
-        </div>
-      )}
+      <AntwoordPaneel
+        antwoorden={antwoorden}
+        onKies={(a) => beantwoord(a, false)}
+        micHint={mic.micHint}
+        kanSpreken={mic.kanSpreken}
+        luistert={mic.luistert}
+        onLuister={mic.luister}
+      />
 
       {fase === 'kies' && !typend && !klaar && (
         <div className="col" style={{ gap: 8, paddingTop: 10, borderTop: '1px solid var(--line)' }}>

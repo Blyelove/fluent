@@ -156,6 +156,15 @@ interface AureaState {
   /** Naam die je meestuurt met een duel-uitdaging; blijft bewaard */
   duelName: string
   setDuelName: (n: string) => void
+
+  /** Ontdekte woordfamilies (stam-ids uit cognaten.ts) */
+  ontdekteFamilies: string[]
+  /**
+   * Een woordfamilie ontdekken: elke andere taal in die familie krijgt echte
+   * XP, want je hebt daar zojuist een woord bijgeleerd zonder het te oefenen.
+   * Geeft terug hoeveel talen er XP kregen; 0 als je hem al had.
+   */
+  ontdekFamilie: (id: string, talen: CourseId[]) => number
   /**
    * Rondt een gesprek af: eerste keer 25 XP, elke keer daarna 10 XP
    * (overoefenen blijft lonen, nooit een slot). Geeft terug hoeveel XP er
@@ -207,6 +216,9 @@ interface AureaState {
 }
 
 const emptyProgress = (): Progress => ({ xp: 0, completed: [] })
+
+/** XP per zustertaal wanneer je een woordfamilie ontdekt */
+const FAMILIE_XP = 3
 
 /**
  * Alles wat bij ÉÉN account hoort. Wat hier niet in staat, is apparaatbreed:
@@ -263,6 +275,7 @@ export type Profiel = Pick<
   | 'stamps'
   | 'gesprekken'
   | 'duelName'
+  | 'ontdekteFamilies'
 >
 
 /** Een kersvers profiel: waar elk nieuw account mee begint */
@@ -320,6 +333,7 @@ function nieuwProfiel(): Profiel {
     stamps: {},
     gesprekken: {},
     duelName: '',
+    ontdekteFamilies: [],
   }
 }
 
@@ -831,6 +845,19 @@ export const useStore = create<AureaState>()(
       },
 
       setDuelName: (n) => set({ duelName: n.slice(0, 24) }),
+
+      ontdekFamilie: (id, talen) => {
+        const s = get()
+        if (s.ontdekteFamilies.includes(id)) return 0
+        // elke zustertaal krijgt echte XP: je kent daar nu ook een woord
+        const nieuw = { ...s.progress }
+        for (const t of talen) {
+          const prev = nieuw[t] ?? emptyProgress()
+          nieuw[t] = { ...prev, xp: prev.xp + FAMILIE_XP }
+        }
+        set({ ontdekteFamilies: [...s.ontdekteFamilies, id], progress: nieuw })
+        return talen.length
+      },
 
       // eenmaal verslagen blijft verslagen: vrijspelen mag, afpakken nooit
       markBotVerslagen: (naam) => {

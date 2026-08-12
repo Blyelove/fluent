@@ -9,6 +9,8 @@ import { levelForXp, levelReward, levelTitle } from '../levels'
 import { countryStates, courseFlagCode, type CountryState } from '../countries'
 import type { CompletedGoal } from '../goals'
 import type { CourseId } from '../types'
+import { familieVan, type WoordFamilie } from '../content/cognaten'
+import { WoordBoom } from '../components/WoordBoom'
 import { Flag } from '../components/Flag'
 import { Avatar } from '../components/Avatar'
 import { ShareButton } from '../components/ShareButton'
@@ -100,6 +102,10 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
   const [gidsOpen, setGidsOpen] = useState(false)
 
   const learnWord = useStore((s) => s.learnWord)
+  const ontdekFamilie = useStore((s) => s.ontdekFamilie)
+  const ontdekteFamilies = useStore((s) => s.ontdekteFamilies)
+  /** de woordfamilie die nu in beeld is, na een ontdekking */
+  const [boom, setBoom] = useState<{ familie: WoordFamilie; bonus: CourseId[] } | null>(null)
   const completeLesson = useStore((s) => s.completeLesson)
   const addMistake = useStore((s) => s.addMistake)
   const alreadyDone = useStore((s) => courseProgress(s, course.id).completed.includes(lesson.id))
@@ -185,6 +191,18 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
   const onCheck = () => {
     if (ex.type === 'new') {
       learnWord(course.id, ex.word, ex.nl)
+      // De Woordenstamboom: heeft dit woord familie in de andere talen en heb
+      // je die nog niet ontdekt, dan komt de boom eerst in beeld. Jij leerde
+      // één woord en werd in vier talen tegelijk beter.
+      const fam = familieVan(course.id, ex.word)
+      if (fam && !ontdekteFamilies.includes(fam.id)) {
+        const zusters = (Object.keys(fam.leden) as CourseId[]).filter((t) => t !== course.id)
+        ontdekFamilie(fam.id, zusters)
+        setBoom({ familie: fam, bonus: zusters })
+        sfx('complete')
+        confetti({ particleCount: 80, spread: 70, origin: { y: 0.55 }, colors: ['#FFC53D', '#A855F7', '#EC4899'], disableForReducedMotion: true })
+        return
+      }
       advance()
       return
     }
@@ -367,6 +385,20 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
           )}
         </AnimatePresence>
       </div>
+
+      {/* de stamboom van het zojuist geleerde woord */}
+      {boom && (
+        <WoordBoom
+          familie={boom.familie}
+          jouwTaal={course.id}
+          bonusTalen={boom.bonus}
+          ontdekt
+          onSluiten={() => {
+            setBoom(null)
+            advance()
+          }}
+        />
+      )}
 
       <div className="lesson-body" key={idx}>
         {ex.type === 'new' && <NewWordEx ex={ex} ttsLang={course.ttsLang} locked={false} register={register} />}

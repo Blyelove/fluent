@@ -285,6 +285,40 @@ wat je onderweg zelf vindt.
    Daarna de geparkeerde ideeënlijst onderaan WERELDREIS.md, te beginnen bij
    de schatkisten halverwege een etappe en de zwaaiende bewoner met een groet.
 
+▓▓ BLOK W — DE WOORDENSTAMBOOM (ons handelsmerk; bestaat nergens anders)
+   Het idee: elk woord dat je leert heeft familie in de andere vijf talen,
+   want ze delen een stam. Leer "amigo" in het Spaans en je krijgt ami (fr),
+   amico (it), amigo (pt) en amicable (en) er gratis bij, met het Latijnse
+   amicus als wortel. Duolingo, Babbel en Busuu doen hier NIETS mee, terwijl
+   het de snelste manier is om een tweede en derde taal te leren.
+   ✅ AF (ronde 62) — de kern: src/content/cognaten.ts (families met stam,
+      herkomst, betekenis, weetje en de leden per taal, plus familieVan() met
+      een Map op moduleniveau en accent-ongevoelig zoeken) ·
+      src/components/WoordBoom.tsx (de wortel als gouden gloeiknoop, neon
+      takken die zich tekenen naar elk familielid, elk lid aantikbaar met
+      moedertaal-audio, jouw taal met de kroon) · store-veld ontdekteFamilies
+      met actie ontdekFamilie() die elke zustertaal 3 echte XP geeft, dus je
+      vaardigheidsniveau in die talen stijgt mee · het ontdekmoment vlak na
+      "Begrepen" bij een nieuw woord, met confetti · de verzameling in het
+      vaardighedenpaneel met een teller en terugkijkbare families.
+   GEMETEN BASELINE (ronde 62, 113 families over 625 nieuwe woorden):
+      Portugees 31%, Italiaans 26%, Spaans 25%, Frans 23%, Engels 14%,
+      Duits 10% van de nieuwe woorden heeft een familie, en 54 van de 113
+      families zijn via een les bereikbaar. Meet dit opnieuw als je families
+      toevoegt (klein scriptje over courseList met familieVan) en rapporteer
+      het percentage; zo blijft zichtbaar of je uitbreiding echt landt.
+   UITBREIDEN, in deze volgorde:
+   1. Meer families, met voorrang voor DUITS en ENGELS (nu 10% en 14%). Werk
+      vanuit de échte lesinhoud: loop de 'new'-woorden per cursus langs en
+      maak families voor woorden die nu niets opleveren. Doel is honderden
+      families en minstens 25% dekking in elke taal. Houd ze taalkundig eerlijk.
+   2. Een eigen Stamboom-scherm: alle families als groeiende neon-constellatie,
+      ontdekt in kleur en de rest als silhouet, met filters per herkomst.
+   3. Valse vrienden als tegenhanger: woorden die op elkaar lijken maar iets
+      anders betekenen (embarazada is niet beschaamd). Eigen rode tak.
+   4. Familie-missies: "ontdek deze week 5 families" als weekmissie-variant.
+   5. Koppelen aan de Wereldreis: per land tonen welke families daar leven.
+
 ▓▓ BLOK P — DUOLINGO-PARITEIT (uitdrukkelijke wens van de gebruiker, ronde 57:
    "we moeten alles hebben wat duolingo ook heeft ... zoals ai waar je mee kan
    praten"). De stand van de vergelijking, bijhouden bij elke ronde:
@@ -390,6 +424,7 @@ Stoppen kan met `/loop stop` of door de cron-taak te verwijderen.
 
 ## Logboek
 
+- **13-08-2026, ronde 62** — **DE WOORDENSTAMBOOM: het eerste echte handelsmerk van Fluent, en iets wat geen enkele taal-app heeft.** Elk woord dat je leert blijkt familie te hebben in de andere vijf talen omdat ze een stam delen. Leer "amigo" en de boom klapt open: het Latijnse amicus als gloeiende wortel, neon takken die zich tekenen naar ami, amico, amigo en amicable, elk lid aantikbaar met een moedertaalstem, en elke zustertaal krijgt 3 echte XP zodat je vaardigheidsniveau daar meteen stijgt. Eén woord leren maakt je dus in vijf talen beter. Dat is het snelste pad naar een tweede en derde taal en precies wat Duolingo, Babbel en Busuu niet doen. Zie Blok W voor het uitbreidingspad (honderden families, een eigen constellatie-scherm, valse vrienden als rode tak, familie-missies, koppeling aan de Wereldreis). **Tegelijk de RuneScape-vaardigheden eindelijk zichtbaar gemaakt**: de gebruiker kon ze niet vinden omdat ze achter een tik op de avatar zaten. Het paneel is nu het herkenbare RS-raster (drie kolommen, vlag als vaardigheidsicoon, twee gouden getallen diagonaal boven elkaar, totaalniveaubalk eronder, tik een taal voor de details) en op Home staat een eigen Vaardigheden-kaart met je niveau, de balk en je totaalniveau. **LES: gebouwd is niet hetzelfde als gevonden.** Een functie die de gebruiker niet ziet, bestaat voor hem niet, ook al staat hij live en werkt hij perfect. Zet nieuwe functies altijd op de plek waar iemand ze zoekt, niet achter een tik die je zelf logisch vindt. Ook de 15-minutenloop verhuisd van een sessie-cron (die alleen vuurt als de sessie stil ligt, en dus nooit vuurde tijdens een werksessie) naar een echte geplande taak op schijf met de volledige opdracht erin.
 - **13-08-2026, ronde 61** — De grote UX-sprong uit het 37-agentteam (63 bevindingen, 28 van de 29 zware adversarieel bevestigd, 17-stappenplan) grotendeels doorgevoerd en live. De hoogtepunten: (1) **De les op Home-niveau**: het nieuwe woord landt als card-hero, goud is uit de oefenkleuren gesaneerd (cyaan = selectie), tikbare accenttegels (á é ñ ç ...) boven het typveld per taal, de voortgangsbalk schiet naar 100% op het laatste antwoord, het juiste antwoord is naluisterbaar in het feedbackpaneel, en de pauzemodal dreigt niet meer met verlies. (2) **Geen scherm rekent nog zelf**: awardXp en addReviewXp geven het echt geboekte bedrag terug (inclusief boost) en les, herhaling, toets, arcade, duel en Grensproef tonen dat bedrag; de beloofde dubbele toetspunten bestaan nu echt en toetsuitslagen zijn per taal gescheiden. (3) **De heldketen in de oefenhub**: jouw fouten > herhaling als card-hero met ademende knop, zichtbare uitleg bij vergrendelde toetsonderwerpen (title-tooltips bestaan niet op touch). (4) **De competitie**: de motivatiekaart ("Nog X XP en je gaat Sanne voorbij") staat nu als held bóven de ranglijst in plaats van eronder begraven, veilig/leeg is cyaan in plaats van vals goud. (5) **Gesprekken als verzameling**: teller met balk in de hub, "opnieuw voor 10 XP" op gevoerde kaarten, en na de confetti staat het volgende gesprek achter één knop klaar. (6) **DE GASTSTART**: één tik "Start direct, zonder account" met een gelote startheld, ingekorte onboarding (welkomststop weg, DAGDOELEN nu één bron mét Fanatiek-optie), en een echt formulier met autocomplete zodat wachtwoordmanagers meedoen. Bewezen: gast → Frans → eerste woord "bonjour" binnen een minuut, en het bestaande account kwam daarna ongeschonden terug (490 XP, level 50). (7) Lege staten op Home zonder straf: "Doe mee" in plaats van "Plek 30", "Start je reeks" in plaats van een grijze nul. LES: bij het controleren van accountwissels las ik eerst het bovenste laagje van de opslagblob en dacht aan dataverlies; de blob loopt per ontwerp één persist achter op het geheugen, dus meet accountdata altijd via de gerenderde app. NOG OPEN uit het plan (volgende rondes): stap 10 (GesprekSpeler en VrijSpeler ontdubbelen in hooks plus hintvoetnoot in het vrije gesprek), stap 12 (profiel herordenen tot trofeeënkast met Instellingen-blok), restjes van stap 7/9/11/13 (duel-voortgangsbalk, zones per ranglijstrij, voortgangsbalk in de gespreksspeler, PersonaPicker-preview als rij, Badges-stickers statisch).
 - **13-08-2026, ronde 60** — Op directe vraag van de gebruiker ("duurt het net zo lang als bij RuneScape?") de vaardigheidscurve verecht: niet langer een eigen kwadraat maar de **authentieke RuneScape-formule**, geschaald door 217. Bewezen met de tabel zelf: level 92 = 30.033 XP = exact de helft van 99 (60.066), level 10 kost 5 XP (levels regenen vroeg, net als daar), level 50 valt na ongeveer een week dagelijks spelen en daarna begint de grind van jaren. Valkuil gevonden en gefixt: door het schalen werd level 2 nul XP breed, wat de voortgangsbalk op NaN zette; de tabel is nu strikt stijgend. Ook "alle soorten Spaans" letterlijk zichtbaar gemaakt in het paneel: per taal een rij met alle veertien landvarianten als vlaggen, veroverd in goud met gloed, de rest gedimd, met een teller. Ondertussen draait een team van zeven scherm-beoordelaars plus toetsers en een hoofdontwerper aan de volgende sprong in design, logica en gebruiksgemak (uitdrukkelijke opdracht: "kan vele malen beter").
 - **13-08-2026, ronde 59** — Twee nieuwe wensen van de gebruiker, allebei dezelfde dag gebouwd én live. (1) **Vaardigheden in RuneScape-stijl**: druk op je poppetje en je ziet per taal je level richting 99, met een totaalniveau bovenaan, mijlpalen en substats per taal. De curve (6·(l−1)²) is zo gekozen dat level 2 al in je eerste les valt maar 99 een meerjarenprestatie blijft, precies het RuneScape-gevoel. De XP komt rechtstreeks uit progress[taal].xp, dus historische voortgang telde meteen mee: het testaccount opende op Spaans level 9 met echte cijfers. Uitbreidingspad (level-up-viering, deelvaardigheden, de 99-mantel, skill-missies) staat in Blok R. (2) **Het vrije gesprek**: de speler kiest zelf waar het over gaat. Zes onderwerpen per taal, twee beurten per onderwerp, doorpraten of afronden, plus een restaurantscenario van vijf beurten in alle zes talen. Bewezen: intro → Muziek → terug in de keuze (Muziek weg uit de chips) → Het weer → afronden → +25 XP (465→490) en 'vrij' in de opslag. Ook gefixt: de bouwstempel toonde UTC-tijd omdat GitHub Actions in UTC bouwt; nu expliciet Europe/Amsterdam. **Les:** de bouwstempel maakte de bundelhash niet-deterministisch, waardoor "vergelijk lokale hash met live hash" als bewijs stierf op het moment dat de stempel erin kwam; het nieuwe bewijs is de stempel zélf uit de live bundel lezen. Wie een controle bouwt, moet checken welke oude controle hij daarmee sloopt.

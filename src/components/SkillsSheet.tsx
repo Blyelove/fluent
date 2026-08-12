@@ -7,6 +7,8 @@ import { countryStates, courseFlagCode } from '../countries'
 import type { CourseId } from '../types'
 import { Flag } from './Flag'
 import { sfx } from '../audio'
+import { AANTAL_FAMILIES, FAMILIES, type WoordFamilie } from '../content/cognaten'
+import { WoordBoom } from './WoordBoom'
 
 /**
  * Het vaardighedenpaneel, gebouwd naar het beroemde RuneScape-scherm: een
@@ -73,7 +75,11 @@ export function SkillsSheet({ onClose }: { onClose: () => void }) {
   const gesprekken = useStore((s) => s.gesprekken)
   const stamps = useStore((s) => s.stamps)
   const huidig = useStore((s) => s.courseId)
+  const ontdekteIds = useStore((s) => s.ontdekteFamilies)
   const [open, setOpen] = useState<CourseId>(huidig)
+  /** familie die je uit je verzameling terugkijkt */
+  const [familie, setFamilie] = useState<WoordFamilie | null>(null)
+  const ontdekt = FAMILIES.filter((f) => ontdekteIds.includes(f.id))
 
   const rijen: Rij[] = courseList.map((c) => {
     const xp = progress[c.id]?.xp ?? 0
@@ -219,6 +225,42 @@ export function SkillsSheet({ onClose }: { onClose: () => void }) {
               </p>
             )}
           </motion.div>
+
+          {/* De Woordenstamboom: je verzameling ontdekte woordfamilies */}
+          <div className="glass" style={{ padding: '13px 15px', marginTop: 12 }}>
+            <div className="spread">
+              <span className="row" style={{ gap: 10 }}>
+                <span style={{ width: 30, height: 30, borderRadius: 9, background: 'rgba(74,222,128,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, flexShrink: 0 }}>🌳</span>
+                <strong className="card-title">Woordenstamboom</strong>
+              </span>
+              <span className="gold-text num" style={{ fontWeight: 700, fontSize: 13.5 }}>
+                {ontdekt.length}/{AANTAL_FAMILIES}
+              </span>
+            </div>
+            <p className="dim" style={{ fontSize: 12.5, margin: '7px 0 9px' }}>
+              {ontdekt.length === 0
+                ? 'Leer een nieuw woord en ontdek zijn familie in de andere talen. Elke ontdekking maakt je in meerdere talen beter.'
+                : 'Woorden die over de talen heen dezelfde stam delen. Tik een familie aan om hem terug te zien.'}
+            </p>
+            {ontdekt.length > 0 && (
+              <div className="row" style={{ flexWrap: 'wrap', gap: 6 }}>
+                {ontdekt.slice(0, 12).map((f) => (
+                  <button
+                    key={f.id}
+                    className="tile"
+                    style={{ fontSize: 12.5, minHeight: 36, padding: '7px 11px' }}
+                    onClick={() => { sfx('tap'); setFamilie(f) }}
+                  >
+                    {f.stam}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {familie && (
+            <WoordBoom familie={familie} jouwTaal={huidig} ontdekt={false} onSluiten={() => setFamilie(null)} />
+          )}
 
           <p className="faint center" style={{ fontSize: 11.5, marginTop: 12 }}>
             Niveau 99 is een echte prestatie: wie hem haalt, is meester van die taal.
