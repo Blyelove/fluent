@@ -72,6 +72,8 @@ interface AureaState {
   todayXp: number
   todayLessons: number
   todayPerfect: number
+  /** Hoeveel eigen fouten je vandaag hebt rechtgezet */
+  todayFixed: number
   /** Dag waarop de dagelijkse-missies-bonus al is uitgekeerd */
   questBonusDay: string | null
 
@@ -218,6 +220,7 @@ export const useStore = create<AureaState>()(
       todayXp: 0,
       todayLessons: 0,
       todayPerfect: 0,
+      todayFixed: 0,
       questBonusDay: null,
 
       progress: {},
@@ -287,11 +290,12 @@ export const useStore = create<AureaState>()(
         let todayXp = (sameDay ? s.todayXp : 0) + xp
         const todayLessons = (sameDay ? s.todayLessons : 0) + 1
         const todayPerfect = (sameDay ? s.todayPerfect : 0) + (perfect ? 1 : 0)
+        const todayFixed = sameDay ? s.todayFixed : 0
 
-        // dagelijkse missies: doel-XP + 2 lessen + 1 foutloze les → bonuskist
+        // dagelijkse missies: doel-XP + 2 lessen + (foutloze les OF 3 fouten rechtgezet) → bonuskist
         let totalXpForCourse = prev.xp + xp
         let questBonusDay = s.questBonusDay
-        const allQuestsDone = todayXp >= s.dailyGoalXp && todayLessons >= 2 && todayPerfect >= 1
+        const allQuestsDone = todayXp >= s.dailyGoalXp && todayLessons >= 2 && (todayPerfect >= 1 || todayFixed >= 3)
         if (allQuestsDone && questBonusDay !== today) {
           totalXpForCourse += 15
           todayXp += 15
@@ -338,6 +342,7 @@ export const useStore = create<AureaState>()(
           todayXp,
           todayLessons,
           todayPerfect,
+          todayFixed,
           questBonusDay,
           goals: remaining,
           goalsDone: [...s.goalsDone, ...doneNow],
@@ -452,7 +457,20 @@ export const useStore = create<AureaState>()(
         set({ mistakes: lijst.length > 60 ? lijst.slice(lijst.length - 60) : lijst })
       },
 
-      clearMistake: (key) => set({ mistakes: get().mistakes.filter((m) => mistakeKey(m) !== key) }),
+      clearMistake: (key) => {
+        const s = get()
+        const today = todayStr()
+        const sameDay = s.todayDay === today
+        set({
+          mistakes: s.mistakes.filter((m) => mistakeKey(m) !== key),
+          todayDay: today,
+          todayFixed: (sameDay ? s.todayFixed : 0) + 1,
+          // dag gewisseld? dan tellen de andere dagtellers ook opnieuw
+          todayXp: sameDay ? s.todayXp : 0,
+          todayLessons: sameDay ? s.todayLessons : 0,
+          todayPerfect: sameDay ? s.todayPerfect : 0,
+        })
+      },
 
       startBoost: (minutes) => set({ boostUntil: Date.now() + minutes * 60000 }),
 
@@ -517,6 +535,7 @@ export const useStore = create<AureaState>()(
           todayXp: 0,
           todayLessons: 0,
           todayPerfect: 0,
+          todayFixed: 0,
           questBonusDay: null,
           progress: {},
           srs: {},

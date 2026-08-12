@@ -95,6 +95,8 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
   const weekArcade = useStore((s) => s.weekArcade)
   const weekDuels = useStore((s) => s.weekDuels)
   const weekChestWeek = useStore((s) => s.weekChestWeek)
+  const todayFixedRaw = useStore((s) => s.todayFixed)
+  const mijnFouten = useStore((s) => s.mistakes.filter((m) => m.c === s.courseId).length)
   const claimWeekChest = useStore((s) => s.claimWeekChest)
   const leagueRank = useMemo(() => yourRank(standings(leagueId, weekXp)), [leagueId, weekXp])
   const addGoal = useStore((s) => s.addGoal)
@@ -282,6 +284,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
       {(() => {
         const lessonsToday = isToday ? todayLessonsRaw : 0
         const perfectToday = isToday ? todayPerfectRaw : 0
+        const fixedToday = isToday ? todayFixedRaw : 0
         const questsDone =
           (xpShown >= dailyGoalXp ? 1 : 0) + (lessonsToday >= 2 ? 1 : 0) + (perfectToday >= 1 ? 1 : 0)
         const weekDone =
@@ -290,7 +293,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
           sfx('tap')
           document.getElementById('vandaag')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
         }
-        const chips: { key: string; icon: string; label: string; klaar: boolean; actie: () => void }[] = [
+        const chips: { key: string; icon: string; label: string; klaar: boolean; hot?: boolean; actie: () => void }[] = [
           { key: 'dag', icon: '⚜️', label: `${questsDone}/3`, klaar: questsDone === 3, actie: naarVandaag },
           { key: 'week', icon: '🎁', label: `${weekDone}/4`, klaar: weekDone === 4, actie: naarVandaag },
           {
@@ -304,6 +307,19 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
             },
           },
         ]
+        // fouten alleen tonen als je ze hebt — anders is het een lege belofte
+        if (mijnFouten > 0)
+          chips.push({
+            key: 'fouten',
+            icon: '🎯',
+            label: String(mijnFouten),
+            klaar: false,
+            hot: true,
+            actie: () => {
+              sfx('tap')
+              onReview()
+            },
+          })
         return (
           <div className="row" style={{ gap: 8, marginBottom: 18 }}>
             {chips.map((c) => (
@@ -317,12 +333,12 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
                   padding: '10px 8px',
                   justifyContent: 'center',
                   borderRadius: 14,
-                  borderColor: c.klaar ? 'var(--line-gold)' : undefined,
+                  borderColor: c.klaar ? 'var(--line-gold)' : c.hot ? 'var(--line-hot)' : undefined,
                   minHeight: 44,
                 }}
               >
                 <span style={{ fontSize: 15 }}>{c.icon}</span>
-                <strong className={c.klaar ? 'gold-text' : ''} style={{ fontSize: 13.5 }}>
+                <strong className={c.klaar ? 'gold-text' : c.hot ? 'hot-text' : ''} style={{ fontSize: 13.5 }}>
                   {c.label}
                 </strong>
               </button>
@@ -385,10 +401,18 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
       {(() => {
         const lessonsToday = isToday ? todayLessonsRaw : 0
         const perfectToday = isToday ? todayPerfectRaw : 0
+        const fixedToday = isToday ? todayFixedRaw : 0
+        // de derde missie is op twee manieren te halen: foutloos spelen óf je eigen fouten wegwerken
+        // ook tonen wanneer je vandaag al fouten hebt weggewerkt, anders verspringt
+        // de missie zodra je lijst leeg is terwijl je hem net gehaald had
+        const derde =
+          (mijnFouten > 0 || fixedToday > 0) && perfectToday < 1
+            ? { label: 'Werk 3 fouten weg', done: fixedToday >= 3, frac: Math.min(1, fixedToday / 3), icon: '🎯' }
+            : { label: 'Speel een foutloze les', done: perfectToday >= 1, frac: perfectToday >= 1 ? 1 : 0, icon: '✨' }
         const quests = [
-          { label: `Verdien ${dailyGoalXp} XP`, done: xpShown >= dailyGoalXp, frac: Math.min(1, xpShown / dailyGoalXp) },
-          { label: 'Voltooi 2 lessen', done: lessonsToday >= 2, frac: Math.min(1, lessonsToday / 2) },
-          { label: 'Speel een foutloze les', done: perfectToday >= 1, frac: perfectToday >= 1 ? 1 : 0 },
+          { label: `Verdien ${dailyGoalXp} XP`, done: xpShown >= dailyGoalXp, frac: Math.min(1, xpShown / dailyGoalXp), icon: '⚡' },
+          { label: 'Voltooi 2 lessen', done: lessonsToday >= 2, frac: Math.min(1, lessonsToday / 2), icon: '📘' },
+          derde,
         ]
         const doneCount = quests.filter((q) => q.done).length
         const bonusIn = questBonusDay !== null && isToday && questBonusDay === todayDay
