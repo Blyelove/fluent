@@ -89,7 +89,15 @@ export default function App() {
   if (!onboarded) return <Onboarding />
 
   if (lesson) {
-    return <LessonScreen course={lesson.course} lesson={lesson.lesson} onExit={() => setLesson(null)} />
+    return (
+      <LessonScreen
+        key={lesson.lesson.id}
+        course={lesson.course}
+        lesson={lesson.lesson}
+        onExit={() => setLesson(null)}
+        onNext={(l) => setLesson({ course: lesson.course, lesson: l })}
+      />
+    )
   }
 
   const items: { id: Tab; icon: ComponentType; label: string; badge?: string }[] = [

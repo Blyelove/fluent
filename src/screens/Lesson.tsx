@@ -26,15 +26,28 @@ interface Props {
   course: Course
   lesson: Lesson
   onExit: () => void
+  /** Ketent door naar de volgende les zonder terug naar het startscherm */
+  onNext?: (lesson: Lesson) => void
 }
+
+const GEEN_LESSEN: string[] = []
 
 const PRAISE = ['Juist.', 'Precies.', 'Uitstekend.', 'Prachtig.', 'Zo hoort het.']
 const GENTLE = ['Bijna.', 'Net niet.', 'Volgende keer.', 'Blijf scherp.']
 
-export function LessonScreen({ course, lesson, onExit }: Props) {
+export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
   const learnWord = useStore((s) => s.learnWord)
   const completeLesson = useStore((s) => s.completeLesson)
   const alreadyDone = useStore((s) => courseProgress(s, course.id).completed.includes(lesson.id))
+  const completedNow = useStore((s) => s.progress[course.id]?.completed ?? GEEN_LESSEN)
+
+  /** De eerstvolgende les die nog niet af is — voor de "nog één les"-knop */
+  const nextLesson = useMemo(() => {
+    for (const sec of course.sections)
+      for (const u of sec.units)
+        for (const l of u.lessons) if (!completedNow.includes(l.id)) return l
+    return null
+  }, [course, completedNow])
 
   const [items, setItems] = useState<Exercise[]>(() => [...lesson.exercises])
   const [idx, setIdx] = useState(0)
@@ -139,6 +152,8 @@ export function LessonScreen({ course, lesson, onExit }: Props) {
         startCode={courseFlagCode[course.id]}
         courseId={course.id}
         onDone={onExit}
+        nextTitle={nextLesson?.title ?? null}
+        onNext={nextLesson ? () => onNext?.(nextLesson) : undefined}
       />
     )
   }
@@ -241,6 +256,8 @@ function CompleteView({
   startCode,
   courseId,
   onDone,
+  nextTitle,
+  onNext,
 }: {
   xp: number
   perfect: boolean
@@ -250,10 +267,17 @@ function CompleteView({
   startCode: string
   courseId: CourseId
   onDone: () => void
+  /** Titel van de eerstvolgende les — leeg als er niets meer volgt */
+  nextTitle?: string | null
+  /** Start meteen de volgende les zonder terug naar het startscherm */
+  onNext?: () => void
 }) {
   const streak = useStore((s) => s.streak)
   const curLevel = useStore((s) => levelForXp(totalXp(s)))
   const look = useStore((s) => s.avatarLook)
+  const todayXp = useStore((s) => s.todayXp)
+  const dailyGoalXp = useStore((s) => s.dailyGoalXp)
+  const goalReached = todayXp >= dailyGoalXp
   const [shown, setShown] = useState(0)
 
   const steps = useMemo(() => {
@@ -267,6 +291,42 @@ function CompleteView({
   const [si, setSi] = useState(0)
   const step = steps[si]
   const next = () => (si + 1 < steps.length ? setSi(si + 1) : onDone())
+  const isLastStep = si === steps.length - 1
+  const canChain = isLastStep && !!onNext && !!nextTitle
+
+  /**
+   * Slotknoppen: op het laatste stapje bied je de volgende les aan in plaats van af te sluiten.
+   * Bewust een functie die JSX teruggeeft (geen component): een component die binnen de render
+   * wordt gedefinieerd, zou bij elke tik van de XP-teller opnieuw worden opgebouwd.
+   */
+  const chainFooter = (label = 'Verder') =>
+    canChain ? (
+      <div className="col" style={{ marginTop: 22, padding: '0 8px', gap: 10 }}>
+        <motion.button
+          className="btn btn-primary"
+          whileTap={{ scale: 0.98 }}
+          onClick={() => {
+            sfx('tap')
+            onNext?.()
+          }}
+          style={{ fontSize: 17 }}
+        >
+          ▶ Nog één les
+        </motion.button>
+        <p className="faint" style={{ fontSize: 12, marginTop: -2 }}>
+          Volgende: {nextTitle}
+        </p>
+        <button className="btn btn-ghost" style={{ fontSize: 14.5, padding: 13 }} onClick={next}>
+          Klaar voor nu
+        </button>
+      </div>
+    ) : (
+      <div style={{ marginTop: 26, padding: '0 8px' }}>
+        <button className="btn btn-primary" onClick={next}>
+          {label}
+        </button>
+      </div>
+    )
 
   useEffect(() => {
     if (step === 'stats' && perfect) {
@@ -326,7 +386,7 @@ function CompleteView({
               </div>
               <div className="glass stat-card" style={{ minWidth: 120 }}>
                 <div className="stat-value">{streak}</div>
-                <div className="stat-label">dagen reeks</div>
+                <div className="stat-label">{streak === 1 ? 'dag reeks' : 'dagen reeks'}</div>
               </div>
             </div>
             {perfect && (
@@ -334,11 +394,33 @@ function CompleteView({
                 Foutloze les — uitzonderlijk.
               </p>
             )}
-            <div style={{ marginTop: 34, padding: '0 8px' }}>
-              <button className="btn btn-primary" onClick={next}>
-                Verder
-              </button>
+
+            {/* Dagdoel: laat zien hoe dichtbij je bent — dat is de motor achter "nog één les" */}
+            <div className="glass" style={{ padding: '14px 16px', marginTop: 18, textAlign: 'left' }}>
+              <div className="spread" style={{ marginBottom: 8 }}>
+                <span style={{ fontSize: 13.5, fontWeight: 700 }}>{goalReached ? '🎉 Dagdoel gehaald!' : 'Jouw dagdoel'}</span>
+                <span className={goalReached ? 'gold-text' : 'faint'} style={{ fontSize: 12.5, fontWeight: 700 }}>
+                  {Math.min(todayXp, dailyGoalXp)} / {dailyGoalXp} XP
+                </span>
+              </div>
+              <div className="progress-track" style={{ height: 8 }}>
+                <motion.div
+                  className="progress-fill"
+                  initial={{ width: `${Math.round((Math.max(0, todayXp - xp) / dailyGoalXp) * 100)}%` }}
+                  animate={{ width: `${Math.min(100, Math.round((todayXp / dailyGoalXp) * 100))}%` }}
+                  transition={{ duration: 0.9, ease: 'easeOut', delay: 0.2 }}
+                />
+              </div>
+              <p className="faint" style={{ fontSize: 12, marginTop: 8 }}>
+                {goalReached
+                  ? 'Je reeks is veiliggesteld voor vandaag. Alles hierna is pure winst.'
+                  : `Nog ${dailyGoalXp - todayXp} XP — dat is ongeveer ${Math.max(1, Math.ceil((dailyGoalXp - todayXp) / 12))} ${
+                      Math.ceil((dailyGoalXp - todayXp) / 12) === 1 ? 'les' : 'lessen'
+                    }.`}
+              </p>
             </div>
+
+            {chainFooter()}
           </motion.div>
         )}
 
@@ -382,11 +464,7 @@ function CompleteView({
             <motion.p className="dim" style={{ fontSize: 15, marginTop: 6 }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.8 }}>
               Jij rent alvast vooruit naar het volgende land.
             </motion.p>
-            <div style={{ marginTop: 30, padding: '0 8px' }}>
-              <button className="btn btn-primary" onClick={next}>
-                Verder
-              </button>
-            </div>
+            {chainFooter()}
           </motion.div>
         )}
 
@@ -421,11 +499,7 @@ function CompleteView({
               </p>
             )}
             <div className="divider-gold" />
-            <div style={{ marginTop: 26, padding: '0 8px' }}>
-              <button className="btn btn-primary" onClick={next}>
-                Verder
-              </button>
-            </div>
+            {chainFooter()}
           </motion.div>
         )}
 
@@ -455,11 +529,7 @@ function CompleteView({
               </motion.p>
             )}
             <div className="divider-gold" />
-            <div style={{ marginTop: 26, padding: '0 8px' }}>
-              <button className="btn btn-primary" onClick={next}>
-                Prachtig
-              </button>
-            </div>
+            {chainFooter('Prachtig')}
           </motion.div>
         )}
       </AnimatePresence>
