@@ -461,8 +461,10 @@ export function WorldMapScreen({
                           ? '3px solid var(--gold)'
                           : '2.5px solid var(--line)',
                       boxShadow: alsVeroverd ? '0 0 22px rgba(255, 197, 61, 0.35)' : '0 3px 0 rgba(0,0,0,0.35)',
-                      opacity: alsVeroverd || k.isVolgende ? 1 : 0.35,
-                      filter: alsVeroverd || k.isVolgende ? undefined : 'grayscale(0.85)',
+                      // verte blijft herkenbaar: te grijs oogt als een kapotte
+                      // afbeelding in plaats van als een bestemming die wacht
+                      opacity: alsVeroverd || k.isVolgende ? 1 : 0.62,
+                      filter: alsVeroverd || k.isVolgende ? undefined : 'grayscale(0.45) brightness(0.85)',
                       transition: 'background 0.4s ease, border 0.4s ease, opacity 0.4s ease, filter 0.4s ease',
                     }}
                   >
@@ -531,6 +533,38 @@ export function WorldMapScreen({
           </p>
         </div>
       </div>
+
+      {/* altijd één zichtbare hoofdactie: de kaart is een vertrekpunt, geen museum */}
+      {onVerderLeren && !gekozen && (
+        <motion.div
+          initial={{ y: 40, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.4, type: 'spring', stiffness: 260, damping: 26 }}
+          style={{
+            padding: '12px 16px calc(14px + env(safe-area-inset-bottom, 0px))',
+            borderTop: '1.5px solid var(--line)',
+            background: 'rgba(14, 11, 31, 0.94)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+          }}
+        >
+          <button
+            className="btn btn-primary"
+            style={{ padding: 15, fontSize: 15.5 }}
+            onClick={() => {
+              sfx('tap')
+              onVerderLeren()
+            }}
+          >
+            {(() => {
+              const doel = knopen.find((k) => k.isVolgende)
+              if (!doel) return '▶ Verder leren'
+              const rest = Math.max(0, doel.threshold - completedCount)
+              return `▶ Verder leren — nog ${rest} ${rest === 1 ? 'les' : 'lessen'} tot ${doel.name}`
+            })()}
+          </button>
+        </motion.div>
+      )}
 
       {/* de veroveringsbanner */}
       <AnimatePresence>

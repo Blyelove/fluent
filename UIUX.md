@@ -90,7 +90,7 @@ Fluent heeft een kern die al als topspel voelt — chunky leslus met combo's en 
 
 **Bewijs:** Open Divisie: inhaalprikkel zichtbaar zonder scrollen, één tik start een les, en de derde statkaart toont een getal dat per les verandert.
 
-### 21. Sticky hoofdactie op de wereldkaart: de enige echte actie ('▶ Verder leren', WorldMap.tsx r641-653) zit verstopt in het bottom-sheet achter een tik op het pulserende land. Voeg een sticky voetbalk toe: '▶ Verder leren — nog 3 lessen tot 🇫🇷 Frankrijk' die direct onVerderLeren aanroept; het landpaneel blijft voor detail. (Home-instap zelf is Wereldreis fase 9 — niet aanraken.)
+### 21. ✅ AF (ronde 38) — Sticky hoofdactie op de wereldkaart: de enige echte actie ('▶ Verder leren', WorldMap.tsx r641-653) zit verstopt in het bottom-sheet achter een tik op het pulserende land. Voeg een sticky voetbalk toe: '▶ Verder leren — nog 3 lessen tot 🇫🇷 Frankrijk' die direct onVerderLeren aanroept; het landpaneel blijft voor detail. (Home-instap zelf is Wereldreis fase 9 — niet aanraken.)
 
 **Bewijs:** Open de kaart: onderaan staat altijd één primaire knop die zonder tussenstap de juiste les start.
 
