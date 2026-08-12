@@ -102,7 +102,7 @@ Fluent heeft een kern die al als topspel voelt — chunky leslus met combo's en 
 
 **Bewijs:** Eerste les van de dag: de keten toont een aparte vlam-stap; tweede les van dezelfde dag toont hem niet.
 
-### 24. Weekmissie-voortgang tonen waar je hem haalt: de store telt weekArcade/weekDuels al, maar Arcade.tsx (r214-354) toont er niets van en Duel.tsx r915 is statische tekst. Voortgangschip in de hub-kop ('🕹️ Weekmissie: 1/3 potjes → 🎁') en op het Result-scherm de trigger ('Nog 1 potje tot de weekkist!').
+### 24. ✅ DEELS AF (ronde 41, speelhal) — Weekmissie-voortgang tonen waar je hem haalt: de store telt weekArcade/weekDuels al, maar Arcade.tsx (r214-354) toont er niets van en Duel.tsx r915 is statische tekst. Voortgangschip in de hub-kop ('🕹️ Weekmissie: 1/3 potjes → 🎁') en op het Result-scherm de trigger ('Nog 1 potje tot de weekkist!').
 
 **Bewijs:** Speel één potje: de chip in de hub springt van 0/3 naar 1/3 en het eindscherm benoemt de afstand tot de kist.
 
@@ -110,7 +110,7 @@ Fluent heeft een kern die al als topspel voelt — chunky leslus met combo's en 
 
 **Bewijs:** Rond de derde dagmissie af: confetti en kist-animatie op de kaart, en de belofte-tekst dekt beide beloningen.
 
-### 26. Medaille-tiers per minigame: Arcade.tsx r340 toont alleen 'Beste score' — daarna valt er niets meer te jagen. Brons/zilver/goud-drempels per spel (bv. Bliksem 40/70/100) op de spelkaart én het eindscherm met afstand tot de volgende tier ('nog 12 punten tot 🥈').
+### 26. ✅ AF (ronde 41) — Medaille-tiers per minigame: Arcade.tsx r340 toont alleen 'Beste score' — daarna valt er niets meer te jagen. Brons/zilver/goud-drempels per spel (bv. Bliksem 40/70/100) op de spelkaart én het eindscherm met afstand tot de volgende tier ('nog 12 punten tot 🥈').
 
 **Bewijs:** Score net onder een drempel: eindscherm toont de exacte afstand; haal de drempel en de kaart in de hub draagt de nieuwe medaille.
 

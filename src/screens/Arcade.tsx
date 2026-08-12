@@ -71,6 +71,17 @@ interface GameDef {
   /** Donkere onderrand voor het 3D-effect */
   shade: string
   glow: string
+  /** Scores voor brons, zilver en goud — zonder doel valt er na één potje niets meer te jagen */
+  medailles: [number, number, number]
+}
+
+/** Welke medaille hoort bij deze score, en hoeveel scheelt het tot de volgende? */
+function medailleVoor(def: GameDef, score: number): { nu: string; volgende: string | null; tekort: number } {
+  const [brons, zilver, goud] = def.medailles
+  if (score >= goud) return { nu: '🥇', volgende: null, tekort: 0 }
+  if (score >= zilver) return { nu: '🥈', volgende: '🥇', tekort: goud - score }
+  if (score >= brons) return { nu: '🥉', volgende: '🥈', tekort: zilver - score }
+  return { nu: '', volgende: '🥉', tekort: brons - score }
 }
 
 const GAMES: GameDef[] = [
@@ -83,6 +94,7 @@ const GAMES: GameDef[] = [
     grad: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
     shade: '#6b21a8',
     glow: 'rgba(236, 72, 153, 0.45)',
+    medailles: [60, 110, 170],
   },
   {
     id: 'storm',
@@ -93,6 +105,7 @@ const GAMES: GameDef[] = [
     grad: 'linear-gradient(135deg, #22d3ee 0%, #6366f1 100%)',
     shade: '#0e7490',
     glow: 'rgba(34, 211, 238, 0.42)',
+    medailles: [120, 180, 230],
   },
   {
     id: 'luister',
@@ -103,6 +116,7 @@ const GAMES: GameDef[] = [
     grad: 'linear-gradient(135deg, #ffe08a 0%, #f59e0b 100%)',
     shade: '#b45309',
     glow: 'rgba(255, 197, 61, 0.45)',
+    medailles: [60, 105, 145],
   },
 ]
 
@@ -132,6 +146,7 @@ export function ArcadeScreen({ onPlayingChange }: { onPlayingChange?: (playing: 
   const srs = useStore((s) => s.srs)
   const arcadeBest = useStore((s) => s.arcadeBest)
   const arcadePlays = useStore((s) => s.arcadePlays)
+  const weekArcade = useStore((s) => s.weekArcade)
   const awardXp = useStore((s) => s.awardXp)
 
   const [phase, setPhase] = useState<Phase>({ name: 'hub' })
@@ -224,6 +239,31 @@ export function ArcadeScreen({ onPlayingChange }: { onPlayingChange?: (playing: 
         <p className="dim" style={{ fontSize: 14, marginTop: 6 }}>
           {arcadePlays > 0 ? `Je speelde al ${arcadePlays} ${arcadePlays === 1 ? 'potje' : 'potjes'}. Nog één dan?` : 'Kies een spel en verdien XP terwijl je speelt.'}
         </p>
+        {/* de weekmissie telt hier mee, dus hier hoor je te zien hoe ver je bent */}
+        <div
+          className="row"
+          style={{
+            gap: 8,
+            marginTop: 12,
+            padding: '8px 13px',
+            borderRadius: 999,
+            border: `1.5px solid ${weekArcade >= 3 ? 'var(--line-gold)' : 'var(--line)'}`,
+            background: weekArcade >= 3 ? 'rgba(255, 197, 61, 0.12)' : 'var(--surface-2)',
+            width: 'fit-content',
+          }}
+        >
+          <span style={{ fontSize: 15 }}>🎁</span>
+          <span style={{ fontSize: 12.5, fontWeight: 800 }}>
+            {weekArcade >= 3 ? (
+              <span className="gold-text">Weekmissie gehaald: 3/3 potjes</span>
+            ) : (
+              <>
+                Weekmissie: {weekArcade}/3 potjes
+                <span className="dim"> · nog {3 - weekArcade} tot de kist</span>
+              </>
+            )}
+          </span>
+        </div>
       </motion.div>
 
       {locked && (
@@ -337,7 +377,16 @@ export function ArcadeScreen({ onPlayingChange }: { onPlayingChange?: (playing: 
                     letterSpacing: '0.04em',
                   }}
                 >
-                  {locked ? '🔒 Vergrendeld' : best > 0 ? `🏆 Beste score: ${best}` : '✨ Nog niet gespeeld'}
+                  {locked
+                    ? '🔒 Vergrendeld'
+                    : best > 0
+                      ? (() => {
+                          const m = medailleVoor(g, best)
+                          return m.volgende
+                            ? `${m.nu || '🏆'} ${best} · nog ${m.tekort} tot ${m.volgende}`
+                            : `🥇 ${best} · goud gehaald`
+                        })()
+                      : `✨ Nog niet gespeeld · ${g.medailles[0]} voor 🥉`}
                 </span>
               </span>
             </motion.button>
@@ -1220,6 +1269,25 @@ function Result({
               <p className="stat-label">{phase.boosted ? 'XP (2× boost)' : 'XP verdiend'}</p>
             </div>
           </div>
+          {/* iets om op te jagen: zonder volgend doel is één potje genoeg geweest */}
+          {(() => {
+            const m = medailleVoor(def, phase.score)
+            return (
+              <p style={{ fontSize: 14, marginTop: 16, fontWeight: 700 }}>
+                {m.volgende ? (
+                  <>
+                    {m.nu && <span style={{ fontSize: 18 }}>{m.nu} </span>}
+                    <span className="dim">Nog </span>
+                    <span className="gold-text">{m.tekort}</span>
+                    <span className="dim"> {m.tekort === 1 ? 'punt' : 'punten'} tot </span>
+                    <span style={{ fontSize: 18 }}>{m.volgende}</span>
+                  </>
+                ) : (
+                  <span className="gold-text">🥇 Goud gehaald. Hoger dan dit gaat niet.</span>
+                )}
+              </p>
+            )
+          })()}
         </motion.div>
 
         <div className="col" style={{ gap: 12, marginTop: 26 }}>
