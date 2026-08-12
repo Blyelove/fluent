@@ -12,6 +12,7 @@ import type { CourseId } from '../types'
 import { Flag } from '../components/Flag'
 import { Avatar } from '../components/Avatar'
 import { ShareButton } from '../components/ShareButton'
+import { GuideSheet } from '../components/GuideSheet'
 import { courses } from '../content'
 import { sfx, speak } from '../audio'
 import {
@@ -78,6 +79,8 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
 
   /** Uitleg opengeklapt bij het huidige foute antwoord */
   const [uitlegOpen, setUitlegOpen] = useState(false)
+  /** de volledige gids van deze unit, opgeroepen vanuit de lesbalk */
+  const [gidsOpen, setGidsOpen] = useState(false)
 
   const learnWord = useStore((s) => s.learnWord)
   const completeLesson = useStore((s) => s.completeLesson)
@@ -298,6 +301,22 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
         >
           ×
         </button>
+        {/* de gids stond alleen op het startscherm; juist midden in een les
+            wil je even kunnen opzoeken hoe die regel ook alweer zat */}
+        {unit && guide && (
+          <button
+            className="btn-quiet"
+            style={{ minWidth: 44, minHeight: 44, fontSize: 17, lineHeight: 1 }}
+            onClick={() => {
+              sfx('tap')
+              setGidsOpen(true)
+            }}
+            aria-label="Grammatica-gids"
+            title="Grammatica-gids"
+          >
+            📖
+          </button>
+        )}
         <div className="progress-track">
           <motion.div
             className="progress-fill"
@@ -453,6 +472,10 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
           )}
         </AnimatePresence>
       </div>
+
+      {gidsOpen && unit && (
+        <GuideSheet unit={unit} courseId={course.id} ttsLang={course.ttsLang} onClose={() => setGidsOpen(false)} />
+      )}
     </div>
   )
 }

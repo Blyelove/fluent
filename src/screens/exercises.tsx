@@ -408,9 +408,22 @@ export function ListenEx({ ex, ttsLang, locked, register }: Common & { ex: Liste
       <p className="eyebrow" style={{ marginBottom: 20 }}>
         Wat hoor je?
       </p>
-      <button className="speaker-btn" style={{ color: 'var(--gold-bright)' }} onClick={() => speak(ex.target, ttsLang)} aria-label="Opnieuw luisteren">
-        <SpeakerIcon size={34} />
-      </button>
+      <div className="row" style={{ gap: 12, justifyContent: 'center' }}>
+        <button className="speaker-btn" style={{ color: 'var(--gold-bright)' }} onClick={() => speak(ex.target, ttsLang)} aria-label="Opnieuw luisteren">
+          <SpeakerIcon size={34} />
+        </button>
+        {/* langzaam luisteren: bij een snelle moedertaalspreker valt een zin
+            soms pas op de helft van de snelheid uiteen in losse woorden */}
+        <button
+          className="speaker-sm"
+          style={{ color: 'var(--cyan)', fontSize: 19 }}
+          onClick={() => speak(ex.target, ttsLang, 0.6)}
+          aria-label="Langzaam afspelen"
+          title="Langzaam"
+        >
+          🐢
+        </button>
+      </div>
       <div className="col" style={{ gap: 10, textAlign: 'left' }}>
         {opties.map((opt, i) => (
           <button

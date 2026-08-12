@@ -126,7 +126,7 @@ Fluent heeft een kern die al als topspel voelt — chunky leslus met combo's en 
 
 **Bewijs:** Maak één mis-tik in een match: de afronding blijft positief, benoemt het paar, en er verschijnt geen irrelevante Waarom-uitleg.
 
-### 30. Langzame herhaalknop bij luisteroefeningen: ListenEx (exercises.tsx r374-417) kan alleen exact hetzelfde herhalen. Tweede 44px-knop 🐢 naast de speaker die dezelfde tekst op ~0.65 rate afspeelt (utterance.rate in audio.ts speak).
+### 30. ✅ AF (ronde 49) — Langzame herhaalknop bij luisteroefeningen: ListenEx (exercises.tsx r374-417) kan alleen exact hetzelfde herhalen. Tweede 44px-knop 🐢 naast de speaker die dezelfde tekst op ~0.65 rate afspeelt (utterance.rate in audio.ts speak).
 
 **Bewijs:** Tik 🐢: dezelfde zin klinkt hoorbaar langzamer; de normale knop blijft op vol tempo.
 
@@ -134,7 +134,7 @@ Fluent heeft een kern die al als topspel voelt — chunky leslus met combo's en 
 
 **Bewijs:** Versla Robo Rens: kroontje in de hub en het eindscherm stelt Turbo Tessa voor; versla Meester Milan en de copy verwijst naar vriendenduels.
 
-### 32. Gids bereikbaar tijdens de les: klein 📖 (44px) in de lesson-top dat GuideSheet van de huidige unit opent (unit is al bekend, Lesson.tsx r62-66); verplaats tegelijk AnimatePresence van binnen GuideSheet.tsx (r69) naar de aanroepkant zodat de exit-animatie echt speelt.
+### 32. ✅ AF (ronde 49) — Gids bereikbaar tijdens de les: klein 📖 (44px) in de lesson-top dat GuideSheet van de huidige unit opent (unit is al bekend, Lesson.tsx r62-66); verplaats tegelijk AnimatePresence van binnen GuideSheet.tsx (r69) naar de aanroepkant zodat de exit-animatie echt speelt.
 
 **Bewijs:** Open de gids halverwege een les zonder de les te verliezen; sluiten toont een vloeiende exit-animatie.
 
