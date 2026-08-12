@@ -52,6 +52,8 @@ function daysBetween(a: string, b: string): number {
 interface AureaState {
   /** Lokale accounts (sleutel = naam in kleine letters); sync via server komt later */
   accounts: Record<string, Account>
+  /** De bewaarde voortgang per account, zodat niemands data ooit overschreven wordt */
+  profiles: Record<string, Profiel>
   currentUser: string | null
   /** "Ingelogd blijven" — true = nooit meer het inlogscherm */
   rememberMe: boolean
@@ -172,6 +174,121 @@ interface AureaState {
 }
 
 const emptyProgress = (): Progress => ({ xp: 0, completed: [] })
+
+/**
+ * Alles wat bij ÉÉN account hoort. Wat hier niet in staat, is apparaatbreed:
+ * de accountlijst zelf, wie er ingelogd is, "ingelogd blijven" en het geluid.
+ *
+ * Waarom dit bestaat: eerder deelden alle accounts op één apparaat dezelfde
+ * voortgang. Maakte een vriend een account aan op jouw telefoon, dan nam die
+ * jouw XP, reeks en lessen over, en schreef er daarna overheen. Nu krijgt elk
+ * account zijn eigen profiel, bewaard onder zijn eigen sleutel.
+ */
+export type Profiel = Pick<
+  AureaState,
+  | 'avatarLook'
+  | 'onboarded'
+  | 'courseId'
+  | 'dailyGoalXp'
+  | 'streak'
+  | 'bestStreak'
+  | 'lastDay'
+  | 'freezes'
+  | 'todayDay'
+  | 'todayXp'
+  | 'todayLessons'
+  | 'todayPerfect'
+  | 'todayFixed'
+  | 'questBonusDay'
+  | 'progress'
+  | 'srs'
+  | 'goals'
+  | 'goalsDone'
+  | 'tests'
+  | 'leagueId'
+  | 'leagueWeek'
+  | 'weekXp'
+  | 'promotions'
+  | 'perfectLessons'
+  | 'arcadePlays'
+  | 'arcadeBest'
+  | 'duelsWon'
+  | 'duelHistory'
+  | 'seenBadgeTiers'
+  | 'boostUntil'
+  | 'activeDays'
+  | 'mistakes'
+  | 'lastSeenDay'
+  | 'comebackDays'
+  | 'weekLessons'
+  | 'weekArcade'
+  | 'weekDuels'
+  | 'weekChestWeek'
+  | 'weekUitslag'
+  | 'worldSeen'
+>
+
+/** Een kersvers profiel: waar elk nieuw account mee begint */
+function nieuwProfiel(): Profiel {
+  return {
+    avatarLook: 'a',
+    onboarded: false,
+    courseId: 'en',
+    dailyGoalXp: 40,
+
+    streak: 0,
+    bestStreak: 0,
+    lastDay: null,
+    freezes: 1,
+
+    todayDay: todayStr(),
+    todayXp: 0,
+    todayLessons: 0,
+    todayPerfect: 0,
+    todayFixed: 0,
+    questBonusDay: null,
+
+    progress: {},
+    srs: {},
+
+    goals: [],
+    goalsDone: [],
+    tests: [],
+
+    leagueId: 0,
+    leagueWeek: weekIndex(),
+    weekXp: 0,
+    promotions: 0,
+
+    perfectLessons: 0,
+    arcadePlays: 0,
+    arcadeBest: {},
+    duelsWon: 0,
+    duelHistory: [],
+    seenBadgeTiers: {},
+
+    boostUntil: 0,
+    activeDays: [],
+    mistakes: [],
+    lastSeenDay: null,
+    comebackDays: 0,
+
+    weekLessons: 0,
+    weekArcade: 0,
+    weekDuels: 0,
+    weekChestWeek: -1,
+    weekUitslag: null,
+    worldSeen: {},
+  }
+}
+
+/** De huidige voortgang uit de actieve state plukken, om onder een account te bewaren */
+function pakProfiel(s: AureaState): Profiel {
+  const leeg = nieuwProfiel()
+  const uit = {} as Record<string, unknown>
+  for (const sleutel of Object.keys(leeg)) uit[sleutel] = (s as unknown as Record<string, unknown>)[sleutel]
+  return uit as Profiel
+}
 
 /**
  * Rolt de competitieweek door als er een nieuwe week is begonnen:
@@ -309,59 +426,15 @@ function rollWeek(s: WeekState): WeekState {
 export const useStore = create<AureaState>()(
   persist(
     (set, get) => ({
+      // apparaatbreed: geldt voor iedereen die deze telefoon gebruikt
       accounts: {},
+      profiles: {},
       currentUser: null,
       rememberMe: true,
-      avatarLook: 'a',
-
-      onboarded: false,
-      courseId: 'en',
-      dailyGoalXp: 40,
       soundOn: true,
 
-      streak: 0,
-      bestStreak: 0,
-      lastDay: null,
-      freezes: 1,
-
-      todayDay: todayStr(),
-      todayXp: 0,
-      todayLessons: 0,
-      todayPerfect: 0,
-      todayFixed: 0,
-      questBonusDay: null,
-
-      progress: {},
-      srs: {},
-
-      goals: [],
-      goalsDone: [],
-      tests: [],
-
-      leagueId: 0,
-      leagueWeek: weekIndex(),
-      weekXp: 0,
-      promotions: 0,
-
-      perfectLessons: 0,
-      arcadePlays: 0,
-      arcadeBest: {},
-      duelsWon: 0,
-      duelHistory: [],
-      seenBadgeTiers: {},
-
-      boostUntil: 0,
-      activeDays: [],
-      mistakes: [],
-      lastSeenDay: null,
-      comebackDays: 0,
-
-      weekLessons: 0,
-      weekArcade: 0,
-      weekDuels: 0,
-      weekChestWeek: -1,
-      weekUitslag: null,
-      worldSeen: {},
+      // en hier de voortgang van wie er nu ingelogd is
+      ...nieuwProfiel(),
 
       completeOnboarding: (c, goalXp) => set({ onboarded: true, courseId: c, dailyGoalXp: goalXp }),
 
@@ -614,8 +687,13 @@ export const useStore = create<AureaState>()(
         }
         set({
           accounts: { ...s.accounts, [key]: { email: email.trim(), passHash, createdAt: todayStr() } },
+          // de voortgang van wie er nu inlogde eerst veilig wegzetten, anders
+          // zou het nieuwe account zijn XP en reeks erven
+          profiles: s.currentUser ? { ...s.profiles, [s.currentUser]: pakProfiel(s) } : s.profiles,
           currentUser: key,
           rememberMe: remember,
+          // een nieuw account begint schoon, met het gekozen personage
+          ...nieuwProfiel(),
           avatarLook: look,
         })
         return 'ok'
@@ -623,14 +701,23 @@ export const useStore = create<AureaState>()(
 
       loginAccount: (email, passHash, remember) => {
         const key = email.trim().toLowerCase()
-        const acc = get().accounts[key]
+        const s = get()
+        const acc = s.accounts[key]
         if (!acc || acc.passHash !== passHash) return 'fout'
         try {
           sessionStorage.setItem('fluent-session', '1')
         } catch {
           /* geen sessionStorage — rememberMe vangt dit op */
         }
-        set({ currentUser: key, rememberMe: remember })
+        // huidige voortgang bewaren, daarna die van dit account terugzetten
+        const bewaard = s.currentUser ? { ...s.profiles, [s.currentUser]: pakProfiel(s) } : s.profiles
+        const eigen = bewaard[key]
+        set({
+          profiles: bewaard,
+          currentUser: key,
+          rememberMe: remember,
+          ...(eigen ?? nieuwProfiel()),
+        })
         return 'ok'
       },
 
@@ -655,49 +742,48 @@ export const useStore = create<AureaState>()(
 
       markWorldSeen: (c, count) => set({ worldSeen: { ...get().worldSeen, [c]: count } }),
 
-      resetAll: () =>
-        set({
-          onboarded: false,
-          courseId: 'en',
-          dailyGoalXp: 40,
-          streak: 0,
-          bestStreak: 0,
-          lastDay: null,
-          freezes: 1,
-          todayDay: todayStr(),
-          todayXp: 0,
-          todayLessons: 0,
-          todayPerfect: 0,
-          todayFixed: 0,
-          questBonusDay: null,
-          progress: {},
-          srs: {},
-          goals: [],
-          goalsDone: [],
-          tests: [],
-          leagueId: 0,
-          leagueWeek: weekIndex(),
-          weekXp: 0,
-          promotions: 0,
-          perfectLessons: 0,
-          arcadePlays: 0,
-          arcadeBest: {},
-          duelsWon: 0,
-          duelHistory: [],
-          seenBadgeTiers: {},
-          boostUntil: 0,
-          activeDays: [],
-          mistakes: [],
-          lastSeenDay: null,
-          comebackDays: 0,
-          weekLessons: 0,
-          weekArcade: 0,
-          weekDuels: 0,
-          weekChestWeek: -1,
-          weekUitslag: null,
-        }),
+      // alleen het profiel van dit account wissen; de personagekeuze en de
+      // accounts van anderen op dit apparaat blijven staan
+      resetAll: () => set({ ...nieuwProfiel(), avatarLook: get().avatarLook }),
     }),
-    { name: 'aurea-v1' }
+    {
+      name: 'aurea-v1',
+      /**
+       * Versienummer van de opslag. Verandert de vorm van de gegevens ooit,
+       * dan draait migrate() en blijft bestaande voortgang behouden. Zonder
+       * dit zou één verkeerde wijziging iedereen zijn account kosten.
+       */
+      version: 2,
+      migrate: (opgeslagen) => opgeslagen as AureaState,
+      /**
+       * Bij elke wijziging schrijven we de actieve voortgang meteen onder het
+       * ingelogde account. Zo staat er altijd een actuele kopie klaar, ook als
+       * de app onverwacht sluit.
+       */
+      partialize: (s) => {
+        const profiel = pakProfiel(s)
+        return {
+          accounts: s.accounts,
+          currentUser: s.currentUser,
+          rememberMe: s.rememberMe,
+          soundOn: s.soundOn,
+          profiles: s.currentUser ? { ...s.profiles, [s.currentUser]: profiel } : s.profiles,
+          // ook los meeschrijven: zo blijft een oude opslag zonder profielen werken
+          ...profiel,
+        } as unknown as AureaState
+      },
+      /**
+       * Bij het opstarten laden we het profiel van wie er ingelogd is. Velden
+       * die nog niet bestonden krijgen automatisch hun nieuwe standaardwaarde,
+       * dus een update voegt hooguit iets toe en haalt nooit iets weg.
+       */
+      merge: (opgeslagenRuw, huidig) => {
+        const p = (opgeslagenRuw ?? {}) as Partial<AureaState>
+        const basis = { ...huidig, ...p }
+        const eigen = p.currentUser ? p.profiles?.[p.currentUser] : undefined
+        return eigen ? { ...basis, ...eigen } : basis
+      },
+    }
   )
 )
 
