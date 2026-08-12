@@ -140,6 +140,10 @@ interface AureaState {
   worldSeen: Partial<Record<CourseId, number>>
   markWorldSeen: (c: CourseId, count: number) => void
 
+  /** Namen van oefenbots die je al verslagen hebt — een ladder om te beklimmen */
+  botsVerslagen: string[]
+  markBotVerslagen: (naam: string) => void
+
   completeOnboarding: (c: CourseId, goalXp: number) => void
   /** Je dagdoel aanpassen — kan altijd, niet alleen tijdens de onboarding */
   setDailyGoal: (xp: number) => void
@@ -228,6 +232,7 @@ export type Profiel = Pick<
   | 'weekChestWeek'
   | 'weekUitslag'
   | 'worldSeen'
+  | 'botsVerslagen'
 >
 
 /** Een kersvers profiel: waar elk nieuw account mee begint */
@@ -281,6 +286,7 @@ function nieuwProfiel(): Profiel {
     weekChestWeek: -1,
     weekUitslag: null,
     worldSeen: {},
+    botsVerslagen: [],
   }
 }
 
@@ -746,6 +752,13 @@ export const useStore = create<AureaState>()(
       clearWeekUitslag: () => set({ weekUitslag: null }),
 
       markWorldSeen: (c, count) => set({ worldSeen: { ...get().worldSeen, [c]: count } }),
+
+      // eenmaal verslagen blijft verslagen: vrijspelen mag, afpakken nooit
+      markBotVerslagen: (naam) => {
+        const s = get()
+        if (s.botsVerslagen.includes(naam)) return
+        set({ botsVerslagen: [...s.botsVerslagen, naam] })
+      },
 
       // alleen het profiel van dit account wissen; de personagekeuze en de
       // accounts van anderen op dit apparaat blijven staan

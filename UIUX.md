@@ -130,7 +130,7 @@ Fluent heeft een kern die al als topspel voelt — chunky leslus met combo's en 
 
 **Bewijs:** Tik 🐢: dezelfde zin klinkt hoorbaar langzamer; de normale knop blijft op vol tempo.
 
-### 31. Bots worden een ladder: niets onthoudt wie je versloeg en na winst op de sterkste bot zegt r699 alsnog 'Er staat vast een sterkere bot voor je klaar'. Per-bot win/verlies-record in de store, kroontje op verslagen bots, na winst de volgende bot voorstellen; special-case de top-bot ('tijd om een echte vriend uit te dagen').
+### 31. ✅ AF (ronde 50) — Bots worden een ladder: niets onthoudt wie je versloeg en na winst op de sterkste bot zegt r699 alsnog 'Er staat vast een sterkere bot voor je klaar'. Per-bot win/verlies-record in de store, kroontje op verslagen bots, na winst de volgende bot voorstellen; special-case de top-bot ('tijd om een echte vriend uit te dagen').
 
 **Bewijs:** Versla Robo Rens: kroontje in de hub en het eindscherm stelt Turbo Tessa voor; versla Meester Milan en de copy verwijst naar vriendenduels.
 

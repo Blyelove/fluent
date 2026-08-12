@@ -306,6 +306,8 @@ export function DuelScreen({
   const recordDuel = useStore((s) => s.recordDuel)
   const awardXp = useStore((s) => s.awardXp)
   const addMistake = useStore((s) => s.addMistake)
+  const botsVerslagen = useStore((s) => s.botsVerslagen)
+  const markBotVerslagen = useStore((s) => s.markBotVerslagen)
   const look = useStore((s) => s.avatarLook)
   const curLevel = useStore((s) => levelForXp(totalXp(s)))
 
@@ -487,6 +489,8 @@ export function DuelScreen({
       awardXp(xp)
       // een botduel mag altijd opnieuw; een echte uitdaging telt maar één keer
       if (!isBotNaam(phase.payload.n)) markeerDuelAfgerond(phase.payload.s)
+      // een verslagen bot krijgt zijn kroontje, en houdt die voorgoed
+      if (won && isBotNaam(phase.payload.n) && phase.payload.n) markBotVerslagen(phase.payload.n)
       if (won) burst()
       setPhase({ name: 'result', payload: phase.payload, score, total, theirScore: theirs, xp })
     } else {
@@ -702,21 +706,36 @@ export function DuelScreen({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
           >
-            <strong style={{ fontSize: 16 }}>{won ? '👑 Verslagen!' : 'Nog een keer?'}</strong>
-            <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 14px' }}>
-              {won
-                ? `Jij hebt ${opponent} verslagen. Er staat vast een sterkere bot voor je klaar — of daag een echte vriend uit.`
-                : `${opponent} speelt elke ronde anders. Nog een keer proberen — of pak een makkelijkere bot?`}
-            </p>
-            <button
-              className="btn btn-primary"
-              onClick={() => {
-                const bot = BOTS.find((b) => b.naam === phase.payload.n) ?? BOTS[0]
-                challengeBot(bot)
-              }}
-            >
-              ⚔️ Revanche tegen {opponent.replace('🤖 ', '')}
-            </button>
+            {(() => {
+              // wie is hierna aan de beurt? de eerstvolgende bot die je nog niet versloeg
+              const huidige = BOTS.find((b) => b.naam === phase.payload.n) ?? BOTS[0]
+              const naVanDeze = [...botsVerslagen, ...(won ? [huidige.naam] : [])]
+              const volgende = won ? BOTS.find((b) => !naVanDeze.includes(b.naam)) : undefined
+              const allesGehad = won && !volgende
+              return (
+                <>
+                  <strong style={{ fontSize: 16 }}>{won ? '👑 Verslagen!' : 'Nog een keer?'}</strong>
+                  <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 14px' }}>
+                    {allesGehad
+                      ? 'Je hebt alle drie de bots verslagen. Er is er geen die je nog kan bijhouden: tijd om een echte vriend uit te dagen.'
+                      : won
+                        ? `Jij hebt ${opponent} verslagen. ${volgende?.naam} is een maatje te groot voor de meesten. Durf jij?`
+                        : `${opponent} speelt elke ronde anders. Nog een keer proberen, of eerst een makkelijkere pakken?`}
+                  </p>
+                  {volgende ? (
+                    <button className="btn btn-primary" style={{ marginBottom: 10 }} onClick={() => challengeBot(volgende)}>
+                      ⚔️ Nu {volgende.naam.replace('🤖 ', '')}
+                    </button>
+                  ) : null}
+                  <button
+                    className={volgende ? 'btn btn-ghost' : 'btn btn-primary'}
+                    onClick={() => challengeBot(huidige)}
+                  >
+                    ↻ {won ? 'Nog eens tegen' : 'Revanche tegen'} {opponent.replace('🤖 ', '')}
+                  </button>
+                </>
+              )
+            })()}
           </motion.div>
         ) : (
         <motion.div
@@ -929,18 +948,37 @@ export function DuelScreen({
             Geen vriend bij de hand? Deze drie spelen altijd mee. Ze maken hun eigen fouten — elke ronde is anders.
           </p>
           <div className="col" style={{ gap: 10 }}>
-            {BOTS.map((bot) => (
-              <button
-                key={bot.naam}
-                className="opt"
-                style={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center', gap: 10 }}
-                onClick={() => challengeBot(bot)}
-              >
-                <span style={{ fontWeight: 800, whiteSpace: 'nowrap' }}>{bot.naam}</span>
-                <span className="faint" style={{ fontSize: 12, textAlign: 'right' }}>{bot.uitleg}</span>
-              </button>
-            ))}
+            {BOTS.map((bot) => {
+              const verslagen = botsVerslagen.includes(bot.naam)
+              return (
+                <button
+                  key={bot.naam}
+                  className="opt"
+                  style={{
+                    justifyContent: 'space-between',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    ...(verslagen ? { borderColor: 'var(--line-gold)', background: 'rgba(255,197,61,0.09)' } : {}),
+                  }}
+                  onClick={() => challengeBot(bot)}
+                >
+                  <span style={{ fontWeight: 800, whiteSpace: 'nowrap' }}>
+                    {verslagen && '👑 '}
+                    {bot.naam}
+                  </span>
+                  <span className="faint" style={{ fontSize: 12, textAlign: 'right' }}>
+                    {verslagen ? 'Verslagen — nog eens?' : bot.uitleg}
+                  </span>
+                </button>
+              )
+            })}
           </div>
+          {botsVerslagen.length === BOTS.length && (
+            <p className="gold-text" style={{ fontSize: 12.5, fontWeight: 700, marginTop: 12 }}>
+              👑 Alle drie verslagen. Tijd om een echte vriend uit te dagen.
+            </p>
+          )}
         </div>
       )}
 
