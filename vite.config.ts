@@ -2,11 +2,21 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
+/** Bouwmoment als leesbare stempel, bv. "12-08 21:30" — komt op het profiel
+ *  te staan zodat je op de live site kunt zíen welke versie er draait */
+const nu = new Date()
+const p2 = (n: number) => String(n).padStart(2, '0')
+const BOUWSTEMPEL = `${p2(nu.getDate())}-${p2(nu.getMonth() + 1)} ${p2(nu.getHours())}:${p2(nu.getMinutes())}`
+
 export default defineConfig({
+  define: { __BOUWSTEMPEL__: JSON.stringify(BOUWSTEMPEL) },
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      // 'prompt' in plaats van 'autoUpdate': de nieuwe versie activeert pas
+      // als de speler op de verversknop tikt. Zo kijkt niemand meer ongemerkt
+      // naar een oude cache, en breekt een deploy nooit een lopende les.
+      registerType: 'prompt',
       includeAssets: ['icons/apple-touch-icon.png'],
       manifest: {
         name: 'Fluent — taal leren die plakt',

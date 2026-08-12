@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type ComponentType } from 'react'
+import { useRegisterSW } from 'virtual:pwa-register/react'
 import type { Course, Lesson } from './types'
 import { courses } from './content'
 import { dueEntries, useStore } from './store'
@@ -73,6 +74,25 @@ export default function App() {
   // duel-uitnodiging uit de link halen (eenmalig bij het openen)
   const incomingDuel = useMemo(() => readDuelFromUrl(), [])
 
+  /**
+   * Nieuwe versies mogen nooit onzichtbaar blijven hangen: de service worker
+   * checkt elke minuut (en bij terugkeren naar het tabblad) of er een deploy
+   * is, en dan verschijnt de verversknop. Pas na een tik wisselt de versie,
+   * dus een lopende les kan nooit halverwege breken.
+   */
+  const {
+    needRefresh: [nieuweVersie],
+    updateServiceWorker,
+  } = useRegisterSW({
+    onRegisteredSW(_url, reg) {
+      if (!reg) return
+      setInterval(() => void reg.update(), 60_000)
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') void reg.update()
+      })
+    },
+  })
+
   useEffect(() => {
     initVoices()
     void initAudioManifest()
@@ -143,6 +163,29 @@ export default function App() {
       {tab === 'league' && <LeagueScreen onLeren={() => setTab('home')} />}
       {tab === 'review' && <ReviewScreen onGoLearn={() => setTab('home')} onPraten={() => setPraten(true)} />}
       {tab === 'profile' && <ProfileScreen />}
+
+      {/* er staat een nieuwe versie klaar: één tik en je kijkt weer live */}
+      {nieuweVersie && (
+        <div style={{ position: 'fixed', left: 14, right: 14, bottom: gamePlaying ? 14 : 96, zIndex: 40, display: 'flex', justifyContent: 'center' }}>
+          <button
+            onClick={() => void updateServiceWorker(true)}
+            className="row"
+            style={{
+              gap: 10,
+              padding: '12px 18px',
+              borderRadius: 999,
+              background: 'var(--grad-gold)',
+              color: 'var(--ink-on-gold)',
+              fontWeight: 700,
+              fontSize: 14,
+              boxShadow: '0 8px 24px rgba(0,0,0,0.5), 0 0 18px rgba(255,197,61,0.45)',
+              minHeight: 44,
+            }}
+          >
+            ⚡ Nieuwe versie klaar · tik om te verversen
+          </button>
+        </div>
+      )}
 
       {!gamePlaying && (
       <nav className="nav">

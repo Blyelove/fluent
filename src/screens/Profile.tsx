@@ -334,7 +334,7 @@ export function ProfileScreen() {
       })()}
 
       <p className="faint center" style={{ fontSize: 13, marginBottom: 16 }}>
-        Fluent leert je talen zonder straf: geen hartjes, geen energie, geen limiet. Alleen een reeks die om je geeft — met automatische
+        Fluent leert je talen zonder straf: geen hartjes, geen energie, geen limiet. Alleen een reeks die om je geeft, met automatische
         bescherming als het leven ertussen komt.
       </p>
 
@@ -347,6 +347,11 @@ export function ProfileScreen() {
       >
         Alles opnieuw beginnen
       </button>
+
+      {/* de bouwstempel: zo zie je op de live site wélke versie er draait */}
+      <p className="faint center" style={{ fontSize: 11.5, marginTop: 14 }}>
+        Fluent · versie van {__BOUWSTEMPEL__}
+      </p>
     </div>
   )
 }
