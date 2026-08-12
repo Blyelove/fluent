@@ -1,8 +1,11 @@
-import { useLayoutEffect, useMemo, useRef } from 'react'
+import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'motion/react'
 import type { Course } from '../types'
 import { countryStates, type CountryState } from '../countries'
 import { Flag } from '../components/Flag'
+import { Avatar } from '../components/Avatar'
+import { levelForXp } from '../levels'
+import { totalXp, useStore } from '../store'
 import { sfx } from '../audio'
 
 /**
@@ -63,11 +66,49 @@ export function WorldMapScreen({
   onBack: () => void
 }) {
   const scroller = useRef<HTMLDivElement | null>(null)
+  const actiefPad = useRef<SVGPathElement | null>(null)
+  const look = useStore((s) => s.avatarLook)
+  const level = useStore((s) => levelForXp(totalXp(s)))
 
   const landen = useMemo(() => countryStates(course, completedCount), [course, completedCount])
   const hoogte = KOP + VOET + Math.max(1, landen.length - 1) * STAP + 80
   const knopen = useMemo(() => bouwKnopen(landen, hoogte), [landen, hoogte])
   const veroverd = landen.filter((c) => c.conquered).length
+
+  /**
+   * De actieve etappe: van je laatst veroverde land (of het vertrekpunt) naar
+   * je volgende bestemming. Jouw held staat op dit pad, precies zo ver als je
+   * lessen vorderen — elke les is letterlijk een stap op de wereld.
+   */
+  const actief = useMemo(() => {
+    const start = { x: knopen[0]?.x ?? BREEDTE / 2, y: hoogte - 52 }
+    const volgendeIdx = knopen.findIndex((k) => k.isVolgende)
+    if (volgendeIdx === -1) {
+      // alles veroverd: de held staat triomfantelijk bij het hoogste land
+      const top = knopen[knopen.length - 1]
+      return top ? { d: '', frac: 1, rustpunt: { x: top.x, y: top.y }, naarLinks: false } : null
+    }
+    const doel = knopen[volgendeIdx]
+    const vorige = volgendeIdx > 0 ? knopen[volgendeIdx - 1] : null
+    const van = vorige ?? start
+    const vorigeDrempel = vorige ? vorige.threshold : 0
+    const frac = Math.min(1, Math.max(0, (completedCount - vorigeDrempel) / Math.max(1, doel.threshold - vorigeDrempel)))
+    return { d: bocht(van, doel), frac, rustpunt: null, naarLinks: doel.x < van.x }
+  }, [knopen, hoogte, completedCount])
+
+  // positie van de held op het actieve pad — gemeten aan het échte SVG-pad
+  const [held, setHeld] = useState<{ x: number; y: number } | null>(null)
+  useLayoutEffect(() => {
+    if (!actief) return
+    if (actief.rustpunt) {
+      setHeld(actief.rustpunt)
+      return
+    }
+    const pad = actiefPad.current
+    if (!pad) return
+    const punt = pad.getPointAtLength(actief.frac * pad.getTotalLength())
+    setHeld({ x: punt.x, y: punt.y })
+  }, [actief])
 
   // de hele route als één gememoïseerde SVG — knopen komen er als HTML overheen
   const kaart = useMemo(() => {
@@ -171,6 +212,62 @@ export function WorldMapScreen({
       <div ref={scroller} className="no-scrollbar" style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', position: 'relative' }}>
         <div style={{ position: 'relative', height: hoogte, maxWidth: 520, margin: '0 auto' }}>
           {kaart}
+
+          {/* de actieve etappe vult live mee met je lesvoortgang */}
+          {actief && !actief.rustpunt && (
+            <svg
+              viewBox={`0 0 ${BREEDTE} ${hoogte}`}
+              width="100%"
+              height={hoogte}
+              preserveAspectRatio="none"
+              aria-hidden="true"
+              style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
+            >
+              <defs>
+                <linearGradient id="reis-actief" x1="0" y1="1" x2="0.6" y2="0">
+                  <stop offset="0" stopColor="#EC4899" />
+                  <stop offset="1" stopColor="#FFC53D" />
+                </linearGradient>
+              </defs>
+              <motion.path
+                ref={actiefPad}
+                d={actief.d}
+                fill="none"
+                stroke="url(#reis-actief)"
+                strokeWidth={6}
+                strokeLinecap="round"
+                pathLength={1}
+                strokeDasharray="1 1"
+                initial={{ strokeDashoffset: 1 }}
+                animate={{ strokeDashoffset: 1 - actief.frac }}
+                transition={{ duration: 0.9, ease: 'easeInOut', delay: 0.25 }}
+              />
+            </svg>
+          )}
+
+          {/* jouw held, precies zo ver als je lessen reiken */}
+          {held && (
+            <div
+              style={{
+                position: 'absolute',
+                left: `${(held.x / BREEDTE) * 100}%`,
+                top: held.y,
+                transform: 'translate(-50%, -88%)',
+                pointerEvents: 'none',
+                zIndex: 2,
+                filter: 'drop-shadow(0 6px 10px rgba(0,0,0,0.5))',
+              }}
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.6, y: -14 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ type: 'spring', stiffness: 240, damping: 18, delay: 0.35 }}
+                style={actief?.naarLinks ? { transform: 'scaleX(-1)' } : undefined}
+              >
+                <Avatar size={84} mode="idle" level={level} courseId={course.id} look={look} />
+              </motion.div>
+            </div>
+          )}
 
           {knopen.map((k) => {
             const resterend = Math.max(0, k.threshold - completedCount)
