@@ -95,6 +95,8 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
 
   const [items, setItems] = useState<Exercise[]>(() => [...lesson.exercises])
   const [idx, setIdx] = useState(0)
+  /** vraagt om bevestiging voordat een halve les verloren gaat */
+  const [pauze, setPauze] = useState(false)
   const [phase, setPhase] = useState<'answer' | 'feedback'>('answer')
   const [result, setResult] = useState<EvalResult | null>(null)
   const [ready, setReady] = useState(false)
@@ -219,11 +221,62 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
   }
 
   const progress = items.length > 0 ? idx / items.length : 0
+  const restVragen = Math.max(0, items.length - idx)
 
   return (
     <div className="shell shell--bare" style={{ paddingBottom: 170 }}>
+      {/* Vangnet: één mistik op het kruisje gooide anders een halve les weg */}
+      <AnimatePresence>
+        {pauze && (
+          <motion.div
+            className="modal-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setPauze(false)}
+            style={{ zIndex: 80 }}
+          >
+            <motion.div
+              className="modal-panel"
+              initial={{ y: 80 }}
+              animate={{ y: 0 }}
+              exit={{ y: 110 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="display" style={{ fontSize: 24, marginBottom: 6 }}>
+                Even pauze?
+              </h3>
+              <p className="dim" style={{ fontSize: 14.5, marginBottom: 18 }}>
+                {restVragen === 1
+                  ? 'Nog één vraag en je bent er. Zonde om nu te stoppen.'
+                  : `Nog ${restVragen} vragen en je bent er. Je voortgang in deze les gaat verloren als je stopt.`}
+              </p>
+              <button
+                className="btn btn-primary"
+                style={{ padding: 15, fontSize: 15.5, marginBottom: 10 }}
+                onClick={() => {
+                  sfx('tap')
+                  setPauze(false)
+                }}
+              >
+                ▶ Doorgaan
+              </button>
+              <button className="btn btn-ghost" style={{ padding: 12, fontSize: 14 }} onClick={onExit}>
+                Toch stoppen
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="lesson-top">
-        <button className="btn-quiet" style={{ padding: 8, fontSize: 22, lineHeight: 1 }} onClick={onExit} aria-label="Les sluiten">
+        <button
+          className="btn-quiet"
+          style={{ padding: 8, fontSize: 22, lineHeight: 1, minWidth: 44, minHeight: 44 }}
+          onClick={() => (idx > 0 ? setPauze(true) : onExit())}
+          aria-label="Les sluiten"
+        >
           ×
         </button>
         <div className="progress-track">

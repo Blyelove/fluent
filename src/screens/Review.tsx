@@ -73,6 +73,8 @@ export function ReviewScreen() {
   const [ready, setReady] = useState(false)
   const [correctCount, setCorrectCount] = useState(0)
   const [pickedUnits, setPickedUnits] = useState<string[]>([])
+  /** vraagt om bevestiging voordat een halve sessie verloren gaat */
+  const [pauze, setPauze] = useState(false)
   const evalRef = useRef<(() => EvalResult) | null>(null)
 
   const due = useMemo(
@@ -391,13 +393,67 @@ export function ReviewScreen() {
   const item = phase.items[idx]
   const ex = item.ex
 
+  const restVragen = Math.max(0, phase.items.length - idx)
+
   return (
     <div className="shell shell--bare" style={{ paddingBottom: 170 }}>
+      {/* zelfde vangnet als in een les: nooit stilzwijgend je werk weggooien */}
+      <AnimatePresence>
+        {pauze && (
+          <motion.div
+            className="modal-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setPauze(false)}
+            style={{ zIndex: 80 }}
+          >
+            <motion.div
+              className="modal-panel"
+              initial={{ y: 80 }}
+              animate={{ y: 0 }}
+              exit={{ y: 110 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="display" style={{ fontSize: 24, marginBottom: 6 }}>
+                Even pauze?
+              </h3>
+              <p className="dim" style={{ fontSize: 14.5, marginBottom: 18 }}>
+                {restVragen === 1
+                  ? 'Nog één vraag en je bent er. Zonde om nu te stoppen.'
+                  : `Nog ${restVragen} vragen en je bent er. Stop je nu, dan telt deze sessie niet mee.`}
+              </p>
+              <button
+                className="btn btn-primary"
+                style={{ padding: 15, fontSize: 15.5, marginBottom: 10 }}
+                onClick={() => {
+                  sfx('tap')
+                  setPauze(false)
+                }}
+              >
+                ▶ Doorgaan
+              </button>
+              <button
+                className="btn btn-ghost"
+                style={{ padding: 12, fontSize: 14 }}
+                onClick={() => {
+                  setPauze(false)
+                  setPhase({ name: 'hub' })
+                }}
+              >
+                Toch stoppen
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="lesson-top">
         <button
           className="btn-quiet"
-          style={{ padding: 8, fontSize: 22, lineHeight: 1 }}
-          onClick={() => setPhase({ name: 'hub' })}
+          style={{ padding: 8, fontSize: 22, lineHeight: 1, minWidth: 44, minHeight: 44 }}
+          onClick={() => (idx > 0 ? setPauze(true) : setPhase({ name: 'hub' }))}
           aria-label="Stoppen"
         >
           ×

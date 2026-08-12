@@ -18,7 +18,7 @@ Fluent heeft een kern die al als topspel voelt — chunky leslus met combo's en 
 
 **Bewijs:** Verse gebruiker: tik op een tempo en zit binnen één seconde in oefening 1 zonder Home te zien.
 
-### 3. Stop-kruisjes krijgen een vangnet: Lesson.tsx r226 en de Review-runner (r397) roepen onExit direct aan en gooien 9 goede antwoorden weg zonder vraag. Bij idx > 0 eerst een sheet in huisstijl: 'Even pauze? Nog X vragen — je bent er bijna' met Doorgaan (primair) en Stoppen (ghost); bij idx === 0 direct sluiten.
+### 3. ✅ AF (ronde 33) — Stop-kruisjes krijgen een vangnet: Lesson.tsx r226 en de Review-runner (r397) roepen onExit direct aan en gooien 9 goede antwoorden weg zonder vraag. Bij idx > 0 eerst een sheet in huisstijl: 'Even pauze? Nog X vragen — je bent er bijna' met Doorgaan (primair) en Stoppen (ghost); bij idx === 0 direct sluiten.
 
 **Bewijs:** Tik op × halverwege een les én een toets: sheet verschijnt, Doorgaan behoudt idx/combo/foutwachtrij; op vraag 1 sluit × direct.
 
