@@ -14,6 +14,7 @@ import { ReviewScreen } from './screens/Review'
 import { ProfileScreen } from './screens/Profile'
 import { LeagueScreen } from './screens/League'
 import { PlayScreen } from './screens/Play'
+import { GesprekkenScreen } from './screens/Gesprek'
 
 type Tab = 'home' | 'play' | 'league' | 'review' | 'profile'
 
@@ -63,6 +64,8 @@ export default function App() {
 
   const [tab, setTab] = useState<Tab>('home')
   const [lesson, setLesson] = useState<{ course: Course; lesson: Lesson } | null>(null)
+  // het gespreksscherm ligt als volledig scherm over de tabs heen
+  const [praten, setPraten] = useState(false)
   // tijdens een minigame of duel verdwijnt de onderbalk: vijf tabs onder je
   // duim tijdens een potje op de klok = één misveeg en je run is weg
   const [gamePlaying, setGamePlaying] = useState(false)
@@ -115,6 +118,8 @@ export default function App() {
     )
   }
 
+  if (praten) return <GesprekkenScreen onExit={() => setPraten(false)} />
+
   const items: { id: Tab; icon: ComponentType; label: string; badge?: string }[] = [
     { id: 'home', icon: PathIcon, label: 'Leren' },
     { id: 'play', icon: PlayIcon, label: 'Spelen' },
@@ -131,11 +136,12 @@ export default function App() {
           onReview={() => setTab('review')}
           onLeague={() => setTab('league')}
           onPlay={() => setTab('play')}
+          onPraten={() => setPraten(true)}
         />
       )}
       {tab === 'play' && <PlayScreen incomingDuel={incomingDuel} onPlayingChange={setGamePlaying} />}
       {tab === 'league' && <LeagueScreen onLeren={() => setTab('home')} />}
-      {tab === 'review' && <ReviewScreen onGoLearn={() => setTab('home')} />}
+      {tab === 'review' && <ReviewScreen onGoLearn={() => setTab('home')} onPraten={() => setPraten(true)} />}
       {tab === 'profile' && <ProfileScreen />}
 
       {!gamePlaying && (

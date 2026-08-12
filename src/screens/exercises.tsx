@@ -46,7 +46,7 @@ function shuffle<T>(arr: T[]): T[] {
   return a
 }
 
-function norm(s: string): string {
+export function norm(s: string): string {
   return s
     .toLowerCase()
     .trim()
@@ -55,7 +55,7 @@ function norm(s: string): string {
 }
 
 /** Accenten weg (café → cafe) — voor de vergelijking, nooit voor de weergave */
-function zonderAccenten(s: string): string {
+export function zonderAccenten(s: string): string {
   return s.normalize('NFD').replace(/[̀-ͯ]/g, '')
 }
 

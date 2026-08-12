@@ -148,6 +148,15 @@ interface AureaState {
   stamps: Partial<Record<CourseId, Record<string, string>>>
   zetStempel: (c: CourseId, code: string) => void
 
+  /** Voltooide gesprekken per cursus (scenario-ids) */
+  gesprekken: Partial<Record<CourseId, string[]>>
+  /**
+   * Rondt een gesprek af: eerste keer 25 XP, elke keer daarna 10 XP
+   * (overoefenen blijft lonen, nooit een slot). Geeft terug hoeveel XP er
+   * echt is bijgeschreven, inclusief een eventuele dubbele-XP-boost.
+   */
+  voltooiGesprek: (scenarioId: string) => number
+
   completeOnboarding: (c: CourseId, goalXp: number) => void
   /** Je dagdoel aanpassen — kan altijd, niet alleen tijdens de onboarding */
   setDailyGoal: (xp: number) => void
@@ -238,6 +247,7 @@ export type Profiel = Pick<
   | 'worldSeen'
   | 'botsVerslagen'
   | 'stamps'
+  | 'gesprekken'
 >
 
 /** Een kersvers profiel: waar elk nieuw account mee begint */
@@ -293,6 +303,7 @@ function nieuwProfiel(): Profiel {
     worldSeen: {},
     botsVerslagen: [],
     stamps: {},
+    gesprekken: {},
   }
 }
 
@@ -765,6 +776,21 @@ export const useStore = create<AureaState>()(
         const perCursus = s.stamps[c] ?? {}
         if (perCursus[code]) return
         set({ stamps: { ...s.stamps, [c]: { ...perCursus, [code]: todayStr() } } })
+      },
+
+      voltooiGesprek: (scenarioId) => {
+        const s = get()
+        const c = s.courseId
+        const klaar = s.gesprekken[c] ?? []
+        const eerste = !klaar.includes(scenarioId)
+        const xpVoor = totalXp(get())
+        // dezelfde route als alle andere activiteiten: boost, reeks, week
+        get().awardXp(eerste ? 25 : 10)
+        if (eerste) {
+          const na = get()
+          set({ gesprekken: { ...na.gesprekken, [c]: [...klaar, scenarioId] } })
+        }
+        return totalXp(get()) - xpVoor
       },
 
       // eenmaal verslagen blijft verslagen: vrijspelen mag, afpakken nooit

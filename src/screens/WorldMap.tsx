@@ -649,7 +649,6 @@ export function WorldMapScreen({
               style={{ maxHeight: '82dvh', overflowY: 'auto' }}
               // eigen scrollvak: het paspoort kan lang worden
             >
-              <div style={{ width: 44, height: 5, borderRadius: 999, background: 'var(--line)', margin: '0 auto 14px' }} />
               <h3 className="display" style={{ fontSize: 24, marginBottom: 4 }}>
                 🛂 Jouw paspoort
               </h3>
@@ -704,7 +703,6 @@ export function WorldMapScreen({
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div style={{ width: 44, height: 5, borderRadius: 999, background: 'var(--line)', margin: '0 auto 16px' }} />
               <div className="row" style={{ gap: 14, marginBottom: 12 }}>
                 <div
                   style={{

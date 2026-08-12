@@ -3,9 +3,11 @@
 :root {
   --bg: #0e0b1f;
   --bg-2: #171233;
-  --surface: rgba(255, 255, 255, 0.055);
-  --surface-2: rgba(255, 255, 255, 0.09);
-  --surface-3: rgba(255, 255, 255, 0.14);
+  /* getint glas: een vleug lila in plaats van grijs wit-alpha, zodat kaarten
+     bij de neonwereld horen in plaats van erop te drijven */
+  --surface: rgba(148, 130, 255, 0.07);
+  --surface-2: rgba(148, 130, 255, 0.11);
+  --surface-3: rgba(148, 130, 255, 0.16);
   --line: rgba(255, 255, 255, 0.13);
   --line-hot: rgba(236, 72, 153, 0.55);
   --line-gold: rgba(255, 197, 61, 0.55);
@@ -26,8 +28,9 @@
   --err: #fb7185;
   --err-bg: rgba(251, 113, 133, 0.14);
   --shadow: 0 10px 32px rgba(0, 0, 0, 0.45);
-  --glow-hot: 0 0 26px rgba(236, 72, 153, 0.35);
-  --glow-gold: 0 0 22px rgba(255, 197, 61, 0.4);
+  /* echt neon: een felle kern van 1px plus een halo, geen wollige vlek */
+  --glow-hot: 0 0 0 1px rgba(236, 72, 153, 0.5), 0 0 12px rgba(236, 72, 153, 0.45), 0 0 36px rgba(168, 85, 247, 0.28);
+  --glow-gold: 0 0 0 1px rgba(255, 224, 138, 0.55), 0 0 10px rgba(255, 197, 61, 0.45), 0 0 30px rgba(245, 158, 11, 0.3);
   --r-lg: 22px;
   --r-md: 16px;
   --r-sm: 12px;
@@ -38,6 +41,13 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 html, body { height: 100%; }
+
+/* De pagina is een rechte kolom: opzij scrollen bestaat niet. `clip` in
+   plaats van `hidden`, want hidden maakt een scrollcontainer en dan kan een
+   mobiele browser hem alsnog opzij duwen. Alleen op html: een overflow op
+   body maakt bódy het scrollvak en dan doet window.scrollTo niets meer.
+   Decor dat breder is dan het scherm (sfeerorbs, gloed) snijdt hier af. */
+html { overflow-x: clip; }
 
 /* Schuifbalken in de huisstijl. De grijze systeembalk van Windows viel hard
    uit de toon in het donkere neon-ontwerp; deze is dun, paars en verdwijnt in
@@ -67,17 +77,39 @@ html, body { height: 100%; }
 
 body {
   background: var(--bg);
-  background-image:
-    radial-gradient(900px 600px at 12% -8%, rgba(168, 85, 247, 0.22), transparent 55%),
-    radial-gradient(820px 520px at 108% 8%, rgba(236, 72, 153, 0.16), transparent 55%),
-    radial-gradient(720px 520px at -8% 92%, rgba(34, 211, 238, 0.13), transparent 55%);
-  background-attachment: fixed;
   color: var(--text);
   font-family: var(--font-ui);
   font-size: 16px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  /* geen overflow op body: dat maakt body het scrollvak en breekt window.scrollTo;
+     het horizontale knippen zit op html */
+}
+
+/* De verlichte zaal: sfeerlicht in drie kleurzones plus een dieptegradiënt.
+   Als fixed pseudo-element in plaats van background-attachment: fixed, want
+   dat laatste is kapot op iOS en stopte bovendien boven de vouw. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(900px 600px at 12% -8%, rgba(168, 85, 247, 0.25), transparent 55%),
+    radial-gradient(820px 520px at 108% 8%, rgba(236, 72, 153, 0.18), transparent 55%),
+    radial-gradient(720px 520px at -8% 92%, rgba(34, 211, 238, 0.15), transparent 55%),
+    linear-gradient(180deg, #171233 0%, #0e0b1f 38%, #0a0718 100%);
+}
+
+/* het vignet: donkere randen trekken het oog naar het midden, als in een zaal */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(130% 92% at 50% 8%, transparent 58%, rgba(4, 2, 12, 0.55) 100%);
 }
 
 #root { min-height: 100dvh; }
@@ -129,14 +161,27 @@ input, textarea {
 .display {
   font-family: var(--font-display);
   font-weight: 700;
-  letter-spacing: 0.01em;
+  letter-spacing: -0.01em;
   line-height: 1.12;
 }
 
+/* kaartkoppen in de huisstijl-font: het gezicht van het merk op elk niveau,
+   niet alleen in de h1 */
+.card-title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* tellers die niet in breedte verspringen */
+.num { font-variant-numeric: tabular-nums lining-nums; }
+
 .eyebrow {
   font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.14em;
+  /* Instrument Sans gaat tot 700; 800 werd nep-vet gesynthetiseerd */
+  font-weight: 700;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--text-dim);
 }
@@ -169,12 +214,63 @@ input, textarea {
 }
 
 .glass {
-  background: var(--surface);
+  /* lichtval van boven: een highlight-verloop plus binnenrand maakt van een
+     platte sticker een fysiek paneel */
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 45%), var(--surface);
   border: 1.5px solid var(--line);
   border-radius: var(--r-lg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* De ene held per scherm: de Doorgaan-kaart. Een gradiëntrand van paars via
+   roze naar goud die nérgens anders voorkomt — daardoor landt het oog hier. */
+.card-hero {
+  position: relative;
+  border: 1px solid transparent;
+  border-radius: var(--r-lg);
+  background:
+    linear-gradient(150deg, rgba(168, 85, 247, 0.22) 0%, rgba(23, 18, 51, 0.92) 48%, rgba(236, 72, 153, 0.18) 100%) padding-box,
+    linear-gradient(135deg, rgba(168, 85, 247, 0.9), rgba(236, 72, 153, 0.9) 55%, rgba(255, 197, 61, 0.7)) border-box;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.45), 0 0 28px rgba(236, 72, 153, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* drukbare statuschips: dezelfde drukfysica als elke knop in de app */
+.chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex: 1;
+  min-height: 44px;
+  padding: 10px 8px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.04));
+  border: 1.5px solid var(--line);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 3px 0 rgba(0, 0, 0, 0.35);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.chip:active {
+  transform: translateY(2px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 1px 0 rgba(0, 0, 0, 0.35);
+}
+
+.chip--gold {
+  border-color: var(--line-gold);
+  background: rgba(255, 197, 61, 0.1);
+}
+
+.chip--cool {
+  border-color: rgba(34, 211, 238, 0.5);
+  background: rgba(34, 211, 238, 0.08);
+}
+
+/* eenmalige opbouw van het scherm, van boven naar beneden */
+.rise {
+  animation: floatIn 0.38s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: var(--d, 0ms);
 }
 
 /* ============ buttons — chunky arcade ============ */
@@ -273,6 +369,14 @@ input, textarea {
   border-color: var(--ok);
   background: var(--ok-bg);
   box-shadow: 0 3px 0 rgba(22, 101, 52, 0.7), 0 0 20px rgba(74, 222, 128, 0.3);
+  /* het goede moment beweegt méér dan het foute: een korte overshoot-pop */
+  animation: pop-correct 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes pop-correct {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.045); }
+  100% { transform: scale(1); }
 }
 
 .opt.wrong {
@@ -323,27 +427,22 @@ input, textarea {
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.35);
 }
 
+/* Voortgang in neon-roze; goud is exclusief voor balken waar een beloning
+   achter zit (dagdoel, missies). Acht permanent glimmende gouden balken
+   devalueerden het goud tot behang. Balken vullen nu ook zichtbaar. */
 .progress-fill {
   height: 100%;
   border-radius: 999px;
-  background: var(--grad-gold);
-  box-shadow: var(--glow-gold);
+  background: linear-gradient(180deg, #c084fc 0%, #a855f7 45%, #ec4899 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 0 0 1px rgba(236, 72, 153, 0.35), 0 0 10px rgba(236, 72, 153, 0.3);
   position: relative;
   overflow: hidden;
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.progress-fill::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.55) 50%, transparent 70%);
-  transform: translateX(-100%);
-  animation: shimmer 2.4s ease-in-out infinite;
-}
-
-@keyframes shimmer {
-  55% { transform: translateX(100%); }
-  100% { transform: translateX(100%); }
+.progress-fill--gold {
+  background: linear-gradient(180deg, #ffe9ad 0%, #ffc53d 45%, #f59e0b 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), var(--glow-gold);
 }
 
 /* ============ lesson ============ */
@@ -485,24 +584,31 @@ input, textarea {
 
 /* ============ nav ============ */
 
+/* Het zwevende arcade-dock: op elke tab zichtbaar bewijs dat dit geen
+   standaard browserbalk is. */
 .nav {
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
   z-index: 30;
+  padding: 0 14px calc(10px + env(safe-area-inset-bottom));
+  pointer-events: none;
 }
 
 .nav-inner {
-  max-width: 480px;
+  pointer-events: auto;
+  max-width: 440px;
   margin: 0 auto;
   display: flex;
   justify-content: space-around;
-  padding: 10px 8px calc(10px + env(safe-area-inset-bottom));
-  background: rgba(17, 13, 38, 0.92);
+  padding: 8px;
+  background: rgba(17, 13, 38, 0.94);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-top: 1.5px solid var(--line);
+  border: 1.5px solid var(--line);
+  border-radius: 26px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 16px 40px rgba(0, 0, 0, 0.55);
 }
 
 .nav-item {
@@ -511,20 +617,22 @@ input, textarea {
   align-items: center;
   gap: 4px;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.05em;
   color: var(--text-faint);
-  padding: 4px 16px;
-  border-radius: var(--r-sm);
+  padding: 8px 14px;
+  border-radius: 18px;
   position: relative;
   transition: color 0.15s ease, transform 0.1s ease;
 }
 
 .nav-item:active { transform: scale(0.92); }
 
+/* gloeiende pil onder de actieve tab; geen filter op een schalend element */
 .nav-item.active {
-  color: var(--hot2);
-  filter: drop-shadow(0 0 8px rgba(236, 72, 153, 0.5));
+  color: #fff;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.3), rgba(236, 72, 153, 0.3));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 0 18px rgba(236, 72, 153, 0.35);
 }
 
 .nav-badge {
@@ -538,6 +646,8 @@ input, textarea {
   background: var(--grad-gold);
   color: var(--ink-on-gold);
   font-size: 11px;
+  /* Baloo levert écht 800; Instrument Sans synthetiseerde het */
+  font-family: var(--font-display);
   font-weight: 800;
   display: flex;
   align-items: center;
@@ -563,6 +673,7 @@ input, textarea {
   font-size: 32px;
   font-weight: 800;
   line-height: 1.1;
+  font-variant-numeric: tabular-nums;
 }
 
 .stat-label {
@@ -593,9 +704,22 @@ input, textarea {
   max-height: 80dvh;
   overflow-y: auto;
   border-radius: 26px 26px 0 0;
-  background: #1a1438;
-  border-top: 2px solid var(--line);
-  padding: 24px 20px calc(24px + env(safe-area-inset-bottom));
+  /* lichtval van boven, als een paneel dat het zaallicht vangt */
+  background: linear-gradient(180deg, #241b52 0%, #1a1438 120px);
+  border-top: 1.5px solid rgba(255, 255, 255, 0.18);
+  padding: 14px 20px calc(24px + env(safe-area-inset-bottom));
+  box-shadow: 0 -16px 48px rgba(0, 0, 0, 0.55);
+}
+
+/* de grabber: elk paneel is met de duim dicht te vegen, en dat mag je zien */
+.modal-panel::before {
+  content: '';
+  display: block;
+  width: 44px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+  margin: 0 auto 16px;
 }
 
 /* ============ hulpstukken ============ */
@@ -608,7 +732,8 @@ input, textarea {
 .divider-gold {
   width: 52px;
   height: 3px;
-  background: var(--grad-hot);
+  background: var(--grad-gold);
+  box-shadow: 0 0 8px rgba(255, 197, 61, 0.5);
   border-radius: 3px;
   margin: 18px auto;
 }
@@ -631,13 +756,14 @@ input, textarea {
   z-index: -1;
 }
 
+/* statische gloed: het motion-budget (max 3 oneindige animaties) gaat naar
+   de vlam, de ring-pulse en de ademende Doorgaan-knop */
 .orb-a {
   width: 300px;
   height: 300px;
   top: -70px;
   right: -90px;
   background: radial-gradient(circle, rgba(168, 85, 247, 0.4), transparent 70%);
-  animation: drift 16s ease-in-out infinite alternate;
 }
 
 .orb-b {
@@ -646,11 +772,6 @@ input, textarea {
   top: 42%;
   left: -100px;
   background: radial-gradient(circle, rgba(34, 211, 238, 0.3), transparent 70%);
-  animation: drift 19s ease-in-out infinite alternate-reverse;
-}
-
-@keyframes drift {
-  to { transform: translate(26px, 36px) scale(1.14); }
 }
 
 /* ============ het leerpad ============ */
@@ -660,14 +781,21 @@ input, textarea {
   padding: 4px 0 24px;
 }
 
+/* De Gouden Draad: de route verloopt van goud (waar je begon) via roze naar
+   paars (waar je heen gaat) — een reislijn, geen Duolingo-stippellijn */
 .path-line {
   position: absolute;
   left: 50%;
   top: 0;
   bottom: 0;
-  width: 3px;
-  transform: translateX(-1.5px);
-  background: repeating-linear-gradient(180deg, rgba(168, 85, 247, 0.4) 0 10px, transparent 10px 20px);
+  width: 4px;
+  transform: translateX(-2px);
+  background: linear-gradient(180deg, var(--gold) 0%, var(--hot2) 45%, var(--hot1) 100%);
+  opacity: 0.5;
+  border-radius: 999px;
+  box-shadow: 0 0 14px rgba(255, 197, 61, 0.25);
+  -webkit-mask-image: repeating-linear-gradient(180deg, #000 0 18px, transparent 18px 26px);
+  mask-image: repeating-linear-gradient(180deg, #000 0 18px, transparent 18px 26px);
 }
 
 .unit-banner {
@@ -719,11 +847,22 @@ input, textarea {
   box-shadow: 0 2px 0 rgba(0, 0, 0, 0.5);
 }
 
+/* voltooid = een paspoortstempel: scheef geslagen, gestreepte inktrand met
+   een binnenring — de reismetafoor tot in elke les */
 .node-big.done {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--uc, #ffb300) 72%, white) 0%, var(--uc, #ffb300) 55%);
-  color: var(--ink-on-gold);
-  border-color: transparent;
-  box-shadow: 0 6px 0 color-mix(in srgb, var(--uc, #ffb300) 50%, black), 0 0 22px color-mix(in srgb, var(--uc, #ffb300) 40%, transparent);
+  background: color-mix(in srgb, var(--uc, #ffb300) 14%, var(--bg-2));
+  color: var(--uc, #ffb300);
+  border: 2.5px dashed var(--uc, #ffb300);
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.45);
+}
+
+.node-big.done::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  opacity: 0.5;
 }
 
 .node-big.current {
@@ -732,7 +871,7 @@ input, textarea {
   border-color: var(--uc, var(--hot2));
   color: var(--uc, var(--hot2));
   background: color-mix(in srgb, var(--uc, #ec4899) 16%, transparent);
-  animation: breathe 2.4s ease-in-out infinite;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.5), 0 0 26px rgba(236, 72, 153, 0.4);
 }
 
 .node-big.current::after {
@@ -759,9 +898,10 @@ input, textarea {
   background: color-mix(in srgb, var(--uc, #ffc53d) 10%, transparent);
 }
 
+/* boven de held die op de huidige knoop staat te wachten */
 .start-label {
   position: absolute;
-  top: -32px;
+  top: -96px;
   left: 50%;
   transform: translateX(-50%);
   background: var(--grad-hot);
@@ -773,12 +913,7 @@ input, textarea {
   padding: 4px 13px;
   border-radius: 999px;
   white-space: nowrap;
-  animation: bob 1.5s ease-in-out infinite;
   box-shadow: 0 4px 16px rgba(236, 72, 153, 0.5);
-}
-
-@keyframes bob {
-  50% { transform: translate(-50%, -6px); }
 }
 
 /* levende streak-vlam */

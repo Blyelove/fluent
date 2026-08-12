@@ -22,6 +22,7 @@ interface Props {
   onReview: () => void
   onLeague?: () => void
   onPlay?: () => void
+  onPraten?: () => void
 }
 
 const StarIcon = ({ filled }: { filled?: boolean }) => (
@@ -43,29 +44,32 @@ function GoalRing({ value, goal }: { value: number; goal: number }) {
   return (
     <div className="row" style={{ gap: 8 }}>
       <svg width="38" height="38" viewBox="0 0 38 38">
-        <circle cx="19" cy="19" r={r} fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="4" />
+        <circle cx="19" cy="19" r={r} fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="4.5" />
         <motion.circle
           cx="19"
           cy="19"
           r={r}
           fill="none"
           stroke="url(#goldgrad)"
-          strokeWidth="4"
+          strokeWidth="4.5"
           strokeLinecap="round"
           strokeDasharray={c}
           animate={{ strokeDashoffset: c * (1 - frac) }}
           transition={{ type: 'spring', stiffness: 90, damping: 20 }}
           transform="rotate(-90 19 19)"
+          // beweegt alleen bij XP-verandering, dus de drop-shadow mag
+          style={{ filter: 'drop-shadow(0 0 4px rgba(255,197,61,0.5))' }}
         />
         <defs>
+          {/* het eerste goudmoment van de dag matcht het frisse systeemgoud, geen dof brons */}
           <linearGradient id="goldgrad" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#EED9A0" />
-            <stop offset="100%" stopColor="#B08D4C" />
+            <stop offset="0%" stopColor="#FFE08A" />
+            <stop offset="100%" stopColor="#FFB300" />
           </linearGradient>
         </defs>
       </svg>
       <div className="col">
-        <span style={{ fontWeight: 700, fontSize: 14, lineHeight: 1.2 }}>{value}</span>
+        <span className="num" style={{ fontWeight: 700, fontSize: 14, lineHeight: 1.2 }}>{value}</span>
         <span className="faint" style={{ fontSize: 11 }}>
           / {goal} XP
         </span>
@@ -74,7 +78,7 @@ function GoalRing({ value, goal }: { value: number; goal: number }) {
   )
 }
 
-export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props) {
+export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten }: Props) {
   const courseId = useStore((s) => s.courseId)
   const setCourse = useStore((s) => s.setCourse)
   const streak = useStore((s) => s.streak)
@@ -182,8 +186,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
   return (
     <div className="shell" style={{ display: 'flex', flexDirection: 'column' }}>
       <div className="ambient-orb orb-a" />
-      <div className="ambient-orb orb-b" />
-      <header className="spread" style={{ marginBottom: 22 }}>
+      <header className="spread rise" style={{ marginBottom: 22 }}>
         <button className="row glass" style={{ gap: 8, padding: '11px 14px', minHeight: 44, borderRadius: 999 }} onClick={() => setPicker(true)}>
           <Flag code={courseFlagCode[courseId]} size={17} />
           <span style={{ fontWeight: 600, fontSize: 14 }}>{course.name}</span>
@@ -291,8 +294,10 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
       {(() => {
         const lp = levelProgress(xpAll)
         const nr = nextReward(courseId, lp.level)
+        // beheersinformatie hoort niet boven de actie: via order naar het
+        // secundaire blok, onder de missies
         return (
-          <div className="glass" style={{ padding: '10px 16px', marginBottom: 16 }}>
+          <div className="glass" style={{ padding: '10px 16px', marginBottom: 16, order: 1 }}>
             <div className="row" style={{ gap: 14 }}>
               <Avatar size={56} level={lp.level} courseId={courseId} look={look} />
               <div style={{ flex: 1 }}>
@@ -300,12 +305,12 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
                   <strong style={{ fontSize: 14 }}>
                     Niveau {lp.level} · {levelTitle(lp.level)}
                   </strong>
-                  <span className="gold-text" style={{ fontWeight: 700, fontSize: 13 }}>
+                  <span className="gold-text num" style={{ fontWeight: 700, fontSize: 13 }}>
                     {xpAll} XP totaal
                   </span>
                 </div>
                 <div className="progress-track" style={{ height: 6, margin: '7px 0 5px' }}>
-                  <div className="progress-fill" style={{ width: `${Math.max(3, Math.round(lp.frac * 100))}%` }} />
+                  <div className="progress-fill progress-fill--gold" style={{ width: `${Math.max(3, Math.round(lp.frac * 100))}%` }} />
                 </div>
                 <p className="faint" style={{ fontSize: 11 }}>
                   Nog {lp.needed - lp.current} XP tot niveau {lp.level + 1}
@@ -316,13 +321,6 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
           </div>
         )
       })()}
-
-      <h1 className="display" style={{ fontSize: 26, marginBottom: 4 }}>
-        {activeSection.title}
-      </h1>
-      <p className="dim" style={{ fontSize: 14, marginBottom: 16 }}>
-        CEFR-niveau {activeSection.cefr} · {completed.length} van {flat.length} lessen voltooid
-      </p>
 
       {/* Doorgaan-hero: de volgende les start met één tik, zonder scrollen.
           Ben je net terug na een paar dagen, dan neemt de welkom-terug-kaart
@@ -348,7 +346,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
                 Alle lessen voltooid!
               </strong>
               <p className="dim" style={{ fontSize: 13.5, marginBottom: 14 }}>
-                Je hebt heel {course.name} tot en met A2 uitgespeeld. Houd het scherp met herhaling en minigames — nieuwe secties zijn in de
+                Je hebt heel {course.name} tot en met A2 uitgespeeld. Houd het scherp met herhaling en minigames. Nieuwe secties zijn in de
                 maak.
               </p>
               <div className="row" style={{ gap: 8 }}>
@@ -366,34 +364,45 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
         const unitDone = next.unit.lessons.filter((l) => completed.includes(l.id)).length
         return (
           <motion.div
-            className="glass"
+            className="card-hero"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            style={{
-              padding: 18,
-              marginBottom: 18,
-              borderColor: 'var(--line-hot)',
-              background: 'linear-gradient(135deg, rgba(168,85,247,0.16), rgba(236,72,153,0.10))',
-              boxShadow: '0 0 28px rgba(236,72,153,0.22)',
-            }}
+            style={{ padding: '22px 20px', marginBottom: 18 }}
           >
             <div className="row" style={{ gap: 12, marginBottom: 14 }}>
-              <span style={{ fontSize: 30, lineHeight: 1 }}>{next.unit.icon}</span>
+              <span
+                style={{
+                  width: 54,
+                  height: 54,
+                  borderRadius: 16,
+                  background: 'var(--grad-hot)',
+                  boxShadow: '0 5px 0 #7e22ce',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 27,
+                  flexShrink: 0,
+                }}
+              >
+                {next.unit.icon}
+              </span>
               <span className="col" style={{ gap: 2, flex: 1, minWidth: 0 }}>
-                <span className="eyebrow" style={{ fontSize: 10.5 }}>
-                  {completed.length === 0 ? 'Je eerste les' : 'Verder waar je gebleven was'}
+                <span className="eyebrow" style={{ fontSize: 10.5, color: '#F0ABFC' }}>
+                  {activeSection.title} · {completed.length === 0 ? 'je eerste les' : 'verder waar je was'}
                 </span>
-                <strong style={{ fontSize: 16.5, lineHeight: 1.2 }}>{next.lesson.title}</strong>
+                <strong className="display" style={{ fontSize: 21, lineHeight: 1.15 }}>{next.lesson.title}</strong>
                 <span className="faint" style={{ fontSize: 12.5 }}>
                   {next.unit.title} · les {unitDone + 1} van {next.unit.lessons.length}
                 </span>
               </span>
             </div>
+            {/* de enige ademende knop van het scherm: de uitnodiging */}
             <motion.button
               className="btn btn-primary"
               whileTap={{ scale: 0.98 }}
+              animate={{ scale: [1, 1.025, 1] }}
+              transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut', repeatDelay: 0.6 }}
               onClick={() => onStartLesson(course, next.lesson)}
-              style={{ fontSize: 17.5 }}
             >
               {completed.length === 0 ? '▶  Beginnen' : '▶  Doorgaan'}
             </motion.button>
@@ -425,14 +434,14 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
                   Fijn dat je er weer bent
                 </strong>
                 <span className="faint" style={{ fontSize: 12.5 }}>
-                  Je was {comebackDays} {comebackDays === 1 ? 'dag' : 'dagen'} weg — geen probleem, je pakt het zo weer op.
+                  Je was {comebackDays} {comebackDays === 1 ? 'dag' : 'dagen'} weg. Geen probleem, je pakt het zo weer op.
                 </span>
               </span>
             </div>
             <p className="dim" style={{ fontSize: 13, marginBottom: 12, lineHeight: 1.5 }}>
               {streak > 0
                 ? `Je reeks van ${streak} ${streak === 1 ? 'dag' : 'dagen'} staat nog${freezes > 0 ? ' en je bescherming is intact' : ''}. `
-                : 'Je begint gewoon opnieuw — dat telt hier net zo hard. '}
+                : 'Je begint gewoon opnieuw, en dat telt hier net zo hard. '}
               We hebben <strong className="gold-text">30 minuten dubbele XP</strong> voor je klaargezet.
             </p>
             <div className="col" style={{ gap: 8 }}>
@@ -456,7 +465,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
                   dismissComeback()
                 }}
               >
-                Later — sluit dit bericht
+                Later, sluit dit bericht
               </button>
             </div>
           </motion.div>
@@ -505,24 +514,17 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
             },
           })
         return (
-          <div className="row" style={{ gap: 8, marginBottom: 18 }}>
+          <div className="row rise" style={{ gap: 8, marginBottom: 18, '--d': '120ms' } as CSSProperties}>
             {chips.map((c) => (
+              // kleurdiscipline: goud = behaald, cyaan = systeem (oefenen),
+              // roze blijft exclusief voor de hero
               <button
                 key={c.key}
-                className="glass row"
+                className={`chip ${c.klaar ? 'chip--gold' : c.hot ? 'chip--cool' : ''}`}
                 onClick={c.actie}
-                style={{
-                  flex: 1,
-                  gap: 6,
-                  padding: '10px 8px',
-                  justifyContent: 'center',
-                  borderRadius: 14,
-                  borderColor: c.klaar ? 'var(--line-gold)' : c.hot ? 'var(--line-hot)' : undefined,
-                  minHeight: 44,
-                }}
               >
                 <span style={{ fontSize: 15 }}>{c.icon}</span>
-                <strong className={c.klaar ? 'gold-text' : c.hot ? 'hot-text' : ''} style={{ fontSize: 13.5 }}>
+                <strong className={`num ${c.klaar ? 'gold-text' : ''}`} style={{ fontSize: 13.5, ...(c.hot ? { color: 'var(--cyan)' } : null) }}>
                   {c.label}
                 </strong>
               </button>
@@ -532,20 +534,18 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
       })()}
 
       {boostUntil > Date.now() && (
-        <motion.div
+        <div
           className="glass row"
-          style={{ padding: '12px 16px', marginBottom: 14, gap: 10, borderColor: 'var(--line-gold)' }}
-          animate={{ boxShadow: ['0 0 0 rgba(255,197,61,0)', '0 0 24px rgba(255,197,61,0.45)', '0 0 0 rgba(255,197,61,0)'] }}
-          transition={{ duration: 1.8, repeat: Infinity }}
+          style={{ padding: '12px 16px', marginBottom: 14, gap: 10, borderColor: 'var(--line-gold)', boxShadow: '0 0 24px rgba(255,197,61,0.35)' }}
         >
           <span style={{ fontSize: 22 }}>⚡</span>
           <span className="col" style={{ gap: 1, flex: 1 }}>
             <strong className="gold-text" style={{ fontSize: 14.5 }}>Dubbele XP actief!</strong>
             <span className="faint" style={{ fontSize: 12 }}>
-              Nog {Math.max(1, Math.ceil((boostUntil - Date.now()) / 60000))} minuten — speel nu door
+              Nog {Math.max(1, Math.ceil((boostUntil - Date.now()) / 60000))} minuten, speel nu door
             </span>
           </span>
-        </motion.div>
+        </div>
       )}
 
       {onLeague && (
@@ -603,10 +603,13 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
           // de dagmissies zijn de dagelijkse haak: die horen boven het pad,
           // niet zeven schermen eronder. De rest van de kaarten blijft achter
           // het leerpad staan (order 1).
-          <div className="glass unit-card" id="vandaag" style={{ order: 0, scrollMarginTop: 16 }}>
+          <div className="glass unit-card rise" id="vandaag" style={{ order: 0, scrollMarginTop: 16, '--d': '180ms' } as CSSProperties}>
             <div className="spread">
-              <strong style={{ fontSize: 15 }}>⚜️ Dagelijkse missies</strong>
-              <span className="gold-text" style={{ fontWeight: 700, fontSize: 14 }}>
+              <span className="row" style={{ gap: 10 }}>
+                <span style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(255,197,61,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>⚜️</span>
+                <strong className="card-title">Dagelijkse missies</strong>
+              </span>
+              <span className="gold-text num" style={{ fontWeight: 700, fontSize: 14 }}>
                 {doneCount} / 3
               </span>
             </div>
@@ -635,7 +638,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
                     {q.label}
                   </span>
                   <div className="progress-track" style={{ height: 5, width: 64, flex: 'none' }}>
-                    <div className="progress-fill" style={{ width: `${Math.round(q.frac * 100)}%` }} />
+                    <div className="progress-fill progress-fill--gold" style={{ width: `${Math.round(q.frac * 100)}%` }} />
                   </div>
                 </div>
               ))}
@@ -689,8 +692,11 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
         return (
           <div className="glass unit-card" style={alles && !geopend ? { borderColor: 'var(--line-gold)', order: 1 } : { order: 1 }}>
             <div className="spread">
-              <strong style={{ fontSize: 15 }}>🎁 Weekmissies</strong>
-              <span className="gold-text" style={{ fontWeight: 800, fontSize: 14 }}>
+              <span className="row" style={{ gap: 10 }}>
+                <span style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(34,211,238,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🎁</span>
+                <strong className="card-title">Weekmissies</strong>
+              </span>
+              <span className="gold-text num" style={{ fontWeight: 700, fontSize: 14 }}>
                 {klaar} / {missies.length}
               </span>
             </div>
@@ -705,7 +711,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
                       {Math.min(m.have, m.need)}/{m.need}
                     </span>
                     <div className="progress-track" style={{ height: 5, width: 52, flex: 'none' }}>
-                      <div className="progress-fill" style={{ width: `${Math.min(100, Math.round((m.have / m.need) * 100))}%` }} />
+                      <div className="progress-fill progress-fill--gold" style={{ width: `${Math.min(100, Math.round((m.have / m.need) * 100))}%` }} />
                     </div>
                   </div>
                 )
@@ -715,8 +721,9 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
               <motion.button
                 className="btn btn-primary"
                 style={{ marginTop: 14 }}
-                animate={{ scale: [1, 1.03, 1] }}
-                transition={{ duration: 1.2, repeat: Infinity }}
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: 'spring', stiffness: 260, damping: 14 }}
                 onClick={() => {
                   sfx('complete')
                   confetti({ particleCount: 140, spread: 100, origin: { y: 0.7 }, colors: ['#A855F7', '#EC4899', '#FFC53D', '#22D3EE'], disableForReducedMotion: true })
@@ -745,14 +752,17 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
         return (
           <div className="glass unit-card" style={{ order: 1 }}>
             <div className="spread">
-              <strong style={{ fontSize: 15 }}>🎯 Jouw doelen</strong>
-              <span className="faint" style={{ fontSize: 13 }}>
+              <span className="row" style={{ gap: 10 }}>
+                <span style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(236,72,153,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🎯</span>
+                <strong className="card-title">Jouw doelen</strong>
+              </span>
+              <span className="faint num" style={{ fontSize: 13 }}>
                 {goalsDoneCount} gehaald
               </span>
             </div>
             {goals.length === 0 && (
               <p className="dim" style={{ fontSize: 13, marginTop: 10 }}>
-                Stel jezelf een doel mét deadline. Wie een doel stelt, haalt het vaker — en meestal eerder.
+                Stel jezelf een doel mét deadline. Wie een doel stelt, haalt het vaker, en meestal eerder.
               </p>
             )}
             <div className="col" style={{ gap: 14, marginTop: 12 }}>
@@ -828,6 +838,42 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
 
       <WorldPeek course={course} completedCount={completed.length} onOpen={() => setWorldOpen(true)} />
 
+      {/* gesprekken: echt praten in de doeltaal, het duolingo-max-gevoel zonder abonnement */}
+      {onPraten && (
+        <button className="glass unit-card row" onClick={() => { sfx('tap'); onPraten() }} style={{ gap: 14, textAlign: 'left', alignItems: 'center', order: 1 }}>
+          <span
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 24,
+              background: 'linear-gradient(135deg, var(--hot1), var(--hot2))',
+              boxShadow: '0 0 16px rgba(168, 85, 247, 0.4)',
+              flexShrink: 0,
+            }}
+          >
+            🗣️
+          </span>
+          <span className="col" style={{ flex: 1, minWidth: 0 }}>
+            <strong style={{ fontSize: 15 }}>
+              Gesprekken{' '}
+              <span className="gold-text" style={{ fontSize: 11, fontWeight: 900, letterSpacing: '0.06em' }}>
+                NIEUW
+              </span>
+            </strong>
+            <span className="dim" style={{ fontSize: 13 }}>
+              Praat echt in het {course.name}, met je stem of met keuzes
+            </span>
+          </span>
+          <span className="dim" style={{ fontSize: 20, flexShrink: 0 }}>
+            ›
+          </span>
+        </button>
+      )}
+
       {(() => {
         const UNIT_COLORS = ['#FFB300', '#FF5C8A', '#22D3EE', '#A3E635', '#A855F7', '#FF8A3D']
         let gi = 0
@@ -863,7 +909,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
               style={{ '--uc': uc } as CSSProperties}
             >
               <span style={{ fontSize: 22 }}>{unit.icon}</span>
-              <strong style={{ flex: 1, fontSize: 15 }}>{unit.title}</strong>
+              <strong className="card-title" style={{ flex: 1 }}>{unit.title}</strong>
               <span style={{ fontSize: 13, fontWeight: 700 }} className={unitDone ? '' : 'faint'}>
                 {unitDone ? '✓ Voltooid' : `${doneCount}/${unit.lessons.length}`}
               </span>
@@ -903,16 +949,18 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
                   ? 'current'
                   : 'open'
                 : 'locked'
-            const offset = [0, 58, 0, -58][idxHere % 4]
+            // vloeiende sinus-slinger in plaats van starre zigzag
+            const offset = Math.round(Math.sin(((idxHere % 6) / 6) * Math.PI * 2) * 76)
             elements.push(
               <div
                 key={lesson.id}
-                style={{ display: 'flex', justifyContent: 'center', transform: `translateX(${offset}px)`, margin: '22px 0', position: 'relative', zIndex: 1 }}
+                style={{ display: 'flex', justifyContent: 'center', transform: `translateX(${offset}px)`, margin: '16px 0', position: 'relative', zIndex: 1 }}
               >
                 <button
                   className={`node-big ${state}`}
                   title={lesson.title}
-                  style={{ '--uc': uc } as CSSProperties}
+                  // voltooide lessen staan als paspoortstempels nét scheef
+                  style={{ '--uc': uc, rotate: state === 'done' ? `${[-6, 5, -3, 7][idxHere % 4]}deg` : undefined } as CSSProperties}
                   onClick={() => {
                     if (state === 'locked') {
                       sfx('tap')
@@ -922,7 +970,17 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
                   }}
                 >
                   {state === 'current' && <span className="start-label">Start</span>}
-                  {state === 'done' ? <span style={{ fontSize: 24, fontWeight: 800 }}>✓</span> : <StarIcon filled={state === 'current'} />}
+                  {/* jouw personage staat op je route te wachten */}
+                  {state === 'current' && (
+                    <span style={{ position: 'absolute', bottom: 'calc(100% - 10px)', left: '50%', transform: 'translateX(-50%)', pointerEvents: 'none' }}>
+                      <Avatar size={58} still level={levelProgress(xpAll).level} courseId={courseId} look={look} />
+                    </span>
+                  )}
+                  {state === 'done' ? (
+                    <span className="display" style={{ fontSize: 22 }}>{lesson.title[0]}</span>
+                  ) : (
+                    <StarIcon filled={state === 'current'} />
+                  )}
                 </button>
               </div>
             )
@@ -931,7 +989,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
           }
         }
         return (
-          <div className="path-wrap" id="leerpad" style={{ scrollMarginTop: 16 }}>
+          <div className="path-wrap rise" id="leerpad" style={{ scrollMarginTop: 16, '--d': '240ms' } as CSSProperties}>
             <div className="path-line" />
             {elements}
           </div>
@@ -939,7 +997,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
       })()}
 
       <p className="faint center" style={{ fontSize: 13, marginTop: 26, order: 2 }}>
-        Sectie 4 en verder zijn in de maak — jouw reis gaat door tot B2.
+        Sectie 4 en verder zijn in de maak. Jouw reis gaat door tot B2.
       </p>
 
       {guideUnit && (
@@ -961,7 +1019,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
                 Kies je doel
               </h3>
               <p className="dim" style={{ fontSize: 13, marginBottom: 16 }}>
-                Haal je het vóór de deadline, dan telt dat — en de XP-beloning is van jou.
+                Haal je het vóór de deadline, dan telt dat, en de XP-beloning is van jou.
               </p>
               <div className="col" style={{ gap: 10 }}>
                 {suggestGoals({ streak, totalXp: xpAll, course, completedCount: completed.length, active: goals }).map((s) => (

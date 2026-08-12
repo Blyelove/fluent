@@ -65,7 +65,7 @@ type Phase =
       units?: Unit[]
     }
 
-export function ReviewScreen({ onGoLearn }: { onGoLearn?: () => void } = {}) {
+export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; onPraten?: () => void } = {}) {
   const courseId = useStore((s) => s.courseId)
   const voltooid = useStore((s) => s.progress[s.courseId]?.completed ?? GEEN_LESSEN)
   const reviewWord = useStore((s) => s.reviewWord)
@@ -285,6 +285,36 @@ export function ReviewScreen({ onGoLearn }: { onGoLearn?: () => void } = {}) {
         <h1 className="display" style={{ fontSize: 30, margin: '8px 0 20px' }}>
           Train jezelf
         </h1>
+
+        {onPraten && (
+          <button className="glass row" onClick={() => { sfx('tap'); onPraten() }} style={{ gap: 14, padding: 18, marginBottom: 16, width: '100%', textAlign: 'left', alignItems: 'center' }}>
+            <span
+              style={{
+                width: 46,
+                height: 46,
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 23,
+                background: 'linear-gradient(135deg, var(--hot1), var(--hot2))',
+                boxShadow: '0 0 16px rgba(168, 85, 247, 0.4)',
+                flexShrink: 0,
+              }}
+            >
+              🗣️
+            </span>
+            <span className="col" style={{ flex: 1, minWidth: 0 }}>
+              <strong style={{ fontSize: 16 }}>Gesprekken</strong>
+              <span className="dim" style={{ fontSize: 13 }}>
+                Voer een echt gesprek, met je stem of met keuzes
+              </span>
+            </span>
+            <span className="dim" style={{ fontSize: 20, flexShrink: 0 }}>
+              ›
+            </span>
+          </button>
+        )}
 
         {mijnFouten.length > 0 && (
           <div className="glass" style={{ padding: 22, marginBottom: 16, borderColor: 'var(--line-hot)' }}>

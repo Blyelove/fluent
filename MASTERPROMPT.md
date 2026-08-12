@@ -127,7 +127,9 @@ DEEL 2 — WAT JE ELKE RONDE DOET, IN DEZE VOLGORDE
 DEEL 3 — KERNREGELS DIE NOOIT VERANDEREN
 ═══════════════════════════════════════════════════════════════
 - NOOIT STRAFFEN. Geen hartjes, geen energie, geen limieten, geen schuldgevoel. Motiveren doe je met beloningen, competitie, voortgang en trots. Dit is hét verschil met Duolingo.
-- Design: neon arcade. Indigo #0E0B1F, paars/roze verloop (#A855F7 → #EC4899), amber XP (#FFC53D), cyaan selectie (#22D3EE), chunky 3D-drukknoppen die echt indrukken, Baloo 2 voor koppen, veel animatie en confetti op de piekmomenten. Alles minstens 44px en met één duim te bedienen.
+- Design: de verlichte arcadehal (vastgelegd door zes ontwerplenzen plus een hoofdontwerper in ronde 57). Diepe achtergrond met vignet en drie kleurzones als vaste laag op body::before/::after (nooit background-attachment: fixed, dat is kapot op iOS). Kaarten zijn getint lila glas met een lichtrand van boven. Neon is een felle 1px-kern plus halo, geen wollige vlek. Eén held per scherm: alleen de Doorgaan-kaart draagt de goudroze gradiëntrand (.card-hero). Goud is exclusief voor beloningen (balken waar een kist of XP achter zit krijgen .progress-fill--gold, de rest blijft neonroze), cyaan is de systeemkleur. Voltooide lessen zijn scheve paspoortstempels op de Gouden Draad, en jouw personage staat op de huidige knoop. Baloo 2 op alle kaartkoppen (.card-title); Instrument Sans gaat tot 700, dus nooit font-weight 800 op de UI-font. Maximaal 3 oneindige animaties per scherm (vlam, ring-pulse, ademende Doorgaan-knop), al het andere is een eenmalige entrance (.rise met --d-delay). Chunky 3D-drukknoppen, alles minstens 44px, één duim.
+- GEEN ENKEL SCHERM SCROLT OPZIJ. De pagina is een rechte kolom. Het knippen zit op html { overflow-x: clip } en NERGENS anders: een overflow op body maakt bódy het scrollvak en dan doet window.scrollTo niets meer (ronde 57 kostte dit een uur). Meet elke ronde documentElement.scrollWidth ≤ clientWidth op de schermen die je aanraakt.
+- Geen middenstreepjes in teksten die de gebruiker ziet. Home is geveegd (ronde 57); veeg elke ronde één scherm tot de teller op nul staat, en schrijf nieuwe teksten er meteen zonder.
 - Uitspraak: elke taal klinkt als een moedertaalspreker. Nooit een Nederlandse stem op een vreemde taal.
 - Alles wat de gebruiker ziet is volledig vertaald en foutloos Nederlands.
 - Het personagesysteem moet het rijkste van alle taal-apps zijn. Dat is een doel, geen bijzaak.
@@ -283,6 +285,40 @@ wat je onderweg zelf vindt.
    Daarna de geparkeerde ideeënlijst onderaan WERELDREIS.md, te beginnen bij
    de schatkisten halverwege een etappe en de zwaaiende bewoner met een groet.
 
+▓▓ BLOK P — DUOLINGO-PARITEIT (uitdrukkelijke wens van de gebruiker, ronde 57:
+   "we moeten alles hebben wat duolingo ook heeft ... zoals ai waar je mee kan
+   praten"). De stand van de vergelijking, bijhouden bij elke ronde:
+   ✅ Wij hebben (en vaak beter): leerpad met secties · reeks + bescherming ·
+      dag- en weekmissies met kist · tien divisies met promotie op de échte
+      ranglijst · duels tegen vrienden én bots · drie minigames · foutenlijst
+      met SRS · grammatica-gidsen · 1000 personages · de Wereldreis met
+      Poortwachters en paspoort · PWA · nooit straffen (hun hartjes-model is
+      juist ons wapen).
+   ✅ AF (ronde 57) — GESPREKKEN, ons antwoord op Duolingo Max Roleplay:
+      src/content/gesprekken.ts (3 scenario's × 6 talen, elk antwoord is goed,
+      fout bestaat niet) + src/screens/Gesprek.tsx (chatscherm met typindicator,
+      moedertaal-audio per beurt, NL-vertaaltoggle, tik op een bel = opnieuw
+      horen) + spraakherkenning via SpeechRecognition waar de browser dat kan
+      (antwoord inspreken in plaats van tikken, met een ruime toleranmarge en
+      een lieve fallback). 25 XP eerste keer, 10 XP daarna, telt als leerdag.
+      UITBREIDEN: elke paar rondes een nieuw scenario in alle zes talen
+      (restaurant, hotel, dokter, winkel, telefoongesprek, sollicitatie), en
+      scenario's koppelen aan de landen van de Wereldreis.
+   ◻ VERHALEN (Duolingo Stories): korte interactieve verhalen op A1/A2 met
+      begripvragen tussendoor, hergebruik van de les-woordenschat en de
+      bestaande audio-pijplijn. Grootste resterende pariteitsgat; ontwerp eerst
+      één Spaans verhaal als sjabloon, dan uitrollen.
+   ◻ Luisterverhalen (DuoRadio-achtig): een gesproken minidialoog afspelen en
+      twee vragen stellen; kan volledig op de bestaande TTS-pijplijn draaien.
+   ◻ Spreekoefeningen ín de les: het bestaande SpeechRecognition-werk uit
+      Gesprek.tsx hergebruiken als oefentype "zeg het hardop" (alleen tonen als
+      de browser het kan; het mag nooit blokkeren).
+   ⛔ Echte vrije AI-chat (Duolingo Max Video Call): heeft een taalmodel-API
+      nodig en dus een sleutel van de gebruiker. GEBLOKKEERD, zelfde regel als
+      Supabase hieronder. De Gesprekken-architectuur is er al klaar voor: een
+      vrije chatmodus is één extra bron van partnerbeurten.
+   ✕ Bewust niet: hartjes/energie (straf), losse wiskunde- en muziekapps.
+
 ▓▓ GEBLOKKEERD tot de gebruiker een Supabase-project en sleutels aanlevert:
    echte accounts op een server, "wachtwoord vergeten", vriendenlijsten,
    ranglijst tussen vrienden, synchronisatie tussen apparaten, het
@@ -292,7 +328,7 @@ wat je onderweg zelf vindt.
    de beveiligingsregels en de synchronisatiecode klaarzetten zodat het
    aanzetten straks één handeling is.
 
-✅ AL AF (niet opnieuw bouwen): vrienden-duels via deel-link · deelbare resultaatplaatjes, ook met je eigen personage erop · Nederlandstalige grammaticagidsen per unit · "Waarom?"-uitleg bij een fout antwoord · jouw-fouten-oefening gevoed door lessen, toetsen én duels · comeback-beloning na afwezigheid · "nog één les"-haakje · dagmissies met bonuskist · weekmissies · divisies · drie minigames · zelf samengestelde toetsen · 24 kant-en-klare personages plus een vrije personage-maker · PWA · automatische publicatie.
+✅ AL AF (niet opnieuw bouwen): vrienden-duels via deel-link · deelbare resultaatplaatjes, ook met je eigen personage erop · Nederlandstalige grammaticagidsen per unit · "Waarom?"-uitleg bij een fout antwoord · jouw-fouten-oefening gevoed door lessen, toetsen én duels · comeback-beloning na afwezigheid · "nog één les"-haakje · dagmissies met bonuskist · weekmissies · divisies · drie minigames · zelf samengestelde toetsen · 1000 personages plus een vrije personage-maker · gesprekken met keuzes en spraak in zes talen · de verlichte-arcadehal-designtaal op Home · PWA · automatische publicatie.
 
 Werk door tot de ronde af is. Vraag niets, wacht nergens op, en stop pas als de verbetering live staat en bewezen werkt.
 ```
@@ -313,6 +349,7 @@ Stoppen kan met `/loop stop` of door de cron-taak te verwijderen.
 
 ## Logboek
 
+- **12-08-2026, ronde 57** — De grootste ronde tot nu toe, gestuurd door drie live-opdrachten. (1) **GESPREKKEN: praten met een personage in de doeltaal**, ons antwoord op Duolingo Max. Drie scenario's (café, nieuwe vrienden, de weg vragen) in alle zes talen, als chat met typindicator, moedertaal-audio per beurt (218 nieuwe fragmenten gegenereerd, manifest op 2698, 0 mislukt), NL-vertaaltoggle, en je antwoord inspreken via SpeechRecognition waar de browser dat kan. Elk antwoord is goed, fout bestaat niet. Bewezen: heel gesprek uitgespeeld, +25 XP exact geboekt (440→465), `gesprekken: {es: ["cafe"]}` in de opslag. Eigen bug direct gevonden en gefixt: een selector met `?? []` gaf elke render een nieuwe array (oneindige lus), precies de valkuil uit stap 4e. (2) **De designsprong "verlichte arcadehal"**: zes ontwerplenzen + hoofdontwerper (55 findings) leverden een 14-stappenplan dat nu op Home en app-breed staat: getint glas met lichtrand, echte neon-gloed (kern+halo), zwevend arcade-dock, één held per scherm (.card-hero met goudroze rand), Gouden Draad met scheve stempel-knopen mét lesletter, jouw personage wachtend op de huidige knoop, goud exclusief voor beloningen, motion-budget van 10+ naar 3, staggered entrance, grabber op elk paneel. (3) **Opzij scrollen bestaat niet meer**: html { overflow-x: clip }. LES, duur betaald: de eerste fix zette de overflow óók op body, en een overflow op body maakt bódy het scrollvak waardoor window.scrollTo stilletjes niets meer doet en de pagina raar rendert. Overflow-knippen hoort op html, nergens anders. Verder Home geveegd op middenstreepjes in zichtbare tekst, en Blok P (Duolingo-pariteit) toegevoegd met de resterende gaten: verhalen, luisterverhalen, spreekoefeningen in de les; vrije AI-chat geblokkeerd op een API-sleutel van de gebruiker.
 - **12-08-2026, ronde 56** — **Wereldreis fase 8 én 9 af, allebei live.** (1) **Het paspoort.** Elke Grensproef die je doorstaat laat nu een echte afdruk achter: `src/components/PassportStamp.tsx` tekent een inktstempel met de vlag in het midden, de landnaam gebogen langs de rand via `textPath`, de datum eronder en een scheefstand die uit de landcode wordt afgeleid — Spanje staat op 7°, Mexico op 10°, en herladen verandert daar niets aan. Het paspoort zelf opent met de 🛂-knop in de kaartheader: een raster van drie kolommen over alle veertien landen, verdiende stempels in goud, de rest als stippellijn met een "?", en onderaan "2 van de 14 stempels · volgende: Colombia". Een verzameling die om vulling vraagt, nooit een slot. (2) **Het wereldblok op Home is een stukje route geworden.** Veertien vlaggetjes op een rij vertelden je niets over waar je stond; nu zie je de bocht waar je op loopt, met het land achter je in kleur, jouw eigen personage precies zo ver als je lessen reiken (`getPointAtLength` op hetzelfde pad, `etappeFrac` uit dezelfde functie als de grote kaart) en het volgende land dat voor je uit lonkt met een amber randje. Teller en lessenstand bleven exact gelijk aan de oude weergave, want beide lezen uit `countryStates`. **Les, nu in stap 4:** bij een miniatuur is "het staat er" niet genoeg — de eerste versie had de afgelegde route wél getekend, maar hij viel volledig weg achter de vlagcirkel en het personage. Meet bij elk klein beeld of het betekenisvolle deel ook echt zíchtbaar overblijft naast alles wat eroverheen staat. **Tweede les, nu in stap 8:** het logboek is niet de nette afsluiting maar het bewijsstuk van de ronde — tussen ronde 30 en 55 is er gebouwd zonder te loggen, en daardoor is niet meer na te lezen wat er is besloten. Een ronde zonder logboekregel telt niet als af.
 - **12-08-2026, ronde 29** — Grote ronde, gestuurd door vijf live-opdrachten van de gebruiker. (1) **Wereldreis fase 4 af**: de veroveringsrun — kom je op de kaart terwijl er sinds je vorige bezoek een land bij is, dan rent je held er in 2,4s naartoe (het land blijft grijs tot hij aankomt), de vlag klapt open met een veer-pop, confetti spuit vanaf de knoop en een banner "🏆 {Land} veroverd!" verschijnt; daarna wandelt hij door naar zijn plek op de volgende etappe. Op verzoek van de gebruiker ("moet smoother") de hele run omgezet naar **motion-waarden buiten React om** — geen re-render per frame meer, 60fps. `worldSeen` in de store zorgt dat elke verovering precies één keer gevierd wordt. (2) **De personagegalerij: van 24 naar 1000** (500 mannen, 500 vrouwen), gegenereerd in themagolven (klassiek/neon/fel/wild) met echte namen uit alle taalwerelden, gegarandeerd uniek uiterlijk, en soepel scrollend dankzij content-visibility. (3) Het keuzescherm is **man/vrouw éérst** (Stap 1 → Stap 2 helden → Stap 3 zelf maken) — de gebruiker vond alles door elkaar onduidelijk, en had gelijk. (4) Nieuwe vaste regels in Deel J: de galerij blijft altijd groeien, de hele UI/UX is een doorlopende opdracht, en er komen **ontgrendelbare silhouet-helden** die je vrijspeelt met prestaties. (5) MASTERPROMPT.md als bestand naar de gebruiker gestuurd ter controle. **Les:** de 24 personages bestonden al maar zaten achter een inklapknop — de gebruiker zag ze niet en dacht dat ze er niet waren. Rijkdom die je verstopt bestaat niet; toon overvloed, en regel de prestatie met rendering-technieken in plaats van met verbergen.
 - **12-08-2026, ronde 28** — **Wereldreis fase 3: het land-paneel.** Elke landknoop op de kaart is nu een echte knop; tikken opent een veerkrachtig paneel (modal-patroon met sleepbalkje) met per status een eigen verhaal: veroverd = "🏆 Veroverd" met vlag in gouden ring; volgende bestemming = "Nog X lessen en de vlag van {land} is van jou" met voortgangsbalk én de knop "▶ Verder leren →" die de kaart sluit en meteen de eerstvolgende les start; verderop = uitleg over de route; buiten de cursus = "🔭 Dit land komt met nieuwe lessen — jouw wereld groeit vanzelf", nooit een slot. Bewezen: Spanje toont de veroverd-variant, Colombia de volgende-variant met "nog 2 lessen", en de CTA startte aantoonbaar een echte les (NIEUW WOORD-scherm). De kaart is daarmee een lanceerplatform, geen galerij.
