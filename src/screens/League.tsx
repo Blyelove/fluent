@@ -329,6 +329,8 @@ export function LeagueScreen() {
   const storedLeagueId = useStore((s) => s.leagueId)
   const storedWeekXp = useStore((s) => s.weekXp)
   const promotions = useStore((s) => s.promotions)
+  const uitslag = useStore((s) => s.weekUitslag)
+  const clearWeekUitslag = useStore((s) => s.clearWeekUitslag)
   const calm = Boolean(useReducedMotion())
 
   // opgeslagen waarden altijd eerst gezond maken
@@ -377,6 +379,21 @@ export function LeagueScreen() {
   const safeTarget = league.demote > 0 ? list[safeRank - 1] : undefined
   const toPromoZone = promoTarget && rank > league.promote ? Math.max(1, promoTarget.xp - weekXp + 1) : 0
   const toSafe = safeTarget && rank > safeRank ? Math.max(1, safeTarget.xp - weekXp + 1) : 0
+
+  // gepromoveerd vorige week? dan knalt het bij het zien van de uitslag
+  useEffect(() => {
+    if (uitslag?.uitkomst !== 'promotie') return
+    confetti({
+      particleCount: 130,
+      spread: 100,
+      startVelocity: 38,
+      origin: { y: 0.28 },
+      colors: ['#A855F7', '#EC4899', '#FFC53D', '#FFFFFF'],
+      disableForReducedMotion: true,
+    })
+    sfx('complete')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // sta je op promotie? dan een feestje bij het openen van het scherm
   useEffect(() => {
@@ -432,6 +449,49 @@ export function LeagueScreen() {
     <div className="shell">
       <div className="ambient-orb orb-a" />
       <div className="ambient-orb orb-b" />
+
+      {/* ---------- uitslag van vorige week ---------- */}
+      {uitslag && (
+        <motion.div
+          className="glass"
+          initial={{ opacity: 0, y: -14, scale: 0.96 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          style={{
+            padding: 20,
+            marginBottom: 18,
+            borderColor:
+              uitslag.uitkomst === 'promotie' ? 'var(--ok)' : uitslag.uitkomst === 'degradatie' ? 'var(--line)' : 'var(--line-gold)',
+          }}
+        >
+          <p className="eyebrow" style={{ fontSize: 10.5 }}>
+            Uitslag vorige week
+          </p>
+          <p className="display" style={{ fontSize: 24, margin: '8px 0 4px' }}>
+            {uitslag.uitkomst === 'promotie'
+              ? `🎉 Plek #${uitslag.rank} — gepromoveerd!`
+              : uitslag.uitkomst === 'degradatie'
+                ? `Plek #${uitslag.rank} — een stapje terug.`
+                : `Plek #${uitslag.rank} — je blijft ${divisionLabel(uitslag.nieuwLeagueId).toLowerCase()}.`}
+          </p>
+          <p className="dim" style={{ fontSize: 13.5, marginBottom: 14 }}>
+            {uitslag.uitkomst === 'promotie'
+              ? `Je eindigde in de promotiezone van de ${divisionLabel(uitslag.leagueId).toLowerCase()} en speelt nu in de ${divisionLabel(uitslag.nieuwLeagueId).toLowerCase()}.`
+              : uitslag.uitkomst === 'degradatie'
+                ? `Vanuit hier kan het alleen maar omhoog — één goede week en je bent terug in de ${divisionLabel(uitslag.leagueId).toLowerCase()}.`
+                : 'Precies de ranglijst gevolgd die je de hele week zag — deze week pak je die promotiezone.'}
+          </p>
+          <button
+            className="btn btn-primary"
+            style={{ padding: 13, fontSize: 14.5 }}
+            onClick={() => {
+              sfx('tap')
+              clearWeekUitslag()
+            }}
+          >
+            {uitslag.uitkomst === 'promotie' ? 'Op naar meer!' : 'Nieuwe week, nieuwe kansen'}
+          </button>
+        </motion.div>
+      )}
 
       {/* ---------- kop ---------- */}
       <div className="center">

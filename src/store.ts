@@ -6,7 +6,7 @@ import { newCard, nextCard, isDue } from './srs'
 import { goalStatus, type CompletedGoal, type Goal } from './goals'
 import type { DuelRecord } from './duel'
 import { mistakeKey, type MistakeRef } from './mistakes'
-import { LEAGUES, weekIndex } from './leagues'
+import { LEAGUES, eindstand, weekIndex, yourRank, zoneFor } from './leagues'
 import type { AvatarStyle, Look } from './components/Avatar'
 import { setSoundEnabled } from './audio'
 
@@ -129,6 +129,9 @@ interface AureaState {
   weekDuels: number
   /** Week waarin de grote weekkist al is geopend */
   weekChestWeek: number
+  /** Uitslag van de vorige competitieweek, tot hij is weggeklikt */
+  weekUitslag: WeekUitslag | null
+  clearWeekUitslag: () => void
 
   completeOnboarding: (c: CourseId, goalXp: number) => void
   setCourse: (c: CourseId) => void
@@ -170,6 +173,17 @@ const emptyProgress = (): Progress => ({ xp: 0, completed: [] })
  * bij genoeg XP promoveer je, bij te weinig zak je terug.
  * Geeft de bij te werken velden terug (weekXp is dan al gereset).
  */
+/** Uitslag van de afgelopen competitieweek, te tonen tot hij is weggeklikt */
+export interface WeekUitslag {
+  /** Plek 1-30 in de eindstand */
+  rank: number
+  /** Divisie waarin die week gespeeld werd */
+  leagueId: number
+  /** Divisie waar je nu in zit */
+  nieuwLeagueId: number
+  uitkomst: 'promotie' | 'veilig' | 'degradatie'
+}
+
 interface WeekState {
   leagueWeek: number
   weekXp: number
@@ -178,6 +192,7 @@ interface WeekState {
   weekLessons: number
   weekArcade: number
   weekDuels: number
+  weekUitslag: WeekUitslag | null
 }
 
 interface ReeksState {
@@ -263,20 +278,27 @@ function rollWeek(s: WeekState): WeekState {
       weekLessons: s.weekLessons,
       weekArcade: s.weekArcade,
       weekDuels: s.weekDuels,
+      weekUitslag: s.weekUitslag,
     }
 
-  const l = LEAGUES[s.leagueId]
-  // grofweg: bots in deze divisie halen gemiddeld dit per week
-  const par = 320 + s.leagueId * 190
+  // promotie en degradatie volgen de EINDSTAND van de ranglijst die je de
+  // hele week zag — niet een verborgen XP-drempel. Wie bij de promotieplekken
+  // eindigt, promoveert; wie in de degradatiezone eindigt, zakt.
+  const stand = eindstand(s.leagueId, s.weekXp, s.leagueWeek)
+  const rank = yourRank(stand)
+  const uitkomst = zoneFor(s.leagueId, rank)
   let leagueId = s.leagueId
   let promotions = s.promotions
-  if (l.promote > 0 && s.weekXp >= par * 1.15) {
+  if (uitkomst === 'promotie') {
     leagueId = Math.min(LEAGUES.length - 1, s.leagueId + 1)
     if (leagueId !== s.leagueId) promotions += 1
-  } else if (l.demote > 0 && s.weekXp < par * 0.3) {
+  } else if (uitkomst === 'degradatie') {
     leagueId = Math.max(0, s.leagueId - 1)
   }
-  return { leagueWeek: now, weekXp: 0, leagueId, promotions, weekLessons: 0, weekArcade: 0, weekDuels: 0 }
+  // deed je vorige week niets (0 XP), dan is er geen uitslag om te vieren of
+  // te betreuren — stil doorrollen, geen scherm
+  const weekUitslag: WeekUitslag | null = s.weekXp > 0 ? { rank, leagueId: s.leagueId, nieuwLeagueId: leagueId, uitkomst } : null
+  return { leagueWeek: now, weekXp: 0, leagueId, promotions, weekLessons: 0, weekArcade: 0, weekDuels: 0, weekUitslag }
 }
 
 export const useStore = create<AureaState>()(
@@ -333,6 +355,7 @@ export const useStore = create<AureaState>()(
       weekArcade: 0,
       weekDuels: 0,
       weekChestWeek: -1,
+      weekUitslag: null,
 
       completeOnboarding: (c, goalXp) => set({ onboarded: true, courseId: c, dailyGoalXp: goalXp }),
 
@@ -622,6 +645,8 @@ export const useStore = create<AureaState>()(
 
       setAvatarLook: (look) => set({ avatarLook: look }),
 
+      clearWeekUitslag: () => set({ weekUitslag: null }),
+
       resetAll: () =>
         set({
           onboarded: false,
@@ -661,6 +686,7 @@ export const useStore = create<AureaState>()(
           weekArcade: 0,
           weekDuels: 0,
           weekChestWeek: -1,
+          weekUitslag: null,
         }),
     }),
     { name: 'aurea-v1' }

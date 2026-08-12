@@ -160,8 +160,8 @@ wat je onderweg zelf vindt.
    8. ✅ AF (ronde 21): één tikfout of gemist accent telt goed met een spellingtip ("Let op de spelling: adiós"); twee fouten blijft fout. In lessen, herhaling én duels.
    9. ✅ AF (ronde 23): .unit-card gedefinieerd (20px 18px padding, 16px marge) — de vier hoofdkaarten plakken niet meer aan elkaar; gemeten op alle vier.
    10. ✅ AF (ronde 24): de app-brede onderbalk verdwijnt tijdens elk potje en duel (playing-signaal doorgetrokken van PlayScreen naar App); hele cyclus bewezen.
-   11. Promotie volgt de ranglijst die je de hele week ziet, met een uitslagscherm op maandag. (midden)
-   12. Daarna pas de uitbreidingen uit blok B t/m G.
+   11. ✅ AF (ronde 25): promotie en degradatie volgen de eindstand van de ranglijst (eindstand() + zoneFor()), met een uitslagkaart op de Divisie-pagina en confetti bij promotie. DE HELE TOP-12 IS AF.
+   12. Volgende: DE WERELDREIS bouwen volgens WERELDREIS.md, fase voor fase — en daarnaast blok B t/m G.
 
 ▓▓ BLOK A — BEWEZEN BUGS. Deze gaan vóór alles. Elk hiervan breekt een belofte
    die de app zelf op het scherm doet.
@@ -255,12 +255,10 @@ wat je onderweg zelf vindt.
    een verticale, scrollende kaart met een slingerend pad, jouw eigen personage
    dat er zichtbaar overheen reist, per land een herkenbaar landmark-silhouet in
    neonstijl, het volgende land dat lokt, en de veroveringstoets als eindbaas.
-   Een compleet ontwerpplan (vier lenzen: spelgevoel, beloningsritme,
-   haalbaarheid, art direction, samengesmeed tot kwartierfasen) staat in
-   WERELDREIS.md zodra de ontwerpronde klaar is — bouw daarna fase voor fase,
-   elke fase bewijsbaar af binnen één ronde. Tot dat bestand er is: niet zelf
-   improviseren, eerst het plan afwachten of (als het uitblijft) de ontwerpronde
-   opnieuw draaien.
+   Het complete ontwerpplan staat in **WERELDREIS.md** (sinds ronde 25): visie,
+   acht kernbeslissingen, tien bouwfasen met elk een eigen bewijs, en een
+   bewust geparkeerde ideeënlijst. Bouw de fasen in volgorde, één per ronde,
+   en streep ze daar af. Fase 1 is de kaart zelf — die moet meteen "wauw" zijn.
 
 ▓▓ GEBLOKKEERD tot de gebruiker een Supabase-project en sleutels aanlevert:
    echte accounts op een server, "wachtwoord vergeten", vriendenlijsten,
@@ -292,6 +290,7 @@ Stoppen kan met `/loop stop` of door de cron-taak te verwijderen.
 
 ## Logboek
 
+- **12-08-2026, ronde 25** — Top-12 punt 11, en daarmee is **de hele top-12 af**. Promotie en degradatie volgen nu de **eindstand van de ranglijst die je de hele week zag** in plaats van een verborgen XP-drempel: `eindstand()` in leagues.ts rekent de deterministische bots op volle weekvoortgang, `rollWeek` bepaalt je plek met `yourRank()` + `zoneFor()` en bewaart een `weekUitslag` in de store. De Divisie-pagina opent met een **uitslagkaart**: "🎉 Plek #4 — gepromoveerd!" met confetti, of bij degradatie een warme tekst zonder verwijt ("vanuit hier kan het alleen maar omhoog"). Deed je vorige week niets (0 XP), dan komt er géén kaart — niets om te betreuren. Beide richtingen bewezen: 900 XP in Zilver → plek #4 → gouden divisie; 10 XP in Goud → plek #30 → terug naar Zilver; wegklikken zet de uitslag op null. **Tegelijk het complete ontwerpplan voor DE WERELDREIS ontvangen en vastgelegd in WERELDREIS.md**: vier ontwerplenzen samengesmeed tot tien bouwfasen — de neon-sagakaart met je eigen personage als reizende held, de Poortwachter-eindbaas met vlagschild, en het paspoort met inktstempels. Volgende rondes: fase 1 (de kaart) bouwen.
 - **12-08-2026, ronde 24** — Top-12 punt 10: **niets breekt je potje meer af**. De speelhal-tabs verdwenen al tijdens een spel, maar de app-brede onderbalk met vijf knoppen bleef gewoon onder je duim staan — één misveeg tijdens een potje op de klok en je run, reeksbonus en ongeboekte XP waren weg. Het playing-signaal ging simpelweg nooit verder dan PlayScreen. Nu doorgetrokken naar App, dat de onderbalk verbergt zodra een minigame of duel loopt. Bewezen over de hele cyclus: nav zichtbaar op start en in de speelhal-hub, wég tijdens een lopende Bliksemronde (klok liep), en terug na het verlaten van het spel.
 - **12-08-2026, ronde 23** — Top-12 punt 9 én de vaste designregel in één: `.unit-card` bestond niet in de CSS terwijl vier hoofdkaarten op het startscherm erop leunden — dagmissies, weekmissies, doelen en wereldverovering hadden nul padding en plakten aan elkaar. Nu gedefinieerd (20px 18px binnenruimte, 16px onderlinge marge) en op alle vier gemeten en met een screenshot bevestigd. Op datzelfde screenshot was meteen te zien dat de weekmissie "Speel 1 duel" op 1/1 ✓ staat door het botduel van ronde 20 — de belofte uit die ronde is dus aantoonbaar overal waargemaakt.
 - **12-08-2026, ronde 22** — Top-12 punt 7: **na elke fout hoor je hoe het wél klinkt**. `EvalResult` heeft nu `speakAnswer`: elk oefentype geeft door wat er in de doeltaal gezegd mag worden — en alléén als dat zeker de doeltaal is (bij een keuzevraag mét `speak` zijn de opties Nederlands, dus die zwijgt; een Spaanse stem die Nederlands voorleest is net zo fout als andersom). Lessen, herhaling en duels spreken het juiste antwoord uit na een fout én na een tikfout-met-tip, met 420ms vertraging zodat het feedbackpaneel eerst landt. De generator verzamelt nu ook de drie stille types (typ, woordtegels, invullen — de hele zin met het juiste woord erin) plus de juiste select-antwoorden: manifest van 1931 → **2480 fragmenten, 0 mislukt**, en de poortwachter controleert de dekking van álle zeven types bij elke build — die meldt nu **nul** ontbrekende teksten. Bewezen in de app: tikfout "grasias" → paneel toont de tip én `/audio/es-ES/….mp3` (het echte moedertaal-fragment) speelt af. Ondertussen draaide het ontwerpteam voor **De Wereldreis** (Blok H) en zijn de creativiteitsregels van de gebruiker als Deel J vastgelegd, inclusief: het design verbetert elke ronde ergens zichtbaar — stilstand is een bug.

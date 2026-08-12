@@ -81,6 +81,19 @@ export function standings(leagueId: number, yourWeekXp: number, now = new Date()
   const hour = now.getHours()
   // hoe ver de week gevorderd is (0-1), inclusief de lopende dag
   const progress = Math.min(1, (day + hour / 24) / 7)
+  return standingsVoor(leagueId, yourWeekXp, week, progress)
+}
+
+/**
+ * De EINDstand van een afgelopen week: dezelfde deterministische bots, maar
+ * op volle weekvoortgang. Promotie en degradatie worden hieruit afgeleid,
+ * zodat de uitslag exact de ranglijst volgt die je de hele week zag.
+ */
+export function eindstand(leagueId: number, yourWeekXp: number, week: number): Competitor[] {
+  return standingsVoor(leagueId, yourWeekXp, week, 1)
+}
+
+function standingsVoor(leagueId: number, yourWeekXp: number, week: number, progress: number): Competitor[] {
   // hoger niveau = fanatiekere tegenstanders
   const base = 320 + leagueId * 190
 
