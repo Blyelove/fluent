@@ -11,6 +11,8 @@ import type { CompletedGoal } from '../goals'
 import type { CourseId } from '../types'
 import { Flag } from '../components/Flag'
 import { Avatar } from '../components/Avatar'
+import { ShareButton } from '../components/ShareButton'
+import { courses } from '../content'
 import { sfx, speak } from '../audio'
 import {
   FillEx,
@@ -408,6 +410,8 @@ function CompleteView({
   const dailyGoalXp = useStore((s) => s.dailyGoalXp)
   const goalReached = todayXp >= dailyGoalXp
   const [shown, setShown] = useState(0)
+  /** het personage op het niveau-scherm, om mee te tekenen op de deelkaart */
+  const figuurRef = useRef<HTMLDivElement | null>(null)
 
   const steps = useMemo(() => {
     const s: ('stats' | 'conquest' | 'goal' | 'level')[] = ['stats']
@@ -593,6 +597,18 @@ function CompleteView({
             <motion.p className="dim" style={{ fontSize: 15, marginTop: 6 }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.8 }}>
               Jij rent alvast vooruit naar het volgende land.
             </motion.p>
+            <div style={{ marginTop: 16, padding: '0 8px' }}>
+              <ShareButton
+                label="Deel je verovering"
+                kaart={{
+                  icoon: '🌍',
+                  waarde: conquered[0].name,
+                  label: 'veroverd',
+                  onderschrift: courses[courseId].name,
+                  bericht: `${conquered[0].name} veroverd in ${courses[courseId].name} met Fluent!`,
+                }}
+              />
+            </div>
             {chainFooter()}
           </motion.div>
         )}
@@ -634,7 +650,7 @@ function CompleteView({
 
         {step === 'level' && newLevel && (
           <motion.div key="lvl" initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35 }}>
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <div ref={figuurRef} style={{ display: 'flex', justifyContent: 'center' }}>
               <Avatar size={128} mode="cheer" level={newLevel} courseId={courseId} look={look} />
             </div>
             <p className="eyebrow" style={{ marginTop: 10 }}>
@@ -646,6 +662,19 @@ function CompleteView({
             <p className="display dim" style={{ fontSize: 21 }}>
               {levelTitle(newLevel)}
             </p>
+            <div style={{ marginTop: 14 }}>
+              <ShareButton
+                label="Laat je personage zien"
+                kaart={() => ({
+                  icoon: '⭐',
+                  waarde: `Niveau ${newLevel}`,
+                  label: levelTitle(newLevel),
+                  onderschrift: `${courses[courseId].name} · ${levelReward(courseId, newLevel) ?? 'nieuw niveau'}`,
+                  bericht: `Niveau ${newLevel} gehaald in ${courses[courseId].name} met Fluent!`,
+                  svg: figuurRef.current?.querySelector('svg') ?? null,
+                })}
+              />
+            </div>
             {levelReward(courseId, newLevel) && (
               <motion.p
                 className="gold-text"

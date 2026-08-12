@@ -9,7 +9,12 @@ export function ShareButton({
   variant = 'ghost',
   style,
 }: {
-  kaart: DeelKaart
+  /**
+   * De kaart, of een functie die hem maakt. Gebruik de functievorm zodra de
+   * kaart iets uit de pagina nodig heeft (zoals je personage): een object dat
+   * tijdens het renderen wordt opgebouwd, ziet refs nog als null.
+   */
+  kaart: DeelKaart | (() => DeelKaart)
   label?: string
   variant?: 'ghost' | 'primary'
   style?: React.CSSProperties
@@ -46,7 +51,7 @@ export function ShareButton({
       onClick={() => {
         sfx('tap')
         setStatus('bezig')
-        void deelKaart(kaart).then((r) => {
+        void deelKaart(typeof kaart === 'function' ? kaart() : kaart).then((r) => {
           if (!levend.current) return
           setStatus(r)
           timer.current = window.setTimeout(() => {
