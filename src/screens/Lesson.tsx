@@ -283,6 +283,11 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
                         Juiste antwoord: <strong style={{ color: 'var(--text)' }}>{result.correctAnswer}</strong>
                       </p>
                     )}
+                    {result?.correct && result?.spellingTip && (
+                      <p className="dim" style={{ fontSize: 15 }}>
+                        Let op de spelling: <strong style={{ color: 'var(--text)' }}>{result.spellingTip}</strong>
+                      </p>
+                    )}
                   </div>
                 </div>
 

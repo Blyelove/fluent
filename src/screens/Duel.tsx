@@ -591,6 +591,11 @@ export function DuelScreen({
                       Juiste antwoord: <strong style={{ color: 'var(--text)' }}>{answered.correctAnswer}</strong>
                     </p>
                   )}
+                  {answered.correct && answered.spellingTip && (
+                    <p className="dim" style={{ fontSize: 15, marginBottom: 10, marginTop: -6 }}>
+                      Let op de spelling: <strong style={{ color: 'var(--text)' }}>{answered.spellingTip}</strong>
+                    </p>
+                  )}
                   <button className="btn btn-primary" onClick={advance}>
                     {idx + 1 === phase.items.length ? 'Naar de uitslag' : 'Volgende vraag'}
                   </button>

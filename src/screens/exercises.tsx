@@ -6,6 +6,12 @@ import { sfx, speak } from '../audio'
 export interface EvalResult {
   correct: boolean
   correctAnswer?: string
+  /**
+   * Gevuld wanneer het antwoord goed gerekend is ondanks een tikfout of een
+   * gemist accent — het feedbackpaneel toont dan de juiste spelling. Eén
+   * letter verkeerd is niet hetzelfde als het woord niet kennen.
+   */
+  spellingTip?: string
 }
 
 export interface Registration {
@@ -34,6 +40,59 @@ function norm(s: string): string {
     .trim()
     .replace(/[.,!?;:'’"«»¿¡]/g, '')
     .replace(/\s+/g, ' ')
+}
+
+/** Accenten weg (café → cafe) — voor de vergelijking, nooit voor de weergave */
+function zonderAccenten(s: string): string {
+  return s.normalize('NFD').replace(/[̀-ͯ]/g, '')
+}
+
+/** Precies één tikfout (letter te veel, te weinig of verkeerd)? */
+function eenTikfout(a: string, b: string): boolean {
+  if (a === b) return false
+  if (Math.abs(a.length - b.length) > 1) return false
+  // zelfde lengte: precies één positie mag verschillen
+  if (a.length === b.length) {
+    let verschillen = 0
+    for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) verschillen++
+    return verschillen === 1
+  }
+  // één letter langer: kort moet in lang passen met één overgeslagen letter
+  const [kort, lang] = a.length < b.length ? [a, b] : [b, a]
+  let i = 0
+  let j = 0
+  let overgeslagen = false
+  while (i < kort.length && j < lang.length) {
+    if (kort[i] === lang[j]) {
+      i++
+      j++
+    } else {
+      if (overgeslagen) return false
+      overgeslagen = true
+      j++
+    }
+  }
+  return true
+}
+
+/**
+ * Beoordeelt een getypt antwoord met menselijke maat: exact goed is goed,
+ * en een gemist accent of één tikfout (bij woorden van 4+ tekens) is óók
+ * goed — met een spellingtip erbij. Een tikfout is geen onwetendheid.
+ */
+export function beoordeelTypen(invoer: string, doelen: string[]): EvalResult {
+  const gegeven = norm(invoer)
+  const hoofd = doelen[0] ?? ''
+  for (const doel of doelen) if (norm(doel) === gegeven) return { correct: true, correctAnswer: hoofd }
+  for (const doel of doelen) {
+    const d = norm(doel)
+    // accentfout: zonder accenten gelijk
+    if (zonderAccenten(d) === zonderAccenten(gegeven)) return { correct: true, correctAnswer: hoofd, spellingTip: doel }
+    // tikfout: één letter afwijking op een woord dat lang genoeg is om dat te vergeven
+    if (d.length >= 4 && eenTikfout(zonderAccenten(d), zonderAccenten(gegeven)))
+      return { correct: true, correctAnswer: hoofd, spellingTip: doel }
+  }
+  return { correct: false, correctAnswer: hoofd }
 }
 
 const SpeakerIcon = ({ size = 26 }: { size?: number }) => (
@@ -350,10 +409,10 @@ export function TypeEx({ ex, locked, register }: Common & { ex: TypeAnswer }) {
   const [val, setVal] = useState('')
 
   useEffect(() => {
-    const answers = [ex.target, ...(ex.accept ?? [])].map(norm)
+    const answers = [ex.target, ...(ex.accept ?? [])]
     register({
       ready: val.trim().length > 0,
-      evaluate: () => ({ correct: answers.includes(norm(val)), correctAnswer: ex.target }),
+      evaluate: () => beoordeelTypen(val, answers),
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [val])
