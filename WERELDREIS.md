@@ -37,7 +37,7 @@ held, en die held ben jij.**
    *Bewijs: open op 375px, tik "Reis verder →": scrollbare neonroute met juiste vlaggen, veroverde segmenten in verloop, volgende land pulseert — zonder horizontale scroll.*
 2. ✅ **AF (ronde 27) — De held op de kaart.** `<Avatar size={84}>` als absolute laag op het actieve segment via getPointAtLength(frac × totalLength), frac = (voltooid − vorige drempel)/(drempel − vorige drempel); kijkrichting via scaleX(−1); het actieve segment vult live mee (motion.path, 0.9s); useLayoutEffect-scroll zet de avatar bij openen op 55% van het scherm.
    *Bewijs: rond één les af, heropen de kaart: de avatar staat zichtbaar één stap verder.*
-3. **Land-sheet.** Bottom sheet per status: veroverd = gouden badge + datum; volgende = voortgangsbalk "nog X van Y lessen" + knop "Verder leren →" die de juiste les start; toekomst = "Dit land komt met nieuwe lessen — jouw wereld groeit vanzelf", nooit een slot.
+3. ✅ **AF (ronde 28) — Land-sheet.** Bottom sheet per status: veroverd = gouden badge + datum; volgende = voortgangsbalk "nog X van Y lessen" + knop "Verder leren →" die de juiste les start; toekomst = "Dit land komt met nieuwe lessen — jouw wereld groeit vanzelf", nooit een slot.
    *Bewijs: alle drie de staten tonen de juiste variant en "Verder leren →" start echt de volgende les.*
 4. **Reisanimatie.** Store-veld worldSeen; bij openen delta detecteren: avatar mode='run' rent in 2,2s over het pad (motionValues, geen rerenders), knoop-pop, vlag-crossfade grijs→kleur, confetti vanaf de knooppositie, banner "{Land} veroverd!"; bij prefers-reduced-motion direct de eindtoestand.
    *Bewijs: drempel kunstmatig naderen, les afronden, kaart openen: de held rent zichtbaar naar het nieuwe land — één keer (worldSeen).*

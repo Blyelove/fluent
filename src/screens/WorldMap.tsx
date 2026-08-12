@@ -1,5 +1,5 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { motion } from 'motion/react'
+import { AnimatePresence, motion } from 'motion/react'
 import type { Course } from '../types'
 import { countryStates, type CountryState } from '../countries'
 import { Flag } from '../components/Flag'
@@ -60,11 +60,15 @@ export function WorldMapScreen({
   course,
   completedCount,
   onBack,
+  onVerderLeren,
 }: {
   course: Course
   completedCount: number
   onBack: () => void
+  /** Sluit de kaart en start meteen de eerstvolgende les — de kaart is een lanceerplatform, geen galerij */
+  onVerderLeren?: () => void
 }) {
+  const [gekozen, setGekozen] = useState<Knoop | null>(null)
   const scroller = useRef<HTMLDivElement | null>(null)
   const actiefPad = useRef<SVGPathElement | null>(null)
   const look = useStore((s) => s.avatarLook)
@@ -272,8 +276,13 @@ export function WorldMapScreen({
           {knopen.map((k) => {
             const resterend = Math.max(0, k.threshold - completedCount)
             return (
-              <div
+              <button
                 key={k.code + k.threshold}
+                aria-label={k.name}
+                onClick={() => {
+                  sfx('tap')
+                  setGekozen(k)
+                }}
                 style={{
                   position: 'absolute',
                   left: `${(k.x / BREEDTE) * 100}%`,
@@ -366,7 +375,7 @@ export function WorldMapScreen({
                         ? `nog ${resterend} ${resterend === 1 ? 'les' : 'lessen'}`
                         : `na ${k.threshold} lessen`}
                 </p>
-              </div>
+              </button>
             )
           })}
 
@@ -386,6 +395,117 @@ export function WorldMapScreen({
           </p>
         </div>
       </div>
+
+      {/* het land-paneel: per status een eigen verhaal, nooit een slot */}
+      <AnimatePresence>
+        {gekozen && (
+          <motion.div
+            className="modal-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setGekozen(null)}
+            style={{ zIndex: 70 }}
+          >
+            <motion.div
+              className="modal-panel"
+              initial={{ y: 90 }}
+              animate={{ y: 0 }}
+              exit={{ y: 130 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div style={{ width: 44, height: 5, borderRadius: 999, background: 'var(--line)', margin: '0 auto 16px' }} />
+              <div className="row" style={{ gap: 14, marginBottom: 12 }}>
+                <div
+                  style={{
+                    width: 56,
+                    height: 56,
+                    borderRadius: '50%',
+                    overflow: 'hidden',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: gekozen.conquered ? '3px solid var(--gold)' : '2.5px solid var(--line)',
+                    background: 'var(--surface-2)',
+                    flexShrink: 0,
+                    filter: gekozen.conquered || gekozen.isVolgende ? undefined : 'grayscale(0.7)',
+                  }}
+                >
+                  <Flag code={gekozen.code} size={36} />
+                </div>
+                <div>
+                  <h3 className="display" style={{ fontSize: 24 }}>
+                    {gekozen.name}
+                  </h3>
+                  {gekozen.conquered ? (
+                    <span
+                      className="gold-text"
+                      style={{ fontSize: 13, fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: 5 }}
+                    >
+                      🏆 Veroverd
+                    </span>
+                  ) : (
+                    <span className="dim" style={{ fontSize: 13 }}>
+                      {gekozen.inCourse ? `Etappe ${gekozen.threshold} lessen` : 'Toekomstige bestemming'}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {gekozen.conquered ? (
+                <p className="dim" style={{ fontSize: 14, marginBottom: 16 }}>
+                  Dit land is van jou — veroverd na {gekozen.threshold} lessen. Jouw personage reisde hier doorheen op weg naar de
+                  volgende bestemming.
+                </p>
+              ) : gekozen.isVolgende ? (
+                <>
+                  <p className="dim" style={{ fontSize: 14, marginBottom: 10 }}>
+                    Jouw volgende bestemming. Nog{' '}
+                    <strong style={{ color: 'var(--gold)' }}>
+                      {Math.max(0, gekozen.threshold - completedCount)}{' '}
+                      {gekozen.threshold - completedCount === 1 ? 'les' : 'lessen'}
+                    </strong>{' '}
+                    en de vlag van {gekozen.name} is van jou.
+                  </p>
+                  <div className="progress-track" style={{ height: 8, marginBottom: 16 }}>
+                    <div
+                      className="progress-fill"
+                      style={{ width: `${Math.min(100, (completedCount / gekozen.threshold) * 100)}%` }}
+                    />
+                  </div>
+                  {onVerderLeren && (
+                    <button
+                      className="btn btn-primary"
+                      style={{ padding: 15, fontSize: 15.5, marginBottom: 10 }}
+                      onClick={() => {
+                        sfx('tap')
+                        setGekozen(null)
+                        onVerderLeren()
+                      }}
+                    >
+                      ▶ Verder leren →
+                    </button>
+                  )}
+                </>
+              ) : gekozen.inCourse ? (
+                <p className="dim" style={{ fontSize: 14, marginBottom: 16 }}>
+                  Deze bestemming ligt verderop langs de route — je bereikt haar na {gekozen.threshold} lessen. Eerst het land hiervoor
+                  veroveren.
+                </p>
+              ) : (
+                <p className="dim" style={{ fontSize: 14, marginBottom: 16 }}>
+                  🔭 Dit land komt met nieuwe lessen — jouw wereld groeit vanzelf. Geen slot, alleen toekomst.
+                </p>
+              )}
+
+              <button className="btn btn-ghost" style={{ padding: 12, fontSize: 14 }} onClick={() => setGekozen(null)}>
+                Terug naar de kaart
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
