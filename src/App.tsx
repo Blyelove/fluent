@@ -62,6 +62,9 @@ export default function App() {
 
   const [tab, setTab] = useState<Tab>('home')
   const [lesson, setLesson] = useState<{ course: Course; lesson: Lesson } | null>(null)
+  // tijdens een minigame of duel verdwijnt de onderbalk: vijf tabs onder je
+  // duim tijdens een potje op de klok = één misveeg en je run is weg
+  const [gamePlaying, setGamePlaying] = useState(false)
 
   // duel-uitnodiging uit de link halen (eenmalig bij het openen)
   const incomingDuel = useMemo(() => readDuelFromUrl(), [])
@@ -119,11 +122,12 @@ export default function App() {
           onPlay={() => setTab('play')}
         />
       )}
-      {tab === 'play' && <PlayScreen incomingDuel={incomingDuel} />}
+      {tab === 'play' && <PlayScreen incomingDuel={incomingDuel} onPlayingChange={setGamePlaying} />}
       {tab === 'league' && <LeagueScreen />}
       {tab === 'review' && <ReviewScreen />}
       {tab === 'profile' && <ProfileScreen />}
 
+      {!gamePlaying && (
       <nav className="nav">
         <div className="nav-inner">
           {items.map((it) => {
@@ -150,6 +154,7 @@ export default function App() {
           })}
         </div>
       </nav>
+      )}
     </>
   )
 }

@@ -6,11 +6,24 @@ import { DuelScreen } from './Duel'
 import { sfx } from '../audio'
 
 /** Speel-tabblad: minigames én vrienden-duels onder één dak */
-export function PlayScreen({ incomingDuel }: { incomingDuel?: DuelPayload | null }) {
+export function PlayScreen({
+  incomingDuel,
+  onPlayingChange: meldOuder,
+}: {
+  incomingDuel?: DuelPayload | null
+  /** Zodat de app-brede onderbalk óók verdwijnt tijdens een potje — één misveeg op een tab kostte anders je hele run */
+  onPlayingChange?: (playing: boolean) => void
+}) {
   const [tab, setTab] = useState<'arcade' | 'duel'>(incomingDuel ? 'duel' : 'arcade')
   const [playing, setPlaying] = useState(false)
 
-  const onPlayingChange = useCallback((p: boolean) => setPlaying(p), [])
+  const onPlayingChange = useCallback(
+    (p: boolean) => {
+      setPlaying(p)
+      meldOuder?.(p)
+    },
+    [meldOuder]
+  )
 
   return (
     <div>
