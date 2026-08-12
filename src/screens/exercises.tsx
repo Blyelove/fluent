@@ -89,9 +89,23 @@ export function NewWordEx({ ex, ttsLang, register }: Common & { ex: NewWord }) {
   )
 }
 
+/**
+ * Antwoordopties in willekeurige volgorde, één keer geschud per oefening.
+ * In de content staat het juiste antwoord vaak op een vaste plek (bij Duits
+ * zelfs overal op knop 1) — wie dat doorheeft, leert knoppen in plaats van
+ * taal. Schudden bij het renderen houdt de content simpel en het spel eerlijk.
+ */
+function useGeschud(options: string[], correct: number): { opties: string[]; juist: number } {
+  return useMemo(() => {
+    const volgorde = shuffle(options.map((_, i) => i))
+    return { opties: volgorde.map((i) => options[i]), juist: volgorde.indexOf(correct) }
+  }, [options, correct])
+}
+
 /* ---------- Kies de vertaling ---------- */
 
 export function SelectEx({ ex, ttsLang, locked, register }: Common & { ex: Select }) {
+  const { opties, juist } = useGeschud(ex.options, ex.correct)
   const [chosen, setChosen] = useState<number | null>(null)
 
   useEffect(() => {
@@ -105,7 +119,7 @@ export function SelectEx({ ex, ttsLang, locked, register }: Common & { ex: Selec
   useEffect(() => {
     register({
       ready: chosen !== null,
-      evaluate: () => ({ correct: chosen === ex.correct, correctAnswer: ex.options[ex.correct] }),
+      evaluate: () => ({ correct: chosen === juist, correctAnswer: ex.options[ex.correct] }),
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chosen])
@@ -124,7 +138,7 @@ export function SelectEx({ ex, ttsLang, locked, register }: Common & { ex: Selec
         )}
       </div>
       <div className="col" style={{ gap: 10 }}>
-        {ex.options.map((opt, i) => (
+        {opties.map((opt, i) => (
           <button
             key={i}
             className={`opt ${chosen === i ? 'selected' : ''}`}
@@ -219,9 +233,12 @@ export function MatchEx({
     if (selL && selR) {
       const pair = ex.pairs.find((p) => p.nl === selL)
       if (pair && pair.target === selR) {
+        // markeer per KANT, niet per woord: bij een paar waarvan beide talen
+        // hetzelfde woord zijn (Duits: hallo → hallo) zou één set met kale
+        // strings op 7 van de 8 blijven steken en de les voorgoed vastzetten
         const next = new Set(done)
-        next.add(selL)
-        next.add(selR)
+        next.add(`l:${selL}`)
+        next.add(`r:${selR}`)
         setDone(next)
         sfx('correct')
         if (next.size === ex.pairs.length * 2) {
@@ -230,7 +247,7 @@ export function MatchEx({
       } else {
         sfx('wrong')
         setWrongCount((w) => w + 1)
-        const f = new Set([selL, selR])
+        const f = new Set([`l:${selL}`, `r:${selR}`])
         setFlash(f)
         setTimeout(() => setFlash(new Set()), 450)
       }
@@ -241,8 +258,8 @@ export function MatchEx({
   }, [selL, selR])
 
   const cls = (v: string, side: 'l' | 'r') => {
-    if (done.has(v)) return 'opt correct dimmed'
-    if (flash.has(v)) return 'opt wrong'
+    if (done.has(`${side}:${v}`)) return 'opt correct dimmed'
+    if (flash.has(`${side}:${v}`)) return 'opt wrong'
     const sel = side === 'l' ? selL : selR
     return `opt ${sel === v ? 'selected' : ''}`
   }
@@ -283,6 +300,7 @@ export function MatchEx({
 /* ---------- Luister ---------- */
 
 export function ListenEx({ ex, ttsLang, locked, register }: Common & { ex: Listen }) {
+  const { opties, juist } = useGeschud(ex.options, ex.correct)
   const [chosen, setChosen] = useState<number | null>(null)
 
   useEffect(() => {
@@ -294,7 +312,7 @@ export function ListenEx({ ex, ttsLang, locked, register }: Common & { ex: Liste
   useEffect(() => {
     register({
       ready: chosen !== null,
-      evaluate: () => ({ correct: chosen === ex.correct, correctAnswer: ex.target }),
+      evaluate: () => ({ correct: chosen === juist, correctAnswer: ex.target }),
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chosen])
@@ -308,7 +326,7 @@ export function ListenEx({ ex, ttsLang, locked, register }: Common & { ex: Liste
         <SpeakerIcon size={34} />
       </button>
       <div className="col" style={{ gap: 10, textAlign: 'left' }}>
-        {ex.options.map((opt, i) => (
+        {opties.map((opt, i) => (
           <button
             key={i}
             className={`opt ${chosen === i ? 'selected' : ''}`}
@@ -361,13 +379,14 @@ export function TypeEx({ ex, locked, register }: Common & { ex: TypeAnswer }) {
 /* ---------- Vul in ---------- */
 
 export function FillEx({ ex, locked, register }: Common & { ex: Fill }) {
+  const { opties, juist } = useGeschud(ex.options, ex.correct)
   const [chosen, setChosen] = useState<number | null>(null)
 
   useEffect(() => {
     register({
       ready: chosen !== null,
       evaluate: () => ({
-        correct: chosen === ex.correct,
+        correct: chosen === juist,
         correctAnswer: `${ex.before} ${ex.options[ex.correct]} ${ex.after}`.replace(/\s+/g, ' ').trim(),
       }),
     })
@@ -388,7 +407,7 @@ export function FillEx({ ex, locked, register }: Common & { ex: Fill }) {
             textAlign: 'center',
           }}
         >
-          {chosen !== null ? ex.options[chosen] : ''}
+          {chosen !== null ? opties[chosen] : ''}
         </span>{' '}
         {ex.after}
       </h2>
@@ -398,7 +417,7 @@ export function FillEx({ ex, locked, register }: Common & { ex: Fill }) {
         </p>
       )}
       <div className="col" style={{ gap: 10 }}>
-        {ex.options.map((opt, i) => (
+        {opties.map((opt, i) => (
           <button
             key={i}
             className={`opt ${chosen === i ? 'selected' : ''}`}
