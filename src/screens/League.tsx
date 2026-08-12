@@ -325,7 +325,7 @@ function Row({ player, rank, delay }: { player: Competitor; rank: number; delay:
 
 /* ---------------- scherm ---------------- */
 
-export function LeagueScreen() {
+export function LeagueScreen({ onLeren }: { onLeren?: () => void } = {}) {
   const storedLeagueId = useStore((s) => s.leagueId)
   const storedWeekXp = useStore((s) => s.weekXp)
   const promotions = useStore((s) => s.promotions)
@@ -530,13 +530,34 @@ export function LeagueScreen() {
           </div>
           <div className="stat-label">XP deze week</div>
         </div>
+        {/* "Spelers: 30" stond hier altijd hetzelfde; dit getal beweegt met elke les */}
         <div className="glass stat-card" style={{ padding: 14 }}>
           <div className="stat-value" style={{ fontSize: 26, color: 'var(--cyan)' }}>
-            {total}
+            {empty ? '—' : zone === 'promotie' ? '✓' : fmt(toPromoZone || 1)}
           </div>
-          <div className="stat-label">Spelers</div>
+          <div className="stat-label">{zone === 'promotie' ? 'In promotiezone' : 'XP tot promotie'}</div>
         </div>
       </div>
+
+      {/* één duidelijke actie: de ranglijst is geen kijkspel */}
+      {!empty && onLeren && (
+        <div style={{ marginTop: 14 }}>
+          <button
+            className="btn btn-primary"
+            style={{ padding: 15, fontSize: 15.5 }}
+            onClick={() => {
+              sfx('tap')
+              onLeren()
+            }}
+          >
+            {zone === 'promotie'
+              ? '▶ Houd je plek vast — doe een les'
+              : climb !== null && above
+                ? `▶ Nog ${fmt(climb)} XP en je gaat ${above.name} voorbij`
+                : '▶ Pak die plek — start een les'}
+          </button>
+        </div>
+      )}
 
       {/* ---------- aftelbalk ---------- */}
       <motion.div

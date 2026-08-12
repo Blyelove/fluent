@@ -86,7 +86,7 @@ Fluent heeft een kern die al als topspel voelt — chunky leslus met combo's en 
 
 **Bewijs:** Tik op de ring: sheet opent, kies 60 XP en de ring en Profiel tonen direct het nieuwe doel.
 
-### 20. Divisie-motivatiekaart omhoog mét actieknop: League.tsx rendert 'Nog 34 XP en je gaat Sanne voorbij!' pas ná 30 ranglijstrijen (r617-678) en nergens staat een knop om die les te doen. Kaart direct onder de statkaarten, met chunky knop '▶ Pak die plek — start een les' via een onLeren-prop vanuit App.tsx; vervang tegelijk de constante statkaart 'Spelers: 30' (r533-538) door 'Nog X XP tot promotiezone' (toPromoZone is al berekend, r380).
+### 20. ✅ AF (ronde 43) — Divisie-motivatiekaart omhoog mét actieknop: League.tsx rendert 'Nog 34 XP en je gaat Sanne voorbij!' pas ná 30 ranglijstrijen (r617-678) en nergens staat een knop om die les te doen. Kaart direct onder de statkaarten, met chunky knop '▶ Pak die plek — start een les' via een onLeren-prop vanuit App.tsx; vervang tegelijk de constante statkaart 'Spelers: 30' (r533-538) door 'Nog X XP tot promotiezone' (toPromoZone is al berekend, r380).
 
 **Bewijs:** Open Divisie: inhaalprikkel zichtbaar zonder scrollen, één tik start een les, en de derde statkaart toont een getal dat per les verandert.
 
@@ -94,7 +94,7 @@ Fluent heeft een kern die al als topspel voelt — chunky leslus met combo's en 
 
 **Bewijs:** Open de kaart: onderaan staat altijd één primaire knop die zonder tussenstap de juiste les start.
 
-### 22. Streak-scherm krijgt de lus-sluitende knop: Streak.tsx r112-116 zegt 'Doe vandaag één les en je reeks begint' zonder knop. Eén chunky primaire knop onder de vlam ('▶ Ontsteek je vlam' bij 0, anders '▶ Houd je vlam brandend'); StreakScreen wordt vanuit Home gerenderd (r147), dus onStartLesson-prop doorgeven.
+### 22. ✅ AF (ronde 43) — Streak-scherm krijgt de lus-sluitende knop: Streak.tsx r112-116 zegt 'Doe vandaag één les en je reeks begint' zonder knop. Eén chunky primaire knop onder de vlam ('▶ Ontsteek je vlam' bij 0, anders '▶ Houd je vlam brandend'); StreakScreen wordt vanuit Home gerenderd (r147), dus onStartLesson-prop doorgeven.
 
 **Bewijs:** Open het vlam-scherm bij streak 0 en 5: beide tonen een knop die direct de volgende les start.
 

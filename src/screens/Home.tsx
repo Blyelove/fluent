@@ -144,7 +144,20 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
     return course.sections[course.sections.length - 1]
   }, [course, currentIdx])
 
-  if (streakOpen) return <StreakScreen onBack={() => setStreakOpen(false)} />
+  if (streakOpen)
+    return (
+      <StreakScreen
+        onBack={() => setStreakOpen(false)}
+        onLeren={
+          currentIdx < flat.length
+            ? () => {
+                setStreakOpen(false)
+                onStartLesson(course, flat[currentIdx].lesson)
+              }
+            : undefined
+        }
+      />
+    )
 
   if (worldOpen)
     return (

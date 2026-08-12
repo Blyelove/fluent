@@ -3,6 +3,7 @@ import { motion } from 'motion/react'
 import { useStore } from '../store'
 import { courses } from '../content'
 import { ShareButton } from '../components/ShareButton'
+import { sfx } from '../audio'
 
 /** Mijlpalen in de reeks — elk met een beloning die je echt krijgt */
 const MILESTONES: { days: number; naam: string; beloning: string }[] = [
@@ -49,12 +50,14 @@ function dayKey(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
-export function StreakScreen({ onBack }: { onBack?: () => void }) {
+export function StreakScreen({ onBack, onLeren }: { onBack?: () => void; onLeren?: () => void }) {
   const streak = useStore((s) => s.streak)
   const bestStreak = useStore((s) => s.bestStreak)
   const freezes = useStore((s) => s.freezes)
   const activeDays = useStore((s) => s.activeDays)
+  const lastDay = useStore((s) => s.lastDay)
   const courseId = useStore((s) => s.courseId)
+  const vandaagGeleerd = lastDay === new Date().toISOString().slice(0, 10)
   const course = courses[courseId]
   const [monthOffset, setMonthOffset] = useState(0)
 
@@ -115,6 +118,22 @@ export function StreakScreen({ onBack }: { onBack?: () => void }) {
           </p>
         )}
       </div>
+
+      {/* het scherm vertelde wat je moest doen, maar bood geen manier om het te doen */}
+      {onLeren && (
+        <div style={{ marginBottom: 18 }}>
+          <button
+            className="btn btn-primary"
+            style={{ padding: 15, fontSize: 15.5 }}
+            onClick={() => {
+              sfx('tap')
+              onLeren()
+            }}
+          >
+            {streak === 0 ? '▶ Ontsteek je vlam' : vandaagGeleerd ? '▶ Nog een les erbij' : '▶ Houd je vlam brandend'}
+          </button>
+        </div>
+      )}
 
       {streak > 0 && (
         <div style={{ marginBottom: 18 }}>
