@@ -46,7 +46,7 @@ Fluent heeft een kern die al als topspel voelt — chunky leslus met combo's en 
 
 **Bewijs:** Nieuwe gebruiker ziet in de Minigames-hub een duel-ingang; één tik landt op de botkeuze.
 
-### 10. Eén doorlopende onboarding: PersonaPicker en Onboarding tellen nu twee keer vanaf 'Stap 1'. Maak één teller 1 Taal → 2 Personage → 3 Tempo (taal eerst: de filterende keuze, en Avatar heeft al een courseId-prop) plus een '‹ Terug'-ghostknop op elke stap; op de tempostap de gekozen taal als chip ('🇪🇸 Spaans — wijzig').
+### 10. ✅ AF (ronde 54) — Eén doorlopende onboarding: PersonaPicker en Onboarding tellen nu twee keer vanaf 'Stap 1'. Maak één teller 1 Taal → 2 Personage → 3 Tempo (taal eerst: de filterende keuze, en Avatar heeft al een courseId-prop) plus een '‹ Terug'-ghostknop op elke stap; op de tempostap de gekozen taal als chip ('🇪🇸 Spaans — wijzig').
 
 **Bewijs:** Doorloop de flow: nummering loopt 1-2-3 zonder reset, en vanaf stap 3 kun je terug naar de taalkeuze.
 

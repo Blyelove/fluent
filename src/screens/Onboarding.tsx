@@ -48,7 +48,9 @@ export function Onboarding({ onKlaar }: { onKlaar?: (c: CourseId) => void }) {
 
         {step === 1 && (
           <motion.div key="s1" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -14 }} transition={{ duration: 0.35 }}>
-            <p className="eyebrow center">Stap 1 van 2</p>
+            {/* geen "Stap 1 van 2" meer: het personagescherm telde ook al vanaf
+                stap 1, en twee tellers naast elkaar leest als teruggaan */}
+            <p className="eyebrow center">Nog twee vragen</p>
             <h2 className="display center" style={{ fontSize: 30, margin: '10px 0 28px' }}>
               Welke taal wordt het?
             </h2>
@@ -82,10 +84,35 @@ export function Onboarding({ onKlaar }: { onKlaar?: (c: CourseId) => void }) {
 
         {step === 2 && (
           <motion.div key="s2" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.35 }}>
-            <p className="eyebrow center">Stap 2 van 2</p>
-            <h2 className="display center" style={{ fontSize: 30, margin: '10px 0 28px' }}>
+            <p className="eyebrow center">Laatste vraag</p>
+            <h2 className="display center" style={{ fontSize: 30, margin: '10px 0 6px' }}>
               Hoeveel tijd per dag?
             </h2>
+            {/* de gekozen taal blijft zichtbaar, en is met één tik te wijzigen */}
+            {courseId && (
+              <button
+                className="row"
+                onClick={() => {
+                  sfx('tap')
+                  setStep(1)
+                }}
+                style={{
+                  gap: 7,
+                  margin: '0 auto 24px',
+                  padding: '8px 14px',
+                  minHeight: 44,
+                  borderRadius: 999,
+                  background: 'var(--surface-2)',
+                  border: '1.5px solid var(--line)',
+                  fontSize: 13,
+                  fontWeight: 700,
+                }}
+              >
+                <Flag code={courseFlagCode[courseId]} size={15} />
+                {courseList.find((c) => c.id === courseId)?.name}
+                <span className="faint" style={{ fontSize: 12 }}>· wijzig</span>
+              </button>
+            )}
             <div className="col" style={{ gap: 12 }}>
               {GOALS.map((g) => (
                 <button
