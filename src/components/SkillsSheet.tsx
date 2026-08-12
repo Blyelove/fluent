@@ -1,44 +1,100 @@
+import { useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { courseList } from '../content'
 import { useStore } from '../store'
 import { MAX_SKILL_LEVEL, skillStand, volgendeMijlpaal } from '../skills'
 import { countryStates, courseFlagCode } from '../countries'
+import type { CourseId } from '../types'
 import { Flag } from './Flag'
 import { sfx } from '../audio'
 
 /**
- * Het vaardighedenpaneel, in RuneScape-geest: druk op je poppetje en zie per
- * taal je level richting 99, met een totaalniveau bovenaan. Elke taal die je
- * ooit aanraakte telt mee; talen op level 1 lonken als volgende skill.
+ * Het vaardighedenpaneel, gebouwd naar het beroemde RuneScape-scherm: een
+ * compact raster van drie kolommen, per vakje het icoon links en rechts twee
+ * gouden getallen diagonaal boven elkaar (jouw niveau boven, 99 onder), met
+ * het totaalniveau in de balk eronder. Tik een vaardigheid aan en je ziet de
+ * details: XP, wat er nog tot het volgende niveau bij moet, je mijlpaal en
+ * alle soorten van die taal.
  */
+
+interface Rij {
+  id: CourseId
+  naam: string
+  xp: number
+  stand: ReturnType<typeof skillStand>
+  lessen: number
+  woorden: number
+  gesprekken: number
+  stempels: number
+  landen: ReturnType<typeof countryStates>
+}
+
+/** Eén vaardigheidsvakje in RuneScape-stijl */
+function SkillTegel({ r, actief, onClick }: { r: Rij; actief: boolean; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      aria-label={`${r.naam}: niveau ${r.stand.level} van ${MAX_SKILL_LEVEL}`}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 6,
+        padding: '9px 8px',
+        minHeight: 52,
+        borderRadius: 12,
+        background: actief ? 'rgba(255, 197, 61, 0.12)' : 'var(--surface-2)',
+        border: `1.5px solid ${actief ? 'var(--gold)' : r.stand.meester ? 'var(--line-gold)' : 'var(--line)'}`,
+        boxShadow: r.stand.meester ? 'var(--glow-gold)' : 'inset 0 1px 0 rgba(255,255,255,0.08)',
+      }}
+    >
+      <Flag code={courseFlagCode[r.id]} size={22} />
+      {/* de twee getallen diagonaal, precies zoals in RuneScape */}
+      <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1, flex: 1 }}>
+        <span
+          className="num"
+          style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 16, color: 'var(--gold-bright)', alignSelf: 'flex-start' }}
+        >
+          {r.stand.level}
+        </span>
+        <span
+          className="num"
+          style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 13, color: 'var(--gold)', opacity: 0.75, alignSelf: 'flex-end', marginTop: 1 }}
+        >
+          {MAX_SKILL_LEVEL}
+        </span>
+      </span>
+    </button>
+  )
+}
+
 export function SkillsSheet({ onClose }: { onClose: () => void }) {
   const progress = useStore((s) => s.progress)
   const srs = useStore((s) => s.srs)
   const gesprekken = useStore((s) => s.gesprekken)
   const stamps = useStore((s) => s.stamps)
+  const huidig = useStore((s) => s.courseId)
+  const [open, setOpen] = useState<CourseId>(huidig)
 
-  const rijen = courseList.map((c) => {
+  const rijen: Rij[] = courseList.map((c) => {
     const xp = progress[c.id]?.xp ?? 0
-    const stand = skillStand(xp)
     const lessen = progress[c.id]?.completed.length ?? 0
     return {
       id: c.id,
       naam: c.name,
       xp,
-      stand,
+      stand: skillStand(xp),
       lessen,
       woorden: Object.values(srs).filter((e) => e.courseId === c.id).length,
       gesprekken: gesprekken[c.id]?.length ?? 0,
       stempels: Object.keys(stamps[c.id] ?? {}).length,
-      // alle soorten van deze taal: elk land op de route is een variant die
-      // je kan veroveren, van Spanje-Spaans tot Mexicaans-Spaans
+      // alle soorten van deze taal: elk land op de route is een variant
       landen: countryStates(c, lessen),
     }
   })
-  // actiefste taal bovenaan, maar alles blijft zichtbaar: ook een level 1
-  // skill is een uitnodiging
-  rijen.sort((a, b) => b.xp - a.xp)
+
   const totaal = rijen.reduce((n, r) => n + r.stand.level, 0)
+  const detail = rijen.find((r) => r.id === open) ?? rijen[0]
+  const mijlpaal = volgendeMijlpaal(detail.stand.level)
 
   return (
     <AnimatePresence>
@@ -58,101 +114,114 @@ export function SkillsSheet({ onClose }: { onClose: () => void }) {
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="spread" style={{ marginBottom: 4 }}>
-            <h3 className="display" style={{ fontSize: 24 }}>
-              🎓 Vaardigheden
-            </h3>
-            <span
-              className="gold-text num"
-              style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 18 }}
-              title="Som van al je taalniveaus"
-            >
-              Totaal {totaal}
-            </span>
-          </div>
-          <p className="dim" style={{ fontSize: 13, marginBottom: 16 }}>
-            Elke taal train je van level 1 naar 99. Alles wat je doet telt mee: lessen, herhalen, spelen, duelleren en praten.
+          <h3 className="display" style={{ fontSize: 24, marginBottom: 2 }}>
+            🎓 Vaardigheden
+          </h3>
+          <p className="dim" style={{ fontSize: 12.5, marginBottom: 14 }}>
+            Elke taal train je van 1 naar 99. Tik een taal aan voor de details.
           </p>
 
-          <div className="col" style={{ gap: 10 }}>
-            {rijen.map((r) => {
-              const mijlpaal = volgendeMijlpaal(r.stand.level)
-              return (
-                <div
-                  key={r.id}
-                  className="glass"
-                  style={{
-                    padding: '12px 14px',
-                    borderColor: r.stand.meester ? 'var(--line-gold)' : undefined,
-                    boxShadow: r.stand.meester ? 'var(--glow-gold)' : undefined,
-                  }}
-                >
-                  <div className="row" style={{ gap: 12 }}>
-                    <Flag code={courseFlagCode[r.id]} size={26} />
-                    <strong className="card-title" style={{ flex: 1 }}>
-                      {r.naam}
-                    </strong>
-                    <span
-                      className={`num ${r.stand.meester ? 'gold-text' : ''}`}
-                      style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 19 }}
-                    >
-                      {r.stand.meester && '🏆 '}
-                      {r.stand.level}
-                      <span className="faint" style={{ fontSize: 12, fontWeight: 700 }}> /{MAX_SKILL_LEVEL}</span>
-                    </span>
-                  </div>
-                  <div className="progress-track" style={{ height: 7, margin: '9px 0 7px' }}>
-                    <div
-                      className={`progress-fill ${r.stand.meester ? 'progress-fill--gold' : ''}`}
-                      style={{ width: `${Math.max(r.xp > 0 ? 3 : 0, Math.round(r.stand.frac * 100))}%` }}
-                    />
-                  </div>
-                  <div className="spread">
-                    <span className="faint num" style={{ fontSize: 11.5 }}>
-                      {r.stand.meester
-                        ? `${r.xp} XP · meester van het ${r.naam}`
-                        : `${r.xp} XP · nog ${r.stand.breedte - r.stand.binnen} tot level ${r.stand.level + 1}${mijlpaal && mijlpaal > r.stand.level + 1 ? ` · mijlpaal: ${mijlpaal}` : ''}`}
-                    </span>
-                  </div>
-                  {r.xp > 0 && (
-                    <>
-                      <p className="faint num" style={{ fontSize: 11, marginTop: 4 }}>
-                        {r.lessen} {r.lessen === 1 ? 'les' : 'lessen'} · {r.woorden} {r.woorden === 1 ? 'woord' : 'woorden'} · {r.gesprekken}{' '}
-                        {r.gesprekken === 1 ? 'gesprek' : 'gesprekken'} · {r.stempels} {r.stempels === 1 ? 'stempel' : 'stempels'}
-                      </p>
-                      {/* alle soorten van deze taal: veroverde varianten in kleur */}
-                      <div className="spread" style={{ marginTop: 8 }}>
-                        <span className="faint" style={{ fontSize: 11 }}>
-                          Soorten {r.naam}
-                        </span>
-                        <span className="faint num" style={{ fontSize: 11 }}>
-                          {r.landen.filter((l) => l.conquered).length}/{r.landen.length}
-                        </span>
-                      </div>
-                      <div className="row" style={{ flexWrap: 'wrap', gap: 5, marginTop: 5 }}>
-                        {r.landen.map((l) => (
-                          <span
-                            key={l.name + l.threshold}
-                            title={l.conquered ? `${l.name}: veroverd` : `${l.name}: na ${l.threshold} lessen`}
-                            style={{
-                              lineHeight: 0,
-                              opacity: l.conquered ? 1 : 0.25,
-                              filter: l.conquered ? 'drop-shadow(0 0 5px rgba(255,197,61,0.55))' : 'grayscale(0.8)',
-                            }}
-                          >
-                            <Flag code={l.code} size={16} />
-                          </span>
-                        ))}
-                      </div>
-                    </>
-                  )}
-                </div>
-              )
-            })}
+          {/* het raster van drie kolommen, het hart van het RuneScape-scherm */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 7 }}>
+            {rijen.map((r) => (
+              <SkillTegel key={r.id} r={r} actief={r.id === open} onClick={() => { sfx('tap'); setOpen(r.id) }} />
+            ))}
           </div>
 
-          <p className="faint center" style={{ fontSize: 11.5, marginTop: 14 }}>
-            Level 99 is een echte prestatie: wie hem haalt, is meester van die taal.
+          {/* de totaalniveau-balk onder het raster */}
+          <div
+            className="spread"
+            style={{
+              marginTop: 7,
+              padding: '11px 14px',
+              borderRadius: 12,
+              background: 'rgba(255, 197, 61, 0.1)',
+              border: '1.5px solid var(--line-gold)',
+            }}
+          >
+            <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 14 }}>Totaalniveau</span>
+            <span className="gold-text num" style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 20 }}>
+              {totaal}
+            </span>
+          </div>
+
+          {/* de details van de aangetikte vaardigheid */}
+          <motion.div
+            key={detail.id}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+            className="glass"
+            style={{ padding: '14px 16px', marginTop: 14, borderColor: detail.stand.meester ? 'var(--line-gold)' : undefined }}
+          >
+            <div className="row" style={{ gap: 10 }}>
+              <Flag code={courseFlagCode[detail.id]} size={24} />
+              <strong className="card-title" style={{ flex: 1 }}>
+                {detail.naam}
+              </strong>
+              <span className={`num ${detail.stand.meester ? 'gold-text' : ''}`} style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 19 }}>
+                {detail.stand.meester && '🏆 '}
+                {detail.stand.level}
+                <span className="faint" style={{ fontSize: 12, fontWeight: 700 }}> /{MAX_SKILL_LEVEL}</span>
+              </span>
+            </div>
+
+            <div className="progress-track" style={{ height: 8, margin: '10px 0 7px' }}>
+              <div
+                className={`progress-fill ${detail.stand.meester ? 'progress-fill--gold' : ''}`}
+                style={{ width: `${Math.max(detail.xp > 0 ? 3 : 0, Math.round(detail.stand.frac * 100))}%` }}
+              />
+            </div>
+
+            <p className="faint num" style={{ fontSize: 11.5 }}>
+              {detail.stand.meester
+                ? `${detail.xp} XP · meester van het ${detail.naam}`
+                : `${detail.xp} XP · nog ${detail.stand.breedte - detail.stand.binnen} XP tot niveau ${detail.stand.level + 1}${
+                    mijlpaal && mijlpaal > detail.stand.level + 1 ? ` · mijlpaal: ${mijlpaal}` : ''
+                  }`}
+            </p>
+
+            {detail.xp > 0 && (
+              <>
+                <p className="faint num" style={{ fontSize: 11, marginTop: 5 }}>
+                  {detail.lessen} {detail.lessen === 1 ? 'les' : 'lessen'} · {detail.woorden} {detail.woorden === 1 ? 'woord' : 'woorden'} ·{' '}
+                  {detail.gesprekken} {detail.gesprekken === 1 ? 'gesprek' : 'gesprekken'} · {detail.stempels}{' '}
+                  {detail.stempels === 1 ? 'stempel' : 'stempels'}
+                </p>
+                <div className="spread" style={{ marginTop: 9 }}>
+                  <span className="faint" style={{ fontSize: 11 }}>
+                    Soorten {detail.naam}
+                  </span>
+                  <span className="faint num" style={{ fontSize: 11 }}>
+                    {detail.landen.filter((l) => l.conquered).length}/{detail.landen.length}
+                  </span>
+                </div>
+                <div className="row" style={{ flexWrap: 'wrap', gap: 5, marginTop: 5 }}>
+                  {detail.landen.map((l) => (
+                    <span
+                      key={l.name + l.threshold}
+                      title={l.conquered ? `${l.name}: veroverd` : `${l.name}: na ${l.threshold} lessen`}
+                      style={{
+                        lineHeight: 0,
+                        opacity: l.conquered ? 1 : 0.25,
+                        filter: l.conquered ? 'drop-shadow(0 0 5px rgba(255,197,61,0.55))' : 'grayscale(0.8)',
+                      }}
+                    >
+                      <Flag code={l.code} size={17} />
+                    </span>
+                  ))}
+                </div>
+              </>
+            )}
+            {detail.xp === 0 && (
+              <p className="dim" style={{ fontSize: 12.5, marginTop: 6 }}>
+                Nog niet begonnen. Eén les en je staat al op niveau 10.
+              </p>
+            )}
+          </motion.div>
+
+          <p className="faint center" style={{ fontSize: 11.5, marginTop: 12 }}>
+            Niveau 99 is een echte prestatie: wie hem haalt, is meester van die taal.
           </p>
           <button className="btn btn-ghost" style={{ marginTop: 10, padding: 12, fontSize: 14 }} onClick={() => { sfx('tap'); onClose() }}>
             Sluiten

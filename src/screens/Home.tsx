@@ -864,6 +864,45 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
         </motion.button>
       )}
 
+      {/* Vaardigheden in RuneScape-stijl: onmisbaar op Home, niet verstopt */}
+      {(() => {
+        const stand = skillStand(progressMap[courseId]?.xp ?? 0)
+        const totaal = courseList.reduce((n, c) => n + skillStand(progressMap[c.id]?.xp ?? 0).level, 0)
+        return (
+          <button className="glass unit-card" onClick={() => { sfx('tap'); setSkillsOpen(true) }} style={{ order: 1, width: '100%', textAlign: 'left' }}>
+            <div className="spread">
+              <span className="row" style={{ gap: 10 }}>
+                <span style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(255,197,61,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🎓</span>
+                <strong className="card-title">Vaardigheden</strong>
+              </span>
+              <span className="gold-text num" style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 14 }}>
+                Totaal {totaal}
+              </span>
+            </div>
+            <div className="row" style={{ gap: 12, marginTop: 12 }}>
+              <Flag code={courseFlagCode[courseId]} size={26} />
+              <span className="col" style={{ flex: 1, minWidth: 0, gap: 6 }}>
+                <span className="spread">
+                  <span style={{ fontSize: 13.5, fontWeight: 600 }}>{course.name}</span>
+                  <span className="num" style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 17, color: 'var(--gold-bright)' }}>
+                    {stand.level}
+                    <span className="faint" style={{ fontSize: 12, fontWeight: 700 }}> / 99</span>
+                  </span>
+                </span>
+                <span className="progress-track" style={{ height: 6, display: 'block' }}>
+                  <span className="progress-fill progress-fill--gold" style={{ width: `${Math.max(3, Math.round(stand.frac * 100))}%`, display: 'block' }} />
+                </span>
+              </span>
+            </div>
+            <p className="faint num" style={{ fontSize: 11.5, marginTop: 7 }}>
+              {stand.meester
+                ? `Meester van het ${course.name}. Niveau 99 bereikt.`
+                : `Nog ${stand.breedte - stand.binnen} XP tot niveau ${stand.level + 1}. Tik voor al je talen.`}
+            </p>
+          </button>
+        )
+      })()}
+
       <WorldPeek course={course} completedCount={completed.length} onOpen={() => setWorldOpen(true)} />
 
       {/* gesprekken: echt praten in de doeltaal, het duolingo-max-gevoel zonder abonnement */}
