@@ -138,7 +138,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
   if (streakOpen) return <StreakScreen onBack={() => setStreakOpen(false)} />
 
   return (
-    <div className="shell">
+    <div className="shell" style={{ display: 'flex', flexDirection: 'column' }}>
       <div className="ambient-orb orb-a" />
       <div className="ambient-orb orb-b" />
       <header className="spread" style={{ marginBottom: 22 }}>
@@ -272,17 +272,60 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
             >
               {completed.length === 0 ? '▶  Beginnen' : '▶  Doorgaan'}
             </motion.button>
-            <button
-              className="btn-quiet center"
-              style={{ width: '100%', fontSize: 12.5, paddingTop: 10, paddingBottom: 0 }}
-              onClick={() => {
-                sfx('tap')
-                document.getElementById('leerpad')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-              }}
-            >
-              Bekijk je hele pad ↓
-            </button>
           </motion.div>
+        )
+      })()}
+
+      {/* Compacte statusbalk: houdt de dagelijkse haakjes zichtbaar zonder het pad weg te duwen */}
+      {(() => {
+        const lessonsToday = isToday ? todayLessonsRaw : 0
+        const perfectToday = isToday ? todayPerfectRaw : 0
+        const questsDone =
+          (xpShown >= dailyGoalXp ? 1 : 0) + (lessonsToday >= 2 ? 1 : 0) + (perfectToday >= 1 ? 1 : 0)
+        const weekDone =
+          (weekXp >= 500 ? 1 : 0) + (weekLessons >= 10 ? 1 : 0) + (weekArcade >= 3 ? 1 : 0) + (weekDuels >= 1 ? 1 : 0)
+        const naarVandaag = () => {
+          sfx('tap')
+          document.getElementById('vandaag')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
+        const chips: { key: string; icon: string; label: string; klaar: boolean; actie: () => void }[] = [
+          { key: 'dag', icon: '⚜️', label: `${questsDone}/3`, klaar: questsDone === 3, actie: naarVandaag },
+          { key: 'week', icon: '🎁', label: `${weekDone}/4`, klaar: weekDone === 4, actie: naarVandaag },
+          {
+            key: 'divisie',
+            icon: '🏆',
+            label: `#${leagueRank}`,
+            klaar: false,
+            actie: () => {
+              sfx('tap')
+              onLeague?.()
+            },
+          },
+        ]
+        return (
+          <div className="row" style={{ gap: 8, marginBottom: 18 }}>
+            {chips.map((c) => (
+              <button
+                key={c.key}
+                className="glass row"
+                onClick={c.actie}
+                style={{
+                  flex: 1,
+                  gap: 6,
+                  padding: '10px 8px',
+                  justifyContent: 'center',
+                  borderRadius: 14,
+                  borderColor: c.klaar ? 'var(--line-gold)' : undefined,
+                  minHeight: 44,
+                }}
+              >
+                <span style={{ fontSize: 15 }}>{c.icon}</span>
+                <strong className={c.klaar ? 'gold-text' : ''} style={{ fontSize: 13.5 }}>
+                  {c.label}
+                </strong>
+              </button>
+            ))}
+          </div>
         )
       })()}
 
@@ -306,7 +349,8 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
       {onLeague && (
         <button
           className="glass spread"
-          style={{ width: '100%', padding: '14px 16px', marginBottom: 16, textAlign: 'left' }}
+          id="vandaag"
+          style={{ width: '100%', padding: '14px 16px', marginBottom: 16, textAlign: 'left', order: 1, scrollMarginTop: 16 }}
           onClick={onLeague}
         >
           <span className="row" style={{ gap: 12 }}>
@@ -347,7 +391,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
         const doneCount = quests.filter((q) => q.done).length
         const bonusIn = questBonusDay !== null && isToday && questBonusDay === todayDay
         return (
-          <div className="glass unit-card">
+          <div className="glass unit-card" style={{ order: 1 }}>
             <div className="spread">
               <strong style={{ fontSize: 15 }}>⚜️ Dagelijkse missies</strong>
               <span className="gold-text" style={{ fontWeight: 700, fontSize: 14 }}>
@@ -402,7 +446,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
         const alles = klaar === missies.length
         const geopend = weekChestWeek === weekIndex()
         return (
-          <div className="glass unit-card" style={alles && !geopend ? { borderColor: 'var(--line-gold)' } : undefined}>
+          <div className="glass unit-card" style={alles && !geopend ? { borderColor: 'var(--line-gold)', order: 1 } : { order: 1 }}>
             <div className="spread">
               <strong style={{ fontSize: 15 }}>🎁 Weekmissies</strong>
               <span className="gold-text" style={{ fontWeight: 800, fontSize: 14 }}>
@@ -458,7 +502,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
           completedByCourse: (cid: (typeof courseList)[number]['id']) => (progressMap[cid]?.completed ?? []).length,
         }
         return (
-          <div className="glass unit-card">
+          <div className="glass unit-card" style={{ order: 1 }}>
             <div className="spread">
               <strong style={{ fontSize: 15 }}>🎯 Jouw doelen</strong>
               <span className="faint" style={{ fontSize: 13 }}>
@@ -525,7 +569,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
       {due.length > 0 && (
         <motion.button
           className="glass spread"
-          style={{ width: '100%', padding: '16px 18px', marginBottom: 18, borderColor: 'var(--line-gold)', textAlign: 'left' }}
+          style={{ width: '100%', padding: '16px 18px', marginBottom: 18, borderColor: 'var(--line-gold)', textAlign: 'left', order: 1 }}
           whileTap={{ scale: 0.98 }}
           onClick={onReview}
         >
@@ -546,7 +590,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
         const conqueredCount = world.filter((c) => c.conquered).length
         const target = world.find((c) => !c.conquered)
         return (
-          <div className="glass unit-card">
+          <div className="glass unit-card" style={{ order: 1 }}>
             <div className="spread">
               <strong style={{ fontSize: 15 }}>🌍 Wereldverovering</strong>
               <span className="gold-text" style={{ fontWeight: 700, fontSize: 14 }}>
@@ -682,7 +726,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
         )
       })()}
 
-      <p className="faint center" style={{ fontSize: 13, marginTop: 26 }}>
+      <p className="faint center" style={{ fontSize: 13, marginTop: 26, order: 2 }}>
         Sectie 4 en verder zijn in de maak — jouw reis gaat door tot B2.
       </p>
 
