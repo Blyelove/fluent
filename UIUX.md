@@ -106,7 +106,7 @@ Fluent heeft een kern die al als topspel voelt — chunky leslus met combo's en 
 
 **Bewijs:** Speel één potje: de chip in de hub springt van 0/3 naar 1/3 en het eindscherm benoemt de afstand tot de kist.
 
-### 25. Dagkist volledig verkopen én vieren: Home.tsx r541 belooft '+15 XP' maar store.ts r393-396 geeft óók 15 min dubbele XP, en het halen is één stille tekstregel terwijl de weekkist confetti krijgt. Tekst: 'Alle drie = kist: +15 XP én 15 min dubbele XP'; bij het derde vinkje confetti + sfx('complete') + korte kist-open-animatie.
+### 25. ✅ AF (ronde 42) — Dagkist volledig verkopen én vieren: Home.tsx r541 belooft '+15 XP' maar store.ts r393-396 geeft óók 15 min dubbele XP, en het halen is één stille tekstregel terwijl de weekkist confetti krijgt. Tekst: 'Alle drie = kist: +15 XP én 15 min dubbele XP'; bij het derde vinkje confetti + sfx('complete') + korte kist-open-animatie.
 
 **Bewijs:** Rond de derde dagmissie af: confetti en kist-animatie op de kaart, en de belofte-tekst dekt beide beloningen.
 

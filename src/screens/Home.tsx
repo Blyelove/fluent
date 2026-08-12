@@ -543,9 +543,38 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
                 </div>
               ))}
             </div>
-            <p className={bonusIn ? 'gold-text' : 'faint'} style={{ fontSize: 12, fontWeight: bonusIn ? 700 : 500, marginTop: 12 }}>
-              {bonusIn ? '✦ Bonuskist binnen: +15 XP verdiend!' : 'Voltooi alle drie voor een bonuskist van +15 XP'}
-            </p>
+            {/* de kist geeft óók een kwartier dubbele XP; dat stond nergens */}
+            {bonusIn ? (
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 16 }}
+                className="row"
+                style={{
+                  gap: 10,
+                  marginTop: 12,
+                  padding: '10px 12px',
+                  borderRadius: 14,
+                  background: 'rgba(255, 197, 61, 0.12)',
+                  border: '1.5px solid var(--line-gold)',
+                }}
+              >
+                <motion.span
+                  style={{ fontSize: 22, lineHeight: 1 }}
+                  animate={{ rotate: [0, -12, 10, 0] }}
+                  transition={{ duration: 0.7, ease: 'easeOut' }}
+                >
+                  🎁
+                </motion.span>
+                <span className="gold-text" style={{ fontSize: 12.5, fontWeight: 800 }}>
+                  Kist geopend: +15 XP en 15 minuten dubbele XP
+                </span>
+              </motion.div>
+            ) : (
+              <p className="faint" style={{ fontSize: 12, marginTop: 12 }}>
+                Alle drie gehaald = kist: +15 XP én 15 minuten dubbele XP
+              </p>
+            )}
           </div>
         )
       })()}
