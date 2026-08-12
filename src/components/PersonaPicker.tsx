@@ -20,23 +20,36 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
   }
 
   const Swatches = ({ colors, active, pick }: { colors: string[]; active: number; pick: (i: number) => void }) => (
-    <div className="row" style={{ gap: 8, flexWrap: 'wrap' }}>
+    <div className="row" style={{ gap: 2, flexWrap: 'wrap', marginLeft: -7 }}>
       {colors.map((c, i) => (
         <button
           key={c}
           onClick={() => pick(i)}
           aria-label={`kleur ${i + 1}`}
+          // 44px raakvlak met een cirkel van 30px erin: goed te raken zonder
+          // dat het rooster uit elkaar valt
           style={{
-            width: 30,
-            height: 30,
-            borderRadius: '50%',
-            background: c,
-            border: active === i ? '3px solid var(--hot2)' : '2px solid rgba(255,255,255,0.25)',
-            boxShadow: active === i ? '0 0 12px rgba(236,72,153,0.5)' : '0 2px 0 rgba(0,0,0,0.35)',
-            transition: 'transform 0.1s ease',
-            transform: active === i ? 'scale(1.12)' : 'scale(1)',
+            width: 44,
+            height: 44,
+            padding: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
-        />
+        >
+          <span
+            style={{
+              width: 30,
+              height: 30,
+              borderRadius: '50%',
+              background: c,
+              border: active === i ? '3px solid var(--hot2)' : '2px solid rgba(255,255,255,0.25)',
+              boxShadow: active === i ? '0 0 12px rgba(236,72,153,0.5)' : '0 2px 0 rgba(0,0,0,0.35)',
+              transition: 'transform 0.1s ease',
+              transform: active === i ? 'scale(1.12)' : 'scale(1)',
+            }}
+          />
+        </button>
       ))}
     </div>
   )
@@ -199,7 +212,8 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
                   key={name}
                   onClick={() => set({ extra: i })}
                   style={{
-                    padding: '5px 10px',
+                    padding: '11px 14px',
+                    minHeight: 44,
                     borderRadius: 999,
                     fontSize: 11.5,
                     fontWeight: 700,
@@ -223,7 +237,8 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
                   key={name}
                   onClick={() => set({ mouth: i })}
                   style={{
-                    padding: '5px 10px',
+                    padding: '11px 14px',
+                    minHeight: 44,
                     borderRadius: 999,
                     fontSize: 11.5,
                     fontWeight: 700,

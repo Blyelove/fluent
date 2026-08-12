@@ -152,7 +152,7 @@ export function ProfileScreen() {
                 }}
                 style={{
                   minWidth: 44,
-                  minHeight: 34,
+                  minHeight: 44,
                   padding: '6px 10px',
                   borderRadius: 999,
                   fontSize: 12.5,
@@ -174,20 +174,30 @@ export function ProfileScreen() {
           <span style={{ fontWeight: 500 }}>Geluid</span>
           <button
             onClick={state.toggleSound}
+            // 52×30 was te klein om te raken; de schakelaar zelf blijft even
+            // groot, maar het raakvlak eromheen is nu 44px hoog
             style={{
               width: 52,
-              height: 30,
+              height: 44,
+              padding: '7px 0',
               borderRadius: 999,
-              background: state.soundOn ? 'var(--grad-gold)' : 'var(--surface-3)',
               position: 'relative',
-              transition: 'background 0.2s ease',
             }}
             aria-label="Geluid aan of uit"
           >
             <span
               style={{
                 position: 'absolute',
-                top: 3,
+                inset: '7px 0',
+                borderRadius: 999,
+                background: state.soundOn ? 'var(--grad-gold)' : 'var(--surface-3)',
+                transition: 'background 0.2s ease',
+              }}
+            />
+            <span
+              style={{
+                position: 'absolute',
+                top: 10,
                 left: state.soundOn ? 25 : 3,
                 width: 24,
                 height: 24,

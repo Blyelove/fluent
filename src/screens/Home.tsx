@@ -183,7 +183,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
       <div className="ambient-orb orb-a" />
       <div className="ambient-orb orb-b" />
       <header className="spread" style={{ marginBottom: 22 }}>
-        <button className="row glass" style={{ gap: 8, padding: '8px 14px', borderRadius: 999 }} onClick={() => setPicker(true)}>
+        <button className="row glass" style={{ gap: 8, padding: '11px 14px', minHeight: 44, borderRadius: 999 }} onClick={() => setPicker(true)}>
           <Flag code={courseFlagCode[courseId]} size={17} />
           <span style={{ fontWeight: 600, fontSize: 14 }}>{course.name}</span>
           <span className="faint" style={{ fontSize: 11 }}>
@@ -193,7 +193,14 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
         <div className="row" style={{ gap: 16 }}>
           <button
             className="row"
-            style={{ gap: 5, color: streak > 0 ? 'var(--gold-bright)' : 'var(--text-faint)', padding: '6px 4px' }}
+            style={{
+              gap: 5,
+              color: streak > 0 ? 'var(--gold-bright)' : 'var(--text-faint)',
+              padding: '6px 10px',
+              minWidth: 44,
+              minHeight: 44,
+              justifyContent: 'center',
+            }}
             onClick={() => setStreakOpen(true)}
             aria-label="Bekijk je reeks"
           >
@@ -930,9 +937,9 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
                 aria-label={`Gids bij ${unit.title}`}
                 title="Grammatica-gids"
                 style={{
-                  width: 34,
-                  height: 34,
-                  borderRadius: 10,
+                  width: 44,
+                  height: 44,
+                  borderRadius: 12,
                   flexShrink: 0,
                   display: 'flex',
                   alignItems: 'center',

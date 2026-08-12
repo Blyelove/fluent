@@ -78,7 +78,7 @@ Fluent heeft een kern die al als topspel voelt — chunky leslus met combo's en 
 
 **Bewijs:** Typ een antwoord en druk Enter (desktop) of Ga (mobiel): evaluatie zonder extra handeling; nogmaals Enter gaat verder.
 
-### 18. Eén 44px-pas over alle mini-raakvlakken: PersonaPicker-swatches 30×30 en chips ~29px, gids-knop 34×34 (Home.tsx r808), les-× ~38px (Lesson.tsx r226), doel-✕ met padding '0 4px' (Home.tsx r644), Review-× ~38px. Alles naar minstens 44×44 (desnoods 36px visueel met onzichtbare hit-area); de doel-✕ krijgt bovendien een 5-seconden 'Ongedaan maken'-toast.
+### 18. ✅ AF (ronde 47) — Eén 44px-pas over alle mini-raakvlakken: PersonaPicker-swatches 30×30 en chips ~29px, gids-knop 34×34 (Home.tsx r808), les-× ~38px (Lesson.tsx r226), doel-✕ met padding '0 4px' (Home.tsx r644), Review-× ~38px. Alles naar minstens 44×44 (desnoods 36px visueel met onzichtbare hit-area); de doel-✕ krijgt bovendien een 5-seconden 'Ongedaan maken'-toast.
 
 **Bewijs:** Meet elk genoemd element in devtools: geen interactief raakvlak onder 44px; doel wissen is 5s terug te draaien.
 
