@@ -70,11 +70,11 @@ Fluent heeft een kern die al als topspel voelt — chunky leslus met combo's en 
 
 **Bewijs:** Op 375px: dagmissies zichtbaar zonder scrollen onder de hero, chip ⚜️ scrolt naar de missies, en Tab-volgorde volgt de kijkvolgorde.
 
-### 16. Antwoordknoppen kleuren na Controleren: SelectEx, ListenEx en FillEx zetten alleen locked; de klassen .opt.correct en .opt.wrong bestaan al in global.css (r272-282) maar alleen MatchEx gebruikt ze. Geef het resultaat als prop door en kleur de juiste optie groen (glow), de foute keuze rood (shake).
+### 16. ✅ AF (ronde 37) — Antwoordknoppen kleuren na Controleren: SelectEx, ListenEx en FillEx zetten alleen locked; de klassen .opt.correct en .opt.wrong bestaan al in global.css (r272-282) maar alleen MatchEx gebruikt ze. Geef het resultaat als prop door en kleur de juiste optie groen (glow), de foute keuze rood (shake).
 
 **Bewijs:** Antwoord bewust fout: jouw keuze schudt rood en het juiste antwoord licht groen op, zonder dat je de onderbalk hoeft te lezen.
 
-### 17. Enter/Ga werkt in typ-oefeningen: TypeEx (exercises.tsx r421-449) heeft geen onKeyDown/submit, dus op mobiel moet je het toetsenbord wegvegen om Controleren te bereiken. Enter triggert Controleren (requestCheck-callback via Registration), in de feedback-fase gaat Enter naar Verder; enterKeyHint="go" op de input.
+### 17. ✅ AF (ronde 37) — Enter/Ga werkt in typ-oefeningen: TypeEx (exercises.tsx r421-449) heeft geen onKeyDown/submit, dus op mobiel moet je het toetsenbord wegvegen om Controleren te bereiken. Enter triggert Controleren (requestCheck-callback via Registration), in de feedback-fase gaat Enter naar Verder; enterKeyHint="go" op de input.
 
 **Bewijs:** Typ een antwoord en druk Enter (desktop) of Ga (mobiel): evaluatie zonder extra handeling; nogmaals Enter gaat verder.
 

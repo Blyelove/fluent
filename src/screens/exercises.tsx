@@ -29,6 +29,8 @@ interface Common {
   ttsLang: string
   locked: boolean
   register: (r: Registration) => void
+  /** Enter of "Ga" in een invoerveld: meteen controleren, zonder het toetsenbord weg te vegen */
+  onSubmit?: () => void
 }
 
 function shuffle<T>(arr: T[]): T[] {
@@ -156,6 +158,18 @@ export function NewWordEx({ ex, ttsLang, register }: Common & { ex: NewWord }) {
 }
 
 /**
+ * De kleur van een antwoordknop nadat je gecontroleerd hebt: jouw foute keuze
+ * schudt rood, het juiste antwoord licht groen op. Zonder dit moest je de
+ * balk onderin lezen om te weten wat er gebeurde.
+ */
+function optKlasse(i: number, gekozen: number | null, juist: number, vast: boolean): string {
+  if (!vast || gekozen === null) return `opt ${gekozen === i ? 'selected' : ''}`
+  if (i === juist) return 'opt correct'
+  if (i === gekozen) return 'opt wrong'
+  return 'opt'
+}
+
+/**
  * Antwoordopties in willekeurige volgorde, één keer geschud per oefening.
  * In de content staat het juiste antwoord vaak op een vaste plek (bij Duits
  * zelfs overal op knop 1) — wie dat doorheeft, leert knoppen in plaats van
@@ -212,7 +226,7 @@ export function SelectEx({ ex, ttsLang, locked, register }: Common & { ex: Selec
         {opties.map((opt, i) => (
           <button
             key={i}
-            className={`opt ${chosen === i ? 'selected' : ''}`}
+            className={optKlasse(i, chosen, juist, locked)}
             disabled={locked}
             onClick={() => {
               sfx('tap')
@@ -401,7 +415,7 @@ export function ListenEx({ ex, ttsLang, locked, register }: Common & { ex: Liste
         {opties.map((opt, i) => (
           <button
             key={i}
-            className={`opt ${chosen === i ? 'selected' : ''}`}
+            className={optKlasse(i, chosen, juist, locked)}
             disabled={locked}
             onClick={() => {
               sfx('tap')
@@ -418,7 +432,7 @@ export function ListenEx({ ex, ttsLang, locked, register }: Common & { ex: Liste
 
 /* ---------- Typ de vertaling ---------- */
 
-export function TypeEx({ ex, locked, register }: Common & { ex: TypeAnswer }) {
+export function TypeEx({ ex, locked, register, onSubmit }: Common & { ex: TypeAnswer }) {
   const [val, setVal] = useState('')
 
   useEffect(() => {
@@ -439,6 +453,15 @@ export function TypeEx({ ex, locked, register }: Common & { ex: TypeAnswer }) {
         value={val}
         disabled={locked}
         onChange={(e) => setVal(e.target.value)}
+        // op de telefoon staat Controleren achter het toetsenbord: met Ga
+        // (of Enter) hoef je dat nooit weg te vegen
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && val.trim().length > 0) {
+            e.preventDefault()
+            onSubmit?.()
+          }
+        }}
+        enterKeyHint="go"
         placeholder="Typ hier…"
         autoCapitalize="off"
         autoCorrect="off"
@@ -493,7 +516,7 @@ export function FillEx({ ex, locked, register }: Common & { ex: Fill }) {
         {opties.map((opt, i) => (
           <button
             key={i}
-            className={`opt ${chosen === i ? 'selected' : ''}`}
+            className={optKlasse(i, chosen, juist, locked)}
             disabled={locked}
             onClick={() => {
               sfx('tap')

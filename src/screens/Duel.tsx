@@ -577,7 +577,7 @@ export function DuelScreen({
 
         <div className="lesson-body" key={idx}>
           {ex.type === 'select' && <SelectEx ex={ex} ttsLang={course.ttsLang} locked={answered !== null} register={register} />}
-          {ex.type === 'type' && <TypeEx ex={ex} ttsLang={course.ttsLang} locked={answered !== null} register={register} />}
+          {ex.type === 'type' && <TypeEx ex={ex} ttsLang={course.ttsLang} locked={answered !== null} register={register} onSubmit={onCheck} />}
           {ex.type === 'wordbank' && <WordBankEx ex={ex} ttsLang={course.ttsLang} locked={answered !== null} register={register} />}
           {ex.type === 'listen' && <ListenEx ex={ex} ttsLang={course.ttsLang} locked={answered !== null} register={register} />}
           {ex.type === 'fill' && <FillEx ex={ex} ttsLang={course.ttsLang} locked={answered !== null} register={register} />}

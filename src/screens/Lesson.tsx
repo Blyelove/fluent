@@ -313,7 +313,7 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
         {ex.type === 'select' && <SelectEx ex={ex} ttsLang={course.ttsLang} locked={phase === 'feedback'} register={register} />}
         {ex.type === 'wordbank' && <WordBankEx ex={ex} ttsLang={course.ttsLang} locked={phase === 'feedback'} register={register} />}
         {ex.type === 'listen' && <ListenEx ex={ex} ttsLang={course.ttsLang} locked={phase === 'feedback'} register={register} />}
-        {ex.type === 'type' && <TypeEx ex={ex} ttsLang={course.ttsLang} locked={phase === 'feedback'} register={register} />}
+        {ex.type === 'type' && <TypeEx ex={ex} ttsLang={course.ttsLang} locked={phase === 'feedback'} register={register} onSubmit={onCheck} />}
         {ex.type === 'fill' && <FillEx ex={ex} ttsLang={course.ttsLang} locked={phase === 'feedback'} register={register} />}
         {ex.type === 'match' && <MatchEx ex={ex} ttsLang={course.ttsLang} onAuto={applyResult} />}
       </div>
