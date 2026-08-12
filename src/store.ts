@@ -118,6 +118,11 @@ interface AureaState {
   /** Oefeningen die je fout had, om gericht te herhalen */
   mistakes: MistakeRef[]
 
+  /** Laatste dag dat je de app opende (los van of je toen leerde) */
+  lastSeenDay: string | null
+  /** Aantal dagen dat je weg was bij je laatste terugkeer; 0 = niets te melden */
+  comebackDays: number
+
   /* ---- weekmissies ---- */
   weekLessons: number
   weekArcade: number
@@ -139,6 +144,10 @@ interface AureaState {
   recordDuel: (r: DuelRecord) => void
   /** Grote weekkist openen: +100 XP en 30 minuten dubbele XP */
   claimWeekChest: () => void
+  /** Bij het openen van de app: kijkt of je terugkomt na een paar dagen weg */
+  registerVisit: () => void
+  /** Het welkom-terug-bericht wegklikken */
+  dismissComeback: () => void
   /** Een fout onthouden zodat je hem gericht kunt herhalen */
   addMistake: (c: CourseId, lessonId: string, index: number) => void
   /** Fout weghalen zodra je hem in een fouten-sessie goed hebt */
@@ -245,6 +254,8 @@ export const useStore = create<AureaState>()(
       boostUntil: 0,
       activeDays: [],
       mistakes: [],
+      lastSeenDay: null,
+      comebackDays: 0,
 
       weekLessons: 0,
       weekArcade: 0,
@@ -441,6 +452,21 @@ export const useStore = create<AureaState>()(
         })
       },
 
+      registerVisit: () => {
+        const s = get()
+        const today = todayStr()
+        if (s.lastSeenDay === today) return
+        const weg = s.lastSeenDay ? daysBetween(s.lastSeenDay, today) : 0
+        // twee dagen of langer weg? dan een warm welkom en een half uur dubbele XP cadeau
+        if (weg >= 2) {
+          set({ lastSeenDay: today, comebackDays: weg, boostUntil: Math.max(s.boostUntil, Date.now() + 30 * 60000) })
+        } else {
+          set({ lastSeenDay: today })
+        }
+      },
+
+      dismissComeback: () => set({ comebackDays: 0 }),
+
       addMistake: (c, lessonId, index) => {
         const s = get()
         const key = mistakeKey({ c, l: lessonId, i: index })
@@ -555,6 +581,8 @@ export const useStore = create<AureaState>()(
           boostUntil: 0,
           activeDays: [],
           mistakes: [],
+          lastSeenDay: null,
+          comebackDays: 0,
           weekLessons: 0,
           weekArcade: 0,
           weekDuels: 0,

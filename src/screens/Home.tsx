@@ -96,6 +96,9 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
   const weekDuels = useStore((s) => s.weekDuels)
   const weekChestWeek = useStore((s) => s.weekChestWeek)
   const todayFixedRaw = useStore((s) => s.todayFixed)
+  const comebackDays = useStore((s) => s.comebackDays)
+  const dismissComeback = useStore((s) => s.dismissComeback)
+  const freezes = useStore((s) => s.freezes)
   const mijnFouten = useStore((s) => s.mistakes.filter((m) => m.c === s.courseId).length)
   const claimWeekChest = useStore((s) => s.claimWeekChest)
   const leagueRank = useMemo(() => yourRank(standings(leagueId, weekXp)), [leagueId, weekXp])
@@ -279,6 +282,67 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
           </motion.div>
         )
       })()}
+
+      {/* Welkom terug: geen verwijt, wel een zachte landing en een cadeautje */}
+      <AnimatePresence>
+        {comebackDays > 0 && (
+          <motion.div
+            className="glass"
+            initial={{ opacity: 0, y: -8, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: 'auto' }}
+            exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+            style={{
+              padding: 16,
+              marginBottom: 16,
+              overflow: 'hidden',
+              borderColor: 'var(--line-gold)',
+              background: 'linear-gradient(135deg, rgba(255,197,61,0.14), rgba(168,85,247,0.10))',
+            }}
+          >
+            <div className="row" style={{ gap: 12, marginBottom: 10 }}>
+              <span style={{ fontSize: 26, lineHeight: 1 }}>👋</span>
+              <span className="col" style={{ gap: 2, flex: 1 }}>
+                <strong className="display" style={{ fontSize: 17 }}>
+                  Fijn dat je er weer bent
+                </strong>
+                <span className="faint" style={{ fontSize: 12.5 }}>
+                  Je was {comebackDays} {comebackDays === 1 ? 'dag' : 'dagen'} weg — geen probleem, je pakt het zo weer op.
+                </span>
+              </span>
+            </div>
+            <p className="dim" style={{ fontSize: 13, marginBottom: 12, lineHeight: 1.5 }}>
+              {streak > 0
+                ? `Je reeks van ${streak} ${streak === 1 ? 'dag' : 'dagen'} staat nog${freezes > 0 ? ' en je bescherming is intact' : ''}. `
+                : 'Je begint gewoon opnieuw — dat telt hier net zo hard. '}
+              We hebben <strong className="gold-text">30 minuten dubbele XP</strong> voor je klaargezet.
+            </p>
+            <div className="col" style={{ gap: 8 }}>
+              <button
+                className="btn btn-primary"
+                style={{ fontSize: 15.5 }}
+                onClick={() => {
+                  sfx('tap')
+                  dismissComeback()
+                  const next = flat[currentIdx]
+                  if (next) onStartLesson(course, next.lesson)
+                }}
+              >
+                ▶ Rustig weer beginnen
+              </button>
+              <button
+                className="btn-quiet center"
+                style={{ width: '100%', fontSize: 13, padding: '6px 0 2px' }}
+                onClick={() => {
+                  sfx('tap')
+                  dismissComeback()
+                }}
+              >
+                Later — sluit dit bericht
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Compacte statusbalk: houdt de dagelijkse haakjes zichtbaar zonder het pad weg te duwen */}
       {(() => {

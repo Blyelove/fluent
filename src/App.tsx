@@ -70,6 +70,7 @@ export default function App() {
     initVoices()
     void initAudioManifest()
     setSoundEnabled(soundOn)
+    useStore.getState().registerVisit()
     if (incomingDuel) setTab('play')
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
