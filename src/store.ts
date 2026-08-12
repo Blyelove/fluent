@@ -158,6 +158,8 @@ interface AureaState {
   loginAccount: (email: string, passHash: string, remember: boolean) => 'ok' | 'fout'
   logout: () => void
   toggleSound: () => void
+  /** Je personage aanpassen — kan altijd, niet alleen bij registratie */
+  setAvatarLook: (look: AvatarStyle) => void
   resetAll: () => void
 }
 
@@ -617,6 +619,8 @@ export const useStore = create<AureaState>()(
         setSoundEnabled(on)
         set({ soundOn: on })
       },
+
+      setAvatarLook: (look) => set({ avatarLook: look }),
 
       resetAll: () =>
         set({

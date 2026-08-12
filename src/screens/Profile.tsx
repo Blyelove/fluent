@@ -4,8 +4,10 @@ import { courseProgress, totalXp, useStore, wordsLearned } from '../store'
 import { levelProgress, levelTitle, wardrobeFor } from '../levels'
 import { courseFlagCode } from '../countries'
 import { Flag } from '../components/Flag'
-import { Avatar } from '../components/Avatar'
+import { Avatar, normalizePersona } from '../components/Avatar'
+import { PersonaPicker } from '../components/PersonaPicker'
 import { BadgesScreen } from './Badges'
+import { sfx } from '../audio'
 
 export function ProfileScreen() {
   const state = useStore()
@@ -13,6 +15,7 @@ export function ProfileScreen() {
   const progress = courseProgress(state, state.courseId)
   const lp = levelProgress(totalXp(state))
   const [view, setView] = useState<'profiel' | 'badges'>('profiel')
+  const [bewerkt, setBewerkt] = useState(false)
 
   if (view === 'badges') {
     return (
@@ -39,7 +42,34 @@ export function ProfileScreen() {
             Niveau {lp.level} · {levelTitle(lp.level)} · <Flag code={courseFlagCode[state.courseId]} size={14} /> {course.name}
           </p>
         </div>
-        <Avatar size={80} mode="idle" level={lp.level} courseId={state.courseId} look={state.avatarLook} />
+        <button
+          onClick={() => {
+            sfx('tap')
+            setBewerkt((b) => !b)
+          }}
+          aria-label="Personage aanpassen"
+          style={{ position: 'relative' }}
+        >
+          <Avatar size={80} mode="idle" level={lp.level} courseId={state.courseId} look={state.avatarLook} />
+          <span
+            style={{
+              position: 'absolute',
+              right: -4,
+              bottom: -2,
+              width: 28,
+              height: 28,
+              borderRadius: '50%',
+              background: 'var(--grad-hot)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 14,
+              boxShadow: '0 2px 6px rgba(0,0,0,0.45)',
+            }}
+          >
+            ✏️
+          </span>
+        </button>
       </div>
       <div style={{ margin: '14px 0 24px' }}>
         <div className="progress-track" style={{ height: 8 }}>
@@ -49,6 +79,16 @@ export function ProfileScreen() {
           Nog {lp.needed - lp.current} XP tot niveau {lp.level + 1} · {levelTitle(lp.level + 1)}
         </p>
       </div>
+
+      {bewerkt && (
+        <div style={{ marginBottom: 18 }}>
+          {/* live opslaan: elke tik past je personage direct aan, overal in de app */}
+          <PersonaPicker value={normalizePersona(state.avatarLook)} onChange={state.setAvatarLook} />
+          <button className="btn btn-primary" style={{ padding: 13, fontSize: 14.5 }} onClick={() => setBewerkt(false)}>
+            Klaar — zo wil ik eruitzien
+          </button>
+        </div>
+      )}
 
       <button
         className="glass spread"
@@ -188,7 +228,7 @@ export function ProfileScreen() {
             <div className="center" style={{ marginTop: 16 }}>
               <Avatar size={110} level={20} courseId={state.courseId} look={state.avatarLook} />
               <p className="faint" style={{ fontSize: 12, marginTop: 4 }}>
-                Jij op niveau 20 — Ultiem Fluent, volledig {course.name.toLowerCase()}
+                Jij op niveau 20 — Ultiem Fluent, volledig {course.name}
               </p>
             </div>
           </div>
