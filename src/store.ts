@@ -518,13 +518,20 @@ export const useStore = create<AureaState>()(
       registerVisit: () => {
         const s = get()
         const today = todayStr()
-        if (s.lastSeenDay === today) return
+        // de competitieweek rolt door zodra je de app ópent, niet pas bij je
+        // eerste voltooide les. Anders zie je maandagochtend nog de stand van
+        // vorige week, met valse promotie-verwachting — en kon je de weekkist
+        // claimen met oude voortgang, waarmee je de kist van de nieuwe week
+        // opbrandde.
+        const league = rollWeek(s)
+        const weekGerold = league.leagueWeek !== s.leagueWeek
+        if (s.lastSeenDay === today && !weekGerold) return
         const weg = s.lastSeenDay ? daysBetween(s.lastSeenDay, today) : 0
         // twee dagen of langer weg? dan een warm welkom en een half uur dubbele XP cadeau
         if (weg >= 2) {
-          set({ lastSeenDay: today, comebackDays: weg, boostUntil: Math.max(s.boostUntil, Date.now() + 30 * 60000) })
+          set({ ...league, lastSeenDay: today, comebackDays: weg, boostUntil: Math.max(s.boostUntil, Date.now() + 30 * 60000) })
         } else {
-          set({ lastSeenDay: today })
+          set({ ...league, lastSeenDay: today })
         }
       },
 
