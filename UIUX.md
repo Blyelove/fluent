@@ -146,7 +146,7 @@ Fluent heeft een kern die al als topspel voelt — chunky leslus met combo's en 
 
 **Bewijs:** Op niveau 4: stadia 1 in kleur, 5-20 als silhouet, ring op je positie; tik op niveau 10 toont de bijbehorende items.
 
-### 35. Kleine consistentie-veeg (één ronde, vier micro-fixes): feedbacktekst één keer per antwoord kiezen i.p.v. Math.random() in de render (Lesson.tsx r283-285); rode '+3s'-pop bij een Woordstorm-misser zoals Bliksem die heeft (Arcade.tsx r858 vs r614); duel-naam persisteren in de store en de key={tab}-remount beperken zodat halve invoer een tabwissel overleeft; in fouten-sessies bij opnieuw fout ook addMistake aanroepen zodat 'hardnekkigste eerst' klopt (Review.tsx r157-179).
+### 35. ✅ GROTENDEELS AF (ronde 53) — Kleine consistentie-veeg (één ronde, vier micro-fixes): feedbacktekst één keer per antwoord kiezen i.p.v. Math.random() in de render (Lesson.tsx r283-285); rode '+3s'-pop bij een Woordstorm-misser zoals Bliksem die heeft (Arcade.tsx r858 vs r614); duel-naam persisteren in de store en de key={tab}-remount beperken zodat halve invoer een tabwissel overleeft; in fouten-sessies bij opnieuw fout ook addMistake aanroepen zodat 'hardnekkigste eerst' klopt (Review.tsx r157-179).
 
 **Bewijs:** Waarom-tik verandert de feedbacktekst niet meer; misser toont +3s bij de klok; naam staat voorgevuld na tabwissel; twee keer fout = hoger n in mistakes.
 

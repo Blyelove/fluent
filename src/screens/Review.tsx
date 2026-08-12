@@ -186,6 +186,10 @@ export function ReviewScreen({ onGoLearn }: { onGoLearn?: () => void } = {}) {
       mistakeKey: mistakeKey(ref),
       bron,
       ex,
+      // herkomst meenemen: gaat hij hier weer mis, dan moet de teller omhoog,
+      // anders klopt "de hardnekkigste eerst" niet
+      lesId: ref.l,
+      exIndex: ref.i,
     }))
     if (items.length === 0) return
     startSession('fouten', items, 'Jouw fouten')
@@ -218,8 +222,9 @@ export function ReviewScreen({ onGoLearn }: { onGoLearn?: () => void } = {}) {
     if (phase.mode === 'srs' && item.key) reviewWord(item.key, r.correct)
     // fout eindelijk goed? dan verdwijnt hij uit je foutenlijst
     if (phase.mode === 'fouten' && item.mistakeKey && r.correct) clearMistake(item.mistakeKey)
-    // een fout in een toets telt net zo hard als een fout in een les
-    if (phase.mode === 'test' && !r.correct && item.lesId !== undefined && item.exIndex !== undefined) {
+    // een fout in een toets telt net zo hard als een fout in een les, en gaat
+    // hij in de foutensessie wéér mis, dan stijgt hij in je lijst
+    if ((phase.mode === 'test' || phase.mode === 'fouten') && !r.correct && item.lesId !== undefined && item.exIndex !== undefined) {
       addMistake(courseId, item.lesId, item.exIndex)
     }
     if (r.correct) {

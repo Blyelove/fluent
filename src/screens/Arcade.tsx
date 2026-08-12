@@ -890,6 +890,8 @@ function Storm({ words, onExit, onFinish }: GameProps) {
   const [wrong, setWrong] = useState<number[]>([])
   const [matched, setMatched] = useState(0)
   const [misses, setMisses] = useState(0)
+  /** tijdstempel van de laatste misser, zodat de +3s-pop opnieuw kan afgaan */
+  const [straf, setStraf] = useState<number | null>(null)
   const [elapsed, setElapsed] = useState(0)
 
   const startRef = useRef(0)
@@ -969,9 +971,13 @@ function Storm({ words, onExit, onFinish }: GameProps) {
       penaltyRef.current += STORM_PENALTY
       missesRef.current += 1
       setMisses(missesRef.current)
+      // je verliest hier drie seconden; zonder zichtbaar teken merk je alleen
+      // achteraf dat je tijd weg is
+      setStraf(Date.now())
       setWrong([first.id, t.id])
       setSelected(null)
       timers.current.push(window.setTimeout(() => setWrong([]), 520))
+      timers.current.push(window.setTimeout(() => setStraf(null), 700))
     }
   }
 
@@ -991,8 +997,22 @@ function Storm({ words, onExit, onFinish }: GameProps) {
             {matched} van {totalPairs} paren
           </p>
         </div>
-        <div className="display" style={{ fontSize: 26, color: 'var(--cyan)', minWidth: 76, textAlign: 'right' }}>
+        <div className="display" style={{ fontSize: 26, color: 'var(--cyan)', minWidth: 76, textAlign: 'right', position: 'relative' }}>
           {secs.toFixed(1)}s
+          <AnimatePresence>
+            {straf !== null && (
+              <motion.span
+                key={straf}
+                initial={{ opacity: 0, y: 4, scale: 0.7 }}
+                animate={{ opacity: 1, y: -20, scale: 1 }}
+                exit={{ opacity: 0, y: -36 }}
+                className="display"
+                style={{ position: 'absolute', right: 0, top: -4, fontSize: 20, color: 'var(--err)' }}
+              >
+                +3s
+              </motion.span>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
