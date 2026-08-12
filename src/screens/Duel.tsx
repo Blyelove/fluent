@@ -142,6 +142,8 @@ function sanitize(p: DuelPayload | null): DuelPayload | null {
     n: safeName(p.n, ''),
     x: safeInt(p.x, -1, -1, 999),
     q: safeInt(p.q, QUESTIONS, 1, 50),
+    // 1 = antwoord van je vriend; alles anders behandelen we als uitdaging
+    r: p.r === 1 ? 1 : 0,
   }
 }
 
@@ -370,8 +372,14 @@ export function DuelScreen({
       return
     }
     const mine = open.find((d) => d.s === p.s)
-    if (mine) {
+    if (mine && p.r === 1) {
       settle(p, mine)
+      return
+    }
+    if (mine) {
+      // dit is je eigen uitdaging-link, niet het antwoord van je vriend
+      sfx('wrong')
+      setCodeError('Dit is je eigen uitdaging. Wacht op de link die je vriend terugstuurt nadat hij gespeeld heeft.')
       return
     }
     setCodeInput('')
@@ -426,7 +434,8 @@ export function DuelScreen({
       // je eigen nieuwe duel: jouw ronde zit erop, nu je vriend nog
       const xp = Math.max(5, score * 2)
       awardXp(xp)
-      const link = duelLink(encodeDuel({ ...phase.payload, n: nameOrDefault, x: score }))
+      // r ontbreekt bewust: dit is een uitdaging die je vriend nog moet spelen
+      const link = duelLink(encodeDuel({ ...phase.payload, n: nameOrDefault, x: score, r: 0 }))
       saveOpen([...open.filter((d) => d.s !== phase.payload.s), { s: phase.payload.s, c: phase.payload.c, score, total, link, day: today() }])
       burst()
       setPhase({ name: 'result', payload: phase.payload, score, total, theirScore: -1, xp })
@@ -556,7 +565,13 @@ export function DuelScreen({
     const tie = theirScore >= 0 && score === theirScore
     const lost = theirScore >= 0 && score < theirScore
     const opponent = phase.payload.n || 'Je vriend'
-    const returnCode = encodeDuel({ ...phase.payload, n: nameOrDefault, x: score })
+    /**
+     * Speelde je het duel van een vriend (dan kennen we zijn score al), dan is
+     * dit een ANTWOORD (r: 1). Startte je zelf een duel, dan is dit juist de
+     * uitdaging die je vriend nog moet spelen (r: 0).
+     */
+    const isAntwoord = theirScore >= 0
+    const returnCode = encodeDuel({ ...phase.payload, n: nameOrDefault, x: score, r: isAntwoord ? 1 : 0 })
     const link = duelLink(returnCode)
 
     return (
@@ -703,7 +718,11 @@ export function DuelScreen({
 
   /* ================= HUB ================= */
 
-  const openForIncoming = safeIncoming ? open.find((d) => d.s === safeIncoming.s) : undefined
+  const openMatch = safeIncoming ? open.find((d) => d.s === safeIncoming.s) : undefined
+  // alleen een échte terugstuur-link (r: 1) is het antwoord van je vriend
+  const openForIncoming = openMatch && safeIncoming?.r === 1 ? openMatch : undefined
+  // wél een eigen open duel, maar géén antwoord: dit is je eigen uitdaging-link
+  const eigenLink = !!openMatch && safeIncoming?.r !== 1
   const showIncoming = !!safeIncoming && !hideIncoming
   const history = [...duelHistory].reverse().slice(0, 6)
 
@@ -747,7 +766,9 @@ export function DuelScreen({
           <div className="row" style={{ gap: 10, marginBottom: 6 }}>
             <span style={{ fontSize: 26 }}>⚔️</span>
             <div style={{ minWidth: 0 }}>
-              <strong style={{ fontSize: 17 }}>{safeIncoming.n || 'Een vriend'} daagt je uit!</strong>
+              <strong style={{ fontSize: 17 }}>
+                {eigenLink ? 'Dit is jouw eigen uitdaging' : `${safeIncoming.n || 'Een vriend'} daagt je uit!`}
+              </strong>
               <p className="dim" style={{ fontSize: 13 }}>
                 <Flag code={courseFlagCode[safeIncoming.c]} size={13} /> {courses[safeIncoming.c]?.name ?? 'Onbekende cursus'} ·{' '}
                 {safeIncoming.q} vragen
@@ -762,6 +783,22 @@ export function DuelScreen({
               </p>
               <button className="btn btn-primary" onClick={() => settle(safeIncoming, openForIncoming)}>
                 🥁 Toon de uitslag
+              </button>
+            </>
+          ) : eigenLink ? (
+            <>
+              <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 14px' }}>
+                Je hebt deze ronde al gespeeld ({openMatch?.score} van de {openMatch?.total}). Stuur de link naar je vriend; zodra hij
+                gespeeld heeft, stuurt hij een link terug en zie je hier de uitslag.
+              </p>
+              <button
+                className="btn btn-ghost"
+                onClick={() => {
+                  sfx('tap')
+                  setHideIncoming(true)
+                }}
+              >
+                Begrepen
               </button>
             </>
           ) : (

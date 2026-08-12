@@ -16,6 +16,13 @@ export interface DuelPayload {
   x: number
   /** Aantal vragen */
   q: number
+  /**
+   * 1 = dit is het ANTWOORD van je vriend op jouw uitdaging.
+   * Ontbreekt of 0 = dit is een uitdaging die nog gespeeld moet worden.
+   * Zonder dit onderscheid zou je eigen uitdaging-link, geopend op je eigen
+   * telefoon, worden aangezien voor een antwoord en een nepduel opleveren.
+   */
+  r?: 0 | 1
 }
 
 function b64encode(s: string): string {
