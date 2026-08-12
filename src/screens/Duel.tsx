@@ -1,0 +1,787 @@
+import { useCallback, useMemo, useRef, useState } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
+import confetti from 'canvas-confetti'
+import type { Course, CourseId, Fill, Listen, Select, TypeAnswer, WordBank } from '../types'
+import { courses } from '../content'
+import { totalXp, useStore } from '../store'
+import { levelForXp } from '../levels'
+import { sfx } from '../audio'
+import { Avatar } from '../components/Avatar'
+import { Flag } from '../components/Flag'
+import { courseFlagCode } from '../countries'
+import { decodeDuel, duelLink, encodeDuel, seededPick, type DuelPayload } from '../duel'
+import { FillEx, ListenEx, SelectEx, TypeEx, WordBankEx, type EvalResult, type Registration } from './exercises'
+
+/** Alleen oefeningen waar je een antwoord op kunt geven — geen 'new' en geen 'match' */
+type QuizEx = Select | TypeAnswer | Listen | Fill | WordBank
+
+const QUESTIONS = 10
+
+/* ---------- open uitdagingen (wachten op antwoord van je vriend) ---------- */
+
+interface OpenDuel {
+  /** seed — hiermee herkennen we het antwoord van je vriend */
+  s: number
+  c: CourseId
+  score: number
+  total: number
+  /** de deel-link die je nog eens kunt kopiëren */
+  link: string
+  day: string
+}
+
+const OPEN_KEY = 'fluent-duels-open'
+
+function readOpen(): OpenDuel[] {
+  try {
+    const raw = localStorage.getItem(OPEN_KEY)
+    if (!raw) return []
+    const arr: unknown = JSON.parse(raw)
+    return Array.isArray(arr) ? (arr as OpenDuel[]).filter((d) => typeof d?.s === 'number') : []
+  } catch {
+    return []
+  }
+}
+
+function writeOpen(list: OpenDuel[]) {
+  try {
+    localStorage.setItem(OPEN_KEY, JSON.stringify(list.slice(-8)))
+  } catch {
+    /* opslag geblokkeerd of vol — niet erg, je link staat ook in je chat */
+  }
+}
+
+/* ---------- hulpjes ---------- */
+
+function today(): string {
+  return new Date().toISOString().slice(0, 10)
+}
+
+function quizPool(course: Course): QuizEx[] {
+  const out: QuizEx[] = []
+  for (const s of course.sections)
+    for (const u of s.units)
+      for (const l of u.lessons)
+        for (const e of l.exercises) if (e.type !== 'new' && e.type !== 'match') out.push(e)
+  return out
+}
+
+function burst() {
+  confetti({
+    particleCount: 140,
+    spread: 110,
+    origin: { y: 0.6 },
+    colors: ['#A855F7', '#EC4899', '#FFC53D', '#22D3EE'],
+    disableForReducedMotion: true,
+  })
+}
+
+/** Accepteert zowel een losse code als een volledige link */
+function codeFromInput(raw: string): string {
+  const t = raw.trim()
+  const i = t.indexOf('duel=')
+  if (i >= 0) return t.slice(i + 5).split('&')[0]
+  return t
+}
+
+async function copyText(text: string): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(text)
+    return true
+  } catch {
+    return false
+  }
+}
+
+/* ---------- deelblok: kopiëren + WhatsApp ---------- */
+
+function ShareBox({ value, waText, copyLabel }: { value: string; waText: string; copyLabel: string }) {
+  const [state, setState] = useState<'idle' | 'ok' | 'fail'>('idle')
+
+  return (
+    <div>
+      <input
+        className="type-input"
+        readOnly
+        value={value}
+        onFocus={(e) => e.currentTarget.select()}
+        style={{ fontSize: 13, marginBottom: 10, letterSpacing: '0.01em' }}
+        aria-label="Jouw duel-code"
+      />
+      <button
+        className="btn btn-primary"
+        style={{ marginBottom: 10 }}
+        onClick={() => {
+          sfx('tap')
+          void copyText(value).then((ok) => {
+            setState(ok ? 'ok' : 'fail')
+            window.setTimeout(() => setState('idle'), 2600)
+          })
+        }}
+      >
+        {state === 'ok' ? '✅ Gekopieerd!' : state === 'fail' ? '👆 Selecteer hierboven en kopieer' : `📋 ${copyLabel}`}
+      </button>
+      <a
+        className="btn btn-ghost"
+        href={`https://wa.me/?text=${encodeURIComponent(waText)}`}
+        target="_blank"
+        rel="noreferrer"
+        style={{ textDecoration: 'none', color: 'var(--text)' }}
+        onClick={() => sfx('tap')}
+      >
+        💬 Deel via WhatsApp
+      </a>
+    </div>
+  )
+}
+
+/* ---------- scorebord tijdens het duel ---------- */
+
+function ScoreBar({ you, them, name, total }: { you: number; them: number; name: string; total: number }) {
+  return (
+    <div className="row" style={{ gap: 10, marginBottom: 18 }}>
+      <motion.div
+        className="glass"
+        key={`you-${you}`}
+        initial={{ scale: 0.94 }}
+        animate={{ scale: 1 }}
+        transition={{ type: 'spring', stiffness: 420, damping: 16 }}
+        style={{ flex: 1, padding: '10px 12px', borderColor: 'var(--line-hot)' }}
+      >
+        <p className="eyebrow" style={{ fontSize: 10 }}>
+          Jij
+        </p>
+        <strong className="display hot-text" style={{ fontSize: 24 }}>
+          {you}
+        </strong>
+      </motion.div>
+      <span className="faint display" style={{ fontSize: 17 }}>
+        vs
+      </span>
+      <div className="glass" style={{ flex: 1, padding: '10px 12px', textAlign: 'right' }}>
+        <p className="eyebrow" style={{ fontSize: 10, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          {name}
+        </p>
+        <strong className="display gold-text" style={{ fontSize: 24 }}>
+          {them >= 0 ? them : '?'}
+          {them >= 0 && <span className="faint display" style={{ fontSize: 14 }}>/{total}</span>}
+        </strong>
+      </div>
+    </div>
+  )
+}
+
+/* ---------- state-machine ---------- */
+
+type Phase =
+  | { name: 'hub' }
+  | { name: 'play'; payload: DuelPayload; items: QuizEx[]; theirScore: number }
+  | { name: 'result'; payload: DuelPayload; score: number; total: number; theirScore: number; xp: number }
+  | { name: 'settled'; opponent: string; yours: number; theirs: number; total: number; xp: number }
+
+export function DuelScreen({ incoming }: { incoming?: DuelPayload | null }) {
+  const courseId = useStore((s) => s.courseId)
+  const duelHistory = useStore((s) => s.duelHistory)
+  const duelsWon = useStore((s) => s.duelsWon)
+  const recordDuel = useStore((s) => s.recordDuel)
+  const awardXp = useStore((s) => s.awardXp)
+  const look = useStore((s) => s.avatarLook)
+  const curLevel = useStore((s) => levelForXp(totalXp(s)))
+
+  const [phase, setPhase] = useState<Phase>({ name: 'hub' })
+  const [open, setOpen] = useState<OpenDuel[]>(() => readOpen())
+  const [myName, setMyName] = useState('')
+  const [codeInput, setCodeInput] = useState('')
+  const [codeError, setCodeError] = useState<string | null>(null)
+  const [hideIncoming, setHideIncoming] = useState(false)
+
+  // per vraag
+  const [idx, setIdx] = useState(0)
+  const [answered, setAnswered] = useState<EvalResult | null>(null)
+  const [ready, setReady] = useState(false)
+  const [correct, setCorrect] = useState(0)
+  const [marks, setMarks] = useState<boolean[]>([])
+  const evalRef = useRef<(() => EvalResult) | null>(null)
+
+  const nameOrDefault = myName.trim() || 'Uitdager'
+
+  const register = useCallback((r: Registration) => {
+    evalRef.current = r.evaluate
+    setReady(r.ready)
+  }, [])
+
+  const saveOpen = (list: OpenDuel[]) => {
+    setOpen(list)
+    writeOpen(list)
+  }
+
+  /* ---- een duel starten ---- */
+
+  const startPlay = (payload: DuelPayload) => {
+    const course = courses[payload.c]
+    if (!course) {
+      setCodeError('Die cursus kennen we niet. Vraag je vriend om een nieuwe link.')
+      return
+    }
+    const wanted = payload.q > 0 ? payload.q : QUESTIONS
+    const items = seededPick(quizPool(course), wanted, payload.s)
+    if (items.length === 0) {
+      setCodeError('Er zijn nog geen vragen voor deze cursus.')
+      return
+    }
+    setIdx(0)
+    setCorrect(0)
+    setMarks([])
+    setAnswered(null)
+    setReady(false)
+    setCodeError(null)
+    evalRef.current = null
+    sfx('tap')
+    setPhase({ name: 'play', payload, items, theirScore: payload.x })
+  }
+
+  const challengeFriend = () => {
+    const seed = Math.floor(Math.random() * 1e9)
+    startPlay({ c: courseId, s: seed, n: nameOrDefault, x: -1, q: QUESTIONS })
+  }
+
+  /* ---- uitslag van je vriend verwerken (jij speelde deze al) ---- */
+
+  const settle = (p: DuelPayload, mine: OpenDuel) => {
+    const total = Math.max(mine.total, p.q > 0 ? p.q : QUESTIONS)
+    const yours = mine.score
+    const theirs = Math.max(0, p.x)
+    const won = yours > theirs
+    const tie = yours === theirs
+    const xp = won ? 25 : tie ? 15 : 10
+    recordDuel({ opponent: p.n || 'Je vriend', yourScore: yours, theirScore: theirs, total, won, day: today() })
+    awardXp(xp)
+    saveOpen(open.filter((d) => d.s !== mine.s))
+    setCodeInput('')
+    setCodeError(null)
+    if (won) burst()
+    sfx(won ? 'complete' : 'wrong')
+    setPhase({ name: 'settled', opponent: p.n || 'Je vriend', yours, theirs, total, xp })
+  }
+
+  const submitCode = () => {
+    const p = decodeDuel(codeFromInput(codeInput))
+    if (!p) {
+      sfx('wrong')
+      setCodeError('Deze code klopt niet. Plak hem helemaal — de hele link mag ook.')
+      return
+    }
+    const mine = open.find((d) => d.s === p.s)
+    if (mine) {
+      settle(p, mine)
+      return
+    }
+    setCodeInput('')
+    startPlay(p)
+  }
+
+  /* ---- antwoord controleren / doorgaan ---- */
+
+  const onCheck = () => {
+    if (phase.name !== 'play' || !evalRef.current) return
+    const r = evalRef.current()
+    setAnswered(r)
+    setMarks((m) => [...m, r.correct])
+    if (r.correct) {
+      sfx('correct')
+      setCorrect((c) => c + 1)
+    } else {
+      sfx('wrong')
+    }
+  }
+
+  const advance = () => {
+    if (phase.name !== 'play') return
+    setAnswered(null)
+    setReady(false)
+    evalRef.current = null
+
+    if (idx + 1 < phase.items.length) {
+      setIdx(idx + 1)
+      return
+    }
+
+    const total = phase.items.length
+    const score = correct
+    const theirs = phase.theirScore
+    sfx('complete')
+
+    if (theirs >= 0) {
+      // inkomend duel: nu is de uitslag bekend
+      const won = score > theirs
+      const tie = score === theirs
+      const xp = won ? 25 : tie ? 15 : 10
+      recordDuel({ opponent: phase.payload.n || 'Je vriend', yourScore: score, theirScore: theirs, total, won, day: today() })
+      awardXp(xp)
+      if (won) burst()
+      setPhase({ name: 'result', payload: phase.payload, score, total, theirScore: theirs, xp })
+    } else {
+      // je eigen nieuwe duel: jouw ronde zit erop, nu je vriend nog
+      const xp = Math.max(5, score * 2)
+      awardXp(xp)
+      const link = duelLink(encodeDuel({ ...phase.payload, n: nameOrDefault, x: score }))
+      saveOpen([...open.filter((d) => d.s !== phase.payload.s), { s: phase.payload.s, c: phase.payload.c, score, total, link, day: today() }])
+      burst()
+      setPhase({ name: 'result', payload: phase.payload, score, total, theirScore: -1, xp })
+    }
+  }
+
+  const backToHub = () => {
+    setPhase({ name: 'hub' })
+    setHideIncoming(true)
+  }
+
+  /* ================= SPELEN ================= */
+
+  if (phase.name === 'play') {
+    const course = courses[phase.payload.c]
+    const ex = phase.items[idx]
+    const opponentName = phase.theirScore >= 0 ? phase.payload.n || 'Je vriend' : 'Je vriend'
+
+    return (
+      <div className="shell shell--bare" style={{ paddingBottom: 180 }}>
+        <div className="lesson-top" style={{ marginBottom: 16 }}>
+          <button
+            className="btn-quiet"
+            style={{ padding: 8, fontSize: 22, lineHeight: 1 }}
+            onClick={() => setPhase({ name: 'hub' })}
+            aria-label="Duel stoppen"
+          >
+            ×
+          </button>
+          <span className="eyebrow" style={{ whiteSpace: 'nowrap' }}>
+            Vraag {idx + 1}/{phase.items.length}
+          </span>
+          <div className="progress-track">
+            <motion.div
+              className="progress-fill"
+              animate={{ width: `${Math.max(4, (idx / phase.items.length) * 100)}%` }}
+              transition={{ type: 'spring', stiffness: 160, damping: 22 }}
+            />
+          </div>
+          <Flag code={courseFlagCode[phase.payload.c]} size={18} />
+        </div>
+
+        <ScoreBar you={correct} them={phase.theirScore} name={opponentName} total={phase.items.length} />
+
+        <div className="row" style={{ gap: 5, justifyContent: 'center', marginBottom: 18 }}>
+          {phase.items.map((_, i) => (
+            <span
+              key={i}
+              style={{
+                width: 9,
+                height: 9,
+                borderRadius: 999,
+                background:
+                  i < marks.length
+                    ? marks[i]
+                      ? 'var(--ok)'
+                      : 'var(--err)'
+                    : i === marks.length
+                      ? 'var(--gold)'
+                      : 'rgba(255,255,255,0.16)',
+                boxShadow: i === marks.length ? '0 0 10px rgba(255,197,61,0.7)' : undefined,
+              }}
+            />
+          ))}
+        </div>
+
+        <div className="lesson-body" key={idx}>
+          {ex.type === 'select' && <SelectEx ex={ex} ttsLang={course.ttsLang} locked={answered !== null} register={register} />}
+          {ex.type === 'type' && <TypeEx ex={ex} ttsLang={course.ttsLang} locked={answered !== null} register={register} />}
+          {ex.type === 'wordbank' && <WordBankEx ex={ex} ttsLang={course.ttsLang} locked={answered !== null} register={register} />}
+          {ex.type === 'listen' && <ListenEx ex={ex} ttsLang={course.ttsLang} locked={answered !== null} register={register} />}
+          {ex.type === 'fill' && <FillEx ex={ex} ttsLang={course.ttsLang} locked={answered !== null} register={register} />}
+        </div>
+
+        <div className="sheet">
+          <AnimatePresence mode="wait">
+            {answered === null ? (
+              <motion.div key="check" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }} transition={{ duration: 0.18 }}>
+                <div className="sheet-inner">
+                  <button className="btn btn-primary" disabled={!ready} onClick={onCheck}>
+                    Controleren
+                  </button>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div key="fb" initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 30, opacity: 0 }} transition={{ duration: 0.18 }}>
+                <div className={`sheet-inner ${answered.correct ? 'good' : 'bad'}`}>
+                  <p className={`feedback-title ${answered.correct ? 'ok-text' : 'err-text'}`} style={{ marginBottom: 10 }}>
+                    {answered.correct ? 'Punt voor jou!' : 'Punt gemist.'}
+                  </p>
+                  {!answered.correct && answered.correctAnswer && (
+                    <p className="dim" style={{ fontSize: 15, marginBottom: 10, marginTop: -6 }}>
+                      Juiste antwoord: <strong style={{ color: 'var(--text)' }}>{answered.correctAnswer}</strong>
+                    </p>
+                  )}
+                  <button className="btn btn-primary" onClick={advance}>
+                    {idx + 1 === phase.items.length ? 'Naar de uitslag' : 'Volgende vraag'}
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+    )
+  }
+
+  /* ================= UITSLAG NA JOUW RONDE ================= */
+
+  if (phase.name === 'result') {
+    const { score, total, theirScore } = phase
+    const won = theirScore >= 0 && score > theirScore
+    const tie = theirScore >= 0 && score === theirScore
+    const lost = theirScore >= 0 && score < theirScore
+    const opponent = phase.payload.n || 'Je vriend'
+    const returnCode = encodeDuel({ ...phase.payload, n: nameOrDefault, x: score })
+    const link = duelLink(returnCode)
+
+    return (
+      <div className="shell" style={{ paddingTop: 8 }}>
+        <div className="ambient-orb orb-a" />
+        <div className="ambient-orb orb-b" />
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="center">
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <Avatar size={100} mode={lost ? 'idle' : 'cheer'} level={curLevel} courseId={phase.payload.c} look={look} />
+          </div>
+          <p className="eyebrow" style={{ marginTop: 8 }}>
+            {theirScore >= 0 ? 'Duel afgerond' : 'Jouw ronde zit erop'}
+          </p>
+          <h1 className="display" style={{ fontSize: 34, margin: '8px 0' }}>
+            {won ? 'Jij wint! 🏆' : tie ? 'Gelijkspel!' : lost ? 'Verloren — nipt.' : 'Netjes gespeeld!'}
+          </h1>
+
+          {theirScore >= 0 ? (
+            <motion.div
+              className="row"
+              style={{ justifyContent: 'center', gap: 14, margin: '6px 0 4px' }}
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 15 }}
+            >
+              <span className="display hot-text" style={{ fontSize: 52 }}>
+                {score}
+              </span>
+              <span className="faint display" style={{ fontSize: 30 }}>
+                –
+              </span>
+              <span className="display gold-text" style={{ fontSize: 52 }}>
+                {theirScore}
+              </span>
+            </motion.div>
+          ) : (
+            <p className="display gold-text" style={{ fontSize: 48, margin: '6px 0' }}>
+              {score}/{total}
+            </p>
+          )}
+
+          <p className="dim" style={{ fontSize: 15 }}>
+            {theirScore >= 0 ? `Jij tegen ${opponent} · ${total} vragen` : `${score} van de ${total} goed`}
+          </p>
+          <div className="divider-gold" />
+          <p className="gold-text display" style={{ fontSize: 20 }}>
+            +{phase.xp} XP
+          </p>
+        </motion.div>
+
+        <motion.div
+          className="glass"
+          style={{ padding: 20, marginTop: 22 }}
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+        >
+          <strong style={{ fontSize: 16 }}>{theirScore >= 0 ? '📨 Stuur je uitslag terug' : '🔗 Stuur de uitdaging door'}</strong>
+          <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 14px' }}>
+            {theirScore >= 0 ? (
+              <>
+                Stuur deze link terug naar {opponent}. Als {opponent} hem opent, ziet die meteen de uitslag van jullie duel —{' '}
+                {won ? 'en dat jij gewonnen hebt.' : 'inclusief jouw score.'}
+              </>
+            ) : (
+              <>
+                Jij scoorde {score} van de {total}. Stuur deze link naar je vriend: die krijgt exact dezelfde {total} vragen. Speelt die
+                de ronde, dan stuurt hij zijn link terug — plak hem hier en je ziet wie gewonnen heeft.
+              </>
+            )}
+          </p>
+          <ShareBox
+            value={link}
+            copyLabel="Kopieer link"
+            waText={
+              theirScore >= 0
+                ? `Duel gespeeld! Ik scoorde ${score} van de ${total}. Open deze link voor de uitslag: ${link}`
+                : `Ik daag je uit in Fluent! Ik scoorde ${score} van de ${total}. Durf jij? ${link}`
+            }
+          />
+        </motion.div>
+
+        <div style={{ marginTop: 16 }}>
+          <button className="btn btn-ghost" onClick={backToHub}>
+            Klaar
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  /* ================= UITSLAG VIA TERUGGESTUURDE CODE ================= */
+
+  if (phase.name === 'settled') {
+    const won = phase.yours > phase.theirs
+    const tie = phase.yours === phase.theirs
+    return (
+      <div className="shell center" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '80dvh' }}>
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <Avatar size={100} mode={won ? 'cheer' : 'idle'} level={curLevel} courseId={courseId} look={look} />
+          </div>
+          <p className="eyebrow" style={{ marginTop: 8 }}>
+            Antwoord binnen van {phase.opponent}
+          </p>
+          <h1 className="display" style={{ fontSize: 34, margin: '8px 0' }}>
+            {won ? 'Jij wint! 🏆' : tie ? 'Gelijkspel!' : `${phase.opponent} wint.`}
+          </h1>
+          <div className="row" style={{ justifyContent: 'center', gap: 14, margin: '6px 0' }}>
+            <span className="display hot-text" style={{ fontSize: 52 }}>
+              {phase.yours}
+            </span>
+            <span className="faint display" style={{ fontSize: 30 }}>
+              –
+            </span>
+            <span className="display gold-text" style={{ fontSize: 52 }}>
+              {phase.theirs}
+            </span>
+          </div>
+          <p className="dim" style={{ fontSize: 15 }}>
+            Jij tegen {phase.opponent} · {phase.total} vragen
+          </p>
+          <div className="divider-gold" />
+          <p className="gold-text display" style={{ fontSize: 20 }}>
+            +{phase.xp} XP
+          </p>
+          <div style={{ marginTop: 30 }}>
+            <button className="btn btn-primary" onClick={backToHub}>
+              Klaar
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    )
+  }
+
+  /* ================= HUB ================= */
+
+  const openForIncoming = incoming ? open.find((d) => d.s === incoming.s) : undefined
+  const showIncoming = !!incoming && !hideIncoming
+  const history = [...duelHistory].reverse().slice(0, 6)
+
+  return (
+    <div className="shell" style={{ paddingTop: 12 }}>
+      <div className="ambient-orb orb-a" />
+      <div className="ambient-orb orb-b" />
+
+      <div className="spread" style={{ marginBottom: 18 }}>
+        <div>
+          <p className="eyebrow">Vrienden</p>
+          <h1 className="display" style={{ fontSize: 28, margin: '6px 0 0' }}>
+            Duel om de eer
+          </h1>
+        </div>
+        {duelsWon > 0 && (
+          <div className="glass" style={{ padding: '8px 14px', textAlign: 'center' }}>
+            <strong className="display gold-text" style={{ fontSize: 22 }}>
+              {duelsWon}
+            </strong>
+            <p className="stat-label" style={{ marginTop: 0 }}>
+              gewonnen
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* --- uitnodiging uit de link --- */}
+      {showIncoming && incoming && (
+        <motion.div
+          className="glass"
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          style={{
+            padding: 22,
+            marginBottom: 16,
+            borderColor: 'var(--line-hot)',
+            boxShadow: '0 0 30px rgba(236,72,153,0.28)',
+          }}
+        >
+          <div className="row" style={{ gap: 10, marginBottom: 6 }}>
+            <span style={{ fontSize: 26 }}>⚔️</span>
+            <div>
+              <strong style={{ fontSize: 17 }}>{incoming.n || 'Een vriend'} daagt je uit!</strong>
+              <p className="dim" style={{ fontSize: 13 }}>
+                <Flag code={courseFlagCode[incoming.c]} size={13} /> {courses[incoming.c]?.name ?? 'Onbekende cursus'} ·{' '}
+                {incoming.q > 0 ? incoming.q : QUESTIONS} vragen
+              </p>
+            </div>
+          </div>
+          {openForIncoming ? (
+            <>
+              <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 14px' }}>
+                Dit is het antwoord op jouw uitdaging. Jij scoorde {openForIncoming.score} van de {openForIncoming.total} — benieuwd of
+                dat genoeg was?
+              </p>
+              <button className="btn btn-primary" onClick={() => settle(incoming, openForIncoming)}>
+                🥁 Toon de uitslag
+              </button>
+            </>
+          ) : (
+            <>
+              <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 14px' }}>
+                {incoming.x >= 0
+                  ? `${incoming.n || 'Je vriend'} scoorde ${incoming.x} van de ${incoming.q > 0 ? incoming.q : QUESTIONS}. Jij krijgt exact dezelfde vragen — versla die score.`
+                  : 'Jij krijgt exact dezelfde vragen als je vriend. Wie scoort er hoger?'}
+              </p>
+              <button className="btn btn-primary" onClick={() => startPlay(incoming)}>
+                Neem de uitdaging aan
+              </button>
+            </>
+          )}
+          <button className="btn-quiet" style={{ width: '100%', marginTop: 4 }} onClick={() => setHideIncoming(true)}>
+            Later
+          </button>
+        </motion.div>
+      )}
+
+      {/* --- zelf uitdagen --- */}
+      <div className="glass" style={{ padding: 22, marginBottom: 16 }}>
+        <strong style={{ fontSize: 16 }}>⚔️ Daag een vriend uit</strong>
+        <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 14px' }}>
+          Jij speelt eerst {QUESTIONS} vragen in het {courses[courseId].name.toLowerCase()}. Daarna krijg je een link met jouw score
+          erin — stuur die naar je vriend en hij krijgt precies dezelfde vragen. Geen account nodig.
+        </p>
+        <input
+          className="type-input"
+          value={myName}
+          onChange={(e) => setMyName(e.target.value)}
+          placeholder="Jouw naam (optioneel)"
+          maxLength={16}
+          style={{ marginBottom: 12, fontSize: 16 }}
+          aria-label="Jouw naam"
+        />
+        <button className="btn btn-primary" onClick={challengeFriend}>
+          <Flag code={courseFlagCode[courseId]} size={16} /> Start mijn ronde
+        </button>
+      </div>
+
+      {/* --- open uitdagingen --- */}
+      {open.length > 0 && (
+        <div className="glass" style={{ padding: 22, marginBottom: 16 }}>
+          <strong style={{ fontSize: 16 }}>⏳ Wacht op antwoord</strong>
+          <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 12px' }}>
+            Deze uitdagingen staan nog open. Kwijtgeraakt? Kopieer de link hier opnieuw.
+          </p>
+          <div className="col" style={{ gap: 12 }}>
+            {open.map((d) => (
+              <div key={d.s} style={{ borderTop: '1.5px solid var(--line)', paddingTop: 12 }}>
+                <div className="spread" style={{ marginBottom: 8 }}>
+                  <span className="row" style={{ gap: 8, fontSize: 14, fontWeight: 700 }}>
+                    <Flag code={courseFlagCode[d.c]} size={14} /> Jouw score: {d.score}/{d.total}
+                  </span>
+                  <button
+                    className="btn-quiet"
+                    style={{ padding: '4px 8px', fontSize: 18, lineHeight: 1 }}
+                    onClick={() => saveOpen(open.filter((x) => x.s !== d.s))}
+                    aria-label="Uitdaging verwijderen"
+                  >
+                    ×
+                  </button>
+                </div>
+                <ShareBox
+                  value={d.link}
+                  copyLabel="Kopieer link opnieuw"
+                  waText={`Ik daag je uit in Fluent! Ik scoorde ${d.score} van de ${d.total}. Durf jij? ${d.link}`}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* --- code invoeren --- */}
+      <div className="glass" style={{ padding: 22, marginBottom: 16 }}>
+        <strong style={{ fontSize: 16 }}>📥 Code van je vriend</strong>
+        <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 12px' }}>
+          Link of code gekregen? Plak hem hier. Is het een nieuwe uitdaging, dan speel je meteen. Is het het antwoord op jouw
+          uitdaging, dan zie je direct de uitslag.
+        </p>
+        <input
+          className="type-input"
+          value={codeInput}
+          onChange={(e) => {
+            setCodeInput(e.target.value)
+            setCodeError(null)
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && codeInput.trim()) submitCode()
+          }}
+          placeholder="Plak hier de link of code…"
+          autoCapitalize="off"
+          autoCorrect="off"
+          spellCheck={false}
+          style={{ marginBottom: 12, fontSize: 15 }}
+          aria-label="Duel-code van je vriend"
+        />
+        {codeError && (
+          <p style={{ color: 'var(--err)', fontSize: 13.5, marginBottom: 12, fontWeight: 600 }}>
+            {codeError}
+          </p>
+        )}
+        <button className="btn btn-ghost" disabled={codeInput.trim().length === 0} onClick={submitCode}>
+          Duel openen
+        </button>
+      </div>
+
+      {/* --- geschiedenis --- */}
+      <div className="glass" style={{ padding: 22 }}>
+        <strong style={{ fontSize: 16 }}>📜 Laatste duels</strong>
+        {history.length === 0 ? (
+          <p className="dim" style={{ fontSize: 13.5, marginTop: 8 }}>
+            Nog geen duels gespeeld. Daag iemand uit — winnen levert 25 XP op, meedoen altijd nog 10.
+          </p>
+        ) : (
+          <div style={{ marginTop: 10 }}>
+            {history.map((d, i) => (
+              <div
+                key={i}
+                className="spread"
+                style={{ padding: '9px 0', borderTop: i === 0 ? 'none' : '1.5px solid var(--line)' }}
+              >
+                <div>
+                  <strong style={{ fontSize: 14.5 }}>{d.opponent}</strong>
+                  <p className="faint" style={{ fontSize: 12 }}>
+                    {d.day} · {d.total} vragen
+                  </p>
+                </div>
+                <div className="row" style={{ gap: 8 }}>
+                  <span
+                    className="display"
+                    style={{ fontSize: 18, fontWeight: 800, color: d.won ? 'var(--ok)' : d.yourScore === d.theirScore ? 'var(--gold)' : 'var(--err)' }}
+                  >
+                    {d.yourScore}-{d.theirScore}
+                  </span>
+                  <span style={{ fontSize: 15 }}>{d.won ? '🏆' : d.yourScore === d.theirScore ? '🤝' : '💀'}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}

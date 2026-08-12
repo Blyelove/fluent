@@ -12,7 +12,11 @@ export interface AvatarStyle {
   outfit: number
   /** 0 geen · 1 bril · 2 oorbellen · 3 sproeten */
   extra?: number
+  /** 0 man · 1 vrouw */
+  gender?: number
 }
+
+export const GENDER_NAMES = ['Man', 'Vrouw']
 
 export const SKINS = ['#FFE4C8', '#FFDBB4', '#F2C094', '#D9A066', '#B07B4F', '#9C6644', '#6E452C', '#4A2E1C']
 const SKIN_SHADES = ['#F5D2AC', '#EFC392', '#DFA672', '#C48A50', '#96613C', '#7E4E31', '#57351F', '#38200F']
@@ -40,6 +44,7 @@ export function normalizePersona(p?: AvatarStyle | Look | null): AvatarStyle {
     hairColor: clamp(p.hairColor, HAIR_COLORS.length - 1, 1),
     outfit: clamp(p.outfit, OUTFIT_COLORS.length - 1, 0),
     extra: clamp(p.extra, EXTRA_NAMES.length - 1, 0),
+    gender: clamp(p.gender, 1, 0),
   }
 }
 
@@ -436,6 +441,15 @@ export function Avatar({
         <circle cx="90.5" cy="65.8" r="1.5" fill="#fff" />
         <circle cx="116.5" cy="65.8" r="1.5" fill="#fff" />
       </motion.g>
+      {/* wimpers (vrouw) */}
+      {p.gender === 1 && (
+        <g stroke="#2B1A4D" strokeWidth="1.6" strokeLinecap="round">
+          <path d="M79 59 L75 56" />
+          <path d="M81 56.5 L78 53" />
+          <path d="M121 59 L125 56" />
+          <path d="M119 56.5 L122 53" />
+        </g>
+      )}
       {/* mond */}
       <path d="M89 84 Q100 92 111 84" stroke="#B0672E" strokeWidth="3" strokeLinecap="round" fill="none" />
       {/* blos */}

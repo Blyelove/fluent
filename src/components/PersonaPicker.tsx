@@ -1,4 +1,4 @@
-import { Avatar, EXTRA_NAMES, HAIR_COLORS, HAIR_STYLE_NAMES, OUTFIT_COLORS, SKINS, type AvatarStyle } from './Avatar'
+import { Avatar, EXTRA_NAMES, GENDER_NAMES, HAIR_COLORS, HAIR_STYLE_NAMES, OUTFIT_COLORS, SKINS, type AvatarStyle } from './Avatar'
 import { sfx } from '../audio'
 
 /** De personage-maker: 6 haarstijlen × 6 huidskleuren × 6 haarkleuren × 6 outfits = 1.296 combinaties */
@@ -40,6 +40,32 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
           </p>
         </div>
         <div className="col" style={{ gap: 10, flex: 1, minWidth: 0 }}>
+          <div>
+            <p className="eyebrow" style={{ fontSize: 10, marginBottom: 5 }}>
+              Ik ben een...
+            </p>
+            <div className="row" style={{ gap: 8 }}>
+              {GENDER_NAMES.map((name, i) => (
+                <button
+                  key={name}
+                  onClick={() => set({ gender: i, hair: i === 1 ? 1 : 0, extra: i === 1 ? 2 : value.extra })}
+                  style={{
+                    flex: 1,
+                    padding: '8px 10px',
+                    borderRadius: 12,
+                    fontSize: 13.5,
+                    fontWeight: 800,
+                    background: (value.gender ?? 0) === i ? 'var(--grad-hot)' : 'var(--surface-2)',
+                    color: (value.gender ?? 0) === i ? '#fff' : 'var(--text-dim)',
+                    border: (value.gender ?? 0) === i ? 'none' : '1.5px solid var(--line)',
+                    boxShadow: (value.gender ?? 0) === i ? '0 3px 0 #7e22ce' : '0 3px 0 rgba(0,0,0,0.3)',
+                  }}
+                >
+                  {i === 0 ? '♂' : '♀'} {name}
+                </button>
+              ))}
+            </div>
+          </div>
           <div>
             <p className="eyebrow" style={{ fontSize: 10, marginBottom: 5 }}>
               Haarstijl — met jouw kleuren

@@ -1,15 +1,31 @@
+import { useState } from 'react'
 import { courses } from '../content'
 import { courseProgress, totalXp, useStore, wordsLearned } from '../store'
 import { levelProgress, levelTitle, wardrobeFor } from '../levels'
 import { courseFlagCode } from '../countries'
 import { Flag } from '../components/Flag'
 import { Avatar } from '../components/Avatar'
+import { BadgesScreen } from './Badges'
 
 export function ProfileScreen() {
   const state = useStore()
   const course = courses[state.courseId]
   const progress = courseProgress(state, state.courseId)
   const lp = levelProgress(totalXp(state))
+  const [view, setView] = useState<'profiel' | 'badges'>('profiel')
+
+  if (view === 'badges') {
+    return (
+      <div>
+        <div className="shell" style={{ paddingBottom: 0, minHeight: 0 }}>
+          <button className="btn btn-ghost" style={{ padding: 12, fontSize: 14 }} onClick={() => setView('profiel')}>
+            ← Terug naar profiel
+          </button>
+        </div>
+        <BadgesScreen />
+      </div>
+    )
+  }
 
   return (
     <div className="shell">
@@ -33,6 +49,21 @@ export function ProfileScreen() {
           Nog {lp.needed - lp.current} XP tot niveau {lp.level + 1} · {levelTitle(lp.level + 1)}
         </p>
       </div>
+
+      <button
+        className="glass spread"
+        style={{ width: '100%', padding: '16px 18px', marginBottom: 18, textAlign: 'left', borderColor: 'var(--line-hot)' }}
+        onClick={() => setView('badges')}
+      >
+        <span className="row" style={{ gap: 12 }}>
+          <span style={{ fontSize: 24 }}>🏅</span>
+          <span className="col" style={{ gap: 2 }}>
+            <strong style={{ fontSize: 15 }}>Prestaties & badges</strong>
+            <span className="faint" style={{ fontSize: 12.5 }}>Bekijk je verzameling en volgende mijlpalen</span>
+          </span>
+        </span>
+        <span className="hot-text" style={{ fontSize: 20, fontWeight: 800 }}>›</span>
+      </button>
 
       <div className="stat-grid" style={{ marginBottom: 24 }}>
         <div className="glass stat-card">

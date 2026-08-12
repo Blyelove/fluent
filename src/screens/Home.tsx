@@ -1,19 +1,23 @@
 import { useMemo, useState, type CSSProperties, type ReactNode } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
+import confetti from 'canvas-confetti'
 import type { Course, Lesson, Unit } from '../types'
 import { courseList, courses } from '../content'
 import { totalXp, useStore } from '../store'
 import { isDue } from '../srs'
 import { countryStates, courseFlagCode, totalLessons } from '../countries'
 import { levelProgress, levelTitle, nextReward } from '../levels'
+import { LEAGUES, standings, weekIndex, yourRank } from '../leagues'
 import { addDaysStr, daysUntil, goalStatus, suggestGoals, todayStr } from '../goals'
 import { Flag } from '../components/Flag'
 import { Avatar } from '../components/Avatar'
+import { StreakScreen } from './Streak'
 import { sfx } from '../audio'
 
 interface Props {
   onStartLesson: (course: Course, lesson: Lesson) => void
   onReview: () => void
+  onLeague?: () => void
 }
 
 const StarIcon = ({ filled }: { filled?: boolean }) => (
@@ -66,7 +70,7 @@ function GoalRing({ value, goal }: { value: number; goal: number }) {
   )
 }
 
-export function HomeScreen({ onStartLesson, onReview }: Props) {
+export function HomeScreen({ onStartLesson, onReview, onLeague }: Props) {
   const courseId = useStore((s) => s.courseId)
   const setCourse = useStore((s) => s.setCourse)
   const streak = useStore((s) => s.streak)
@@ -82,10 +86,20 @@ export function HomeScreen({ onStartLesson, onReview }: Props) {
   const goals = useStore((s) => s.goals)
   const goalsDoneCount = useStore((s) => s.goalsDone.length)
   const look = useStore((s) => s.avatarLook)
+  const boostUntil = useStore((s) => s.boostUntil)
+  const leagueId = useStore((s) => s.leagueId)
+  const weekXp = useStore((s) => s.weekXp)
+  const weekLessons = useStore((s) => s.weekLessons)
+  const weekArcade = useStore((s) => s.weekArcade)
+  const weekDuels = useStore((s) => s.weekDuels)
+  const weekChestWeek = useStore((s) => s.weekChestWeek)
+  const claimWeekChest = useStore((s) => s.claimWeekChest)
+  const leagueRank = useMemo(() => yourRank(standings(leagueId, weekXp)), [leagueId, weekXp])
   const addGoal = useStore((s) => s.addGoal)
   const removeGoal = useStore((s) => s.removeGoal)
   const [picker, setPicker] = useState(false)
   const [goalModal, setGoalModal] = useState(false)
+  const [streakOpen, setStreakOpen] = useState(false)
 
   const course = courses[courseId]
   const completed = useMemo(() => progressMap[courseId]?.completed ?? [], [progressMap, courseId])
@@ -120,6 +134,8 @@ export function HomeScreen({ onStartLesson, onReview }: Props) {
     return course.sections[course.sections.length - 1]
   }, [course, currentIdx])
 
+  if (streakOpen) return <StreakScreen onBack={() => setStreakOpen(false)} />
+
   return (
     <div className="shell">
       <div className="ambient-orb orb-a" />
@@ -133,12 +149,17 @@ export function HomeScreen({ onStartLesson, onReview }: Props) {
           </span>
         </button>
         <div className="row" style={{ gap: 16 }}>
-          <div className="row" style={{ gap: 5, color: streak > 0 ? 'var(--gold-bright)' : 'var(--text-faint)' }}>
+          <button
+            className="row"
+            style={{ gap: 5, color: streak > 0 ? 'var(--gold-bright)' : 'var(--text-faint)', padding: '6px 4px' }}
+            onClick={() => setStreakOpen(true)}
+            aria-label="Bekijk je reeks"
+          >
             <span className={streak > 0 ? 'flame-active' : ''} style={{ lineHeight: 0 }}>
               <FlameIcon />
             </span>
             <span style={{ fontWeight: 700, fontSize: 15 }}>{streak}</span>
-          </div>
+          </button>
           <GoalRing value={xpShown} goal={dailyGoalXp} />
         </div>
       </header>
@@ -178,6 +199,56 @@ export function HomeScreen({ onStartLesson, onReview }: Props) {
       <p className="dim" style={{ fontSize: 14, marginBottom: 20 }}>
         CEFR-niveau {activeSection.cefr} · {completed.length} van {flat.length} lessen voltooid
       </p>
+
+      {boostUntil > Date.now() && (
+        <motion.div
+          className="glass row"
+          style={{ padding: '12px 16px', marginBottom: 14, gap: 10, borderColor: 'var(--line-gold)' }}
+          animate={{ boxShadow: ['0 0 0 rgba(255,197,61,0)', '0 0 24px rgba(255,197,61,0.45)', '0 0 0 rgba(255,197,61,0)'] }}
+          transition={{ duration: 1.8, repeat: Infinity }}
+        >
+          <span style={{ fontSize: 22 }}>⚡</span>
+          <span className="col" style={{ gap: 1, flex: 1 }}>
+            <strong className="gold-text" style={{ fontSize: 14.5 }}>Dubbele XP actief!</strong>
+            <span className="faint" style={{ fontSize: 12 }}>
+              Nog {Math.max(1, Math.ceil((boostUntil - Date.now()) / 60000))} minuten — speel nu door
+            </span>
+          </span>
+        </motion.div>
+      )}
+
+      {onLeague && (
+        <button
+          className="glass spread"
+          style={{ width: '100%', padding: '14px 16px', marginBottom: 16, textAlign: 'left' }}
+          onClick={onLeague}
+        >
+          <span className="row" style={{ gap: 12 }}>
+            <span
+              style={{
+                width: 38,
+                height: 38,
+                borderRadius: 12,
+                background: LEAGUES[leagueId].color,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 19,
+                flexShrink: 0,
+              }}
+            >
+              🏆
+            </span>
+            <span className="col" style={{ gap: 2 }}>
+              <strong style={{ fontSize: 14.5 }}>{LEAGUES[leagueId].name}-divisie</strong>
+              <span className="faint" style={{ fontSize: 12.5 }}>
+                Plek {leagueRank} van 30 · {weekXp} XP deze week
+              </span>
+            </span>
+          </span>
+          <span className="hot-text" style={{ fontSize: 20, fontWeight: 800 }}>›</span>
+        </button>
+      )}
 
       {(() => {
         const lessonsToday = isToday ? todayLessonsRaw : 0
@@ -230,6 +301,66 @@ export function HomeScreen({ onStartLesson, onReview }: Props) {
             <p className={bonusIn ? 'gold-text' : 'faint'} style={{ fontSize: 12, fontWeight: bonusIn ? 700 : 500, marginTop: 12 }}>
               {bonusIn ? '✦ Bonuskist binnen: +15 XP verdiend!' : 'Voltooi alle drie voor een bonuskist van +15 XP'}
             </p>
+          </div>
+        )
+      })()}
+
+      {(() => {
+        const missies = [
+          { label: 'Verdien 500 XP', have: weekXp, need: 500, icon: '⚡' },
+          { label: 'Voltooi 10 lessen', have: weekLessons, need: 10, icon: '📘' },
+          { label: 'Speel 3 minigames', have: weekArcade, need: 3, icon: '🕹️' },
+          { label: 'Speel 1 duel', have: weekDuels, need: 1, icon: '⚔️' },
+        ]
+        const klaar = missies.filter((m) => m.have >= m.need).length
+        const alles = klaar === missies.length
+        const geopend = weekChestWeek === weekIndex()
+        return (
+          <div className="glass unit-card" style={alles && !geopend ? { borderColor: 'var(--line-gold)' } : undefined}>
+            <div className="spread">
+              <strong style={{ fontSize: 15 }}>🎁 Weekmissies</strong>
+              <span className="gold-text" style={{ fontWeight: 800, fontSize: 14 }}>
+                {klaar} / {missies.length}
+              </span>
+            </div>
+            <div className="col" style={{ gap: 9, marginTop: 13 }}>
+              {missies.map((m) => {
+                const done = m.have >= m.need
+                return (
+                  <div className="row" key={m.label} style={{ gap: 10 }}>
+                    <span style={{ fontSize: 16, width: 22, textAlign: 'center', filter: done ? 'none' : 'grayscale(0.7)' }}>{m.icon}</span>
+                    <span style={{ flex: 1, fontSize: 13.5, fontWeight: 600, color: done ? 'var(--text)' : 'var(--text-dim)' }}>{m.label}</span>
+                    <span className="faint" style={{ fontSize: 11.5, minWidth: 52, textAlign: 'right' }}>
+                      {Math.min(m.have, m.need)}/{m.need}
+                    </span>
+                    <div className="progress-track" style={{ height: 5, width: 52, flex: 'none' }}>
+                      <div className="progress-fill" style={{ width: `${Math.min(100, Math.round((m.have / m.need) * 100))}%` }} />
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+            {alles && !geopend ? (
+              <motion.button
+                className="btn btn-primary"
+                style={{ marginTop: 14 }}
+                animate={{ scale: [1, 1.03, 1] }}
+                transition={{ duration: 1.2, repeat: Infinity }}
+                onClick={() => {
+                  sfx('complete')
+                  confetti({ particleCount: 140, spread: 100, origin: { y: 0.7 }, colors: ['#A855F7', '#EC4899', '#FFC53D', '#22D3EE'], disableForReducedMotion: true })
+                  claimWeekChest()
+                }}
+              >
+                🎁 Open de weekkist · +100 XP
+              </motion.button>
+            ) : (
+              <p className={geopend ? 'gold-text' : 'faint'} style={{ fontSize: 12, fontWeight: geopend ? 700 : 500, marginTop: 12 }}>
+                {geopend
+                  ? '✦ Weekkist geopend: +100 XP en 30 min dubbele XP!'
+                  : 'Alle vier gehaald = 100 XP + 30 minuten dubbele XP'}
+              </p>
+            )}
           </div>
         )
       })()}

@@ -4,6 +4,8 @@ import type { Card } from 'ts-fsrs'
 import type { CourseId } from './types'
 import { newCard, nextCard, isDue } from './srs'
 import { goalStatus, type CompletedGoal, type Goal } from './goals'
+import type { DuelRecord } from './duel'
+import { LEAGUES, weekIndex } from './leagues'
 import type { AvatarStyle, Look } from './components/Avatar'
 import { setSoundEnabled } from './audio'
 
@@ -81,6 +83,42 @@ interface AureaState {
   /** Zelf samengestelde toetsen — resultaat wordt onthouden */
   tests: TestResult[]
 
+  /* ---- competitie ---- */
+  /** Huidige divisie (0 = Brons … 9 = Diamant) */
+  leagueId: number
+  /** Weeknummer waarvoor weekXp geldt */
+  leagueWeek: number
+  /** XP verdiend in de lopende competitieweek */
+  weekXp: number
+  /** Aantal keer gepromoveerd */
+  promotions: number
+
+  /* ---- verzamelen & spelen ---- */
+  /** Aantal foutloze lessen ooit */
+  perfectLessons: number
+  /** Gespeelde minigames */
+  arcadePlays: number
+  /** Hoogste score per minigame */
+  arcadeBest: Record<string, number>
+  /** Gewonnen duels van vrienden */
+  duelsWon: number
+  duelHistory: DuelRecord[]
+  /** Behaalde badge-tiers (voor "nieuw!"-melding) */
+  seenBadgeTiers: Record<string, number>
+
+  /** Actieve XP-boost: tijdstip (ms) waarop hij afloopt */
+  boostUntil: number
+
+  /** Alle dagen waarop je geleerd hebt (YYYY-MM-DD) — voor de streak-kalender */
+  activeDays: string[]
+
+  /* ---- weekmissies ---- */
+  weekLessons: number
+  weekArcade: number
+  weekDuels: number
+  /** Week waarin de grote weekkist al is geopend */
+  weekChestWeek: number
+
   completeOnboarding: (c: CourseId, goalXp: number) => void
   setCourse: (c: CourseId) => void
   completeLesson: (c: CourseId, lessonId: string, xp: number, perfect: boolean) => void
@@ -90,6 +128,13 @@ interface AureaState {
   addGoal: (g: Goal) => void
   removeGoal: (id: string) => void
   addTestResult: (r: TestResult) => void
+  /** XP toekennen buiten lessen om (minigames, duels) — telt mee voor competitie */
+  awardXp: (xp: number, opts?: { arcade?: string; score?: number }) => void
+  recordDuel: (r: DuelRecord) => void
+  /** Grote weekkist openen: +100 XP en 30 minuten dubbele XP */
+  claimWeekChest: () => void
+  startBoost: (minutes: number) => void
+  markBadgesSeen: (map: Record<string, number>) => void
   registerAccount: (email: string, passHash: string, remember: boolean, look: AvatarStyle | Look) => 'ok' | 'bestaat'
   loginAccount: (email: string, passHash: string, remember: boolean) => 'ok' | 'fout'
   logout: () => void
@@ -98,6 +143,50 @@ interface AureaState {
 }
 
 const emptyProgress = (): Progress => ({ xp: 0, completed: [] })
+
+/**
+ * Rolt de competitieweek door als er een nieuwe week is begonnen:
+ * bij genoeg XP promoveer je, bij te weinig zak je terug.
+ * Geeft de bij te werken velden terug (weekXp is dan al gereset).
+ */
+interface WeekState {
+  leagueWeek: number
+  weekXp: number
+  leagueId: number
+  promotions: number
+  weekLessons: number
+  weekArcade: number
+  weekDuels: number
+}
+
+function rollWeek(s: WeekState): WeekState {
+  const now = weekIndex()
+  // let op: alleen de weekvelden teruggeven — een spread van de hele state
+  // zou bij set() de zojuist bijgewerkte voortgang weer overschrijven
+  if (now === s.leagueWeek)
+    return {
+      leagueWeek: s.leagueWeek,
+      weekXp: s.weekXp,
+      leagueId: s.leagueId,
+      promotions: s.promotions,
+      weekLessons: s.weekLessons,
+      weekArcade: s.weekArcade,
+      weekDuels: s.weekDuels,
+    }
+
+  const l = LEAGUES[s.leagueId]
+  // grofweg: bots in deze divisie halen gemiddeld dit per week
+  const par = 320 + s.leagueId * 190
+  let leagueId = s.leagueId
+  let promotions = s.promotions
+  if (l.promote > 0 && s.weekXp >= par * 1.15) {
+    leagueId = Math.min(LEAGUES.length - 1, s.leagueId + 1)
+    if (leagueId !== s.leagueId) promotions += 1
+  } else if (l.demote > 0 && s.weekXp < par * 0.3) {
+    leagueId = Math.max(0, s.leagueId - 1)
+  }
+  return { leagueWeek: now, weekXp: 0, leagueId, promotions, weekLessons: 0, weekArcade: 0, weekDuels: 0 }
+}
 
 export const useStore = create<AureaState>()(
   persist(
@@ -130,6 +219,26 @@ export const useStore = create<AureaState>()(
       goalsDone: [],
       tests: [],
 
+      leagueId: 0,
+      leagueWeek: weekIndex(),
+      weekXp: 0,
+      promotions: 0,
+
+      perfectLessons: 0,
+      arcadePlays: 0,
+      arcadeBest: {},
+      duelsWon: 0,
+      duelHistory: [],
+      seenBadgeTiers: {},
+
+      boostUntil: 0,
+      activeDays: [],
+
+      weekLessons: 0,
+      weekArcade: 0,
+      weekDuels: 0,
+      weekChestWeek: -1,
+
       completeOnboarding: (c, goalXp) => set({ onboarded: true, courseId: c, dailyGoalXp: goalXp }),
 
       setCourse: (c) => set({ courseId: c }),
@@ -157,8 +266,11 @@ export const useStore = create<AureaState>()(
             }
           }
           lastDay = today
-          // elke 7 dagen op rij: een bevriezing erbij (max 2)
-          if (streak > 0 && streak % 7 === 0) freezes = Math.min(2, freezes + 1)
+          // elke 7 dagen op rij een bescherming erbij; het maximum groeit mee met je reeks
+          const maxFreezes = streak >= 100 ? 4 : streak >= 30 ? 3 : 2
+          if (streak > 0 && streak % 7 === 0) freezes = Math.min(maxFreezes, freezes + 1)
+          // extra bescherming cadeau op de grote mijlpalen
+          if ([30, 60, 100, 200, 365].includes(streak)) freezes = Math.min(maxFreezes, freezes + 1)
         }
         if (streak > bestStreak) bestStreak = streak
 
@@ -203,6 +315,10 @@ export const useStore = create<AureaState>()(
           }
         }
 
+        // competitie: alle verdiende XP van deze les telt mee voor de weekstand
+        const gainedTotal = totalXpForCourse - prev.xp
+        const league = rollWeek(s)
+
         set({
           progress: { ...s.progress, [c]: { xp: totalXpForCourse, completed } },
           streak,
@@ -216,6 +332,13 @@ export const useStore = create<AureaState>()(
           questBonusDay,
           goals: remaining,
           goalsDone: [...s.goalsDone, ...doneNow],
+          perfectLessons: s.perfectLessons + (perfect ? 1 : 0),
+          activeDays: s.activeDays.includes(today) ? s.activeDays : [...s.activeDays.slice(-400), today],
+          ...league,
+          weekXp: league.weekXp + gainedTotal,
+          weekLessons: league.weekLessons + 1,
+          // alle dagmissies gehaald? 15 minuten dubbele XP cadeau
+          boostUntil: allQuestsDone && s.questBonusDay !== today ? Date.now() + 15 * 60000 : s.boostUntil,
         })
       },
 
@@ -253,6 +376,60 @@ export const useStore = create<AureaState>()(
       removeGoal: (id) => set({ goals: get().goals.filter((g) => g.id !== id) }),
 
       addTestResult: (r) => set({ tests: [...get().tests.slice(-19), r] }),
+
+      awardXp: (xp, opts) => {
+        const s = get()
+        const today = todayStr()
+        const c = s.courseId
+        const prev = s.progress[c] ?? emptyProgress()
+        const boosted = s.boostUntil > Date.now() ? xp * 2 : xp
+        const league = rollWeek(s)
+        set({
+          progress: { ...s.progress, [c]: { ...prev, xp: prev.xp + boosted } },
+          todayDay: today,
+          todayXp: (s.todayDay === today ? s.todayXp : 0) + boosted,
+          ...league,
+          weekXp: league.weekXp + boosted,
+          weekArcade: league.weekArcade + (opts?.arcade ? 1 : 0),
+          arcadePlays: opts?.arcade ? s.arcadePlays + 1 : s.arcadePlays,
+          arcadeBest: opts?.arcade
+            ? { ...s.arcadeBest, [opts.arcade]: Math.max(s.arcadeBest[opts.arcade] ?? 0, opts.score ?? 0) }
+            : s.arcadeBest,
+        })
+      },
+
+      recordDuel: (r) => {
+        const s = get()
+        const league = rollWeek(s)
+        set({
+          duelHistory: [...s.duelHistory.slice(-19), r],
+          duelsWon: s.duelsWon + (r.won ? 1 : 0),
+          ...league,
+          weekDuels: league.weekDuels + 1,
+        })
+      },
+
+      claimWeekChest: () => {
+        const s = get()
+        const week = weekIndex()
+        if (s.weekChestWeek === week) return
+        const c = s.courseId
+        const prev = s.progress[c] ?? emptyProgress()
+        const league = rollWeek(s)
+        set({
+          progress: { ...s.progress, [c]: { ...prev, xp: prev.xp + 100 } },
+          ...league,
+          weekXp: league.weekXp + 100,
+          todayXp: s.todayDay === todayStr() ? s.todayXp + 100 : 100,
+          todayDay: todayStr(),
+          weekChestWeek: week,
+          boostUntil: Math.max(s.boostUntil, Date.now() + 30 * 60000),
+        })
+      },
+
+      startBoost: (minutes) => set({ boostUntil: Date.now() + minutes * 60000 }),
+
+      markBadgesSeen: (map) => set({ seenBadgeTiers: { ...get().seenBadgeTiers, ...map } }),
 
       registerAccount: (email, passHash, remember, look) => {
         const key = email.trim().toLowerCase()
@@ -319,6 +496,22 @@ export const useStore = create<AureaState>()(
           goals: [],
           goalsDone: [],
           tests: [],
+          leagueId: 0,
+          leagueWeek: weekIndex(),
+          weekXp: 0,
+          promotions: 0,
+          perfectLessons: 0,
+          arcadePlays: 0,
+          arcadeBest: {},
+          duelsWon: 0,
+          duelHistory: [],
+          seenBadgeTiers: {},
+          boostUntil: 0,
+          activeDays: [],
+          weekLessons: 0,
+          weekArcade: 0,
+          weekDuels: 0,
+          weekChestWeek: -1,
         }),
     }),
     { name: 'aurea-v1' }
