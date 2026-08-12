@@ -5,6 +5,7 @@ import type { Course } from '../types'
 import { courses } from '../content'
 import { useStore } from '../store'
 import { sfx, speak } from '../audio'
+import { ShareButton } from '../components/ShareButton'
 
 /* ============================================================
    De speelhal: drie minigames met woorden uit je eigen cursus.
@@ -1231,6 +1232,18 @@ function Result({
           >
             🔁 Nog een keer
           </button>
+          <ShareButton
+            label={phase.record ? 'Deel je record' : 'Deel je score'}
+            kaart={{
+              icoon: phase.record ? '🏆' : def.emoji,
+              waarde: String(phase.score),
+              label: `punten · ${def.name}`,
+              onderschrift: phase.record ? 'Nieuw persoonlijk record' : `Beste ooit: ${best}`,
+              bericht: phase.record
+                ? `Nieuw record bij ${def.name}: ${phase.score} punten in Fluent!`
+                : `${phase.score} punten bij ${def.name} in Fluent!`,
+            }}
+          />
           <button
             className="btn btn-ghost"
             onClick={() => {

@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import { motion } from 'motion/react'
 import { useStore } from '../store'
+import { courses } from '../content'
+import { ShareButton } from '../components/ShareButton'
 
 /** Mijlpalen in de reeks — elk met een beloning die je echt krijgt */
 const MILESTONES: { days: number; naam: string; beloning: string }[] = [
@@ -52,6 +54,8 @@ export function StreakScreen({ onBack }: { onBack?: () => void }) {
   const bestStreak = useStore((s) => s.bestStreak)
   const freezes = useStore((s) => s.freezes)
   const activeDays = useStore((s) => s.activeDays)
+  const courseId = useStore((s) => s.courseId)
+  const course = courses[courseId]
   const [monthOffset, setMonthOffset] = useState(0)
 
   const active = useMemo(() => new Set(activeDays), [activeDays])
@@ -111,6 +115,22 @@ export function StreakScreen({ onBack }: { onBack?: () => void }) {
           </p>
         )}
       </div>
+
+      {streak > 0 && (
+        <div style={{ marginBottom: 18 }}>
+          <ShareButton
+            variant="primary"
+            label="Deel je reeks"
+            kaart={{
+              icoon: '🔥',
+              waarde: String(streak),
+              label: streak === 1 ? 'dag op rij' : 'dagen op rij',
+              onderschrift: `${course.name} · ${flame.naam}`,
+              bericht: `Ik zit op ${streak} ${streak === 1 ? 'dag' : 'dagen'} op rij ${course.name} leren met Fluent!`,
+            }}
+          />
+        </div>
+      )}
 
       <div className="stat-grid" style={{ marginBottom: 20 }}>
         <div className="glass stat-card">
