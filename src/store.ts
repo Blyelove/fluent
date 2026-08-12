@@ -5,6 +5,7 @@ import type { CourseId } from './types'
 import { newCard, nextCard, isDue } from './srs'
 import { goalStatus, type CompletedGoal, type Goal } from './goals'
 import type { DuelRecord } from './duel'
+import { mistakeKey, type MistakeRef } from './mistakes'
 import { LEAGUES, weekIndex } from './leagues'
 import type { AvatarStyle, Look } from './components/Avatar'
 import { setSoundEnabled } from './audio'
@@ -112,6 +113,9 @@ interface AureaState {
   /** Alle dagen waarop je geleerd hebt (YYYY-MM-DD) — voor de streak-kalender */
   activeDays: string[]
 
+  /** Oefeningen die je fout had, om gericht te herhalen */
+  mistakes: MistakeRef[]
+
   /* ---- weekmissies ---- */
   weekLessons: number
   weekArcade: number
@@ -133,6 +137,10 @@ interface AureaState {
   recordDuel: (r: DuelRecord) => void
   /** Grote weekkist openen: +100 XP en 30 minuten dubbele XP */
   claimWeekChest: () => void
+  /** Een fout onthouden zodat je hem gericht kunt herhalen */
+  addMistake: (c: CourseId, lessonId: string, index: number) => void
+  /** Fout weghalen zodra je hem in een fouten-sessie goed hebt */
+  clearMistake: (key: string) => void
   startBoost: (minutes: number) => void
   markBadgesSeen: (map: Record<string, number>) => void
   registerAccount: (email: string, passHash: string, remember: boolean, look: AvatarStyle | Look) => 'ok' | 'bestaat'
@@ -233,6 +241,7 @@ export const useStore = create<AureaState>()(
 
       boostUntil: 0,
       activeDays: [],
+      mistakes: [],
 
       weekLessons: 0,
       weekArcade: 0,
@@ -427,6 +436,24 @@ export const useStore = create<AureaState>()(
         })
       },
 
+      addMistake: (c, lessonId, index) => {
+        const s = get()
+        const key = mistakeKey({ c, l: lessonId, i: index })
+        const bestaand = s.mistakes.find((m) => mistakeKey(m) === key)
+        if (bestaand) {
+          set({
+            mistakes: s.mistakes.map((m) => (mistakeKey(m) === key ? { ...m, n: m.n + 1, t: Date.now() } : m)),
+          })
+          return
+        }
+        // hoogstens 60 bewaren: de oudste valt af zodat de opslag klein blijft
+        const nieuw: MistakeRef = { c, l: lessonId, i: index, n: 1, t: Date.now() }
+        const lijst = [...s.mistakes, nieuw]
+        set({ mistakes: lijst.length > 60 ? lijst.slice(lijst.length - 60) : lijst })
+      },
+
+      clearMistake: (key) => set({ mistakes: get().mistakes.filter((m) => mistakeKey(m) !== key) }),
+
       startBoost: (minutes) => set({ boostUntil: Date.now() + minutes * 60000 }),
 
       markBadgesSeen: (map) => set({ seenBadgeTiers: { ...get().seenBadgeTiers, ...map } }),
@@ -508,6 +535,7 @@ export const useStore = create<AureaState>()(
           seenBadgeTiers: {},
           boostUntil: 0,
           activeDays: [],
+          mistakes: [],
           weekLessons: 0,
           weekArcade: 0,
           weekDuels: 0,

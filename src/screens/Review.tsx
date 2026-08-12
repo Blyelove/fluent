@@ -5,6 +5,7 @@ import type { Course, Exercise, Select, TypeAnswer, Unit } from '../types'
 import { courses } from '../content'
 import { useStore } from '../store'
 import { nextDueDate } from '../srs'
+import { mistakeKey, resolveMistake, sorteerFouten, type MistakeRef } from '../mistakes'
 import { levelForXp } from '../levels'
 import { totalXp } from '../store'
 import { sfx } from '../audio'
@@ -32,13 +33,19 @@ function courseVocab(course: Course): { word: string; nl: string }[] {
 interface Item {
   /** srs-sleutel — alleen bij herhaal-modus */
   key?: string
+  /** sleutel van de bewaarde fout — alleen bij de fouten-modus */
+  mistakeKey?: string
+  /** waar deze fout vandaan komt, om te tonen tijdens het oefenen */
+  bron?: string
   ex: Exercise
 }
 
+type Mode = 'srs' | 'test' | 'fouten'
+
 type Phase =
   | { name: 'hub' }
-  | { name: 'run'; mode: 'srs' | 'test'; items: Item[]; label: string }
-  | { name: 'done'; mode: 'srs' | 'test'; correct: number; total: number; label: string; passed: boolean }
+  | { name: 'run'; mode: Mode; items: Item[]; label: string }
+  | { name: 'done'; mode: Mode; correct: number; total: number; label: string; passed: boolean }
 
 export function ReviewScreen() {
   const courseId = useStore((s) => s.courseId)
@@ -47,6 +54,8 @@ export function ReviewScreen() {
   const addTestResult = useStore((s) => s.addTestResult)
   const srs = useStore((s) => s.srs)
   const tests = useStore((s) => s.tests)
+  const mistakes = useStore((s) => s.mistakes)
+  const clearMistake = useStore((s) => s.clearMistake)
   const curLevel = useStore((s) => levelForXp(totalXp(s)))
   const look = useStore((s) => s.avatarLook)
 
@@ -68,12 +77,22 @@ export function ReviewScreen() {
 
   const allUnits = useMemo(() => course.sections.flatMap((s) => s.units), [course])
 
+  /** Jouw eigen fouten, hardnekkigste eerst, met de bijbehorende oefening erbij */
+  const mijnFouten = useMemo(() => {
+    const uit: { ref: MistakeRef; ex: Exercise; bron: string }[] = []
+    for (const ref of sorteerFouten(mistakes.filter((m) => m.c === courseId))) {
+      const gevonden = resolveMistake(course, ref)
+      if (gevonden) uit.push({ ref, ex: gevonden.ex, bron: gevonden.unitTitle })
+    }
+    return uit
+  }, [mistakes, courseId, course])
+
   const register = useCallback((r: Registration) => {
     evalRef.current = r.evaluate
     setReady(r.ready)
   }, [])
 
-  const startSession = (mode: 'srs' | 'test', items: Item[], label: string) => {
+  const startSession = (mode: Mode, items: Item[], label: string) => {
     setIdx(0)
     setCorrectCount(0)
     setAnswered(null)
@@ -103,6 +122,16 @@ export function ReviewScreen() {
     startSession('srs', items, 'Herhaling')
   }
 
+  const startFouten = () => {
+    const items: Item[] = mijnFouten.slice(0, 12).map(({ ref, ex, bron }) => ({
+      mistakeKey: mistakeKey(ref),
+      bron,
+      ex,
+    }))
+    if (items.length === 0) return
+    startSession('fouten', items, 'Jouw fouten')
+  }
+
   const startTest = (units: Unit[]) => {
     const eligible: Exercise[] = []
     for (const u of units) for (const l of u.lessons) for (const e of l.exercises) if (e.type !== 'new' && e.type !== 'match') eligible.push(e)
@@ -119,6 +148,8 @@ export function ReviewScreen() {
     setAnswered(r)
     const item = phase.items[idx]
     if (phase.mode === 'srs' && item.key) reviewWord(item.key, r.correct)
+    // fout eindelijk goed? dan verdwijnt hij uit je foutenlijst
+    if (phase.mode === 'fouten' && item.mistakeKey && r.correct) clearMistake(item.mistakeKey)
     if (r.correct) {
       sfx('correct')
       setCorrectCount((c) => c + 1)
@@ -135,9 +166,14 @@ export function ReviewScreen() {
     if (idx + 1 >= phase.items.length) {
       const total = phase.items.length
       const finalCorrect = correctCount
-      if (phase.mode === 'srs') {
-        addReviewXp(courseId, Math.max(2, finalCorrect * 2))
-        setPhase({ name: 'done', mode: 'srs', correct: finalCorrect, total, label: phase.label, passed: true })
+      if (phase.mode === 'srs' || phase.mode === 'fouten') {
+        // fouten wegwerken levert extra op: dit is het waardevolste oefenwerk
+        const xp = phase.mode === 'fouten' ? Math.max(4, finalCorrect * 4) : Math.max(2, finalCorrect * 2)
+        addReviewXp(courseId, xp)
+        if (phase.mode === 'fouten' && finalCorrect === total && total > 0) {
+          confetti({ particleCount: 120, spread: 100, origin: { y: 0.6 }, colors: ['#A855F7', '#EC4899', '#FFC53D', '#22D3EE'], disableForReducedMotion: true })
+        }
+        setPhase({ name: 'done', mode: phase.mode, correct: finalCorrect, total, label: phase.label, passed: true })
       } else {
         const passed = finalCorrect >= Math.ceil(total * 0.8)
         addReviewXp(courseId, finalCorrect * 2 + (passed ? 10 : 0))
@@ -170,6 +206,35 @@ export function ReviewScreen() {
         <h1 className="display" style={{ fontSize: 30, margin: '8px 0 20px' }}>
           Train jezelf
         </h1>
+
+        {mijnFouten.length > 0 && (
+          <div className="glass" style={{ padding: 22, marginBottom: 16, borderColor: 'var(--line-hot)' }}>
+            <div className="spread">
+              <strong style={{ fontSize: 16 }}>🎯 Jouw fouten</strong>
+              <span className="hot-text" style={{ fontWeight: 800 }}>
+                {mijnFouten.length}
+              </span>
+            </div>
+            <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 12px' }}>
+              Precies de vragen waar jij op struikelde, de hardnekkigste eerst. Heb je er één goed, dan verdwijnt hij uit je lijst —
+              en fouten wegwerken levert dubbele punten op.
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 14 }}>
+              {[...new Set(mijnFouten.map((f) => f.bron))].slice(0, 4).map((b) => (
+                <span
+                  key={b}
+                  className="faint"
+                  style={{ fontSize: 11.5, padding: '4px 10px', borderRadius: 999, border: '1px solid var(--line)' }}
+                >
+                  {b}
+                </span>
+              ))}
+            </div>
+            <button className="btn btn-primary" onClick={startFouten}>
+              Werk je fouten weg
+            </button>
+          </div>
+        )}
 
         <div className="glass" style={{ padding: 22, marginBottom: 16 }}>
           <div className="spread">
@@ -261,19 +326,35 @@ export function ReviewScreen() {
             {phase.label}
           </p>
           <h1 className="display" style={{ fontSize: 34, margin: '10px 0' }}>
-            {phase.mode === 'srs'
+            {phase.mode === 'fouten'
               ? phase.correct === phase.total
-                ? 'IJzersterk geheugen.'
-                : 'Weer wat steviger.'
-              : phase.passed
-                ? 'Geslaagd!'
-                : 'Net niet — probeer opnieuw.'}
+                ? 'Alles rechtgezet!'
+                : 'Weer een paar minder.'
+              : phase.mode === 'srs'
+                ? phase.correct === phase.total
+                  ? 'IJzersterk geheugen.'
+                  : 'Weer wat steviger.'
+                : phase.passed
+                  ? 'Geslaagd!'
+                  : 'Net niet — probeer opnieuw.'}
           </h1>
           <div className="divider-gold" />
           <p className="dim" style={{ fontSize: 16 }}>
             {phase.correct} van {phase.total} goed · +
-            {phase.mode === 'srs' ? Math.max(2, phase.correct * 2) : phase.correct * 2 + (phase.passed ? 10 : 0)} XP
+            {phase.mode === 'fouten'
+              ? Math.max(4, phase.correct * 4)
+              : phase.mode === 'srs'
+                ? Math.max(2, phase.correct * 2)
+                : phase.correct * 2 + (phase.passed ? 10 : 0)}{' '}
+            XP
           </p>
+          {phase.mode === 'fouten' && (
+            <p className="faint" style={{ fontSize: 13, marginTop: 6 }}>
+              {phase.correct === phase.total
+                ? 'Deze vragen staan niet meer op je foutenlijst.'
+                : `${phase.correct} van je fouten zijn weg. De rest komt terug tot je ze beheerst.`}
+            </p>
+          )}
           {phase.mode === 'test' && !phase.passed && (
             <p className="faint" style={{ fontSize: 13, marginTop: 6 }}>
               Je hebt {Math.ceil(phase.total * 0.8)} goede antwoorden nodig om te slagen.
@@ -306,7 +387,7 @@ export function ReviewScreen() {
           ×
         </button>
         <span className="eyebrow" style={{ whiteSpace: 'nowrap' }}>
-          {phase.mode === 'srs' ? 'Herhaling' : 'Toets'}
+          {phase.mode === 'srs' ? 'Herhaling' : phase.mode === 'fouten' ? 'Jouw fouten' : 'Toets'}
         </span>
         <div className="progress-track">
           <motion.div
@@ -342,7 +423,17 @@ export function ReviewScreen() {
             <motion.div key="fb" initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 30, opacity: 0 }} transition={{ duration: 0.18 }}>
               <div className={`sheet-inner ${answered.correct ? 'good' : 'bad'}`}>
                 <p className={`feedback-title ${answered.correct ? 'ok-text' : 'err-text'}`} style={{ marginBottom: 10 }}>
-                  {answered.correct ? (phase.mode === 'srs' ? 'Onthouden.' : 'Goed!') : phase.mode === 'srs' ? 'Deze komt sneller terug.' : 'Helaas.'}
+                  {answered.correct
+                    ? phase.mode === 'fouten'
+                      ? 'Rechtgezet!'
+                      : phase.mode === 'srs'
+                        ? 'Onthouden.'
+                        : 'Goed!'
+                    : phase.mode === 'fouten'
+                      ? 'Deze houden we nog even vast.'
+                      : phase.mode === 'srs'
+                        ? 'Deze komt sneller terug.'
+                        : 'Helaas.'}
                 </p>
                 {!answered.correct && answered.correctAnswer && (
                   <p className="dim" style={{ fontSize: 15, marginBottom: 10, marginTop: -6 }}>

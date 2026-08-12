@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import confetti from 'canvas-confetti'
 import type { Course, Exercise, Lesson, UnitGuide } from '../types'
 import { loadGuides, pickRule } from '../content/guides'
+import { isHerhaalbaar } from '../mistakes'
 import { courseProgress, totalXp, useStore } from '../store'
 import { levelForXp, levelReward, levelTitle } from '../levels'
 import { countryStates, courseFlagCode, type CountryState } from '../countries'
@@ -78,6 +79,7 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
 
   const learnWord = useStore((s) => s.learnWord)
   const completeLesson = useStore((s) => s.completeLesson)
+  const addMistake = useStore((s) => s.addMistake)
   const alreadyDone = useStore((s) => courseProgress(s, course.id).completed.includes(lesson.id))
   const completedNow = useStore((s) => s.progress[course.id]?.completed ?? GEEN_LESSEN)
 
@@ -130,6 +132,9 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
         sfx('wrong')
         setCombo(0)
         setMistakes((m) => m + 1)
+        // onthouden zodat je hem later gericht kunt herhalen
+        const positie = lesson.exercises.indexOf(ex)
+        if (positie >= 0 && isHerhaalbaar(ex)) addMistake(course.id, lesson.id, positie)
         if (!retried.current.has(ex)) {
           retried.current.add(ex)
           setItems((arr) => [...arr, ex])
