@@ -13,7 +13,7 @@ const GOALS = [
   { xp: 60, label: 'Gedreven', sub: '±15 min per dag' },
 ]
 
-export function Onboarding() {
+export function Onboarding({ onKlaar }: { onKlaar?: (c: CourseId) => void }) {
   const completeOnboarding = useStore((s) => s.completeOnboarding)
   const [step, setStep] = useState(0)
   const [courseId, setCourseId] = useState<CourseId | null>(null)
@@ -93,7 +93,11 @@ export function Onboarding() {
                   className="opt"
                   onClick={() => {
                     sfx('tap')
-                    if (courseId) completeOnboarding(courseId, g.xp)
+                    if (!courseId) return
+                    completeOnboarding(courseId, g.xp)
+                    // meteen de eerste les in: het startscherm vol tellers heeft
+                    // pas betekenis als je je eerste woorden geleerd hebt
+                    onKlaar?.(courseId)
                   }}
                 >
                   <span className="col" style={{ gap: 2, flex: 1 }}>
@@ -109,7 +113,7 @@ export function Onboarding() {
               ))}
             </div>
             <p className="faint center" style={{ fontSize: 13, marginTop: 22 }}>
-              Je kunt dit later altijd aanpassen.
+              Kies en je eerste woorden beginnen meteen. Je kunt dit later altijd aanpassen.
             </p>
           </motion.div>
         )}

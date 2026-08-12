@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type ComponentType } from 'react'
 import type { Course, Lesson } from './types'
+import { courses } from './content'
 import { dueEntries, useStore } from './store'
 import { initAudioManifest, initVoices, setSoundEnabled } from './audio'
 import { LEAGUES, standings, yourRank } from './leagues'
@@ -90,7 +91,17 @@ export default function App() {
   }
   if (!currentUser || (!rememberMe && !sessionOk)) return <AuthScreen />
 
-  if (!onboarded) return <Onboarding />
+  if (!onboarded)
+    return (
+      <Onboarding
+        onKlaar={(c) => {
+          // rechtstreeks de eerste les van de gekozen cursus starten
+          const cursus = courses[c]
+          const eerste = cursus?.sections[0]?.units[0]?.lessons[0]
+          if (cursus && eerste) setLesson({ course: cursus, lesson: eerste })
+        }}
+      />
+    )
 
   if (lesson) {
     return (

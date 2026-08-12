@@ -14,7 +14,7 @@ Fluent heeft een kern die al als topspel voelt — chunky leslus met combo's en 
 
 **Bewijs:** Open een duel-link, speel hem, wissel tab heen en terug en herlaad: de uitdaging verschijnt niet opnieuw en XP stijgt maar één keer.
 
-### 2. Laatste onboarding-tik start direct les 1: in Onboarding.tsx r96 na completeOnboarding meteen onStartLesson met flat[0] aanroepen ('Je eerste woorden — daar gaan we'), zodat de gebruiker Home pas ziet ná zijn eerste lesvoltooiing, wanneer de tellers iets betekenen.
+### 2. ✅ AF (ronde 32) — Laatste onboarding-tik start direct les 1: in Onboarding.tsx r96 na completeOnboarding meteen onStartLesson met flat[0] aanroepen ('Je eerste woorden — daar gaan we'), zodat de gebruiker Home pas ziet ná zijn eerste lesvoltooiing, wanneer de tellers iets betekenen.
 
 **Bewijs:** Verse gebruiker: tik op een tempo en zit binnen één seconde in oefening 1 zonder Home te zien.
 
@@ -54,7 +54,7 @@ Fluent heeft een kern die al als topspel voelt — chunky leslus met combo's en 
 
 **Bewijs:** Activeer een boost, rond een les af: het getal op het resultaatscherm is exact gelijk aan de XP-stijging in de store.
 
-### 12. Personagemaker uit de kritieke route: PersonaPicker r93-133 zet 250+ helden vóór de startknop. Vul standaard een willekeurige passende held in met grote '🎲 Verras me'-knop; de volledige galerij ingeklapt achter 'Zelf samenstellen (300.000+ combinaties)' en bereikbaar via Profiel (setAvatarLook bestaat al).
+### 12. ✅ DEELS AF (ronde 32) — "🎲 Verras me" toegevoegd; de galerij blijft bewust volledig zichtbaar in een scrollvak, want verstoppen was juist de klacht. Personagemaker uit de kritieke route: PersonaPicker r93-133 zet 250+ helden vóór de startknop. Vul standaard een willekeurige passende held in met grote '🎲 Verras me'-knop; de volledige galerij ingeklapt achter 'Zelf samenstellen (300.000+ combinaties)' en bereikbaar via Profiel (setAvatarLook bestaat al).
 
 **Bewijs:** Verse gebruiker passeert het personagescherm in twee tikken (Verras me → verder); de galerij opent nog volledig via de inklap en via Profiel.
 

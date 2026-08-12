@@ -82,9 +82,30 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
         ))}
       </div>
 
-      <p className="eyebrow" style={{ fontSize: 10, marginBottom: 6 }}>
-        Stap 2: kies je held ({helden.length} karakters)
-      </p>
+      <div className="spread" style={{ marginBottom: 6 }}>
+        <p className="eyebrow" style={{ fontSize: 10 }}>
+          Stap 2: kies je held ({helden.length} karakters)
+        </p>
+        <button
+          onClick={() => {
+            sfx('tap')
+            const kies = helden[Math.floor(Math.random() * helden.length)]
+            if (kies) onChange({ ...kies.stijl })
+          }}
+          style={{
+            padding: '6px 12px',
+            borderRadius: 999,
+            fontSize: 12,
+            fontWeight: 800,
+            background: 'var(--surface-2)',
+            border: '1.5px solid var(--line-hot)',
+            color: 'var(--hot2)',
+            minHeight: 32,
+          }}
+        >
+          🎲 Verras me
+        </button>
+      </div>
       <p className="faint" style={{ fontSize: 11.5, marginBottom: 10 }}>
         Allemaal uniek en direct te kiezen. Onderaan stel je hem zelf samen uit ruim 300.000 combinaties.
       </p>
