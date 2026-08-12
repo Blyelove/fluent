@@ -18,6 +18,31 @@ type QuizEx = Select | TypeAnswer | Listen | Fill | WordBank
 
 const QUESTIONS = 10
 
+/**
+ * Oefentegenstanders voor wie (nog) geen vriend met de app heeft. Zonder hen
+ * was de weekmissie "speel 1 duel" — en dus de weekkist — in je eentje
+ * onhaalbaar: een beloning beloven die je niet kúnt verdienen voelt als straf.
+ * Elke bot "speelt" zijn ronde met een eigen trefkans, dus de uitslag is elke
+ * keer anders en winnen blijft spannend.
+ */
+const BOTS = [
+  { naam: '🤖 Robo Rens', kans: 0.5, uitleg: 'Warmt nog op — lekker om tegen te beginnen' },
+  { naam: '🤖 Turbo Tessa', kans: 0.68, uitleg: 'Scherp — je moet er echt voor spelen' },
+  { naam: '🤖 Meester Milan', kans: 0.85, uitleg: 'Verslaat bijna iedereen — durf jij?' },
+] as const
+
+/** Herkent een bot-tegenstander aan de naam in de duel-payload */
+function isBotNaam(n?: string): boolean {
+  return !!n && n.startsWith('🤖')
+}
+
+/** Speelt de ronde van de bot: per vraag een kansje, net als een echte tegenstander */
+function botScore(kans: number, totaal: number): number {
+  let goed = 0
+  for (let i = 0; i < totaal; i++) if (Math.random() < kans) goed++
+  return goed
+}
+
 /* ---------- open uitdagingen (wachten op antwoord van je vriend) ---------- */
 
 interface OpenDuel {
@@ -356,6 +381,12 @@ export function DuelScreen({
     startPlay({ c: courseId, s: seed, n: nameOrDefault, x: -1, q: QUESTIONS })
   }
 
+  /** Oefenduel: de bot heeft zijn ronde al "gespeeld", jij moet zijn score kloppen */
+  const challengeBot = (bot: (typeof BOTS)[number]) => {
+    const seed = Math.floor(Math.random() * 1e9)
+    startPlay({ c: courseId, s: seed, n: bot.naam, x: botScore(bot.kans, QUESTIONS), q: QUESTIONS })
+  }
+
   /* ---- uitslag van je vriend verwerken (jij speelde deze al) ---- */
 
   const settle = (p: DuelPayload, mine: OpenDuel) => {
@@ -645,6 +676,31 @@ export function DuelScreen({
           </p>
         </motion.div>
 
+        {isBotNaam(phase.payload.n) ? (
+          <motion.div
+            className="glass"
+            style={{ padding: 20, marginTop: 22 }}
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+          >
+            <strong style={{ fontSize: 16 }}>{won ? '👑 Verslagen!' : 'Nog een keer?'}</strong>
+            <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 14px' }}>
+              {won
+                ? `Jij hebt ${opponent} verslagen. Er staat vast een sterkere bot voor je klaar — of daag een echte vriend uit.`
+                : `${opponent} speelt elke ronde anders. Nog een keer proberen — of pak een makkelijkere bot?`}
+            </p>
+            <button
+              className="btn btn-primary"
+              onClick={() => {
+                const bot = BOTS.find((b) => b.naam === phase.payload.n) ?? BOTS[0]
+                challengeBot(bot)
+              }}
+            >
+              ⚔️ Revanche tegen {opponent.replace('🤖 ', '')}
+            </button>
+          </motion.div>
+        ) : (
         <motion.div
           className="glass"
           style={{ padding: 20, marginTop: 22 }}
@@ -676,6 +732,7 @@ export function DuelScreen({
             }
           />
         </motion.div>
+        )}
 
         <div style={{ marginTop: 16 }}>
           <button className="btn btn-ghost" onClick={backToHub}>
@@ -839,6 +896,32 @@ export function DuelScreen({
             Later
           </button>
         </motion.div>
+      )}
+
+      {/* --- oefenduel tegen een bot: de weekmissie is ook zonder vrienden haalbaar --- */}
+      {myPoolSize > 0 && (
+        <div className="glass" style={{ padding: 22, marginBottom: 16, borderColor: 'var(--line-hot)' }}>
+          <div className="spread">
+            <strong style={{ fontSize: 16 }}>🤖 Oefenduel</strong>
+            <span className="faint" style={{ fontSize: 11.5 }}>telt mee voor je weekmissie</span>
+          </div>
+          <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 14px' }}>
+            Geen vriend bij de hand? Deze drie spelen altijd mee. Ze maken hun eigen fouten — elke ronde is anders.
+          </p>
+          <div className="col" style={{ gap: 10 }}>
+            {BOTS.map((bot) => (
+              <button
+                key={bot.naam}
+                className="opt"
+                style={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center', gap: 10 }}
+                onClick={() => challengeBot(bot)}
+              >
+                <span style={{ fontWeight: 800, whiteSpace: 'nowrap' }}>{bot.naam}</span>
+                <span className="faint" style={{ fontSize: 12, textAlign: 'right' }}>{bot.uitleg}</span>
+              </button>
+            ))}
+          </div>
+        </div>
       )}
 
       {/* --- zelf uitdagen --- */}
