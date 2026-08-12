@@ -301,17 +301,24 @@ wat je onderweg zelf vindt.
       vaardigheidsniveau in die talen stijgt mee · het ontdekmoment vlak na
       "Begrepen" bij een nieuw woord, met confetti · de verzameling in het
       vaardighedenpaneel met een teller en terugkijkbare families.
-   GEMETEN BASELINE (ronde 62, 113 families over 625 nieuwe woorden):
-      Portugees 31%, Italiaans 26%, Spaans 25%, Frans 23%, Engels 14%,
-      Duits 10% van de nieuwe woorden heeft een familie, en 54 van de 113
-      families zijn via een les bereikbaar. Meet dit opnieuw als je families
-      toevoegt (klein scriptje over courseList met familieVan) en rapporteer
-      het percentage; zo blijft zichtbaar of je uitbreiding echt landt.
+   GEMETEN STAND (ronde 62c, zelf nagemeten: 160 families, gemiddeld 4,94
+      talen per familie, over 625 nieuwe woorden): Portugees 59%, Italiaans
+      55%, Spaans 54%, Frans 54%, Engels 27%, Duits 21%, en 100 van de 160
+      families zijn via een les bereikbaar. Meet dit opnieuw bij elke
+      uitbreiding met een klein scriptje over courseList plus familieVan, en
+      rapporteer het percentage; zo blijft zichtbaar of je werk echt landt.
+      LET OP bij het zoeken: cursuswoorden staan er vaak mét lidwoord, los
+      (el gato, der Kaffee) én samengetrokken (l'eau, l'acqua). familieVan
+      knipt beide weg; zonder die tweede regel miste je álle Franse en
+      Italiaanse woorden met een apostrof, en dat kostte de helft van de
+      dekking in die twee talen.
    UITBREIDEN, in deze volgorde:
-   1. Meer families, met voorrang voor DUITS en ENGELS (nu 10% en 14%). Werk
-      vanuit de échte lesinhoud: loop de 'new'-woorden per cursus langs en
-      maak families voor woorden die nu niets opleveren. Doel is honderden
-      families en minstens 25% dekking in elke taal. Houd ze taalkundig eerlijk.
+   1. Meer families, met voorrang voor DUITS (21%) en ENGELS (27%); de vier
+      Romaanse talen zitten al boven de 50%. Werk vanuit de échte lesinhoud:
+      loop de 'new'-woorden per cursus langs en maak families voor woorden die
+      nu niets opleveren. Doel: minstens 40% dekking in élke taal. Houd ze
+      taalkundig eerlijk. Let op dat CourseId geen 'nl' kent, dus bij een
+      Germaanse familie kan het Nederlandse lid alleen in het weetje staan.
    2. Een eigen Stamboom-scherm: alle families als groeiende neon-constellatie,
       ontdekt in kleur en de rest als silhouet, met filters per herkomst.
    3. Valse vrienden als tegenhanger: woorden die op elkaar lijken maar iets
@@ -424,6 +431,7 @@ Stoppen kan met `/loop stop` of door de cron-taak te verwijderen.
 
 ## Logboek
 
+- **13-08-2026, ronde 62c** — De stamboom van 113 naar **160 families** en de dekking meer dan verdubbeld: Portugees 59%, Italiaans 55%, Spaans 54%, Frans 54%, Engels 27%, Duits 21%, met 100 families bereikbaar via een les. Zelf nagemeten, niet overgenomen. De sprong kwam voor het grootste deel niet van méér data maar van één blinde vlek in het zoeken: cursuswoorden staan er soms mét samengetrokken lidwoord (l'eau, l'acqua, l'amico), en die werden nooit gevonden. Dat kostte in Frans en Italiaans ruw de helft van alle mogelijke ontdekkingen. **LES: als een functie minder vaak afgaat dan je verwacht, is de data zelden de schuldige; kijk eerst naar de sleutel waarmee je zoekt.** Mooiste vondst in de nieuwe families: het Duitse Kaffee blijkt via het Arabische qahwa familie van café, caffè en coffee.
 - **13-08-2026, ronde 62b (naspelen na het publiceren)** — Het werk van drie parallelle agents zat in dezelfde publicatie, dus alles zelf nagespeeld in plaats van op hun rapport te vertrouwen. Bewezen: het gespreksscherm loopt na de ontdubbeling nog helemaal door (voortgangsbalk exact 0 → 25 → 50 → 75%, +25 XP geboekt van 490 naar 515, klaar-scherm verschijnt), het vrije gesprek toont nu wél de hintregel "Tik een antwoord of spreek het in met de microfoon" die het miste, en de ondertitel telt netjes mee van "Vrij gesprek · Spaans" naar "Vrij gesprek · 1 onderwerp". **REGEL, nu bindend: een rapport van een agent is een bewering, geen bewijs.** Speel zelf na wat zij aanraakten voordat je het afvinkt, zeker als hun werk al in een publicatie zit.
 - **13-08-2026, ronde 62** — **DE WOORDENSTAMBOOM: het eerste echte handelsmerk van Fluent, en iets wat geen enkele taal-app heeft.** Elk woord dat je leert blijkt familie te hebben in de andere vijf talen omdat ze een stam delen. Leer "amigo" en de boom klapt open: het Latijnse amicus als gloeiende wortel, neon takken die zich tekenen naar ami, amico, amigo en amicable, elk lid aantikbaar met een moedertaalstem, en elke zustertaal krijgt 3 echte XP zodat je vaardigheidsniveau daar meteen stijgt. Eén woord leren maakt je dus in vijf talen beter. Dat is het snelste pad naar een tweede en derde taal en precies wat Duolingo, Babbel en Busuu niet doen. Zie Blok W voor het uitbreidingspad (honderden families, een eigen constellatie-scherm, valse vrienden als rode tak, familie-missies, koppeling aan de Wereldreis). **Tegelijk de RuneScape-vaardigheden eindelijk zichtbaar gemaakt**: de gebruiker kon ze niet vinden omdat ze achter een tik op de avatar zaten. Het paneel is nu het herkenbare RS-raster (drie kolommen, vlag als vaardigheidsicoon, twee gouden getallen diagonaal boven elkaar, totaalniveaubalk eronder, tik een taal voor de details) en op Home staat een eigen Vaardigheden-kaart met je niveau, de balk en je totaalniveau. **LES: gebouwd is niet hetzelfde als gevonden.** Een functie die de gebruiker niet ziet, bestaat voor hem niet, ook al staat hij live en werkt hij perfect. Zet nieuwe functies altijd op de plek waar iemand ze zoekt, niet achter een tik die je zelf logisch vindt. Ook de 15-minutenloop verhuisd van een sessie-cron (die alleen vuurt als de sessie stil ligt, en dus nooit vuurde tijdens een werksessie) naar een echte geplande taak op schijf met de volledige opdracht erin.
 - **13-08-2026, ronde 61** — De grote UX-sprong uit het 37-agentteam (63 bevindingen, 28 van de 29 zware adversarieel bevestigd, 17-stappenplan) grotendeels doorgevoerd en live. De hoogtepunten: (1) **De les op Home-niveau**: het nieuwe woord landt als card-hero, goud is uit de oefenkleuren gesaneerd (cyaan = selectie), tikbare accenttegels (á é ñ ç ...) boven het typveld per taal, de voortgangsbalk schiet naar 100% op het laatste antwoord, het juiste antwoord is naluisterbaar in het feedbackpaneel, en de pauzemodal dreigt niet meer met verlies. (2) **Geen scherm rekent nog zelf**: awardXp en addReviewXp geven het echt geboekte bedrag terug (inclusief boost) en les, herhaling, toets, arcade, duel en Grensproef tonen dat bedrag; de beloofde dubbele toetspunten bestaan nu echt en toetsuitslagen zijn per taal gescheiden. (3) **De heldketen in de oefenhub**: jouw fouten > herhaling als card-hero met ademende knop, zichtbare uitleg bij vergrendelde toetsonderwerpen (title-tooltips bestaan niet op touch). (4) **De competitie**: de motivatiekaart ("Nog X XP en je gaat Sanne voorbij") staat nu als held bóven de ranglijst in plaats van eronder begraven, veilig/leeg is cyaan in plaats van vals goud. (5) **Gesprekken als verzameling**: teller met balk in de hub, "opnieuw voor 10 XP" op gevoerde kaarten, en na de confetti staat het volgende gesprek achter één knop klaar. (6) **DE GASTSTART**: één tik "Start direct, zonder account" met een gelote startheld, ingekorte onboarding (welkomststop weg, DAGDOELEN nu één bron mét Fanatiek-optie), en een echt formulier met autocomplete zodat wachtwoordmanagers meedoen. Bewezen: gast → Frans → eerste woord "bonjour" binnen een minuut, en het bestaande account kwam daarna ongeschonden terug (490 XP, level 50). (7) Lege staten op Home zonder straf: "Doe mee" in plaats van "Plek 30", "Start je reeks" in plaats van een grijze nul. LES: bij het controleren van accountwissels las ik eerst het bovenste laagje van de opslagblob en dacht aan dataverlies; de blob loopt per ontwerp één persist achter op het geheugen, dus meet accountdata altijd via de gerenderde app. NOG OPEN uit het plan (volgende rondes): stap 10 (GesprekSpeler en VrijSpeler ontdubbelen in hooks plus hintvoetnoot in het vrije gesprek), stap 12 (profiel herordenen tot trofeeënkast met Instellingen-blok), restjes van stap 7/9/11/13 (duel-voortgangsbalk, zones per ranglijstrij, voortgangsbalk in de gespreksspeler, PersonaPicker-preview als rij, Badges-stickers statisch).
