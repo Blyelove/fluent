@@ -12,6 +12,9 @@ import { sfx, speak } from '../audio'
 import { Avatar } from '../components/Avatar'
 import { FillEx, ListenEx, SelectEx, TypeEx, WordBankEx, type EvalResult, type Registration } from './exercises'
 
+/** stabiele lege lijst: een nieuwe array per render zou de selector laten ratelen */
+const GEEN_LESSEN: string[] = []
+
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr]
   for (let i = a.length - 1; i > 0; i--) {
@@ -47,13 +50,24 @@ type Mode = 'srs' | 'test' | 'fouten'
 
 type Phase =
   | { name: 'hub' }
-  | { name: 'run'; mode: Mode; items: Item[]; label: string }
+  | { name: 'run'; mode: Mode; items: Item[]; label: string; units?: Unit[] }
   // xp = wat je écht kreeg, inclusief eventuele dubbele XP — het scherm mag
   // nooit een ander getal tonen dan wat er is bijgeschreven
-  | { name: 'done'; mode: Mode; correct: number; total: number; label: string; passed: boolean; xp: number }
+  | {
+      name: 'done'
+      mode: Mode
+      correct: number
+      total: number
+      label: string
+      passed: boolean
+      xp: number
+      /** de gekozen onderwerpen, zodat "probeer opnieuw" dezelfde toets kan bouwen */
+      units?: Unit[]
+    }
 
 export function ReviewScreen() {
   const courseId = useStore((s) => s.courseId)
+  const voltooid = useStore((s) => s.progress[s.courseId]?.completed ?? GEEN_LESSEN)
   const reviewWord = useStore((s) => s.reviewWord)
   const addReviewXp = useStore((s) => s.addReviewXp)
   const addTestResult = useStore((s) => s.addTestResult)
@@ -86,6 +100,16 @@ export function ReviewScreen() {
 
   const allUnits = useMemo(() => course.sections.flatMap((s) => s.units), [course])
 
+  /**
+   * Alleen onderwerpen waar je al minstens één les van hebt gedaan. Anders
+   * bouw je een toets over stof die je nooit gezien hebt en zak je gegarandeerd,
+   * wat ook nog eens je foutenlijst vervuilt.
+   */
+  const geleerdeUnits = useMemo(
+    () => new Set(allUnits.filter((u) => u.lessons.some((l) => voltooid.includes(l.id))).map((u) => u.id)),
+    [allUnits, voltooid]
+  )
+
   /** Jouw eigen fouten, hardnekkigste eerst, met de bijbehorende oefening erbij */
   const mijnFouten = useMemo(() => {
     const uit: { ref: MistakeRef; ex: Exercise; bron: string }[] = []
@@ -101,13 +125,14 @@ export function ReviewScreen() {
     setReady(r.ready)
   }, [])
 
-  const startSession = (mode: Mode, items: Item[], label: string) => {
+  const startSession = (mode: Mode, items: Item[], label: string, units?: Unit[]) => {
     setIdx(0)
     setCorrectCount(0)
     setAnswered(null)
     setReady(false)
+    setPauze(false)
     evalRef.current = null
-    setPhase({ name: 'run', mode, items, label })
+    setPhase({ name: 'run', mode, items, label, units })
   }
 
   const startSrs = () => {
@@ -153,7 +178,7 @@ export function ReviewScreen() {
       .slice(0, 10)
       .map(({ ex, lesId, exIndex }) => ({ ex, lesId, exIndex }))
     const label = units.length === 1 ? `Toets: ${units[0].title}` : `Toets: ${units.length} onderwerpen`
-    startSession('test', items, label)
+    startSession('test', items, label, units)
   }
 
   const onCheck = () => {
@@ -211,7 +236,7 @@ export function ReviewScreen() {
         if (passed) {
           confetti({ particleCount: 110, spread: 100, origin: { y: 0.6 }, colors: ['#A855F7', '#EC4899', '#FFC53D', '#22D3EE'], disableForReducedMotion: true })
         }
-        setPhase({ name: 'done', mode: 'test', correct: finalCorrect, total, label: phase.label, passed, xp: xp * dubbel })
+        setPhase({ name: 'done', mode: 'test', correct: finalCorrect, total, label: phase.label, passed, xp: xp * dubbel, units: phase.units })
       }
       sfx('complete')
     } else {
@@ -284,26 +309,35 @@ export function ReviewScreen() {
         <div className="glass" style={{ padding: 22 }}>
           <strong style={{ fontSize: 16 }}>📝 Eigen toets</strong>
           <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 12px' }}>
-            Kies zelf je onderwerpen, wij bouwen de toets. Haal 8 van de 10 en je slaagt: dubbele punten + bonus.
+            {geleerdeUnits.size === 0
+              ? 'Zodra je je eerste les hebt gedaan, kun je hier een eigen toets bouwen over wat je geleerd hebt.'
+              : 'Kies zelf je onderwerpen, wij bouwen de toets. Haal 80% goed en je slaagt: dubbele punten plus bonus.'}
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 14 }}>
             {allUnits.map((u) => {
               const on = pickedUnits.includes(u.id)
+              // nooit gestart? dan is toetsen zinloos, dus grijs en niet kiesbaar
+              const geleerd = geleerdeUnits.has(u.id)
               return (
                 <button
                   key={u.id}
                   className="tile"
+                  disabled={!geleerd}
+                  title={geleerd ? u.title : `${u.title} — doe hier eerst een les`}
                   style={
-                    on
-                      ? { background: 'rgba(168,85,247,0.25)', borderColor: 'var(--hot1)', boxShadow: '0 3px 0 rgba(126,34,206,0.6)' }
-                      : undefined
+                    !geleerd
+                      ? { opacity: 0.4, filter: 'grayscale(0.8)' }
+                      : on
+                        ? { background: 'rgba(168,85,247,0.25)', borderColor: 'var(--hot1)', boxShadow: '0 3px 0 rgba(126,34,206,0.6)' }
+                        : undefined
                   }
                   onClick={() => {
+                    if (!geleerd) return
                     sfx('tap')
                     setPickedUnits((p) => (on ? p.filter((x) => x !== u.id) : [...p, u.id]))
                   }}
                 >
-                  {u.icon} {u.title}
+                  {geleerd ? u.icon : '🔒'} {u.title}
                 </button>
               )
             })}
@@ -375,11 +409,33 @@ export function ReviewScreen() {
           )}
           {phase.mode === 'test' && !phase.passed && (
             <p className="faint" style={{ fontSize: 13, marginTop: 6 }}>
-              Je hebt {Math.ceil(phase.total * 0.8)} goede antwoorden nodig om te slagen.
+              Nog {Math.max(1, Math.ceil(phase.total * 0.8) - phase.correct)} goede antwoorden en je was geslaagd. Zo weer gedaan.
             </p>
           )}
           <div style={{ marginTop: 32 }}>
-            <button className="btn btn-primary" onClick={() => setPhase({ name: 'hub' })}>
+            {/* gezakt? dan direct opnieuw kunnen, zonder alles opnieuw te kiezen */}
+            {phase.mode === 'test' && !phase.passed && phase.units && phase.units.length > 0 && (
+              <button
+                className="btn btn-primary"
+                style={{ marginBottom: 10 }}
+                onClick={() => {
+                  sfx('tap')
+                  startTest(phase.units ?? [])
+                }}
+              >
+                ↻ Probeer opnieuw
+              </button>
+            )}
+            {/* nog fouten over? dan meteen nog een ronde */}
+            {phase.mode === 'fouten' && phase.correct < phase.total && (
+              <button className="btn btn-primary" style={{ marginBottom: 10 }} onClick={startFouten}>
+                ↻ Nog een ronde
+              </button>
+            )}
+            <button
+              className={phase.mode === 'test' && !phase.passed ? 'btn btn-ghost' : 'btn btn-primary'}
+              onClick={() => setPhase({ name: 'hub' })}
+            >
               Klaar
             </button>
           </div>

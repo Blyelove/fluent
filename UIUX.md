@@ -26,11 +26,11 @@ Fluent heeft een kern die al als topspel voelt — chunky leslus met combo's en 
 
 **Bewijs:** Verse gebruiker bereikt oefening 1 zonder één formulierveld in te vullen; bestaand inloggen werkt nog.
 
-### 5. Eigen toets filtert op geleerde stof: Review.tsx r85+r288 toont álle units als aanklikbare chips, ook nooit-gestarte — een nieuweling zakt gegarandeerd. Filter op units met minstens één afgeronde les (store.progress[courseId].completed bestaat al); niet-gestarte units grijs met slotje en label 'Eerst leren'.
+### 5. ✅ AF (ronde 35) — Eigen toets filtert op geleerde stof: Review.tsx r85+r288 toont álle units als aanklikbare chips, ook nooit-gestarte — een nieuweling zakt gegarandeerd. Filter op units met minstens één afgeronde les (store.progress[courseId].completed bestaat al); niet-gestarte units grijs met slotje en label 'Eerst leren'.
 
 **Bewijs:** Met 1 afgeronde les is alleen die unit kiesbaar; rond een les in unit 2 af en de tweede chip ontgrendelt zichtbaar.
 
-### 6. Opnieuw-knop op het klaar-scherm: Review.tsx r340-386 zegt 'Net niet — probeer opnieuw' maar biedt alleen 'Klaar'. Bewaar de gekozen units in de run-fase en toon bij zakken primair 'Probeer opnieuw' (zelfde units, verse schud); bij fouten-modus met restfouten 'Nog een ronde'.
+### 6. ✅ AF (ronde 35) — Opnieuw-knop op het klaar-scherm: Review.tsx r340-386 zegt 'Net niet — probeer opnieuw' maar biedt alleen 'Klaar'. Bewaar de gekozen units in de run-fase en toon bij zakken primair 'Probeer opnieuw' (zelfde units, verse schud); bij fouten-modus met restfouten 'Nog een ronde'.
 
 **Bewijs:** Zak een toets: één tik op 'Probeer opnieuw' start direct een nieuwe run over dezelfde units.
 
@@ -62,7 +62,7 @@ Fluent heeft een kern die al als topspel voelt — chunky leslus met combo's en 
 
 **Bewijs:** Forceer pickVoice op null: het startscherm waarschuwt en elke ronde blijft speelbaar via de visuele flits.
 
-### 14. Belofte '8 van de 10' één bron van waarheid geven: Review.tsx r285 belooft hard '8 van de 10' terwijl startTest (r150-152) bij kleine units bv. 6 vragen levert met lat ceil(total*0.8)=5. Kaarttekst generiek ('80% goed = geslaagd') en de exacte lat pas bij de start van de run tonen ('6 vragen — 5 goed = geslaagd').
+### 14. ✅ AF (ronde 35) — Belofte '8 van de 10' één bron van waarheid geven: Review.tsx r285 belooft hard '8 van de 10' terwijl startTest (r150-152) bij kleine units bv. 6 vragen levert met lat ceil(total*0.8)=5. Kaarttekst generiek ('80% goed = geslaagd') en de exacte lat pas bij de start van de run tonen ('6 vragen — 5 goed = geslaagd').
 
 **Bewijs:** Genereer een toets over een kleine unit: het getoonde aantal en de lat komen exact overeen met wat advance() hanteert.
 
