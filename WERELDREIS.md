@@ -49,7 +49,7 @@ held, en die held ben jij.**
    *Bewijs: XP +40, en na herladen staat de stempeldatum nog in de opslag.*
 8. ✅ **AF (ronde 56) — Het paspoort.** `src/components/PassportStamp.tsx` (~40 regels: gestippelde inktcirkel #FFC53D, Flag 22px in minimasker, landnaam gebogen via textPath met useId, datum, deterministische rotatie geseed op landcode) plus het paspoortscherm als sheet vanuit de kaartheader: raster van 3 kolommen, veroverd gestempeld, rest stippellijn met "?", onderaan "X van de N stempels · volgende: {land}".
    *Bewijs: twee stempels staan nét verschillend scheef en herladen verandert niets.*
-9. **Home-instap.** Het wereldblok op Home vervangen door een mini-viewport: statische SVG ~340×96 met het gebogen verlooppad, laatst veroverde vlag in kleur, `<Avatar size={44} still/>` op de huidige positie, volgende vlag gedimd met amber randje, voortgangsbalk en de knop "Reis verder →".
+9. ✅ **AF (ronde 56) — Home-instap.** Het wereldblok op Home vervangen door een mini-viewport: statische SVG ~340×96 met het gebogen verlooppad, laatst veroverde vlag in kleur, `<Avatar size={44} still/>` op de huidige positie, volgende vlag gedimd met amber randje, voortgangsbalk en de knop "Reis verder →".
    *Bewijs: je eigen poppetje staat in de preview vlak voor het volgende land; teller klopt exact met de oude weergave.*
 10. **De sfeerlaag.** Klimaatzone-verloop over de kaart (vallei → hoogland → kosmische top), per zone 3-4 decorgroepjes (boompjes, cactussen, sterren, maan) in één useMemo-groep van <80 knopen, mist over toekomst-etappes, afsluitende controlepas op 375×812.
     *Bewijs: zones verlopen zichtbaar, niets scrolt horizontaal, scrollen blijft vloeiend.*

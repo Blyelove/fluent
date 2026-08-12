@@ -14,6 +14,7 @@ import { Avatar } from '../components/Avatar'
 import { GuideSheet } from '../components/GuideSheet'
 import { StreakScreen } from './Streak'
 import { WorldMapScreen } from './WorldMap'
+import { WorldPeek } from '../components/WorldPeek'
 import { sfx } from '../audio'
 
 interface Props {
@@ -825,69 +826,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay }: Props)
         </motion.button>
       )}
 
-      {(() => {
-        const world = countryStates(course, completed.length)
-        const conqueredCount = world.filter((c) => c.conquered).length
-        const target = world.find((c) => !c.conquered)
-        return (
-          <div className="glass unit-card" style={{ order: 1 }}>
-            <div className="spread">
-              <strong style={{ fontSize: 15 }}>🌍 Wereldverovering</strong>
-              <span className="gold-text" style={{ fontWeight: 700, fontSize: 14 }}>
-                {conqueredCount} / {world.length}
-              </span>
-            </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 12 }}>
-              {world.map((c) => (
-                <span
-                  key={c.name}
-                  className={c.conquered ? 'flag-conquered' : ''}
-                  title={c.conquered ? `${c.name} — veroverd` : `${c.name} — na ${c.threshold} lessen`}
-                  style={{
-                    opacity: c.conquered ? 1 : 0.25,
-                    filter: c.conquered ? undefined : 'grayscale(0.8)',
-                    transition: 'opacity 0.3s ease',
-                    lineHeight: 0,
-                  }}
-                >
-                  <Flag code={c.code} size={21} />
-                </span>
-              ))}
-            </div>
-            {target ? (
-              <div style={{ marginTop: 14 }}>
-                <div className="spread" style={{ marginBottom: 6 }}>
-                  <span className="dim row" style={{ fontSize: 13, gap: 6 }}>
-                    Volgende: <Flag code={target.code} size={14} /> {target.name}
-                  </span>
-                  <span className="faint" style={{ fontSize: 12 }}>
-                    {target.inCourse
-                      ? `nog ${Math.max(0, target.threshold - completed.length)} ${target.threshold - completed.length === 1 ? 'les' : 'lessen'}`
-                      : 'komt met nieuwe lessen'}
-                  </span>
-                </div>
-                <div className="progress-track" style={{ height: 6 }}>
-                  <div className="progress-fill" style={{ width: `${Math.min(100, (completed.length / target.threshold) * 100)}%` }} />
-                </div>
-              </div>
-            ) : (
-              <p className="gold-text" style={{ fontSize: 13, fontWeight: 600, marginTop: 12 }}>
-                De hele {course.name}talige wereld is van jou. Meesterlijk.
-              </p>
-            )}
-            <button
-              className="btn btn-primary"
-              style={{ marginTop: 14, padding: 13, fontSize: 14.5 }}
-              onClick={() => {
-                sfx('tap')
-                setWorldOpen(true)
-              }}
-            >
-              🗺️ Reis verder →
-            </button>
-          </div>
-        )
-      })()}
+      <WorldPeek course={course} completedCount={completed.length} onOpen={() => setWorldOpen(true)} />
 
       {(() => {
         const UNIT_COLORS = ['#FFB300', '#FF5C8A', '#22D3EE', '#A3E635', '#A855F7', '#FF8A3D']
