@@ -111,7 +111,9 @@ export default function App() {
   })
 
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).has('demo')) {
+    const alGebruiker = useStore.getState().currentUser
+    // demo mag nooit een echte sessie overschrijven
+    if (new URLSearchParams(window.location.search).has('demo') && (!alGebruiker || alGebruiker === 'demo')) {
       try { sessionStorage.setItem('fluent-session', '1') } catch { /* geen sessie nodig */ }
       useStore.setState({
         currentUser: 'demo', rememberMe: true, onboarded: true, courseId: 'es',

@@ -239,6 +239,56 @@ export function SkillsSheet({ onClose }: { onClose: () => void }) {
                 Nog niet begonnen. Eén les en je staat al op niveau 10.
               </p>
             )}
+
+            {/* de meestermantel: het eindbeeld waar alles naartoe werkt. Tot
+                niveau 99 hangt hij hier als silhouet te wachten. */}
+            <div className="row" style={{ gap: 11, marginTop: 12, paddingTop: 11, borderTop: '1px solid var(--line)' }}>
+              <svg
+                width="34"
+                height="40"
+                viewBox="0 0 34 40"
+                aria-hidden="true"
+                style={{
+                  flexShrink: 0,
+                  filter: detail.stand.meester ? 'drop-shadow(0 0 8px rgba(255,197,61,0.6))' : 'none',
+                  opacity: detail.stand.meester ? 1 : 0.5,
+                }}
+              >
+                {/* de kap */}
+                <path
+                  d="M 17 1 L 27 6 L 24 10 L 10 10 L 7 6 Z"
+                  fill={detail.stand.meester ? 'var(--gold)' : 'var(--surface-3)'}
+                  stroke={detail.stand.meester ? 'var(--gold-bright)' : 'var(--line)'}
+                  strokeWidth="1.2"
+                />
+                {/* de mantel zelf, wapperend */}
+                <path
+                  d="M 10 10 L 24 10 L 29 34 L 23 31 L 17 36 L 11 31 L 5 34 Z"
+                  fill={detail.stand.meester ? 'url(#mantelverloop)' : 'var(--surface-2)'}
+                  stroke={detail.stand.meester ? 'var(--gold)' : 'var(--line)'}
+                  strokeWidth="1.2"
+                />
+                <defs>
+                  <linearGradient id="mantelverloop" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stopColor="var(--hot1)" />
+                    <stop offset="55%" stopColor="var(--hot2)" />
+                    <stop offset="100%" stopColor="var(--gold)" />
+                  </linearGradient>
+                </defs>
+                {/* het embleem op de borst */}
+                <circle cx="17" cy="18" r="3.4" fill={detail.stand.meester ? 'var(--gold-bright)' : 'var(--line)'} />
+              </svg>
+              <div className="col" style={{ gap: 1, minWidth: 0 }}>
+                <strong style={{ fontSize: 13, fontWeight: 700 }}>
+                  {detail.stand.meester ? `De meestermantel van het ${detail.naam}` : 'De meestermantel'}
+                </strong>
+                <span className="faint" style={{ fontSize: 11.5 }}>
+                  {detail.stand.meester
+                    ? 'Verdiend op niveau 99. Je personage draagt hem overal.'
+                    : 'Wacht op je bij niveau 99, in de kleuren van jouw taalwereld.'}
+                </span>
+              </div>
+            </div>
           </motion.div>
 
           {/* De Woordenstamboom: je verzameling ontdekte woordfamilies */}

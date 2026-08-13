@@ -77,8 +77,10 @@ export function skillStand(xp: number): SkillStand {
   return { level, binnen, breedte, frac: Math.min(1, binnen / breedte), meester: false }
 }
 
-/** Mijlpalen die het trainen richting geven, in RuneScape-geest */
+/** De mijlpalen, in RuneScape-geest: 92 is de helft van de XP naar 99 */
+export const MIJLPALEN = [10, 25, 50, 75, 92, 99] as const
+
 export function volgendeMijlpaal(level: number): number | null {
-  for (const m of [10, 25, 50, 75, 90, 99]) if (level < m) return m
+  for (const m of MIJLPALEN) if (level < m) return m
   return null
 }
