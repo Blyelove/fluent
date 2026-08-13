@@ -140,9 +140,8 @@ body::after {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  /* ornament ligt bovenop het vignet, allebei uit tokens */
-  background: var(--ornament), var(--vignet);
-  background-size: var(--ornament-maat), auto;
+  /* alleen het vignet; het ornament heeft een eigen laag die met je niveau meegroeit */
+  background: var(--vignet);
 }
 
 #root { min-height: 100dvh; }

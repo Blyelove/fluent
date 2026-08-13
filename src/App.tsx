@@ -165,6 +165,9 @@ export default function App() {
       {tab === 'review' && <ReviewScreen onGoLearn={() => setTab('home')} onPraten={() => setPraten(true)} />}
       {tab === 'profile' && <ProfileScreen />}
 
+      {/* het ornament van je taalwereld, dat met je niveau meegroeit */}
+      <div className="wereld-laag" aria-hidden="true" />
+
       {/* de proeverij van taalwerelden: vergelijk ze op je eigen scherm */}
       <WereldKiezer verborgen={gamePlaying} />
 

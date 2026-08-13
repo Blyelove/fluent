@@ -1,0 +1,289 @@
+/* ============================================================
+   DE VIJF ANDERE TALEN
+
+   Elke taal krijgt zijn eigen dialect, uit de echte beeldcultuur van
+   die taal. Zelfde DNA, compleet ander gevoel.
+   ============================================================ */
+
+/* ---------- FRANS · inkt en art nouveau ---------- */
+[data-wereld='encre'] {
+  --bg: #0b1024;
+  --bg-2: #131a38;
+  --surface: rgba(214, 198, 255, 0.07);
+  --surface-2: rgba(214, 198, 255, 0.11);
+  --surface-3: rgba(214, 198, 255, 0.16);
+  --line: rgba(238, 228, 255, 0.15);
+  --line-hot: rgba(214, 110, 140, 0.55);
+  --text: #f4f0ff;
+  --text-dim: #b6aed2;
+  --text-faint: #948cae;
+  --hot1: #3b3a8c;
+  --hot2: #d66e8c;
+  --grad-hot: linear-gradient(135deg, #3b3a8c 0%, #d66e8c 100%);
+  --gold: #d9b26a;
+  --gold-bright: #f2ddab;
+  --gold-deep: #a37f3c;
+  --grad-gold: linear-gradient(135deg, #f2ddab 0%, #b28a44 100%);
+  --ink-on-gold: #14102a;
+  --cyan: #7fb3c8;
+  --glow-hot: 0 0 0 1px rgba(214, 110, 140, 0.5), 0 0 12px rgba(214, 110, 140, 0.38), 0 0 34px rgba(59, 58, 140, 0.32);
+  --sfeer:
+    radial-gradient(880px 620px at 14% -10%, rgba(59, 58, 140, 0.4), transparent 56%),
+    radial-gradient(760px 500px at 106% 12%, rgba(214, 110, 140, 0.18), transparent 55%),
+    linear-gradient(180deg, #131a38 0%, #0b1024 42%, #070a18 100%);
+  --vignet: radial-gradient(128% 90% at 50% 8%, transparent 56%, rgba(3, 4, 14, 0.62) 100%);
+  /* de zweepslaglijn van de art nouveau, als fijn liniatuur */
+  --ornament:
+    repeating-linear-gradient(76deg, rgba(217, 178, 106, 0.05) 0 1px, transparent 1px 34px),
+    repeating-linear-gradient(-76deg, rgba(214, 110, 140, 0.035) 0 1px, transparent 1px 52px);
+  --hero-vlak: linear-gradient(150deg, rgba(59, 58, 140, 0.42) 0%, rgba(12, 15, 38, 0.95) 50%, rgba(214, 110, 140, 0.2) 100%);
+  --hero-rand: linear-gradient(135deg, rgba(217, 178, 106, 0.9), rgba(214, 110, 140, 0.85) 55%, rgba(59, 58, 140, 0.85));
+  --hero-schaduw: 0 10px 32px rgba(0, 0, 0, 0.5), 0 0 26px rgba(59, 58, 140, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  --hero-tekst: #f4f0ff;
+  --hero-dim: #cbc2e4;
+  --hero-faint: #9d94b8;
+  --hero-eyebrow: #f0c98f;
+  --paneel-diep: rgba(12, 15, 38, 0.92);
+  --paneel-tekst: #f4f0ff;
+  --paneel-dim: #cbc2e4;
+  --paneel-faint: #9d94b8;
+}
+
+/* ---------- DUITS · raster en precisie, in bauhauskleur ---------- */
+[data-wereld='raster'] {
+  --bg: #14161a;
+  --bg-2: #1d2026;
+  --surface: rgba(255, 255, 255, 0.055);
+  --surface-2: rgba(255, 255, 255, 0.09);
+  --surface-3: rgba(255, 255, 255, 0.14);
+  --line: rgba(255, 255, 255, 0.18);
+  --line-hot: rgba(214, 40, 40, 0.6);
+  --text: #f3f4f6;
+  --text-dim: #a8adb8;
+  --text-faint: #8b919d;
+  --hot1: #1f4ed8;
+  --hot2: #d62828;
+  --grad-hot: linear-gradient(135deg, #1f4ed8 0%, #d62828 100%);
+  --gold: #f2b705;
+  --gold-bright: #ffd84d;
+  --gold-deep: #b58500;
+  --grad-gold: linear-gradient(135deg, #ffd84d 0%, #c99100 100%);
+  --ink-on-gold: #14161a;
+  --cyan: #17a2b8;
+  /* precisie: strakke hoeken en een gloed die niet uitloopt */
+  --r-lg: 10px;
+  --r-md: 8px;
+  --r-sm: 5px;
+  --glow-hot: 0 0 0 1.5px rgba(214, 40, 40, 0.7), 0 0 10px rgba(214, 40, 40, 0.28);
+  --glow-gold: 0 0 0 1.5px rgba(242, 183, 5, 0.7), 0 0 10px rgba(242, 183, 5, 0.26);
+  --sfeer:
+    radial-gradient(820px 560px at 6% -8%, rgba(31, 78, 216, 0.26), transparent 55%),
+    radial-gradient(700px 480px at 110% 90%, rgba(214, 40, 40, 0.14), transparent 55%),
+    linear-gradient(180deg, #1d2026 0%, #14161a 44%, #0e1013 100%);
+  --vignet: radial-gradient(132% 94% at 50% 6%, transparent 62%, rgba(4, 5, 7, 0.5) 100%);
+  /* millimeterpapier: het raster is hier het ornament */
+  --ornament:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.045) 0 1px, transparent 1px 40px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.045) 0 1px, transparent 1px 40px),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.02) 0 1px, transparent 1px 8px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.02) 0 1px, transparent 1px 8px);
+  --hero-vlak: linear-gradient(150deg, rgba(31, 78, 216, 0.34) 0%, rgba(18, 20, 25, 0.96) 50%, rgba(214, 40, 40, 0.24) 100%);
+  --hero-rand: linear-gradient(135deg, rgba(31, 78, 216, 0.95), rgba(214, 40, 40, 0.9) 55%, rgba(242, 183, 5, 0.9));
+  --hero-schaduw: 0 8px 0 rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  --hero-tekst: #f3f4f6;
+  --hero-dim: #c3c8d2;
+  --hero-faint: #949aa6;
+  --hero-eyebrow: #ffd84d;
+  --paneel-diep: rgba(18, 20, 25, 0.94);
+  --paneel-tekst: #f3f4f6;
+  --paneel-dim: #c3c8d2;
+  --paneel-faint: #949aa6;
+}
+
+/* ---------- ITALIAANS · fresco en marmer ---------- */
+[data-wereld='fresco'] {
+  --bg: #1a1210;
+  --bg-2: #271b16;
+  --surface: rgba(255, 226, 190, 0.07);
+  --surface-2: rgba(255, 226, 190, 0.11);
+  --surface-3: rgba(255, 226, 190, 0.16);
+  --line: rgba(255, 235, 210, 0.16);
+  --line-hot: rgba(197, 90, 58, 0.55);
+  --text: #fbf2e6;
+  --text-dim: #c9b39c;
+  --text-faint: #a89380;
+  --hot1: #1f6f54;
+  --hot2: #c55a3a;
+  --grad-hot: linear-gradient(135deg, #1f6f54 0%, #c55a3a 100%);
+  --gold: #e0b64d;
+  --gold-bright: #ffde96;
+  --gold-deep: #a5802a;
+  --grad-gold: linear-gradient(135deg, #ffde96 0%, #b98f31 100%);
+  --ink-on-gold: #241610;
+  --cyan: #5fa8a0;
+  --glow-hot: 0 0 0 1px rgba(197, 90, 58, 0.5), 0 0 12px rgba(197, 90, 58, 0.36), 0 0 32px rgba(31, 111, 84, 0.28);
+  --sfeer:
+    radial-gradient(880px 600px at 12% -8%, rgba(197, 90, 58, 0.26), transparent 56%),
+    radial-gradient(780px 520px at 104% 14%, rgba(224, 182, 77, 0.18), transparent 55%),
+    radial-gradient(700px 500px at -6% 96%, rgba(31, 111, 84, 0.16), transparent 55%),
+    linear-gradient(180deg, #271b16 0%, #1a1210 42%, #120c0a 100%);
+  --vignet: radial-gradient(130% 92% at 50% 8%, transparent 58%, rgba(10, 6, 5, 0.6) 100%);
+  /* de aderen van marmer: brede, trage banen */
+  --ornament:
+    repeating-linear-gradient(28deg, rgba(255, 235, 210, 0.035) 0 2px, transparent 2px 90px),
+    repeating-linear-gradient(-14deg, rgba(255, 222, 150, 0.028) 0 1px, transparent 1px 140px);
+  --hero-vlak: linear-gradient(150deg, rgba(31, 111, 84, 0.34) 0%, rgba(30, 20, 16, 0.95) 50%, rgba(197, 90, 58, 0.26) 100%);
+  --hero-rand: linear-gradient(135deg, rgba(31, 111, 84, 0.9), rgba(197, 90, 58, 0.88) 55%, rgba(224, 182, 77, 0.85));
+  --hero-schaduw: 0 10px 32px rgba(0, 0, 0, 0.5), 0 0 26px rgba(197, 90, 58, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  --hero-tekst: #fbf2e6;
+  --hero-dim: #d8c3ab;
+  --hero-faint: #a89279;
+  --hero-eyebrow: #ffd98f;
+  --paneel-diep: rgba(30, 20, 16, 0.93);
+  --paneel-tekst: #fbf2e6;
+  --paneel-dim: #d8c3ab;
+  --paneel-faint: #a89279;
+}
+
+/* ---------- PORTUGEES · oceaan en calçada ---------- */
+[data-wereld='calcada'] {
+  --bg: #061a26;
+  --bg-2: #0a2a3a;
+  --surface: rgba(150, 225, 255, 0.07);
+  --surface-2: rgba(150, 225, 255, 0.11);
+  --surface-3: rgba(150, 225, 255, 0.16);
+  --line: rgba(200, 240, 255, 0.16);
+  --line-hot: rgba(255, 111, 89, 0.55);
+  --text: #eefaff;
+  --text-dim: #9dc0d0;
+  --text-faint: #82a3b3;
+  --hot1: #0e7c8c;
+  --hot2: #ff6f59;
+  --grad-hot: linear-gradient(135deg, #0e7c8c 0%, #ff6f59 100%);
+  --gold: #ffc94d;
+  --cyan: #35d0e0;
+  --glow-hot: 0 0 0 1px rgba(255, 111, 89, 0.5), 0 0 12px rgba(255, 111, 89, 0.38), 0 0 34px rgba(14, 124, 140, 0.3);
+  --sfeer:
+    radial-gradient(900px 620px at 10% -8%, rgba(14, 124, 140, 0.36), transparent 56%),
+    radial-gradient(780px 520px at 108% 12%, rgba(255, 111, 89, 0.18), transparent 55%),
+    radial-gradient(720px 520px at 44% 104%, rgba(53, 208, 224, 0.14), transparent 55%),
+    linear-gradient(180deg, #0a2a3a 0%, #061a26 42%, #04121b 100%);
+  --vignet: radial-gradient(130% 92% at 50% 8%, transparent 58%, rgba(2, 9, 14, 0.6) 100%);
+  /* de golf uit de Portugese stoeptegels */
+  --ornament:
+    repeating-radial-gradient(circle at 0 50%, rgba(210, 245, 255, 0.05) 0 1px, transparent 1px 26px),
+    repeating-linear-gradient(90deg, rgba(210, 245, 255, 0.022) 0 1px, transparent 1px 52px);
+  --hero-vlak: linear-gradient(150deg, rgba(14, 124, 140, 0.36) 0%, rgba(6, 27, 39, 0.95) 50%, rgba(255, 111, 89, 0.24) 100%);
+  --hero-rand: linear-gradient(135deg, rgba(14, 124, 140, 0.9), rgba(255, 111, 89, 0.88) 55%, rgba(255, 201, 77, 0.85));
+  --hero-schaduw: 0 10px 32px rgba(0, 0, 0, 0.5), 0 0 26px rgba(14, 124, 140, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  --hero-tekst: #eefaff;
+  --hero-dim: #b6d5e2;
+  --hero-faint: #8aa9b8;
+  --hero-eyebrow: #ffb59f;
+  --paneel-diep: rgba(6, 27, 39, 0.93);
+  --paneel-tekst: #eefaff;
+  --paneel-dim: #b6d5e2;
+  --paneel-faint: #8aa9b8;
+}
+
+/* ---------- ENGELS · messing en mist ---------- */
+[data-wereld='messing'] {
+  --bg: #0d1614;
+  --bg-2: #14231f;
+  --surface: rgba(216, 236, 226, 0.06);
+  --surface-2: rgba(216, 236, 226, 0.1);
+  --surface-3: rgba(216, 236, 226, 0.15);
+  --line: rgba(232, 244, 238, 0.15);
+  --line-hot: rgba(155, 44, 60, 0.55);
+  --line-gold: rgba(198, 150, 74, 0.6);
+  --text: #f1f6f3;
+  --text-dim: #a8b8b1;
+  --text-faint: #8b9b95;
+  --hot1: #1c4a3f;
+  --hot2: #9b2c3c;
+  --grad-hot: linear-gradient(135deg, #1c4a3f 0%, #9b2c3c 100%);
+  --gold: #c6964a;
+  --gold-bright: #e8cd8e;
+  --gold-deep: #8f6a2c;
+  --grad-gold: linear-gradient(135deg, #e8cd8e 0%, #9c7331 100%);
+  --ink-on-gold: #101a17;
+  --cyan: #6f9ea8;
+  --glow-hot: 0 0 0 1px rgba(155, 44, 60, 0.5), 0 0 12px rgba(155, 44, 60, 0.34), 0 0 30px rgba(28, 74, 63, 0.3);
+  --glow-gold: 0 0 0 1px rgba(232, 205, 142, 0.5), 0 0 10px rgba(198, 150, 74, 0.38), 0 0 28px rgba(143, 106, 44, 0.28);
+  --sfeer:
+    radial-gradient(880px 620px at 16% -10%, rgba(28, 74, 63, 0.42), transparent 58%),
+    radial-gradient(760px 520px at 106% 16%, rgba(198, 150, 74, 0.14), transparent 55%),
+    linear-gradient(180deg, #14231f 0%, #0d1614 44%, #080f0d 100%);
+  /* mist: het vignet hangt hier laag en zacht */
+  --vignet: radial-gradient(124% 88% at 50% 14%, transparent 48%, rgba(6, 12, 10, 0.66) 100%);
+  /* fijn krijtstreepje, als op een pak uit Savile Row */
+  --ornament: repeating-linear-gradient(90deg, rgba(232, 244, 238, 0.035) 0 1px, transparent 1px 22px);
+  --hero-vlak: linear-gradient(150deg, rgba(28, 74, 63, 0.5) 0%, rgba(13, 25, 22, 0.96) 50%, rgba(155, 44, 60, 0.24) 100%);
+  --hero-rand: linear-gradient(135deg, rgba(198, 150, 74, 0.9), rgba(28, 74, 63, 0.9) 55%, rgba(155, 44, 60, 0.85));
+  --hero-schaduw: 0 10px 32px rgba(0, 0, 0, 0.55), 0 0 24px rgba(28, 74, 63, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  --hero-tekst: #f1f6f3;
+  --hero-dim: #c2d2cb;
+  --hero-faint: #93a49d;
+  --hero-eyebrow: #e8cd8e;
+  --paneel-diep: rgba(13, 25, 22, 0.94);
+  --paneel-tekst: #f1f6f3;
+  --paneel-dim: #c2d2cb;
+  --paneel-faint: #93a49d;
+}
+
+/* ============================================================
+   DE WERELD GROEIT MEE MET JOU
+
+   Op niveau 1 is je wereld een schets: rustig, leeg, veel ruimte.
+   Hoe dichter je bij 99 komt, hoe rijker en dieper hij wordt. Zonder
+   ook maar een cijfer te lezen zie je aan je scherm hoe ver je bent.
+
+   Het ornament en het sfeerlicht liggen in een eigen laag, zodat ze
+   los kunnen groeien zonder het vignet mee te trekken.
+   ============================================================ */
+
+.wereld-laag {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--ornament);
+  opacity: var(--rijkdom-ornament, 1);
+  transition: opacity 0.8s ease;
+}
+
+body::before { opacity: var(--rijkdom-sfeer, 1); transition: opacity 0.8s ease; }
+
+/* niveau 1 tot 9: een schets. Alleen jij en de taal, verder niets. */
+[data-rijkdom='1'] {
+  --rijkdom-ornament: 0;
+  --rijkdom-sfeer: 0.5;
+}
+/* 10 tot 24: de eerste lijnen van het ornament komen op */
+[data-rijkdom='2'] {
+  --rijkdom-ornament: 0.35;
+  --rijkdom-sfeer: 0.68;
+}
+/* 25 tot 49: de wereld krijgt kleur en diepte */
+[data-rijkdom='3'] {
+  --rijkdom-ornament: 0.6;
+  --rijkdom-sfeer: 0.84;
+}
+/* 50 tot 74: alles staat er, vol en warm */
+[data-rijkdom='4'] {
+  --rijkdom-ornament: 0.85;
+  --rijkdom-sfeer: 1;
+}
+/* 75 en hoger: de wereld van een meester, tot in de hoeken afgewerkt */
+[data-rijkdom='5'] {
+  --rijkdom-ornament: 1;
+  --rijkdom-sfeer: 1;
+}
+
+/* wie liever geen beweging ziet, krijgt de eindstand meteen */
+@media (prefers-reduced-motion: reduce) {
+  .wereld-laag,
+  body::before {
+    transition: none;
+  }
+}
