@@ -82,7 +82,6 @@ function GoalRing({ value, goal }: { value: number; goal: number }) {
 
 export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten }: Props) {
   const courseId = useStore((s) => s.courseId)
-  const setCourse = useStore((s) => s.setCourse)
   const streak = useStore((s) => s.streak)
   const todayXp = useStore((s) => s.todayXp)
   const todayDay = useStore((s) => s.todayDay)
@@ -112,7 +111,6 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
   const leagueRank = useMemo(() => yourRank(standings(leagueId, weekXp)), [leagueId, weekXp])
   const addGoal = useStore((s) => s.addGoal)
   const removeGoal = useStore((s) => s.removeGoal)
-  const [picker, setPicker] = useState(false)
   const [goalModal, setGoalModal] = useState(false)
   const [streakOpen, setStreakOpen] = useState(false)
   const [worldOpen, setWorldOpen] = useState(false)
@@ -190,13 +188,12 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
     <div className="shell" style={{ display: 'flex', flexDirection: 'column' }}>
       <div className="ambient-orb orb-a" />
       <header className="spread rise" style={{ marginBottom: 22 }}>
-        <button className="row glass" style={{ gap: 8, padding: '11px 14px', minHeight: 44, borderRadius: 999 }} onClick={() => setPicker(true)}>
-          <Flag code={courseFlagCode[courseId]} size={17} />
+        {/* alleen de vlag als stille wegwijzer: van taal wisselen doe je op je
+            profiel, zodat de kop hier ademt */}
+        <span className="row" style={{ gap: 8, minHeight: 44, alignItems: 'center' }} aria-label={`Je leert ${course.name}`}>
+          <Flag code={courseFlagCode[courseId]} size={20} />
           <span style={{ fontWeight: 600, fontSize: 14 }}>{course.name}</span>
-          <span className="faint" style={{ fontSize: 11 }}>
-            ▾
-          </span>
-        </button>
+        </span>
         <div className="row" style={{ gap: 16 }}>
           <button
             className="row"
@@ -1129,44 +1126,6 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
         )}
       </AnimatePresence>
 
-      <AnimatePresence>
-        {picker && (
-          <motion.div className="modal-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setPicker(false)}>
-            <motion.div
-              className="modal-panel"
-              initial={{ y: 80 }}
-              animate={{ y: 0 }}
-              exit={{ y: 120 }}
-              transition={{ type: 'spring', stiffness: 260, damping: 28 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h3 className="display" style={{ fontSize: 22, marginBottom: 18 }}>
-                Kies je cursus
-              </h3>
-              <div className="col" style={{ gap: 10 }}>
-                {courseList.map((c) => (
-                  <button
-                    key={c.id}
-                    className={`opt ${c.id === courseId ? 'selected' : ''}`}
-                    onClick={() => {
-                      setCourse(c.id)
-                      setPicker(false)
-                    }}
-                  >
-                    <Flag code={courseFlagCode[c.id]} size={22} />
-                    <span className="col" style={{ gap: 1 }}>
-                      <strong>{c.name}</strong>
-                      <span className="faint" style={{ fontSize: 13 }}>
-                        {c.tagline}
-                      </span>
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   )
 }

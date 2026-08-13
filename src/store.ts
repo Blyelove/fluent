@@ -161,6 +161,17 @@ interface AureaState {
   wereld: string
   setWereld: (id: string) => void
 
+  /** Arena-bekers: winst +30, verlies -10, nooit onder nul */
+  bekers: number
+  /** Gespeelde en gewonnen arenagevechten */
+  arenaGevechten: number
+  arenaWinsten: number
+  /**
+   * Uitslag van een arenagevecht boeken. Winst geeft ook XP in de taal van
+   * het gevecht. Geeft terug hoeveel bekers je nu hebt.
+   */
+  boekArena: (gewonnen: boolean) => number
+
   /** Ontdekte woordfamilies (stam-ids uit cognaten.ts) */
   ontdekteFamilies: string[]
   /**
@@ -279,6 +290,9 @@ export type Profiel = Pick<
   | 'stamps'
   | 'gesprekken'
   | 'duelName'
+  | 'bekers'
+  | 'arenaGevechten'
+  | 'arenaWinsten'
   | 'ontdekteFamilies'
 >
 
@@ -337,6 +351,9 @@ function nieuwProfiel(): Profiel {
     stamps: {},
     gesprekken: {},
     duelName: '',
+    bekers: 0,
+    arenaGevechten: 0,
+    arenaWinsten: 0,
     ontdekteFamilies: [],
   }
 }
@@ -853,6 +870,16 @@ export const useStore = create<AureaState>()(
       setDuelName: (n) => set({ duelName: n.slice(0, 24) }),
 
       setWereld: (id) => set({ wereld: id }),
+
+      boekArena: (gewonnen) => {
+        const s = get()
+        const na = Math.max(0, s.bekers + (gewonnen ? 30 : -10))
+        set({ bekers: na, arenaGevechten: s.arenaGevechten + 1, arenaWinsten: s.arenaWinsten + (gewonnen ? 1 : 0) })
+        // winst is ook gewoon leren geweest: echte XP in de taal van het gevecht
+        if (gewonnen) get().awardXp(20)
+        else get().awardXp(5)
+        return na
+      },
 
       ontdekFamilie: (id, talen) => {
         const s = get()

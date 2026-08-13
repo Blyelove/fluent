@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 import { motion } from 'motion/react'
 import type { DuelPayload } from '../duel'
 import { ArcadeScreen } from './Arcade'
+import { ArenaScreen } from './Arena'
 import { DuelScreen } from './Duel'
 import { sfx } from '../audio'
 
@@ -14,7 +15,12 @@ export function PlayScreen({
   /** Zodat de app-brede onderbalk óók verdwijnt tijdens een potje — één misveeg op een tab kostte anders je hele run */
   onPlayingChange?: (playing: boolean) => void
 }) {
-  const [tab, setTab] = useState<'arcade' | 'duel'>(incomingDuel ? 'duel' : 'arcade')
+  const [tab, setTab] = useState<'arcade' | 'duel' | 'arena'>(() => {
+    if (incomingDuel) return 'duel'
+    // ?arena=1 opent de arena direct, voor een gedeelde link of een beeld
+    if (new URLSearchParams(window.location.search).has('arena')) return 'arena'
+    return 'arcade'
+  })
   const [playing, setPlaying] = useState(false)
 
   const onPlayingChange = useCallback(
@@ -33,8 +39,9 @@ export function PlayScreen({
             {(
               [
                 ['arcade', '🕹️', 'Minigames'],
+                ['arena', '🏟️', 'Arena'],
                 // "Vrienden" verborg dat je hier ook alleen tegen een bot kunt duelleren
-                ['duel', '⚔️', 'Duels'],
+                ['duel', '🤝', 'Duels'],
               ] as const
             ).map(([id, icon, label]) => (
               <button
@@ -55,6 +62,8 @@ export function PlayScreen({
       <motion.div key={tab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22 }}>
         {tab === 'arcade' ? (
           <ArcadeScreen onPlayingChange={onPlayingChange} onDuels={() => setTab('duel')} />
+        ) : tab === 'arena' ? (
+          <ArenaScreen onTerug={() => { setTab('arcade'); onPlayingChange(false) }} onPlayingChange={onPlayingChange} />
         ) : (
           <DuelScreen incoming={incomingDuel} onPlayingChange={onPlayingChange} />
         )}

@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState, type ComponentType } from 'react'
 import { useRegisterSW } from 'virtual:pwa-register/react'
-import { WereldKiezer } from './components/WereldKiezer'
 import { pasWereldToe } from './werelden'
 import { skillStand } from './skills'
 import type { Course, Lesson } from './types'
@@ -198,8 +197,6 @@ export default function App() {
       {/* het ornament van je taalwereld, dat met je niveau meegroeit */}
       <div className="wereld-laag" aria-hidden="true" />
 
-      {/* de proeverij van taalwerelden: vergelijk ze op je eigen scherm */}
-      <WereldKiezer verborgen={gamePlaying} />
 
       {/* er staat een nieuwe versie klaar: één tik en je kijkt weer live */}
       {nieuweVersie && (

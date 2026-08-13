@@ -3,7 +3,9 @@ import { courseList, courses } from '../content'
 import { courseProgress, totalXp, useStore, wordsLearned } from '../store'
 import { levelProgress, levelTitle, nextReward, wardrobeFor } from '../levels'
 import { skillStand } from '../skills'
+import { arenaVoor } from '../arena'
 import { SkillRaster, SkillsSheet } from '../components/SkillsSheet'
+import { WereldKiezer } from '../components/WereldKiezer'
 import { courseFlagCode } from '../countries'
 import { Flag } from '../components/Flag'
 import { Avatar, normalizePersona } from '../components/Avatar'
@@ -88,8 +90,28 @@ export function ProfileScreen() {
       {/* het vaardighedenraster opent het profiel, zonder één tik: zes talen
           als skills richting 99, met het totaalniveau eronder. Wie RuneScape
           ooit speelde is meteen thuis. Tik een taal voor de details. */}
-      <div style={{ marginBottom: 24 }}>
+      <div style={{ marginBottom: 10 }}>
         <SkillRaster actief={state.courseId} onTegel={() => { sfx('tap'); setSkillsOpen(true) }} />
+      </div>
+
+      {/* je arena staat naast je vaardigheden: bekers vertellen waar je vecht */}
+      <div
+        className="spread"
+        style={{
+          padding: '11px 14px',
+          marginBottom: 24,
+          borderRadius: 12,
+          background: 'var(--surface)',
+          border: '1.5px solid var(--line)',
+        }}
+      >
+        <span className="row" style={{ gap: 8 }}>
+          <span style={{ fontSize: 16 }}>{arenaVoor(state.bekers).emoji}</span>
+          <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 14 }}>{arenaVoor(state.bekers).naam}</span>
+        </span>
+        <span className="gold-text num" style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 16 }}>
+          🏆 {state.bekers}
+        </span>
       </div>
 
       {/* de held van dit scherm: je transformatie staat bovenaan, want dat is
@@ -265,6 +287,36 @@ export function ProfileScreen() {
       {/* al het beheer bij elkaar, onderaan: eerst je trofeeën, dan de knoppen */}
       <p className="eyebrow" style={{ marginBottom: 10 }}>Instellingen</p>
       <div className="glass" style={{ padding: '6px 18px', marginBottom: 20 }}>
+        {/* van taal wisselen woont hier, niet meer op het startscherm */}
+        <div style={{ padding: '14px 0', borderBottom: '1px solid var(--line)' }}>
+          <div className="spread" style={{ marginBottom: 10 }}>
+            <span style={{ fontWeight: 500 }}>Taal die je leert</span>
+            <span className="dim" style={{ fontSize: 13.5 }}>{course.name}</span>
+          </div>
+          <div className="row" style={{ gap: 7, flexWrap: 'wrap' }}>
+            {courseList.map((c) => (
+              <button
+                key={c.id}
+                onClick={() => { sfx('tap'); state.setCourse(c.id) }}
+                aria-label={`Wissel naar ${c.name}`}
+                style={{
+                  width: 46,
+                  height: 44,
+                  borderRadius: 12,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: c.id === state.courseId ? 'var(--surface-3)' : 'var(--surface)',
+                  border: `1.5px solid ${c.id === state.courseId ? 'var(--line-hot)' : 'var(--line)'}`,
+                  boxShadow: c.id === state.courseId ? 'var(--glow-hot)' : undefined,
+                }}
+              >
+                <Flag code={courseFlagCode[c.id]} size={22} />
+              </button>
+            ))}
+          </div>
+        </div>
+        <WereldKiezer />
         {/* stond hier als dode tekst; nu draai je er zo doorheen */}
         <div className="spread" style={{ padding: '10px 0', borderBottom: '1px solid var(--line)' }}>
           <span style={{ fontWeight: 500 }}>Dagelijks doel</span>

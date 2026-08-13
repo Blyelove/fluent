@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { WERELDEN, WERELD_PER_TAAL, pasWereldToe, rijkdomVoor } from '../werelden'
 import { useStore } from '../store'
+import { courses } from '../content'
 import { skillStand } from '../skills'
 import { sfx } from '../audio'
 
@@ -12,7 +13,7 @@ import { sfx } from '../audio'
  * van dialect wisselt. Zo zie je meteen of een wereld het houdt op elk scherm
  * dat je normaal gebruikt, en niet alleen op een mooi uitgekozen voorbeeld.
  */
-export function WereldKiezer({ verborgen }: { verborgen?: boolean }) {
+export function WereldKiezer() {
   const wereld = useStore((s) => s.wereld)
   const setWereld = useStore((s) => s.setWereld)
   const taal = useStore((s) => s.courseId)
@@ -24,7 +25,6 @@ export function WereldKiezer({ verborgen }: { verborgen?: boolean }) {
     pasWereldToe(wereld, taal, niveau)
   }, [wereld, taal, niveau])
 
-  if (verborgen) return null
   const automatisch = WERELD_PER_TAAL[taal]
   const actiefId = wereld || automatisch
   const huidig = WERELDEN.find((w) => w.id === actiefId)
@@ -32,26 +32,17 @@ export function WereldKiezer({ verborgen }: { verborgen?: boolean }) {
 
   return (
     <>
-      <button
-        onClick={() => { sfx('tap'); setOpen(true) }}
-        aria-label="Kies een taalwereld"
-        style={{
-          position: 'fixed',
-          right: 14,
-          bottom: 92,
-          zIndex: 45,
-          width: 48,
-          height: 48,
-          borderRadius: '50%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: 20,
-          background: 'var(--grad-hot)',
-          boxShadow: 'var(--glow-hot)',
-        }}
-      >
-        🎨
+      <button className="spread" style={{ width: '100%', padding: '14px 0', minHeight: 44, borderBottom: '1px solid var(--line)', textAlign: 'left' }} onClick={() => { sfx('tap'); setOpen(true) }}>
+        <span style={{ fontWeight: 500 }}>Taalwereld</span>
+        <span className="row" style={{ gap: 8 }}>
+          <span className="row" style={{ gap: 0 }}>
+            {(huidig?.proef ?? []).map((c, i) => (
+              <span key={c} style={{ width: 9, height: 18, background: c, borderTopLeftRadius: i === 0 ? 5 : 0, borderBottomLeftRadius: i === 0 ? 5 : 0, borderTopRightRadius: i === 2 ? 5 : 0, borderBottomRightRadius: i === 2 ? 5 : 0 }} />
+            ))}
+          </span>
+          <span className="dim" style={{ fontSize: 13.5 }}>{huidig?.naam ?? 'Neon arcade'}</span>
+          <span className="faint" style={{ fontSize: 16 }}>›</span>
+        </span>
       </button>
 
       <AnimatePresence>
@@ -152,7 +143,7 @@ export function WereldKiezer({ verborgen }: { verborgen?: boolean }) {
                   ))}
                 </div>
                 <p className="faint" style={{ fontSize: 11, marginTop: 6 }}>
-                  Niveau {niveau} in het {huidig?.naam ?? 'Spaans'}. Hoe dichter bij 99, hoe voller je wereld wordt: het ornament komt op,
+                  Niveau {niveau} in het {courses[taal].name}. Hoe dichter bij 99, hoe voller je wereld wordt: het ornament komt op,
                   het licht wordt dieper.
                 </p>
               </div>
