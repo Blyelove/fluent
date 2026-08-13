@@ -3,7 +3,7 @@ import { courseList, courses } from '../content'
 import { courseProgress, totalXp, useStore, wordsLearned } from '../store'
 import { levelProgress, levelTitle, nextReward, wardrobeFor } from '../levels'
 import { skillStand } from '../skills'
-import { SkillsSheet } from '../components/SkillsSheet'
+import { SkillRaster, SkillsSheet } from '../components/SkillsSheet'
 import { courseFlagCode } from '../countries'
 import { Flag } from '../components/Flag'
 import { Avatar, normalizePersona } from '../components/Avatar'
@@ -83,6 +83,13 @@ export function ProfileScreen() {
         <p className="faint" style={{ fontSize: 12, marginTop: 6 }}>
           Nog {lp.needed - lp.current} XP tot niveau {lp.level + 1}: {levelTitle(lp.level + 1)}
         </p>
+      </div>
+
+      {/* het vaardighedenraster opent het profiel, zonder één tik: zes talen
+          als skills richting 99, met het totaalniveau eronder. Wie RuneScape
+          ooit speelde is meteen thuis. Tik een taal voor de details. */}
+      <div style={{ marginBottom: 24 }}>
+        <SkillRaster actief={state.courseId} onTegel={() => { sfx('tap'); setSkillsOpen(true) }} />
       </div>
 
       {/* de held van dit scherm: je transformatie staat bovenaan, want dat is
@@ -215,22 +222,6 @@ export function ProfileScreen() {
           </span>
         </span>
         <span className="hot-text" style={{ fontSize: 20, fontWeight: 800 }}>›</span>
-      </button>
-
-      {/* vaardigheden in RuneScape-stijl: elke taal een niveau richting 99 */}
-      <button className="glass spread" style={{ width: '100%', padding: '13px 16px', marginBottom: 24, textAlign: 'left' }} onClick={() => { sfx('tap'); setSkillsOpen(true) }}>
-        <span className="row" style={{ gap: 10 }}>
-          <span style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(255,197,61,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🎓</span>
-          <span className="col" style={{ gap: 1 }}>
-            <strong className="card-title">Vaardigheden</strong>
-            <span className="faint" style={{ fontSize: 12 }}>
-              {course.name} niveau {skillStand(progress.xp).level} van 99
-            </span>
-          </span>
-        </span>
-        <span className="gold-text num" style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 17 }}>
-          Totaal {courseList.reduce((n, c) => n + skillStand(state.progress[c.id]?.xp ?? 0).level, 0)}
-        </span>
       </button>
 
       {skillsOpen && <SkillsSheet onClose={() => setSkillsOpen(false)} />}

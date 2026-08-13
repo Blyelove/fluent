@@ -75,7 +75,12 @@ export default function App() {
     pasWereldToe(wereldKeuze, taalNu, niveauNu)
   }, [wereldKeuze, taalNu, niveauNu])
 
-  const [tab, setTab] = useState<Tab>('home')
+  // ?demo=1 vult een wegwerpprofiel met voortgang en ?tab= opent een tabblad
+  // direct: zo is elk scherm vast te leggen via een kale link, zonder inloggen
+  const [tab, setTab] = useState<Tab>(() => {
+    const t = new URLSearchParams(window.location.search).get('tab')
+    return t === 'profiel' ? 'profile' : t === 'spelen' ? 'play' : t === 'divisie' ? 'league' : t === 'oefenen' ? 'review' : 'home'
+  })
   const [lesson, setLesson] = useState<{ course: Course; lesson: Lesson } | null>(null)
   // het gespreksscherm ligt als volledig scherm over de tabs heen
   const [praten, setPraten] = useState(false)
@@ -106,6 +111,18 @@ export default function App() {
   })
 
   useEffect(() => {
+    if (new URLSearchParams(window.location.search).has('demo')) {
+      try { sessionStorage.setItem('fluent-session', '1') } catch { /* geen sessie nodig */ }
+      useStore.setState({
+        currentUser: 'demo', rememberMe: true, onboarded: true, courseId: 'es',
+        streak: 34, bestStreak: 41, dailyGoalXp: 40,
+        progress: {
+          es: { xp: 5200, completed: ['es-u1-l1', 'es-u1-l2', 'es-u1-l3', 'es-u2-l1', 'es-u2-l2', 'es-u2-l3', 'es-u3-l1'] },
+          en: { xp: 2400, completed: [] }, fr: { xp: 900, completed: [] },
+          de: { xp: 120, completed: [] }, it: { xp: 60, completed: [] }, pt: { xp: 30, completed: [] },
+        },
+      })
+    }
     initVoices()
     void initAudioManifest()
     setSoundEnabled(soundOn)

@@ -69,19 +69,13 @@ function SkillTegel({ r, actief, onClick }: { r: Rij; actief: boolean; onClick: 
   )
 }
 
-export function SkillsSheet({ onClose }: { onClose: () => void }) {
+/** Alle vaardigheidsrijen uit de store, op één plek berekend */
+function useSkillRijen(): Rij[] {
   const progress = useStore((s) => s.progress)
   const srs = useStore((s) => s.srs)
   const gesprekken = useStore((s) => s.gesprekken)
   const stamps = useStore((s) => s.stamps)
-  const huidig = useStore((s) => s.courseId)
-  const ontdekteIds = useStore((s) => s.ontdekteFamilies)
-  const [open, setOpen] = useState<CourseId>(huidig)
-  /** familie die je uit je verzameling terugkijkt */
-  const [familie, setFamilie] = useState<WoordFamilie | null>(null)
-  const ontdekt = FAMILIES.filter((f) => ontdekteIds.includes(f.id))
-
-  const rijen: Rij[] = courseList.map((c) => {
+  return courseList.map((c) => {
     const xp = progress[c.id]?.xp ?? 0
     const lessen = progress[c.id]?.completed.length ?? 0
     return {
@@ -97,8 +91,50 @@ export function SkillsSheet({ onClose }: { onClose: () => void }) {
       landen: countryStates(c, lessen),
     }
   })
+}
 
+/**
+ * Het RuneScape-raster los bruikbaar: drie kolommen vakjes plus de
+ * totaalniveaubalk. Staat op het profiel zonder één tik, en in het paneel.
+ */
+export function SkillRaster({ actief, onTegel }: { actief?: CourseId; onTegel: (id: CourseId) => void }) {
+  const rijen = useSkillRijen()
   const totaal = rijen.reduce((n, r) => n + r.stand.level, 0)
+  return (
+    <>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 7 }}>
+        {rijen.map((r) => (
+          <SkillTegel key={r.id} r={r} actief={r.id === actief} onClick={() => onTegel(r.id)} />
+        ))}
+      </div>
+      <div
+        className="spread"
+        style={{
+          marginTop: 7,
+          padding: '11px 14px',
+          borderRadius: 12,
+          background: 'rgba(255, 197, 61, 0.1)',
+          border: '1.5px solid var(--line-gold)',
+        }}
+      >
+        <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 14 }}>Totaalniveau</span>
+        <span className="gold-text num" style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 20 }}>
+          {totaal}
+        </span>
+      </div>
+    </>
+  )
+}
+
+export function SkillsSheet({ onClose }: { onClose: () => void }) {
+  const huidig = useStore((s) => s.courseId)
+  const ontdekteIds = useStore((s) => s.ontdekteFamilies)
+  const [open, setOpen] = useState<CourseId>(huidig)
+  /** familie die je uit je verzameling terugkijkt */
+  const [familie, setFamilie] = useState<WoordFamilie | null>(null)
+  const ontdekt = FAMILIES.filter((f) => ontdekteIds.includes(f.id))
+
+  const rijen = useSkillRijen()
   const detail = rijen.find((r) => r.id === open) ?? rijen[0]
   const mijlpaal = volgendeMijlpaal(detail.stand.level)
 
@@ -128,28 +164,7 @@ export function SkillsSheet({ onClose }: { onClose: () => void }) {
           </p>
 
           {/* het raster van drie kolommen, het hart van het RuneScape-scherm */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 7 }}>
-            {rijen.map((r) => (
-              <SkillTegel key={r.id} r={r} actief={r.id === open} onClick={() => { sfx('tap'); setOpen(r.id) }} />
-            ))}
-          </div>
-
-          {/* de totaalniveau-balk onder het raster */}
-          <div
-            className="spread"
-            style={{
-              marginTop: 7,
-              padding: '11px 14px',
-              borderRadius: 12,
-              background: 'rgba(255, 197, 61, 0.1)',
-              border: '1.5px solid var(--line-gold)',
-            }}
-          >
-            <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 14 }}>Totaalniveau</span>
-            <span className="gold-text num" style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 20 }}>
-              {totaal}
-            </span>
-          </div>
+          <SkillRaster actief={open} onTegel={(id) => { sfx('tap'); setOpen(id) }} />
 
           {/* de details van de aangetikte vaardigheid */}
           <motion.div
