@@ -415,7 +415,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                 {next.unit.icon}
               </span>
               <span className="col" style={{ gap: 2, flex: 1, minWidth: 0 }}>
-                <span className="eyebrow" style={{ fontSize: 10.5, color: '#F0ABFC' }}>
+                <span className="eyebrow" style={{ fontSize: 10.5, color: 'var(--hero-eyebrow)' }}>
                   {activeSection.title} · {completed.length === 0 ? 'je eerste les' : 'verder waar je was'}
                 </span>
                 <strong className="display" style={{ fontSize: 21, lineHeight: 1.15 }}>{next.lesson.title}</strong>

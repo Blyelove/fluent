@@ -157,6 +157,10 @@ interface AureaState {
   duelName: string
   setDuelName: (n: string) => void
 
+  /** Gekozen taalwereld (data-wereld op html); leeg = de neonwereld */
+  wereld: string
+  setWereld: (id: string) => void
+
   /** Ontdekte woordfamilies (stam-ids uit cognaten.ts) */
   ontdekteFamilies: string[]
   /**
@@ -487,6 +491,8 @@ export const useStore = create<AureaState>()(
       currentUser: null,
       rememberMe: true,
       soundOn: true,
+      // de taalwereld is een apparaatvoorkeur, geen accountvoortgang
+      wereld: '',
 
       // en hier de voortgang van wie er nu ingelogd is
       ...nieuwProfiel(),
@@ -846,6 +852,8 @@ export const useStore = create<AureaState>()(
 
       setDuelName: (n) => set({ duelName: n.slice(0, 24) }),
 
+      setWereld: (id) => set({ wereld: id }),
+
       ontdekFamilie: (id, talen) => {
         const s = get()
         if (s.ontdekteFamilies.includes(id)) return 0
@@ -891,6 +899,7 @@ export const useStore = create<AureaState>()(
           currentUser: s.currentUser,
           rememberMe: s.rememberMe,
           soundOn: s.soundOn,
+          wereld: s.wereld,
           profiles: s.currentUser ? { ...s.profiles, [s.currentUser]: profiel } : s.profiles,
           // ook los meeschrijven: zo blijft een oude opslag zonder profielen werken
           ...profiel,

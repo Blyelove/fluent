@@ -36,6 +36,41 @@
   --r-sm: 12px;
   --font-display: 'Baloo 2', 'Instrument Sans', system-ui, sans-serif;
   --font-ui: 'Instrument Sans', system-ui, sans-serif;
+
+  /* ---- de drie sfeerlagen achter alles ----
+     Een taalwereld is niets meer dan een andere invulling van deze drie plus
+     de kleuren hierboven. Zo kan het Spaans er compleet anders uitzien dan
+     het Duits zonder dat er één scherm herbouwd hoeft te worden. */
+  --sfeer:
+    radial-gradient(900px 600px at 12% -8%, rgba(168, 85, 247, 0.25), transparent 55%),
+    radial-gradient(820px 520px at 108% 8%, rgba(236, 72, 153, 0.18), transparent 55%),
+    radial-gradient(720px 520px at -8% 92%, rgba(34, 211, 238, 0.15), transparent 55%),
+    linear-gradient(180deg, #171233 0%, #0e0b1f 38%, #0a0718 100%);
+  --vignet: radial-gradient(130% 92% at 50% 8%, transparent 58%, rgba(4, 2, 12, 0.55) 100%);
+  /* het ornament van de cultuur: tegelwerk, mozaïek, raster. Standaard uit. */
+  --ornament: none;
+  --ornament-maat: auto;
+
+  /* ---- de heldkaart ----
+     Eén kaart per scherm mag stralen. Het vlak, de rand en de tekst erop zijn
+     tokens, want in een lichte wereld blijft de held juist donker (schaduw)
+     en moet de tekst erop meebewegen. */
+  --hero-vlak: linear-gradient(150deg, rgba(168, 85, 247, 0.22) 0%, rgba(23, 18, 51, 0.92) 48%, rgba(236, 72, 153, 0.18) 100%);
+  --hero-rand: linear-gradient(135deg, rgba(168, 85, 247, 0.9), rgba(236, 72, 153, 0.9) 55%, rgba(255, 197, 61, 0.7));
+  --hero-schaduw: 0 10px 32px rgba(0, 0, 0, 0.45), 0 0 28px rgba(236, 72, 153, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  --hero-tekst: #f5f3ff;
+  --hero-dim: #cdc3f0;
+  --hero-faint: #a79cd0;
+  --hero-eyebrow: #f0abfc;
+
+  /* ---- het diepe paneel ----
+     De unitbalken en het bottom-sheet liggen als een blok vóór de wereld.
+     Ook dat blok is een token, zodat het in een lichte wereld gewoon donker
+     kan blijven met licht schrift erop. */
+  --paneel-diep: rgba(23, 18, 51, 0.9);
+  --paneel-tekst: #f5f3ff;
+  --paneel-dim: #cdc3f0;
+  --paneel-faint: #a79cd0;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -95,11 +130,7 @@ body::before {
   inset: 0;
   z-index: -2;
   pointer-events: none;
-  background:
-    radial-gradient(900px 600px at 12% -8%, rgba(168, 85, 247, 0.25), transparent 55%),
-    radial-gradient(820px 520px at 108% 8%, rgba(236, 72, 153, 0.18), transparent 55%),
-    radial-gradient(720px 520px at -8% 92%, rgba(34, 211, 238, 0.15), transparent 55%),
-    linear-gradient(180deg, #171233 0%, #0e0b1f 38%, #0a0718 100%);
+  background: var(--sfeer);
 }
 
 /* het vignet: donkere randen trekken het oog naar het midden, als in een zaal */
@@ -109,7 +140,9 @@ body::after {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background: radial-gradient(130% 92% at 50% 8%, transparent 58%, rgba(4, 2, 12, 0.55) 100%);
+  /* ornament ligt bovenop het vignet, allebei uit tokens */
+  background: var(--ornament), var(--vignet);
+  background-size: var(--ornament-maat), auto;
 }
 
 #root { min-height: 100dvh; }
@@ -230,10 +263,14 @@ input, textarea {
   position: relative;
   border: 1px solid transparent;
   border-radius: var(--r-lg);
-  background:
-    linear-gradient(150deg, rgba(168, 85, 247, 0.22) 0%, rgba(23, 18, 51, 0.92) 48%, rgba(236, 72, 153, 0.18) 100%) padding-box,
-    linear-gradient(135deg, rgba(168, 85, 247, 0.9), rgba(236, 72, 153, 0.9) 55%, rgba(255, 197, 61, 0.7)) border-box;
-  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.45), 0 0 28px rgba(236, 72, 153, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  background: var(--hero-vlak) padding-box, var(--hero-rand) border-box;
+  box-shadow: var(--hero-schaduw);
+  /* alles binnen de held leest van de heldtokens: zo klopt de tekst ook als
+     de kaart donker blijft terwijl de wereld eromheen licht is */
+  color: var(--hero-tekst);
+  --text: var(--hero-tekst);
+  --text-dim: var(--hero-dim);
+  --text-faint: var(--hero-faint);
 }
 
 /* drukbare statuschips: dezelfde drukfysica als elke knop in de app */
@@ -547,7 +584,11 @@ input, textarea {
   margin: 0 auto;
   padding: 18px 20px calc(18px + env(safe-area-inset-bottom));
   border-radius: 26px 26px 0 0;
-  background: rgba(23, 18, 51, 0.94);
+  background: var(--paneel-diep);
+  color: var(--paneel-tekst);
+  --text: var(--paneel-tekst);
+  --text-dim: var(--paneel-dim);
+  --text-faint: var(--paneel-faint);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-top: 2px solid var(--line);
@@ -805,7 +846,11 @@ input, textarea {
   gap: 12px;
   padding: 14px 18px;
   border-radius: 18px;
-  background: rgba(23, 18, 51, 0.88);
+  background: var(--paneel-diep);
+  color: var(--paneel-tekst);
+  --text: var(--paneel-tekst);
+  --text-dim: var(--paneel-dim);
+  --text-faint: var(--paneel-faint);
   border: 2px solid var(--line);
   margin: 30px 0 6px;
   position: relative;
@@ -817,7 +862,7 @@ input, textarea {
 
 .unit-banner-active {
   border-color: var(--uc, var(--hot2));
-  background: color-mix(in srgb, var(--uc, #ec4899) 14%, rgba(23, 18, 51, 0.88));
+  background: color-mix(in srgb, var(--uc, #ec4899) 14%, var(--paneel-diep));
   box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35), 0 0 24px color-mix(in srgb, var(--uc, #ec4899) 35%, transparent);
 }
 

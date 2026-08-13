@@ -61,10 +61,9 @@ export function AuthScreen() {
     }
   }
 
+  // alles uit tokens: op een lichte taalwereld werd wit op roze onleesbaar
   const segment = (actief: boolean) =>
-    actief
-      ? { borderColor: 'var(--hot2)', background: 'rgba(236, 72, 153, 0.14)', color: '#fff', boxShadow: '0 0 14px rgba(236, 72, 153, 0.25)' }
-      : undefined
+    actief ? { borderColor: 'var(--hot2)', background: 'var(--surface-3)', color: 'var(--text)', boxShadow: 'var(--glow-hot)' } : undefined
 
   return (
     <div className="shell shell--bare" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '100dvh' }}>

@@ -59,7 +59,7 @@ export function WoordBoom({
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           onClick={(e) => e.stopPropagation()}
         >
-          <p className="eyebrow center" style={{ color: '#F0ABFC' }}>
+          <p className="eyebrow center" style={{ color: 'var(--hero-eyebrow)' }}>
             {ontdekt ? 'Woordfamilie ontdekt' : 'Woordfamilie'}
           </p>
           <h3 className="display center" style={{ fontSize: 23, margin: '6px 0 14px' }}>

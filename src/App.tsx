@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type ComponentType } from 'react'
 import { useRegisterSW } from 'virtual:pwa-register/react'
+import { WereldKiezer } from './components/WereldKiezer'
 import type { Course, Lesson } from './types'
 import { courses } from './content'
 import { dueEntries, useStore } from './store'
@@ -163,6 +164,9 @@ export default function App() {
       {tab === 'league' && <LeagueScreen onLeren={() => setTab('home')} />}
       {tab === 'review' && <ReviewScreen onGoLearn={() => setTab('home')} onPraten={() => setPraten(true)} />}
       {tab === 'profile' && <ProfileScreen />}
+
+      {/* de proeverij van taalwerelden: vergelijk ze op je eigen scherm */}
+      <WereldKiezer verborgen={gamePlaying} />
 
       {/* er staat een nieuwe versie klaar: één tik en je kijkt weer live */}
       {nieuweVersie && (

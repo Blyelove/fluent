@@ -1,0 +1,210 @@
+/* ============================================================
+   DE TAALWERELDEN
+
+   Geen enkele taal-app laat zien welke taal je leert. Duolingo is
+   even groen voor Spaans als voor Japans. Hier krijgt elke taal zijn
+   eigen visuele dialect: een palet uit de echte beeldcultuur, een
+   eigen ornament, een eigen materiaal en een eigen lichtval.
+
+   Het blijft altijd Fluent: de verlichte arcadehal, echt neon, en
+   goud uitsluitend voor beloningen. Maar het is neon gezien door die
+   cultuur heen.
+
+   Een wereld is niets meer dan een setje tokens op <html data-wereld>.
+   Geen enkel scherm hoeft ervoor herbouwd te worden.
+   ============================================================ */
+
+/* ---------- A. AZULEJO · geglazuurd tegelwerk uit Sevilla ---------- */
+[data-wereld='azulejo'] {
+  --bg: #08122e;
+  --bg-2: #0d1c42;
+  --surface: rgba(120, 175, 255, 0.08);
+  --surface-2: rgba(120, 175, 255, 0.13);
+  --surface-3: rgba(120, 175, 255, 0.18);
+  --line: rgba(203, 227, 255, 0.16);
+  --line-hot: rgba(228, 87, 46, 0.55);
+  --text: #eef4ff;
+  --text-dim: #9fb6da;
+  --text-faint: #6a83aa;
+  --hot1: #2f7be8;
+  --hot2: #e4572e;
+  --grad-hot: linear-gradient(135deg, #2f7be8 0%, #e4572e 100%);
+  --cyan: #3fd0d8;
+  --glow-hot: 0 0 0 1px rgba(228, 87, 46, 0.5), 0 0 12px rgba(228, 87, 46, 0.4), 0 0 36px rgba(47, 123, 232, 0.3);
+  --sfeer:
+    radial-gradient(900px 600px at 10% -8%, rgba(47, 123, 232, 0.32), transparent 55%),
+    radial-gradient(820px 520px at 108% 10%, rgba(228, 87, 46, 0.2), transparent 55%),
+    radial-gradient(760px 540px at -8% 94%, rgba(255, 197, 61, 0.14), transparent 55%),
+    linear-gradient(180deg, #0d1c42 0%, #08122e 40%, #050c22 100%);
+  --vignet: radial-gradient(130% 92% at 50% 8%, transparent 58%, rgba(2, 6, 20, 0.6) 100%);
+  /* het tegelraster van een Andalusisch binnenhof */
+  --ornament:
+    repeating-linear-gradient(0deg, rgba(190, 220, 255, 0.05) 0 1px, transparent 1px 56px),
+    repeating-linear-gradient(90deg, rgba(190, 220, 255, 0.05) 0 1px, transparent 1px 56px),
+    repeating-linear-gradient(45deg, rgba(190, 220, 255, 0.028) 0 1px, transparent 1px 28px);
+  --hero-vlak: linear-gradient(150deg, rgba(47, 123, 232, 0.3) 0%, rgba(9, 22, 58, 0.94) 48%, rgba(228, 87, 46, 0.22) 100%);
+  --hero-rand: linear-gradient(135deg, rgba(47, 123, 232, 0.9), rgba(228, 87, 46, 0.85) 55%, rgba(255, 197, 61, 0.75));
+  --hero-schaduw: 0 10px 32px rgba(0, 0, 0, 0.5), 0 0 28px rgba(47, 123, 232, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  --hero-tekst: #eef4ff;
+  --hero-dim: #b9cdea;
+  --hero-faint: #8ea6c8;
+  --hero-eyebrow: #ffbf9a;
+  --paneel-diep: rgba(9, 22, 58, 0.9);
+  --paneel-tekst: #eef4ff;
+  --paneel-dim: #b9cdea;
+  --paneel-faint: #8ea6c8;
+}
+
+/* ---------- B. FLAMENCO · nacht, karmijn, been en messing ---------- */
+[data-wereld='flamenco'] {
+  --bg: #12060b;
+  --bg-2: #1e0a12;
+  --surface: rgba(255, 190, 170, 0.06);
+  --surface-2: rgba(255, 190, 170, 0.1);
+  --surface-3: rgba(255, 190, 170, 0.15);
+  --line: rgba(255, 226, 205, 0.15);
+  --line-hot: rgba(255, 45, 85, 0.55);
+  --line-gold: rgba(224, 165, 60, 0.6);
+  --text: #fdf4ee;
+  --text-dim: #cbaa9d;
+  --text-faint: #907468;
+  --hot1: #a10f3a;
+  --hot2: #ff2d55;
+  --grad-hot: linear-gradient(135deg, #a10f3a 0%, #ff2d55 100%);
+  --gold: #e0a53c;
+  --gold-bright: #ffd98a;
+  --gold-deep: #a9701c;
+  --grad-gold: linear-gradient(135deg, #ffd98a 0%, #c98a24 100%);
+  --ink-on-gold: #24080e;
+  --cyan: #d9c7a8;
+  --glow-hot: 0 0 0 1px rgba(255, 45, 85, 0.55), 0 0 12px rgba(255, 45, 85, 0.45), 0 0 40px rgba(161, 15, 58, 0.35);
+  --glow-gold: 0 0 0 1px rgba(255, 217, 138, 0.5), 0 0 10px rgba(224, 165, 60, 0.4), 0 0 30px rgba(169, 112, 28, 0.3);
+  --sfeer:
+    radial-gradient(820px 560px at 50% -12%, rgba(255, 45, 85, 0.22), transparent 58%),
+    radial-gradient(700px 480px at 108% 88%, rgba(224, 165, 60, 0.14), transparent 55%),
+    linear-gradient(180deg, #1e0a12 0%, #12060b 42%, #080306 100%);
+  /* diep vignet: één spot op een donker podium */
+  --vignet: radial-gradient(120% 86% at 50% 12%, transparent 46%, rgba(3, 1, 3, 0.78) 100%);
+  /* gitaarsnaren, nauwelijks zichtbaar */
+  --ornament: repeating-linear-gradient(90deg, rgba(255, 220, 190, 0.035) 0 1px, transparent 1px 72px);
+  --hero-vlak: linear-gradient(150deg, rgba(161, 15, 58, 0.4) 0%, rgba(24, 8, 14, 0.95) 50%, rgba(224, 165, 60, 0.16) 100%);
+  --hero-rand: linear-gradient(135deg, rgba(255, 45, 85, 0.9), rgba(161, 15, 58, 0.9) 55%, rgba(224, 165, 60, 0.8));
+  --hero-schaduw: 0 12px 36px rgba(0, 0, 0, 0.62), 0 0 30px rgba(255, 45, 85, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  --hero-tekst: #fdf4ee;
+  --hero-dim: #dcbcae;
+  --hero-faint: #b0907f;
+  --hero-eyebrow: #ffb3a0;
+  --paneel-diep: rgba(24, 8, 14, 0.92);
+  --paneel-tekst: #fdf4ee;
+  --paneel-dim: #dcbcae;
+  --paneel-faint: #b0907f;
+}
+
+/* ---------- C. TRENCADÍS · het mozaïek van Gaudí ---------- */
+[data-wereld='trencadis'] {
+  --bg: #0a1a1c;
+  --bg-2: #0f2a2b;
+  --surface: rgba(110, 255, 224, 0.07);
+  --surface-2: rgba(110, 255, 224, 0.11);
+  --surface-3: rgba(110, 255, 224, 0.16);
+  --line: rgba(190, 255, 240, 0.16);
+  --line-hot: rgba(255, 122, 77, 0.55);
+  --text: #eefaf6;
+  --text-dim: #9dc4bb;
+  --text-faint: #6a8d86;
+  --hot1: #00b39a;
+  --hot2: #ff7a4d;
+  --grad-hot: linear-gradient(135deg, #00b39a 0%, #ff7a4d 100%);
+  --gold: #ffcf5c;
+  --cyan: #2ee6c8;
+  --glow-hot: 0 0 0 1px rgba(255, 122, 77, 0.5), 0 0 12px rgba(255, 122, 77, 0.4), 0 0 36px rgba(0, 179, 154, 0.32);
+  /* Gaudí kende geen rechte lijn */
+  --r-lg: 30px;
+  --r-md: 22px;
+  --r-sm: 15px;
+  --sfeer:
+    radial-gradient(880px 600px at 8% -6%, rgba(0, 179, 154, 0.3), transparent 56%),
+    radial-gradient(800px 520px at 110% 14%, rgba(255, 122, 77, 0.22), transparent 55%),
+    radial-gradient(740px 520px at 40% 104%, rgba(255, 207, 92, 0.14), transparent 55%),
+    linear-gradient(180deg, #0f2a2b 0%, #0a1a1c 40%, #061113 100%);
+  --vignet: radial-gradient(132% 94% at 50% 6%, transparent 60%, rgba(2, 10, 11, 0.6) 100%);
+  /* gebroken tegelscherven in drie richtingen */
+  --ornament:
+    repeating-linear-gradient(60deg, rgba(0, 220, 190, 0.05) 0 2px, transparent 2px 34px),
+    repeating-linear-gradient(-60deg, rgba(255, 122, 77, 0.045) 0 2px, transparent 2px 41px),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.028) 0 2px, transparent 2px 47px);
+  --hero-vlak: linear-gradient(150deg, rgba(0, 179, 154, 0.32) 0%, rgba(8, 30, 32, 0.94) 48%, rgba(255, 122, 77, 0.24) 100%);
+  --hero-rand: linear-gradient(135deg, rgba(0, 179, 154, 0.9), rgba(255, 122, 77, 0.88) 55%, rgba(255, 207, 92, 0.8));
+  --hero-schaduw: 0 10px 32px rgba(0, 0, 0, 0.5), 0 0 28px rgba(0, 179, 154, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  --hero-tekst: #eefaf6;
+  --hero-dim: #b3d8d0;
+  --hero-faint: #8bb0a8;
+  --hero-eyebrow: #ffb08c;
+  --paneel-diep: rgba(8, 30, 32, 0.9);
+  --paneel-tekst: #eefaf6;
+  --paneel-dim: #b3d8d0;
+  --paneel-faint: #8bb0a8;
+}
+
+/* ---------- D. SOL Y SOMBRA · de gedurfde: licht in plaats van donker ----------
+   Elke taal-app is donker of grijswit. Deze is gebleekt pleisterwerk om
+   vijf uur 's middags: warm licht, en schaduw als harde vorm in plaats van
+   een zachte gloed. Neon wordt hier zonverblinding. */
+[data-wereld='solysombra'] {
+  --bg: #f6e8d2;
+  --bg-2: #efd9bb;
+  --surface: rgba(74, 30, 8, 0.055);
+  --surface-2: rgba(74, 30, 8, 0.09);
+  --surface-3: rgba(74, 30, 8, 0.14);
+  --line: rgba(74, 30, 8, 0.18);
+  --line-hot: rgba(157, 23, 77, 0.5);
+  --line-gold: rgba(180, 83, 9, 0.5);
+  --text: #2a1206;
+  --text-dim: #6b4a33;
+  --text-faint: #74563a;
+  --hot1: #c2410c;
+  --hot2: #9d174d;
+  --grad-hot: linear-gradient(135deg, #c2410c 0%, #9d174d 100%);
+  --gold: #b45309;
+  --gold-bright: #d97706;
+  --gold-deep: #92400e;
+  --grad-gold: linear-gradient(135deg, #d97706 0%, #92400e 100%);
+  --ink-on-gold: #fff8ec;
+  --cyan: #0e7490;
+  --ok: #15803d;
+  --ok-bg: rgba(21, 128, 61, 0.12);
+  --err: #b91c1c;
+  --err-bg: rgba(185, 28, 28, 0.1);
+  /* geen halo maar een geworpen schaduw: sombra */
+  --shadow: 6px 8px 0 rgba(74, 30, 8, 0.12);
+  --glow-hot: 0 0 0 1.5px rgba(157, 23, 77, 0.55), 5px 6px 0 rgba(157, 23, 77, 0.18);
+  --glow-gold: 0 0 0 1.5px rgba(180, 83, 9, 0.55), 5px 6px 0 rgba(180, 83, 9, 0.18);
+  --sfeer:
+    radial-gradient(760px 520px at 88% -10%, rgba(255, 214, 130, 0.85), transparent 58%),
+    radial-gradient(720px 560px at -6% 96%, rgba(194, 65, 12, 0.14), transparent 55%),
+    linear-gradient(180deg, #fdf3e2 0%, #f6e8d2 42%, #ecd8b8 100%);
+  /* omgekeerd vignet: het licht valt van rechtsboven binnen */
+  --vignet: radial-gradient(128% 90% at 78% 4%, transparent 52%, rgba(120, 70, 25, 0.16) 100%);
+  /* harde schaduwbanen van een luifel */
+  --ornament: repeating-linear-gradient(115deg, rgba(74, 30, 8, 0.05) 0 40px, transparent 40px 118px);
+  /* de held is hier letterlijk de sombra: één diep schaduwblok in een
+     zonovergoten scherm, met licht schrift erop */
+  --hero-vlak: linear-gradient(150deg, rgba(120, 40, 10, 0.96) 0%, rgba(46, 18, 8, 0.97) 52%, rgba(157, 23, 77, 0.9) 100%);
+  --hero-rand: linear-gradient(135deg, rgba(194, 65, 12, 0.95), rgba(157, 23, 77, 0.9) 55%, rgba(217, 119, 6, 0.9));
+  --hero-schaduw: 10px 12px 0 rgba(74, 30, 8, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  --hero-tekst: #fdf3e2;
+  --hero-dim: #e2c8ad;
+  --hero-faint: #bda183;
+  --hero-eyebrow: #ffcf8f;
+  /* ook hier blijft het paneel de schaduw in een zonnig scherm */
+  --paneel-diep: rgba(46, 18, 8, 0.94);
+  --paneel-tekst: #fdf3e2;
+  --paneel-dim: #e2c8ad;
+  --paneel-faint: #bda183;
+}
+
+/* op een lichte wereld werkt de witte glans op glas averechts */
+[data-wereld='solysombra'] .glass {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.12) 60%), var(--surface);
+  box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}

@@ -130,7 +130,7 @@ export function NewWordEx({ ex, ttsLang, register }: Common & { ex: NewWord }) {
     <div className="center float-in">
       {/* het nieuwe woord is de held van dit scherm; goud blijft voor beloningen */}
       <div className="card-hero" style={{ padding: '30px 20px 26px' }}>
-        <p className="eyebrow" style={{ marginBottom: 16, color: '#F0ABFC' }}>
+        <p className="eyebrow" style={{ marginBottom: 16, color: 'var(--hero-eyebrow)' }}>
           Nieuw woord
         </p>
         <button className="speaker-btn" onClick={() => speak(ex.word, ttsLang)} aria-label="Luister">
