@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState, type ComponentType } from 'react'
 import { useRegisterSW } from 'virtual:pwa-register/react'
 import { WereldKiezer } from './components/WereldKiezer'
+import { pasWereldToe } from './werelden'
+import { skillStand } from './skills'
 import type { Course, Lesson } from './types'
 import { courses } from './content'
 import { dueEntries, useStore } from './store'
@@ -63,6 +65,15 @@ export default function App() {
   const dueCount = useStore((s) => dueEntries(s, s.courseId).length)
   const leagueId = useStore((s) => s.leagueId)
   const weekXp = useStore((s) => s.weekXp)
+
+  // de taalwereld hoort op élk scherm te staan, ook op het inlogscherm; de
+  // kiezer laadt daar niet, dus zetten we hem hier op het document
+  const wereldKeuze = useStore((s) => s.wereld)
+  const taalNu = useStore((s) => s.courseId)
+  const niveauNu = useStore((s) => skillStand(s.progress[s.courseId]?.xp ?? 0).level)
+  useEffect(() => {
+    pasWereldToe(wereldKeuze, taalNu, niveauNu)
+  }, [wereldKeuze, taalNu, niveauNu])
 
   const [tab, setTab] = useState<Tab>('home')
   const [lesson, setLesson] = useState<{ course: Course; lesson: Lesson } | null>(null)

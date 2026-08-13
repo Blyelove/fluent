@@ -63,13 +63,30 @@ export function rijkdomVoor(level: number): 1 | 2 | 3 | 4 | 5 {
 }
 
 /**
+ * Een wereld uit de link, zodat je er een kunt delen of vastleggen:
+ * ?wereld=azulejo, en met &rijkdom=1..5 ook de trap. Handig om twee werelden
+ * naast elkaar te zetten zonder in de app te hoeven klikken.
+ */
+export function wereldUitLink(): { wereld?: string; rijkdom?: number } {
+  try {
+    const p = new URLSearchParams(window.location.search)
+    const w = p.get('wereld') ?? undefined
+    const r = Number(p.get('rijkdom'))
+    return { wereld: w ?? undefined, rijkdom: r >= 1 && r <= 5 ? r : undefined }
+  } catch {
+    return {}
+  }
+}
+
+/**
  * Zet wereld en rijkdom op het document. Een lege keuze betekent: volg de
  * taal die je leert, want dat is het hele idee.
  */
 export function pasWereldToe(keuze: string, taal: CourseId, level: number): void {
   const el = document.documentElement
-  const id = keuze || WERELD_PER_TAAL[taal] || ''
+  const uitLink = wereldUitLink()
+  const id = uitLink.wereld ?? (keuze || WERELD_PER_TAAL[taal] || '')
   if (id && id !== 'neon') el.setAttribute('data-wereld', id)
   else el.removeAttribute('data-wereld')
-  el.setAttribute('data-rijkdom', String(rijkdomVoor(level)))
+  el.setAttribute('data-rijkdom', String(uitLink.rijkdom ?? rijkdomVoor(level)))
 }
