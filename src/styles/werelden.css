@@ -117,6 +117,8 @@
   --grad-hot: linear-gradient(135deg, #00b39a 0%, #ff7a4d 100%);
   --gold: #ffcf5c;
   --cyan: #2ee6c8;
+  /* het jade verloop is licht: witte tekst erop leest niet */
+  --ink-op-hot: #04211c;
   --glow-hot: 0 0 0 1px rgba(255, 122, 77, 0.5), 0 0 12px rgba(255, 122, 77, 0.4), 0 0 36px rgba(0, 179, 154, 0.32);
   /* Gaudí kende geen rechte lijn */
   --r-lg: 30px;

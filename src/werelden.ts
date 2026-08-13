@@ -40,6 +40,12 @@ export const WERELDEN: Wereld[] = [
   { id: 'fresco', naam: 'Fresco', herkomst: 'Italiaans · pleisterkleur, marmeraders en dieppgroen', proef: ['#1f6f54', '#c55a3a', '#e0b64d'], taal: 'it' },
   { id: 'calcada', naam: 'Calçada', herkomst: 'Portugees · de oceaan en de golf in de stoeptegels', proef: ['#0e7c8c', '#ff6f59', '#ffc94d'], taal: 'pt' },
   { id: 'messing', naam: 'Messing', herkomst: 'Engels · mist, diep petrol en messing', proef: ['#1c4a3f', '#9b2c3c', '#c6964a'], taal: 'en' },
+  { id: 'nuit', naam: 'Nuit bleue', herkomst: 'Frans · de blauwe nacht boven Parijs, absint en koperlicht', proef: ['#14406e', '#7ec8a8', '#d8a55c'], taal: 'fr' },
+  { id: 'papier', naam: 'Papier', herkomst: 'Frans · wit papier met inkt, een schetsboek op een terras', proef: ['#2a2f7a', '#b03a5a', '#966a28'], taal: 'fr' },
+  { id: 'schwarzwald', naam: 'Schwarzwald', herkomst: 'Duits · sparrengroen, houtskool en warm lampglas', proef: ['#1e4d38', '#d87a3c', '#e8b45c'], taal: 'de' },
+  { id: 'notte', naam: 'Notte romana', herkomst: 'Italiaans · travertijn in het donker, wijnrood en olijf', proef: ['#5c6b32', '#a01e34', '#d9b678'], taal: 'it' },
+  { id: 'saudade', naam: 'Saudade', herkomst: 'Portugees · warm licht op witgekalkte muren aan de Taag', proef: ['#0d5b6b', '#be3c2c', '#9e6a14'], taal: 'pt' },
+  { id: 'soho', naam: 'Neon Soho', herkomst: 'Engels · natte straat in Londen om middernacht', proef: ['#2de2e6', '#ff3e78', '#ffd166'], taal: 'en' },
   { id: 'neon', naam: 'Neon arcade', herkomst: 'Onze oude wereld, gelijk voor elke taal', proef: ['#a855f7', '#ec4899', '#ffc53d'], taal: 'es' },
 ]
 

@@ -76,6 +76,10 @@
      Een cultuur beweegt ook anders. Het Spaans zet een hak neer, het Frans
      glijdt, het Duits klikt op zijn plek en het Italiaans zwelt aan. Twee
      tokens sturen dat: hoe lang iets duurt en met welke curve. */
+  /* de inkt op het hete verloop. In de meeste werelden is dat wit, maar
+     waar het verloop licht begint (jade in Trencadis) moet het donker. */
+  --ink-op-hot: #ffffff;
+
   --beweging-duur: 0.38s;
   --beweging-curve: cubic-bezier(0.2, 0.8, 0.2, 1);
   --beweging-tik: 0.08s;
@@ -958,7 +962,7 @@ input, textarea {
   left: 50%;
   transform: translateX(-50%);
   background: var(--grad-hot);
-  color: #fff;
+  color: var(--ink-op-hot);
   font-family: var(--font-display);
   font-weight: 800;
   font-size: 12px;

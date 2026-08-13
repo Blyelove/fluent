@@ -1,0 +1,318 @@
+/* ============================================================
+   TWEEDE EN DERDE RICHTING PER TAAL
+
+   Het Spaans had er vier om uit te kiezen; nu heeft elke taal er
+   drie. Steeds één veilige, één met karakter en één die verder gaat
+   dan een taal-app normaal durft.
+   ============================================================ */
+
+/* ---------- FRANS, tweede richting: NUIT BLEUE ----------
+   De blauwe nacht boven Parijs. Kobalt, absint en koperlicht. */
+[data-wereld='nuit'] {
+  --bg: #05101f;
+  --bg-2: #0a1c33;
+  --surface: rgba(160, 210, 255, 0.07);
+  --surface-2: rgba(160, 210, 255, 0.11);
+  --surface-3: rgba(160, 210, 255, 0.16);
+  --line: rgba(200, 230, 255, 0.15);
+  --line-hot: rgba(126, 200, 168, 0.55);
+  --text: #eef6ff;
+  --text-dim: #a8c4dc;
+  --text-faint: #90a8be;
+  --hot1: #14406e;
+  --hot2: #7ec8a8;
+  --grad-hot: linear-gradient(135deg, #14406e 0%, #7ec8a8 100%);
+  --gold: #d8a55c;
+  --gold-bright: #f4d69c;
+  --gold-deep: #9d7130;
+  --grad-gold: linear-gradient(135deg, #f4d69c 0%, #a87b34 100%);
+  --ink-on-gold: #06131f;
+  --cyan: #5fd0c0;
+  --glow-hot: 0 0 0 1px rgba(126, 200, 168, 0.5), 0 0 12px rgba(126, 200, 168, 0.35), 0 0 34px rgba(20, 64, 110, 0.4);
+  --sfeer:
+    radial-gradient(900px 620px at 20% -10%, rgba(20, 64, 110, 0.55), transparent 58%),
+    radial-gradient(700px 480px at 100% 18%, rgba(126, 200, 168, 0.14), transparent 55%),
+    linear-gradient(180deg, #0a1c33 0%, #05101f 44%, #030a15 100%);
+  --vignet: radial-gradient(126% 90% at 50% 10%, transparent 54%, rgba(1, 5, 12, 0.68) 100%);
+  /* het smeedijzer van een balkon in Haussmann-stijl */
+  --ornament:
+    repeating-linear-gradient(90deg, rgba(200, 230, 255, 0.045) 0 1px, transparent 1px 30px),
+    repeating-radial-gradient(circle at 50% 0, rgba(216, 165, 92, 0.03) 0 1px, transparent 1px 30px);
+  --hero-vlak: linear-gradient(150deg, rgba(20, 64, 110, 0.55) 0%, rgba(5, 16, 31, 0.96) 52%, rgba(126, 200, 168, 0.2) 100%);
+  --hero-rand: linear-gradient(135deg, rgba(126, 200, 168, 0.9), rgba(20, 64, 110, 0.9) 55%, rgba(216, 165, 92, 0.85));
+  --hero-schaduw: 0 10px 32px rgba(0, 0, 0, 0.55), 0 0 26px rgba(20, 64, 110, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  --hero-tekst: #eef6ff;
+  --hero-dim: #bed4e6;
+  --hero-faint: #94aabe;
+  --hero-eyebrow: #9fe0c4;
+  --paneel-diep: rgba(5, 16, 31, 0.93);
+  --paneel-tekst: #eef6ff;
+  --paneel-dim: #bed4e6;
+  --paneel-faint: #94aabe;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --kop-spatie: 0.005em;
+  --beweging-duur: 0.54s;
+  --beweging-curve: cubic-bezier(0.4, 0.02, 0.2, 1);
+  --beweging-tik: 0.1s;
+}
+
+/* ---------- FRANS, derde richting: PAPIER ----------
+   De gedurfde. Wit papier met inkt, als een schetsboek op een terras. */
+[data-wereld='papier'] {
+  --bg: #f7f4ec;
+  --bg-2: #efe9dc;
+  --surface: rgba(20, 22, 46, 0.05);
+  --surface-2: rgba(20, 22, 46, 0.085);
+  --surface-3: rgba(20, 22, 46, 0.13);
+  --line: rgba(20, 22, 46, 0.16);
+  --line-hot: rgba(176, 58, 90, 0.5);
+  --line-gold: rgba(150, 106, 40, 0.5);
+  --text: #14162e;
+  --text-dim: #4b4d6b;
+  --text-faint: #6d6f8a;
+  --hot1: #2a2f7a;
+  --hot2: #b03a5a;
+  --grad-hot: linear-gradient(135deg, #2a2f7a 0%, #b03a5a 100%);
+  --gold: #966a28;
+  --gold-bright: #b8862f;
+  --gold-deep: #6f4d18;
+  --grad-gold: linear-gradient(135deg, #b8862f 0%, #6f4d18 100%);
+  --ink-on-gold: #fdfbf5;
+  --cyan: #1d6a7a;
+  --ok: #15803d;
+  --ok-bg: rgba(21, 128, 61, 0.12);
+  --err: #a4161a;
+  --err-bg: rgba(164, 22, 26, 0.1);
+  --shadow: 4px 5px 0 rgba(20, 22, 46, 0.1);
+  --glow-hot: 0 0 0 1.5px rgba(176, 58, 90, 0.5), 4px 5px 0 rgba(176, 58, 90, 0.14);
+  --glow-gold: 0 0 0 1.5px rgba(150, 106, 40, 0.5), 4px 5px 0 rgba(150, 106, 40, 0.14);
+  --sfeer:
+    radial-gradient(700px 520px at 84% -8%, rgba(255, 250, 235, 0.9), transparent 58%),
+    linear-gradient(180deg, #fbf8f1 0%, #f7f4ec 42%, #ece5d7 100%);
+  --vignet: radial-gradient(126% 90% at 74% 6%, transparent 54%, rgba(90, 80, 55, 0.14) 100%);
+  /* het liniatuur van een schetsboek */
+  --ornament: repeating-linear-gradient(0deg, rgba(20, 22, 46, 0.045) 0 1px, transparent 1px 27px);
+  --hero-vlak: linear-gradient(150deg, rgba(42, 47, 122, 0.96) 0%, rgba(16, 18, 40, 0.97) 52%, rgba(176, 58, 90, 0.9) 100%);
+  --hero-rand: linear-gradient(135deg, rgba(42, 47, 122, 0.95), rgba(176, 58, 90, 0.9) 55%, rgba(184, 134, 47, 0.9));
+  --hero-schaduw: 8px 10px 0 rgba(20, 22, 46, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  --hero-tekst: #fbf9f4;
+  --hero-dim: #cfcde4;
+  --hero-faint: #a9a7c4;
+  --hero-eyebrow: #f0c98f;
+  --paneel-diep: rgba(16, 18, 40, 0.95);
+  --paneel-tekst: #fbf9f4;
+  --paneel-dim: #cfcde4;
+  --paneel-faint: #a9a7c4;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --kop-spatie: 0.01em;
+  --kop-gewicht: 700;
+  --beweging-duur: 0.46s;
+  --beweging-curve: cubic-bezier(0.45, 0.05, 0.25, 1);
+  --beweging-tik: 0.09s;
+}
+
+/* ---------- DUITS, tweede richting: SCHWARZWALD ----------
+   Diep sparrengroen, houtskool en warm lampglas. */
+[data-wereld='schwarzwald'] {
+  --bg: #0e1512;
+  --bg-2: #16211c;
+  --surface: rgba(200, 235, 215, 0.06);
+  --surface-2: rgba(200, 235, 215, 0.1);
+  --surface-3: rgba(200, 235, 215, 0.15);
+  --line: rgba(220, 245, 230, 0.15);
+  --line-hot: rgba(216, 122, 60, 0.55);
+  --text: #eef7f1;
+  --text-dim: #aac2b4;
+  --text-faint: #8ba396;
+  --hot1: #1e4d38;
+  --hot2: #d87a3c;
+  --grad-hot: linear-gradient(135deg, #1e4d38 0%, #d87a3c 100%);
+  --gold: #e8b45c;
+  --gold-bright: #ffd894;
+  --gold-deep: #a87c2c;
+  --cyan: #5aa898;
+  --glow-hot: 0 0 0 1px rgba(216, 122, 60, 0.5), 0 0 12px rgba(216, 122, 60, 0.36), 0 0 32px rgba(30, 77, 56, 0.34);
+  --r-lg: 12px;
+  --r-md: 9px;
+  --r-sm: 6px;
+  --sfeer:
+    radial-gradient(880px 620px at 14% -10%, rgba(30, 77, 56, 0.5), transparent 58%),
+    radial-gradient(700px 500px at 104% 16%, rgba(232, 180, 92, 0.14), transparent 55%),
+    linear-gradient(180deg, #16211c 0%, #0e1512 44%, #080d0b 100%);
+  --vignet: radial-gradient(124% 88% at 50% 12%, transparent 50%, rgba(4, 8, 6, 0.68) 100%);
+  /* de nerf van gezaagd hout */
+  --ornament:
+    repeating-linear-gradient(88deg, rgba(220, 245, 230, 0.03) 0 1px, transparent 1px 14px),
+    repeating-linear-gradient(92deg, rgba(232, 180, 92, 0.022) 0 1px, transparent 1px 46px);
+  --hero-vlak: linear-gradient(150deg, rgba(30, 77, 56, 0.55) 0%, rgba(12, 20, 16, 0.96) 52%, rgba(216, 122, 60, 0.24) 100%);
+  --hero-rand: linear-gradient(135deg, rgba(30, 77, 56, 0.92), rgba(216, 122, 60, 0.88) 55%, rgba(232, 180, 92, 0.85));
+  --hero-schaduw: 0 10px 32px rgba(0, 0, 0, 0.55), 0 0 24px rgba(30, 77, 56, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  --hero-tekst: #eef7f1;
+  --hero-dim: #c2d8ca;
+  --hero-faint: #9db3a6;
+  --hero-eyebrow: #ffd894;
+  --paneel-diep: rgba(12, 20, 16, 0.94);
+  --paneel-tekst: #eef7f1;
+  --paneel-dim: #c2d8ca;
+  --paneel-faint: #9db3a6;
+  --font-display: 'Space Grotesk', 'Instrument Sans', system-ui, sans-serif;
+  --kop-spatie: -0.012em;
+  --beweging-duur: 0.34s;
+  --beweging-curve: cubic-bezier(0.35, 0.02, 0.2, 1);
+  --beweging-tik: 0.07s;
+}
+
+/* ---------- ITALIAANS, tweede richting: NOTTE ROMANA ----------
+   Romeinse nacht: travertijn in het donker, wijnrood en olijf. */
+[data-wereld='notte'] {
+  --bg: #14100f;
+  --bg-2: #201a18;
+  --surface: rgba(255, 235, 215, 0.06);
+  --surface-2: rgba(255, 235, 215, 0.1);
+  --surface-3: rgba(255, 235, 215, 0.15);
+  --line: rgba(255, 240, 225, 0.15);
+  --line-hot: rgba(160, 30, 52, 0.6);
+  --text: #f8f1e8;
+  --text-dim: #c3b2a2;
+  --text-faint: #a2907f;
+  --hot1: #5c6b32;
+  --hot2: #a01e34;
+  --grad-hot: linear-gradient(135deg, #5c6b32 0%, #a01e34 100%);
+  --gold: #d9b678;
+  --gold-bright: #f5dcac;
+  --gold-deep: #9c7c3e;
+  --grad-gold: linear-gradient(135deg, #f5dcac 0%, #a8853f 100%);
+  --ink-on-gold: #1a1310;
+  --cyan: #7fa08a;
+  --glow-hot: 0 0 0 1px rgba(160, 30, 52, 0.55), 0 0 12px rgba(160, 30, 52, 0.35), 0 0 30px rgba(92, 107, 50, 0.28);
+  --sfeer:
+    radial-gradient(860px 600px at 18% -10%, rgba(160, 30, 52, 0.28), transparent 56%),
+    radial-gradient(760px 520px at 102% 18%, rgba(217, 182, 120, 0.16), transparent 55%),
+    linear-gradient(180deg, #201a18 0%, #14100f 44%, #0c0908 100%);
+  --vignet: radial-gradient(124% 88% at 50% 10%, transparent 50%, rgba(8, 5, 4, 0.68) 100%);
+  /* de blokken van een travertijnen muur */
+  --ornament:
+    repeating-linear-gradient(0deg, rgba(255, 240, 225, 0.035) 0 1px, transparent 1px 46px),
+    repeating-linear-gradient(90deg, rgba(255, 240, 225, 0.025) 0 1px, transparent 1px 96px);
+  --hero-vlak: linear-gradient(150deg, rgba(92, 107, 50, 0.4) 0%, rgba(22, 16, 14, 0.96) 52%, rgba(160, 30, 52, 0.3) 100%);
+  --hero-rand: linear-gradient(135deg, rgba(160, 30, 52, 0.9), rgba(92, 107, 50, 0.88) 55%, rgba(217, 182, 120, 0.85));
+  --hero-schaduw: 0 10px 32px rgba(0, 0, 0, 0.58), 0 0 24px rgba(160, 30, 52, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  --hero-tekst: #f8f1e8;
+  --hero-dim: #d6c4b2;
+  --hero-faint: #b09e8c;
+  --hero-eyebrow: #f5dcac;
+  --paneel-diep: rgba(22, 16, 14, 0.94);
+  --paneel-tekst: #f8f1e8;
+  --paneel-dim: #d6c4b2;
+  --paneel-faint: #b09e8c;
+  --font-display: 'Playfair Display', Georgia, serif;
+  --kop-spatie: -0.008em;
+  --beweging-duur: 0.5s;
+  --beweging-curve: cubic-bezier(0.3, 1.2, 0.6, 1);
+  --beweging-tik: 0.09s;
+}
+
+/* ---------- PORTUGEES, tweede richting: SAUDADE ----------
+   De gedurfde: warm licht op witgekalkte muren aan de Taag. */
+[data-wereld='saudade'] {
+  --bg: #f4efe6;
+  --bg-2: #e8e0d2;
+  --surface: rgba(10, 42, 58, 0.055);
+  --surface-2: rgba(10, 42, 58, 0.09);
+  --surface-3: rgba(10, 42, 58, 0.14);
+  --line: rgba(10, 42, 58, 0.18);
+  --line-hot: rgba(190, 60, 44, 0.5);
+  --line-gold: rgba(158, 106, 20, 0.5);
+  --text: #0a2230;
+  --text-dim: #3c5b6b;
+  --text-faint: #5d7a89;
+  --hot1: #0d5b6b;
+  --hot2: #be3c2c;
+  --grad-hot: linear-gradient(135deg, #0d5b6b 0%, #be3c2c 100%);
+  --gold: #9e6a14;
+  --gold-bright: #c08a20;
+  --gold-deep: #7a5010;
+  /* dieper goud, want de lichte inkt erop moet leesbaar blijven */
+  --grad-gold: linear-gradient(135deg, #9c6c14 0%, #5c3a08 100%);
+  --ink-on-gold: #fdf8ee;
+  --cyan: #0d6070;
+  --ok: #15803d;
+  --ok-bg: rgba(21, 128, 61, 0.12);
+  --err: #b3261e;
+  --err-bg: rgba(179, 38, 30, 0.1);
+  --shadow: 5px 6px 0 rgba(10, 42, 58, 0.1);
+  --glow-hot: 0 0 0 1.5px rgba(190, 60, 44, 0.5), 5px 6px 0 rgba(190, 60, 44, 0.16);
+  --glow-gold: 0 0 0 1.5px rgba(158, 106, 20, 0.5), 5px 6px 0 rgba(158, 106, 20, 0.16);
+  --sfeer:
+    radial-gradient(740px 520px at 86% -8%, rgba(255, 236, 196, 0.9), transparent 58%),
+    radial-gradient(700px 540px at -6% 96%, rgba(13, 91, 107, 0.12), transparent 55%),
+    linear-gradient(180deg, #faf6ee 0%, #f4efe6 42%, #e6dccb 100%);
+  --vignet: radial-gradient(126% 90% at 78% 4%, transparent 54%, rgba(60, 80, 90, 0.14) 100%);
+  /* de golf van de calçada, nu als donkere kiezel op wit */
+  --ornament: repeating-radial-gradient(circle at 0 50%, rgba(10, 42, 58, 0.05) 0 1px, transparent 1px 26px);
+  --hero-vlak: linear-gradient(150deg, rgba(13, 91, 107, 0.96) 0%, rgba(8, 34, 46, 0.97) 52%, rgba(190, 60, 44, 0.9) 100%);
+  --hero-rand: linear-gradient(135deg, rgba(13, 91, 107, 0.95), rgba(190, 60, 44, 0.9) 55%, rgba(192, 138, 32, 0.9));
+  --hero-schaduw: 9px 11px 0 rgba(10, 42, 58, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  --hero-tekst: #f6fbfd;
+  --hero-dim: #c5dbe4;
+  --hero-faint: #9dbac6;
+  --hero-eyebrow: #ffcf8f;
+  --paneel-diep: rgba(8, 34, 46, 0.95);
+  --paneel-tekst: #f6fbfd;
+  --paneel-dim: #c5dbe4;
+  --paneel-faint: #9dbac6;
+  --font-display: 'Fredoka', 'Baloo 2', system-ui, sans-serif;
+  --beweging-duur: 0.5s;
+  --beweging-curve: cubic-bezier(0.5, 0, 0.2, 1);
+  --beweging-tik: 0.1s;
+}
+
+/* ---------- ENGELS, tweede richting: NEON SOHO ----------
+   De gedurfde: natte straat in Londen om middernacht, neon in de plas. */
+[data-wereld='soho'] {
+  --bg: #0a0a14;
+  --bg-2: #121223;
+  --surface: rgba(190, 200, 255, 0.07);
+  --surface-2: rgba(190, 200, 255, 0.11);
+  --surface-3: rgba(190, 200, 255, 0.16);
+  --line: rgba(215, 222, 255, 0.16);
+  --line-hot: rgba(255, 62, 120, 0.6);
+  --text: #f2f3ff;
+  --text-dim: #b0b4d4;
+  --text-faint: #9096b8;
+  --hot1: #2de2e6;
+  --hot2: #ff3e78;
+  --grad-hot: linear-gradient(135deg, #2de2e6 0%, #ff3e78 100%);
+  --gold: #ffd166;
+  --gold-bright: #ffe9a8;
+  --gold-deep: #c99a20;
+  --cyan: #2de2e6;
+  --ink-op-hot: #0a0a14;
+  --glow-hot: 0 0 0 1px rgba(255, 62, 120, 0.6), 0 0 14px rgba(255, 62, 120, 0.5), 0 0 40px rgba(45, 226, 230, 0.35);
+  --sfeer:
+    radial-gradient(880px 600px at 10% -8%, rgba(45, 226, 230, 0.26), transparent 56%),
+    radial-gradient(820px 540px at 106% 12%, rgba(255, 62, 120, 0.26), transparent 55%),
+    radial-gradient(700px 520px at 50% 104%, rgba(255, 209, 102, 0.12), transparent 55%),
+    linear-gradient(180deg, #121223 0%, #0a0a14 44%, #05050c 100%);
+  --vignet: radial-gradient(122% 86% at 50% 10%, transparent 46%, rgba(2, 2, 6, 0.74) 100%);
+  /* de weerspiegeling in nat asfalt: horizontale strepen die uitlopen */
+  --ornament:
+    repeating-linear-gradient(0deg, rgba(45, 226, 230, 0.05) 0 1px, transparent 1px 18px),
+    repeating-linear-gradient(0deg, rgba(255, 62, 120, 0.035) 0 1px, transparent 1px 43px);
+  --hero-vlak: linear-gradient(150deg, rgba(45, 226, 230, 0.24) 0%, rgba(10, 10, 22, 0.96) 50%, rgba(255, 62, 120, 0.28) 100%);
+  --hero-rand: linear-gradient(135deg, rgba(45, 226, 230, 0.95), rgba(255, 62, 120, 0.92) 55%, rgba(255, 209, 102, 0.85));
+  --hero-schaduw: 0 10px 34px rgba(0, 0, 0, 0.6), 0 0 30px rgba(255, 62, 120, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  --hero-tekst: #f2f3ff;
+  --hero-dim: #c8cbe8;
+  --hero-faint: #a3a8cc;
+  --hero-eyebrow: #7ff0f2;
+  --paneel-diep: rgba(10, 10, 22, 0.94);
+  --paneel-tekst: #f2f3ff;
+  --paneel-dim: #c8cbe8;
+  --paneel-faint: #a3a8cc;
+  --font-display: 'Space Grotesk', 'Instrument Sans', system-ui, sans-serif;
+  --kop-spatie: -0.02em;
+  --beweging-duur: 0.3s;
+  --beweging-curve: cubic-bezier(0.18, 1.1, 0.3, 1);
+  --beweging-tik: 0.06s;
+}

@@ -187,7 +187,11 @@ export function WereldKiezer({ verborgen }: { verborgen?: boolean }) {
                   )}
                 </button>
 
-                {WERELDEN.map((w) => {
+                {/* eerst de werelden van jouw taal, dan de rest; anders is
+                    vijftien richtingen een lijst in plaats van een keuze */}
+                {[...WERELDEN]
+                  .sort((a, b) => (a.taal === taal ? 0 : 1) - (b.taal === taal ? 0 : 1))
+                  .map((w) => {
                   const actief = w.id === wereld
                   return (
                     <button

@@ -6,5 +6,6 @@ import './styles/werelden.css'
 import './styles/werelden-talen.css'
 import './styles/werelden-beweging.css'
 import './styles/werelden-typografie.css'
+import './styles/werelden-opties.css'
 
 createRoot(document.getElementById('root')!).render(<App />)
