@@ -71,6 +71,14 @@
   --paneel-tekst: #f5f3ff;
   --paneel-dim: #cdc3f0;
   --paneel-faint: #a79cd0;
+
+  /* ---- het bewegingskarakter ----
+     Een cultuur beweegt ook anders. Het Spaans zet een hak neer, het Frans
+     glijdt, het Duits klikt op zijn plek en het Italiaans zwelt aan. Twee
+     tokens sturen dat: hoe lang iets duurt en met welke curve. */
+  --beweging-duur: 0.38s;
+  --beweging-curve: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --beweging-tik: 0.08s;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -285,7 +293,7 @@ input, textarea {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.04));
   border: 1.5px solid var(--line);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 3px 0 rgba(0, 0, 0, 0.35);
-  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  transition: transform var(--beweging-tik) ease, box-shadow var(--beweging-tik) ease;
 }
 
 .chip:active {
@@ -305,7 +313,7 @@ input, textarea {
 
 /* eenmalige opbouw van het scherm, van boven naar beneden */
 .rise {
-  animation: floatIn 0.38s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: floatIn var(--beweging-duur) var(--beweging-curve) both;
   animation-delay: var(--d, 0ms);
 }
 
@@ -323,7 +331,7 @@ input, textarea {
   font-weight: 800;
   font-size: 17px;
   letter-spacing: 0.02em;
-  transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.15s ease;
+  transition: transform var(--beweging-tik) ease, box-shadow var(--beweging-tik) ease, filter 0.15s ease;
   user-select: none;
 }
 
@@ -385,7 +393,7 @@ input, textarea {
   font-weight: 600;
   font-size: 17px;
   box-shadow: 0 3px 0 rgba(0, 0, 0, 0.3);
-  transition: border-color 0.12s ease, background 0.12s ease, transform 0.08s ease, box-shadow 0.08s ease;
+  transition: border-color 0.12s ease, background 0.12s ease, transform var(--beweging-tik) ease, box-shadow var(--beweging-tik) ease;
 }
 
 .opt:hover { background: var(--surface-2); }
@@ -435,7 +443,7 @@ input, textarea {
   font-weight: 600;
   font-size: 17px;
   box-shadow: 0 3px 0 rgba(0, 0, 0, 0.35);
-  transition: background 0.12s ease, transform 0.08s ease, opacity 0.15s ease, box-shadow 0.08s ease;
+  transition: background 0.12s ease, transform var(--beweging-tik) ease, opacity 0.15s ease, box-shadow var(--beweging-tik) ease;
 }
 
 .tile:hover { background: var(--surface-3); }
@@ -474,7 +482,7 @@ input, textarea {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 0 0 1px rgba(236, 72, 153, 0.35), 0 0 10px rgba(236, 72, 153, 0.3);
   position: relative;
   overflow: hidden;
-  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: width calc(var(--beweging-duur) * 1.6) var(--beweging-curve);
 }
 
 .progress-fill--gold {
@@ -548,7 +556,7 @@ input, textarea {
   justify-content: center;
   margin: 0 auto 30px;
   box-shadow: 0 6px 0 #7e22ce, 0 12px 30px rgba(168, 85, 247, 0.45);
-  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  transition: transform var(--beweging-tik) ease, box-shadow var(--beweging-tik) ease;
 }
 
 .speaker-btn:active {
@@ -884,7 +892,7 @@ input, textarea {
   background: var(--surface-2);
   color: var(--text-faint);
   box-shadow: 0 6px 0 rgba(0, 0, 0, 0.5);
-  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  transition: transform var(--beweging-tik) ease, box-shadow var(--beweging-tik) ease;
 }
 
 .node-big:active {

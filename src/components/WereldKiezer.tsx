@@ -155,22 +155,42 @@ export function WereldKiezer({ verborgen }: { verborgen?: boolean }) {
                         boxShadow: actief ? 'var(--glow-hot)' : undefined,
                       }}
                     >
-                      {/* de drie dragende kleuren als staaltjes */}
-                      <span className="row" style={{ gap: 0, flexShrink: 0 }}>
-                        {w.proef.map((c, i) => (
+                      {/* een echte miniatuur van die wereld: dezelfde tokens,
+                          dus wat je hier ziet is precies wat je krijgt */}
+                      <span data-wereld={w.id === 'neon' ? undefined : w.id} style={{ flexShrink: 0, display: 'block' }}>
+                        <span
+                          style={{
+                            display: 'block',
+                            position: 'relative',
+                            width: 58,
+                            height: 44,
+                            borderRadius: 10,
+                            overflow: 'hidden',
+                            background: 'var(--bg)',
+                            border: '1px solid var(--line)',
+                          }}
+                        >
+                          {/* het sfeerlicht van de wereld */}
+                          <span style={{ position: 'absolute', inset: 0, background: 'var(--sfeer)', backgroundSize: 'cover' }} />
+                          {/* het ornament van de cultuur */}
+                          <span style={{ position: 'absolute', inset: 0, background: 'var(--ornament)' }} />
+                          {/* de heldkaart met zijn eigen rand */}
                           <span
-                            key={c}
                             style={{
-                              width: 15,
-                              height: 30,
-                              background: c,
-                              borderTopLeftRadius: i === 0 ? 8 : 0,
-                              borderBottomLeftRadius: i === 0 ? 8 : 0,
-                              borderTopRightRadius: i === 2 ? 8 : 0,
-                              borderBottomRightRadius: i === 2 ? 8 : 0,
+                              position: 'absolute',
+                              left: 6,
+                              top: 7,
+                              right: 6,
+                              height: 17,
+                              borderRadius: 5,
+                              border: '1px solid transparent',
+                              background: 'var(--hero-vlak) padding-box, var(--hero-rand) border-box',
                             }}
                           />
-                        ))}
+                          {/* de knop en het goud van de beloning */}
+                          <span style={{ position: 'absolute', left: 6, bottom: 6, width: 28, height: 9, borderRadius: 999, background: 'var(--grad-hot)' }} />
+                          <span style={{ position: 'absolute', right: 6, bottom: 6, width: 12, height: 9, borderRadius: 999, background: 'var(--grad-gold)' }} />
+                        </span>
                       </span>
                       <span className="col" style={{ flex: 1, minWidth: 0, gap: 1 }}>
                         <strong className="card-title">{w.naam}</strong>
