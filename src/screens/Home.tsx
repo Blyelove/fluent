@@ -956,7 +956,9 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                   padding: '6px 16px',
                   borderRadius: 999,
                   border: '1.5px solid var(--line)',
-                  background: 'rgba(23, 18, 51, 0.92)',
+                  // uit tokens: op een lichte taalwereld blijft dit blokje donker
+                  background: 'var(--paneel-diep)',
+                  color: 'var(--paneel-dim)',
                 }}
               >
                 {section.title} · {section.cefr}

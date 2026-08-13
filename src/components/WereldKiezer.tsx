@@ -80,6 +80,56 @@ export function WereldKiezer({ verborgen }: { verborgen?: boolean }) {
                 de hele app spreekt hem meteen.
               </p>
 
+              {/* voor en na, naast elkaar en levend: links de oude wereld die
+                  voor elke taal hetzelfde was, rechts die van jouw taal nu */}
+              <div className="row" style={{ gap: 10, marginBottom: 12, alignItems: 'stretch' }}>
+                {[
+                  { id: 'neon', label: 'Voor', sub: 'Gelijk voor elke taal' },
+                  { id: actiefId, label: 'Na', sub: huidig?.naam ?? 'Neon arcade' },
+                ].map((v, i) => (
+                  <div key={v.label} className="col" style={{ flex: 1, gap: 5, minWidth: 0 }}>
+                    <span data-wereld={v.id === 'neon' ? undefined : v.id} style={{ display: 'block' }}>
+                      <span
+                        style={{
+                          display: 'block',
+                          position: 'relative',
+                          width: '100%',
+                          height: 96,
+                          borderRadius: 12,
+                          overflow: 'hidden',
+                          background: 'var(--bg)',
+                          border: i === 1 ? '1.5px solid var(--line-hot)' : '1px solid var(--line)',
+                        }}
+                      >
+                        <span style={{ position: 'absolute', inset: 0, background: 'var(--sfeer)', backgroundSize: 'cover' }} />
+                        <span style={{ position: 'absolute', inset: 0, background: 'var(--ornament)' }} />
+                        <span
+                          style={{
+                            position: 'absolute',
+                            left: 9,
+                            top: 10,
+                            right: 9,
+                            height: 34,
+                            borderRadius: 8,
+                            border: '1px solid transparent',
+                            background: 'var(--hero-vlak) padding-box, var(--hero-rand) border-box',
+                          }}
+                        />
+                        <span style={{ position: 'absolute', left: 9, top: 51, right: 34, height: 13, borderRadius: 5, background: 'var(--surface-2)', border: '1px solid var(--line)' }} />
+                        <span style={{ position: 'absolute', right: 9, top: 51, width: 20, height: 13, borderRadius: 5, background: 'var(--grad-gold)' }} />
+                        <span style={{ position: 'absolute', left: 9, bottom: 9, width: 52, height: 15, borderRadius: 999, background: 'var(--grad-hot)' }} />
+                      </span>
+                    </span>
+                    <span className="col" style={{ gap: 0 }}>
+                      <strong style={{ fontSize: 12.5 }}>{v.label}</strong>
+                      <span className="faint" style={{ fontSize: 11 }}>
+                        {v.sub}
+                      </span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+
               {/* de rijkdomtrap: je wereld groeit mee met je niveau */}
               <div className="glass" style={{ padding: '11px 13px', marginBottom: 12 }}>
                 <div className="spread">

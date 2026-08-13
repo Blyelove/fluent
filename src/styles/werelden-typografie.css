@@ -1,0 +1,84 @@
+/* ============================================================
+   DE TYPOGRAFISCHE STEM PER TAAL
+
+   Het laatste onderdeel van het dialect. Alleen de koppen wisselen
+   van stem; de lopende tekst blijft overal Instrument Sans, want
+   leesbaarheid gaat vóór sfeer. Vier extra families dragen negen
+   werelden, zodat het laden licht blijft.
+
+   Elke stem krijgt ook zijn eigen letterafstand: een klassieke
+   renaissance-letter wil lucht, een bauhaus-grotesk wil strakheid.
+   ============================================================ */
+
+/* Spaans, azulejo: Baloo 2, warm en rond, zoals de app altijd al klonk */
+[data-wereld='azulejo'] {
+  --font-display: 'Baloo 2', 'Instrument Sans', system-ui, sans-serif;
+}
+
+/* Flamenco: een hoog contrast didone. Dun waar het dun hoort, zwaar waar het telt */
+[data-wereld='flamenco'] {
+  --font-display: 'Playfair Display', Georgia, serif;
+  --kop-spatie: -0.01em;
+}
+
+/* Trencadís: Fredoka, rond en organisch, alsof de letters zelf tegels zijn */
+[data-wereld='trencadis'] {
+  --font-display: 'Fredoka', 'Baloo 2', system-ui, sans-serif;
+}
+
+/* Sol y sombra: dezelfde didone, maar in affichegewicht onder de felle zon */
+[data-wereld='solysombra'] {
+  --font-display: 'Playfair Display', Georgia, serif;
+  --kop-spatie: -0.015em;
+  --kop-gewicht: 800;
+}
+
+/* Frans, encre: Cormorant Garamond, de letter van de Franse boekdrukkunst */
+[data-wereld='encre'] {
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --kop-spatie: 0.005em;
+  --kop-gewicht: 700;
+}
+
+/* Duits, raster: Space Grotesk, geometrisch en zonder franje */
+[data-wereld='raster'] {
+  --font-display: 'Space Grotesk', 'Instrument Sans', system-ui, sans-serif;
+  --kop-spatie: -0.02em;
+}
+
+/* Italiaans, fresco: Playfair, de klassieke letter boven een fresco */
+[data-wereld='fresco'] {
+  --font-display: 'Playfair Display', Georgia, serif;
+  --kop-spatie: -0.005em;
+}
+
+/* Portugees, calçada: Fredoka, rond als de kiezels in de stoep */
+[data-wereld='calcada'] {
+  --font-display: 'Fredoka', 'Baloo 2', system-ui, sans-serif;
+}
+
+/* Engels, messing: Playfair, ingetogen en zonder er iets van te maken */
+[data-wereld='messing'] {
+  --font-display: 'Playfair Display', Georgia, serif;
+  --kop-spatie: 0;
+}
+
+/* de koppen lezen de stem én de bijbehorende afstand */
+.display {
+  letter-spacing: var(--kop-spatie, -0.01em);
+  font-weight: var(--kop-gewicht, 700);
+}
+
+.card-title {
+  letter-spacing: var(--kop-spatie, 0);
+  font-weight: var(--kop-gewicht, 700);
+}
+
+/* een serif op klein formaat heeft iets meer lucht nodig om te blijven werken */
+[data-wereld='encre'] .card-title,
+[data-wereld='fresco'] .card-title,
+[data-wereld='flamenco'] .card-title,
+[data-wereld='messing'] .card-title,
+[data-wereld='solysombra'] .card-title {
+  font-size: 17.5px;
+}
