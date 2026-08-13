@@ -322,14 +322,10 @@ export function ArenaScreen({ onTerug, onPlayingChange }: { onTerug: () => void;
 
       {/* de vraag als slagwissel */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={vraagIdx}
-            initial={{ x: kalm ? 0 : 40, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: kalm ? 0 : -40, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
+        {/* bewust een CSS-animatie en géén exit: de vraag mag nooit van een
+            JavaScript-animatieframe afhangen, want in een achtergrondtab komt
+            dat frame niet en zou het gevecht bevriezen of onzichtbaar zijn */}
+        <div key={vraagIdx} className="float-in">
             <p className="eyebrow center" style={{ marginBottom: 8 }}>
               Wat is dit in het {course.name}?
             </p>
@@ -347,8 +343,7 @@ export function ArenaScreen({ onTerug, onPlayingChange }: { onTerug: () => void;
                 )
               })}
             </div>
-          </motion.div>
-        </AnimatePresence>
+        </div>
 
         <div style={{ minHeight: 34, marginTop: 14 }} className="center">
           {botDenkt && (
