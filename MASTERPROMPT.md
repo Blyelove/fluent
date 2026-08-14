@@ -434,6 +434,18 @@ Stoppen kan met `/loop stop` of door de cron-taak te verwijderen.
 
 ## Logboek
 
+- **14-08-2026, ronde 70** - **Nieuw doel: ontwerp tot de bodem. Begonnen bij het personage, want dat is het hart.**
+
+  Het personage had haar, huid, outfit en mond. Daardoor leken twee mensen met dezelfde haarkleur precies op elkaar: een gezicht wordt herkenbaar van zijn vórm, de ogen, de wenkbrauwen en de neus, en die waren er niet of maar in één soort. Er is nu `src/components/avatar-trekken.tsx` met acht varianten per trek: gezichtsvorm, ogen, wenkbrauwen, neus, mond (van vier naar acht) en lichaamsbouw.
+
+  **De voorwaarde die alles bij elkaar houdt:** de kruin blijft een halve cirkel met straal 34 en het hoofd blijft tussen x 66 en 134. Alle tien de haarstijlen, de oren, de hoeden en de brillen zijn op die maten getekend. Wat varieert is de kaak en de kin, en dat is precies waar een gezichtsvorm zijn karakter vandaan haalt.
+
+  **De kiezer toont nu voorbeelden in plaats van woorden.** "Tuit" en "Streep" zeggen niets over hoe een mond eruitziet. Elke tegel tekent jouw eigen personage met alleen díe trek veranderd, dus je vergelijkt wat je werkelijk krijgt. En met `?persona=face:3,eyes:1,nose:5` is elk gezicht via een kale link te bekijken en vast te leggen.
+
+  **LES: een model uitbreiden is niet hetzelfde als het aansluiten.** De nieuwe trekken stonden in het model, stonden in de kiezer, en kwamen nooit bij de tekening aan: de normaliseerfunctie die een profiel opschoont gaf alleen de oude velden door en liet de nieuwe stilletjes vallen. Geen foutmelding, geen waarschuwing, alleen een personage dat niet veranderde. **Regel: wie een model uitbreidt, loopt élke plek na waar dat model wordt gekopieerd of opgeschoond.**
+
+  **LES: een te grove vingerafdruk meldt dubbelen die er niet zijn.** De proef die controleert of acht varianten ook echt acht verschillende tekeningen opleveren, keek naar `d`, `cx`, `rx`, `ry`, `x` en `width`. Wenkbrauwen verschillen juist in `y` en `transform`, en pupillen in `r`. De meting meldde dus dubbele varianten die in werkelijkheid prima verschilden. Ook pakte hij de eerste svg op het scherm, en dat was soms een vlag in plaats van het personage.
+
 - **14-08-2026, ronde 69** - **Punt 1a en 1d bewezen, en vijftien richtingen nagelopen op echte code.**
 
   **1a, de XP-drop zweeft omhoog.** Nu met een echte baan, gemeten op de live link: top 71 naar 12 pixels terwijl de doorzichtigheid van 0,16 naar 1 loopt en weer uitdooft, op 17 pixels tekst en één tegelijk. Dus omhoog, zichtbaar, en subtiel.

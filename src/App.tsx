@@ -124,6 +124,11 @@ export default function App() {
        alleen te zien door zestigduizend XP te verdienen, en dus in de praktijk
        niet te controleren of vast te leggen. */
     const meesterDemo = vraag.has('meester')
+    /* ?persona=face:3,eyes:1,nose:5 zet losse trekken van het personage.
+       Zonder zoiets is een gezicht alleen te bekijken door het met de hand in
+       elkaar te klikken, en dan kun je acht varianten niet naast elkaar
+       leggen of vastleggen. Onbekende sleutels worden genegeerd. */
+    const persona = vraag.get('persona')
     // demo mag nooit een echte sessie overschrijven
     if ((vraag.has('demo') || meesterDemo) && (!alGebruiker || alGebruiker === 'demo')) {
       try { sessionStorage.setItem('fluent-session', '1') } catch { /* geen sessie nodig */ }
@@ -139,6 +144,17 @@ export default function App() {
           de: { xp: 120, completed: [] }, it: { xp: 60, completed: [] }, pt: { xp: 30, completed: [] },
         },
       })
+    }
+    if (persona) {
+      const trekken: Record<string, number> = {}
+      for (const stuk of persona.split(',')) {
+        const [sleutel, waarde] = stuk.split(':')
+        const n = Number(waarde)
+        if (sleutel && Number.isFinite(n)) trekken[sleutel.trim()] = n
+      }
+      const nu = useStore.getState().avatarLook
+      const basis = typeof nu === 'string' ? { hair: 0, skin: 2, hairColor: 1, outfit: 0 } : nu
+      useStore.setState({ avatarLook: { ...basis, ...trekken } as typeof nu })
     }
     initVoices()
     void initAudioManifest()

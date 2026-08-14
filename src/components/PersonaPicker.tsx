@@ -10,14 +10,81 @@ import {
   type AvatarStyle,
 } from './Avatar'
 import { GALERIJ } from './avatarGallery'
+import { BOUW_NAMEN, BROW_NAMEN, GEZICHT_NAMEN, NEUS_NAMEN, OOG_NAMEN } from './avatar-trekken'
 import { sfx } from '../audio'
 
-/** De personage-maker: 10 haarstijlen × 8 huidtinten × 12 haarkleuren × 10 outfits × extra's × monden */
+/**
+ * De personage-maker. Tien haarstijlen maal acht huidtinten maal twaalf
+ * haarkleuren maal tien outfits maal acht gezichtsvormen maal acht oogvormen
+ * maal acht wenkbrauwen maal acht neuzen maal acht monden maal acht bouwen.
+ */
 export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChange: (p: AvatarStyle) => void }) {
   const set = (patch: Partial<AvatarStyle>) => {
     sfx('tap')
     onChange({ ...value, ...patch })
   }
+
+  /**
+   * Eén rij keuzes voor één trek, elk als een echt personage in het klein.
+   *
+   * Woorden als "Tuit" en "Streep" zeggen niets over hoe een mond eruitziet;
+   * je moet het zien. Elke tegel tekent dus jouw eigen personage met alleen
+   * díe trek veranderd, zodat je vergelijkt wat je werkelijk krijgt.
+   */
+  const TrekRij = ({
+    titel,
+    sleutel,
+    namen,
+    heel,
+  }: {
+    titel: string
+    sleutel: keyof AvatarStyle
+    namen: string[]
+    /** het hele lijf laten zien in plaats van alleen het hoofd */
+    heel?: boolean
+  }) => (
+    <div>
+      <p className="eyebrow" style={{ fontSize: 10, marginBottom: 5, color: 'var(--text-faint)' }}>
+        {titel}
+      </p>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(60px, 1fr))', gap: 6 }}>
+        {namen.map((naam, i) => {
+          const aan = ((value[sleutel] as number | undefined) ?? 0) === i
+          return (
+            <button
+              key={naam}
+              onClick={() => set({ [sleutel]: i } as Partial<AvatarStyle>)}
+              title={naam}
+              aria-label={`${titel}: ${naam}`}
+              style={{
+                borderRadius: 12,
+                overflow: 'hidden',
+                background: aan ? 'rgba(236,72,153,0.16)' : 'var(--surface-2)',
+                border: aan ? '2px solid var(--hot2)' : '1.5px solid var(--line)',
+                padding: '3px 0 2px',
+                minHeight: 44,
+              }}
+            >
+              {/* een venster op de tekening: bij een gezichtstrek kijk je naar
+                  het hoofd, bij de bouw naar het hele lijf */}
+              <div
+                style={{
+                  height: heel ? 54 : 40,
+                  overflow: 'hidden',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'flex-start',
+                }}
+              >
+                <Avatar size={heel ? 54 : 62} look={{ ...value, [sleutel]: i }} courseId="es" still />
+              </div>
+              <p style={{ fontSize: 9.5, fontWeight: 700, color: aan ? 'var(--hot2)' : 'var(--text-faint)' }}>{naam}</p>
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
 
   const Swatches = ({ colors, active, pick }: { colors: string[]; active: number; pick: (i: number) => void }) => (
     <div className="row" style={{ gap: 2, flexWrap: 'wrap', marginLeft: -7 }}>
@@ -166,14 +233,28 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
           )
         })}
       </div>
-      <div className="row" style={{ gap: 14, alignItems: 'flex-start' }}>
-        <div className="center" style={{ flexShrink: 0 }}>
+      {/* Het voorbeeld hoort bovenaan te blijven plakken en de keuzes horen de
+          volle breedte te krijgen. Eerder stonden ze naast elkaar, en dan hield
+          een telefoon van 375 nog ongeveer 190 pixels over voor de keuzes: acht
+          varianten pasten daar in twee kolommen, dus vier rijen per trek. Nu
+          zie je je personage de hele tijd terwijl je eronder doorloopt. */}
+      <div className="col" style={{ gap: 12 }}>
+        <div
+          className="center"
+          style={{
+            position: 'sticky',
+            top: 0,
+            zIndex: 2,
+            paddingBottom: 6,
+            background: 'linear-gradient(var(--surface) 72%, transparent)',
+          }}
+        >
           <Avatar size={96} look={value} courseId="es" />
           <p className="faint" style={{ fontSize: 10.5, marginTop: 2 }}>
             Dit ben jij
           </p>
         </div>
-        <div className="col" style={{ gap: 10, flex: 1, minWidth: 0 }}>
+        <div className="col" style={{ gap: 10, minWidth: 0 }}>
           <div>
             <p className="eyebrow" style={{ fontSize: 10, marginBottom: 5 }}>
               Stap 3 (mag ook): maak hem helemaal eigen
@@ -230,31 +311,15 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
               ))}
             </div>
           </div>
-          <div>
-            <p className="eyebrow" style={{ fontSize: 10, marginBottom: 5 }}>
-              Mond
-            </p>
-            <div className="row" style={{ gap: 6, flexWrap: 'wrap' }}>
-              {MOUTH_NAMES.map((name, i) => (
-                <button
-                  key={name}
-                  onClick={() => set({ mouth: i })}
-                  style={{
-                    padding: '11px 14px',
-                    minHeight: 44,
-                    borderRadius: 999,
-                    fontSize: 11.5,
-                    fontWeight: 700,
-                    background: (value.mouth ?? 0) === i ? 'var(--grad-hot)' : 'var(--surface-2)',
-                    color: (value.mouth ?? 0) === i ? '#fff' : 'var(--text-dim)',
-                    border: (value.mouth ?? 0) === i ? 'none' : '1.5px solid var(--line)',
-                  }}
-                >
-                  {name}
-                </button>
-              ))}
-            </div>
-          </div>
+          {/* De trekken die een gezicht herkenbaar maken. Ze stonden er niet
+              in, en daardoor leken twee personages met dezelfde haarkleur
+              precies op elkaar. */}
+          <TrekRij titel="Gezichtsvorm" sleutel="face" namen={GEZICHT_NAMEN} />
+          <TrekRij titel="Ogen" sleutel="eyes" namen={OOG_NAMEN} />
+          <TrekRij titel="Wenkbrauwen" sleutel="brows" namen={BROW_NAMEN} />
+          <TrekRij titel="Neus" sleutel="nose" namen={NEUS_NAMEN} />
+          <TrekRij titel="Mond" sleutel="mouth" namen={MOUTH_NAMES} />
+          <TrekRij titel="Lichaamsbouw" sleutel="build" namen={BOUW_NAMEN} heel />
           <div>
             <p className="eyebrow" style={{ fontSize: 10, marginBottom: 5 }}>
               Huidskleur

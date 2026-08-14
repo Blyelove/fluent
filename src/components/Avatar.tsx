@@ -1,6 +1,19 @@
 import { useId } from 'react'
 import { motion } from 'motion/react'
 import type { CourseId } from '../types'
+import {
+  BOUWEN,
+  BOUW_NAMEN,
+  BROW_NAMEN,
+  GEZICHT_NAMEN,
+  Gezicht,
+  Mond,
+  NEUS_NAMEN,
+  Neus,
+  OOG_NAMEN,
+  Ogen,
+  Wenkbrauwen,
+} from './avatar-trekken'
 
 /** De 24 kant-en-klare personages (a t/m x) — ook nog steeds de legacy-waarde in de store */
 export type Look =
@@ -19,8 +32,21 @@ export interface AvatarStyle {
   extra?: number
   /** 0 man · 1 vrouw */
   gender?: number
-  /** 0 glimlach · 1 brede lach · 2 kalm · 3 grijns */
+  /** 0 glimlach · 1 brede lach · 2 kalm · 3 grijns · 4 tuit · 5 streep · 6 open lach · 7 scheve grijns */
   mouth?: number
+  /* Alles hieronder is optioneel en telt als 0 wanneer het ontbreekt. Zo houdt
+     een profiel dat al bestond precies het gezicht dat het had, en krijgt wie
+     nu kiest acht varianten per trek in plaats van één. */
+  /** gezichtsvorm, zie GEZICHT_NAMEN */
+  face?: number
+  /** oogvorm, zie OOG_NAMEN */
+  eyes?: number
+  /** wenkbrauwen, zie BROW_NAMEN */
+  brows?: number
+  /** neus, zie NEUS_NAMEN */
+  nose?: number
+  /** lichaamsbouw, zie BOUW_NAMEN */
+  build?: number
 }
 
 export const GENDER_NAMES = ['Man', 'Vrouw']
@@ -52,7 +78,7 @@ const NATURAL_BROW = '#4A3728'
 export const OUTFIT_COLORS = ['#7C7694', '#3E5C9A', '#B33A4B', '#2E7D5B', '#8A5BB8', '#C77B3F', '#22D3EE', '#EC4899', '#E8CB2A', '#232733']
 export const HAIR_STYLE_NAMES = ['Kort', 'Lang', 'Krullen', 'Knot', 'Buzz', 'Staart', 'Afro', 'Hanekam', 'Kuif', 'Vlechten']
 export const EXTRA_NAMES = ['Geen', 'Bril', 'Oorbellen', 'Sproeten']
-export const MOUTH_NAMES = ['Glimlach', 'Brede lach', 'Kalm', 'Grijns']
+export const MOUTH_NAMES = ['Glimlach', 'Brede lach', 'Kalm', 'Grijns', 'Tuit', 'Streep', 'Open lach', 'Scheef']
 export const DEFAULT_PERSONA: AvatarStyle = { hair: 0, skin: 2, hairColor: 1, outfit: 0, extra: 0, gender: 0, mouth: 0 }
 
 /**
@@ -160,6 +186,14 @@ export function normalizePersona(p?: AvatarStyle | Look | null): AvatarStyle {
     extra: clamp(p.extra, EXTRA_NAMES.length - 1, 0),
     gender: clamp(p.gender, 1, 0),
     mouth: clamp(p.mouth, MOUTH_NAMES.length - 1, 0),
+    /* De nieuwe trekken horen hier net zo goed thuis. Ze stonden er eerst
+       niet in, en dan komen ze überhaupt niet bij de tekening aan: het model
+       had ze wel, het personage kreeg ze nooit te zien. */
+    face: clamp(p.face, GEZICHT_NAMEN.length - 1, 0),
+    eyes: clamp(p.eyes, OOG_NAMEN.length - 1, 0),
+    brows: clamp(p.brows, BROW_NAMEN.length - 1, 0),
+    nose: clamp(p.nose, NEUS_NAMEN.length - 1, 0),
+    build: clamp(p.build, BOUW_NAMEN.length - 1, 0),
   }
 }
 
@@ -233,6 +267,14 @@ export function Avatar({
   const mouthLine = MOUTH_LINES[p.skin]
   const running = mode === 'run'
   const cheering = mode === 'cheer'
+  /* De lichaamsbouw als factor op de bestaande maten. Zo blijven de emblemen,
+     de strepen en de halsdoek die op de torso staan gewoon kloppen, en hoeft
+     er niets opnieuw ingemeten te worden. */
+  const bouw = BOUWEN[p.build ?? 0] ?? BOUWEN[0]
+  const torsoBreed = Math.round(64 * bouw.breed)
+  const torsoX = Math.round(100 - torsoBreed / 2)
+  const torsoHoog = Math.round(66 * bouw.hoog)
+  const torsoOnder = 106 + torsoHoog
 
   const hasScarf = level >= 2
   const hasHat = level >= 3
@@ -401,9 +443,9 @@ export function Avatar({
         </motion.g>
       )}
 
-      {/* benen */}
+      {/* benen: hoe ver ze uit elkaar staan hoort bij de bouw */}
       <motion.rect
-        x="82"
+        x={82 - bouw.spreid}
         y="166"
         width="14"
         height="42"
@@ -414,7 +456,7 @@ export function Avatar({
         style={{ originX: '89px', originY: '170px' }}
       />
       <motion.rect
-        x="104"
+        x={104 + bouw.spreid}
         y="166"
         width="14"
         height="42"
@@ -464,8 +506,8 @@ export function Avatar({
       )}
 
       {/* torso */}
-      <rect x="68" y="106" width="64" height="66" rx="20" fill={shirtFill} />
-      <ellipse cx="100" cy="168" rx="30" ry="8" fill="rgba(0,0,0,0.16)" />
+      <rect x={torsoX} y="106" width={torsoBreed} height={torsoHoog} rx="20" fill={shirtFill} />
+      <ellipse cx="100" cy={torsoOnder - 4} rx={torsoBreed / 2 - 2} ry="8" fill="rgba(0,0,0,0.16)" />
       <path d="M90 106 L100 116 L110 106 Z" fill="rgba(0,0,0,0.22)" />
       {hasOutfit && s.stripes && (
         <g clipPath={`url(#av-torso-${uid})`}>
@@ -512,9 +554,8 @@ export function Avatar({
         </g>
       )}
 
-      {/* hoofd */}
-      <circle cx="100" cy="66" r="34" fill={lk.skin} />
-      <path d="M126 44 A34 34 0 0 1 126 88 A44 44 0 0 0 126 44 Z" fill={lk.shade} opacity="0.4" />
+      {/* hoofd: de kruin is voor elke vorm gelijk, de kaak maakt het verschil */}
+      <Gezicht vorm={p.face ?? 0} huid={lk.skin} schaduw={lk.shade} />
       {/* haar — 10 stijlen, zie HAIR_STYLE_NAMES */}
       {p.hair === 0 && <path d="M66 62 Q66 30 100 30 Q134 30 134 62 Q126 44 100 44 Q74 44 66 62 Z" fill={lk.hair} />}
       {p.hair === 1 && (
@@ -581,9 +622,8 @@ export function Avatar({
           <circle cx="133" cy="110" r="2.6" fill={s.accent} />
         </g>
       )}
-      {/* wenkbrauwen */}
-      <rect x="80" y="52" width="14" height="3.5" rx="1.75" fill={browColor} transform="rotate(-4 87 54)" />
-      <rect x="106" y="52" width="14" height="3.5" rx="1.75" fill={browColor} transform="rotate(4 113 54)" />
+      {/* wenkbrauwen: stand en dikte doen meer voor een gezicht dan wat ook */}
+      <Wenkbrauwen vorm={p.brows ?? 0} kleur={browColor} />
       {/* oren */}
       <circle cx="66" cy="68" r="6" fill={lk.skin} />
       <circle cx="134" cy="68" r="6" fill={lk.skin} />
@@ -594,12 +634,7 @@ export function Avatar({
         transition={{ duration: 3.4, repeat: Infinity, times: [0, 0.88, 0.94, 1] }}
         style={{ originX: '100px', originY: '66px' }}
       >
-        <ellipse cx="87" cy="66" rx="7.5" ry="8.5" fill="#fff" />
-        <ellipse cx="113" cy="66" rx="7.5" ry="8.5" fill="#fff" />
-        <circle cx="89" cy="67.5" r="4" fill="#2B1A4D" />
-        <circle cx="115" cy="67.5" r="4" fill="#2B1A4D" />
-        <circle cx="90.5" cy="65.8" r="1.5" fill="#fff" />
-        <circle cx="116.5" cy="65.8" r="1.5" fill="#fff" />
+        <Ogen vorm={p.eyes ?? 0} />
       </motion.g>
       {/* wimpers (vrouw) */}
       {p.gender === 1 && (
@@ -610,19 +645,11 @@ export function Avatar({
           <path d="M119 56.5 L122 53" />
         </g>
       )}
-      {/* mond — 4 vormen, blijft ook op 56px leesbaar */}
-      {p.mouth === 1 ? (
-        <g>
-          <path d="M87 82 Q100 98 113 82 Z" fill="#8E3B22" />
-          <path d="M89.5 83.6 L110.5 83.6 Q100 89 89.5 83.6 Z" fill="#FFF8F2" />
-        </g>
-      ) : p.mouth === 2 ? (
-        <path d="M91 85 Q100 89 109 85" stroke={mouthLine} strokeWidth="3" strokeLinecap="round" fill="none" />
-      ) : p.mouth === 3 ? (
-        <path d="M88 85 Q100 93 112 79" stroke={mouthLine} strokeWidth="3" strokeLinecap="round" fill="none" />
-      ) : (
-        <path d="M89 84 Q100 92 111 84" stroke={mouthLine} strokeWidth="3" strokeLinecap="round" fill="none" />
-      )}
+      {/* neus: die was er niet, en juist daardoor leek elk gezicht op elk ander */}
+      <Neus vorm={p.nose ?? 0} kleur={lk.shade} />
+      {/* mond: acht vormen, allemaal leesbaar tot op 56 pixels */}
+      <Mond vorm={p.mouth ?? 0} lijn={mouthLine} />
+
       {/* blos */}
       <circle cx="76" cy="78" r="4.5" fill="#E89B6F" opacity="0.55" />
       <circle cx="124" cy="78" r="4.5" fill="#E89B6F" opacity="0.55" />
