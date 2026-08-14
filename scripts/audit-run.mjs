@@ -54,6 +54,7 @@ const telFouten = (u) =>
   u.contrastFouten.length +
   u.tikdoelenTeKlein.length +
   u.middenstreepjes.length +
+  (u.tekstBreekt ? u.tekstBreekt.length : 0) +
   (u.horizontaalScroll ? 1 : 0) +
   // deze werd wel gemeten maar niet meegeteld, dus de grens uit het doel stond
   // er alleen op papier
@@ -167,6 +168,11 @@ try {
 
 const stuk = uitslagen.filter((u) => telFouten(u) > 0)
 console.log(`\n${uitslagen.length} combinaties gemeten op ${BREEDTE}px`)
+console.log(
+  'gemeten per combinatie: contrast onder 3 op 1, tikdoelen onder 44 pixels, horizontale scroll,
+' +
+    'middenstreepjes, tekst die uit zijn vak breekt, en hoogstens drie oneindige animaties',
+)
 if (!stuk.length) {
   console.log('SCHOON')
   process.exit(0)
@@ -178,6 +184,8 @@ for (const u of stuk.slice(0, 24)) {
   if (u.tikdoelenTeKlein.length) delen.push('tikdoel ' + u.tikdoelenTeKlein.map((t) => `"${t.t}" ${t.w}x${t.h}`).join(' | '))
   if (u.horizontaalScroll) delen.push('horizontale scroll')
   if (u.middenstreepjes.length) delen.push('middenstreepje ' + u.middenstreepjes.join(' | '))
+  if (u.tekstBreekt && u.tekstBreekt.length)
+    delen.push('tekst breekt uit zijn vak: ' + u.tekstBreekt.map((b) => `"${b.t}" ${b.inhoud}>${b.vak}`).join(' | '))
   if (u.oneindigeAnimaties.aantal > MAX_ANIMATIES)
     delen.push(`${u.oneindigeAnimaties.aantal} oneindige animaties (${u.oneindigeAnimaties.soorten.join(', ')}), hoogstens ${MAX_ANIMATIES}`)
   console.log(`${u.scherm}/${u.wereld}: ${delen.join('; ')}`)

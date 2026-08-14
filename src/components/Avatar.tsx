@@ -315,7 +315,14 @@ export function Avatar({
   const cosmic = level >= 19
   const hasHalo = level >= 20
 
-  const shirtFill = hasOutfit ? s.shirt : OUTFIT_COLORS[p.outfit]
+  /* Je gekozen kledingkleur werd vanaf niveau 4 stilletjes overschreven door
+     het tenue van je land. Je koos dus iets in de kiezer dat na een paar
+     lessen verdween, en dat is een gebroken belofte.
+     Nu wint jouw keuze altijd, behalve als je hem nooit hebt aangeraakt: kleur
+     nul betekent "de kleur van mijn land". De wereld houdt zijn eigen gezicht
+     via de stof, de kraag en het accent, dus er gaat niets verloren. */
+  const eigenKleur = (p.outfit ?? 0) > 0
+  const shirtFill = hasOutfit && !eigenKleur ? s.shirt : OUTFIT_COLORS[p.outfit]
 
   return (
     <motion.svg

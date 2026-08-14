@@ -17,13 +17,21 @@ const BASIS = (process.argv[2] ?? 'http://localhost:5210/').replace(/\/?$/, '/')
 const POORT = 9300 + (process.pid % 600)
 const wacht = (ms) => new Promise((r) => setTimeout(r, ms))
 
+/* Álle onderdelen die punt 1a noemt, en van elk moeten er minstens acht zijn
+   die ook echt anders tekenen. Een lijst met acht namen is makkelijk; acht
+   verschillende tekeningen is het bewijs. */
 const TREKKEN = [
-  { sleutel: 'face', naam: 'gezichtsvorm' },
-  { sleutel: 'eyes', naam: 'ogen' },
-  { sleutel: 'brows', naam: 'wenkbrauwen' },
-  { sleutel: 'nose', naam: 'neus' },
-  { sleutel: 'mouth', naam: 'mond' },
-  { sleutel: 'build', naam: 'lichaamsbouw' },
+  { sleutel: 'face', naam: 'gezichtsvorm', aantal: 8 },
+  { sleutel: 'eyes', naam: 'ogen', aantal: 8 },
+  { sleutel: 'brows', naam: 'wenkbrauwen', aantal: 8 },
+  { sleutel: 'nose', naam: 'neus', aantal: 8 },
+  { sleutel: 'mouth', naam: 'mond', aantal: 8 },
+  { sleutel: 'build', naam: 'lichaamsbouw', aantal: 8 },
+  { sleutel: 'hair', naam: 'haarmodel', aantal: 10 },
+  // huid en haar zijn kleuren, dus die moeten mét kleur worden vergeleken
+  { sleutel: 'skin', naam: 'huidtint', aantal: 8, kleur: true },
+  { sleutel: 'hairColor', naam: 'haarkleur', aantal: 12, kleur: true },
+  { sleutel: 'outfit', naam: 'kledingkleur', aantal: 10, kleur: true },
 ]
 
 let fouten = 0
@@ -47,6 +55,7 @@ const VINGERAFDRUK = [
   '  // laat dat nou net de eigenschappen zijn waarmee wenkbrauwen van elkaar',
   '  // verschillen: de meting meldde dubbelen die er niet waren.',
   '  const velden = ["d", "cx", "cy", "r", "rx", "ry", "x", "y", "width", "height", "transform", "points"];',
+  '  if (METKLEUR) velden.push("fill", "stroke");',
   '  const delen = [];',
   '  for (const n of svg.querySelectorAll("path, circle, ellipse, rect, polygon, line")) {',
   '    let stuk = n.tagName;',
@@ -56,6 +65,12 @@ const VINGERAFDRUK = [
   '  return delen.join("//");',
   '})()',
 ].join('\n')
+
+/* De vingerafdruk met of zonder kleur. Bij haar- en kledingkleur is de kleur
+   juist het verschil; bij een vorm is hij ruis, want dan zou een andere
+   taalwereld al voor een andere afdruk zorgen. De vlag wordt hier ingebakken
+   en niet op window gezet, want elke navigatie wist dat weer. */
+const afdrukVoor = (metKleur) => VINGERAFDRUK.replace('METKLEUR', metKleur ? 'true' : 'false')
 
 const profiel = await mkdtemp(join(tmpdir(), 'persona-'))
 const edge = spawn('C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', [
@@ -112,12 +127,12 @@ try {
 
   for (const trek of TREKKEN) {
     const afdrukken = new Map()
-    for (let n = 0; n < 8; n++) {
+    for (let n = 0; n < trek.aantal; n++) {
       await stuur('Page.navigate', { url: `${BASIS}?demo=1&tab=profiel&persona=${trek.sleutel}:${n}` })
       await wacht(1500)
       await stuur('Emulation.setDeviceMetricsOverride', { width: 375, height: 812, deviceScaleFactor: 1, mobile: false })
       await wacht(280)
-      const afdruk = await ev(VINGERAFDRUK)
+      const afdruk = await ev(afdrukVoor(trek.kleur))
       if (typeof afdruk !== 'string' || afdruk.startsWith('FOUT') || afdruk === 'geen svg') {
         console.log(`  ${trek.naam} ${n}: ${afdruk}`)
         continue
@@ -126,7 +141,10 @@ try {
       if (al !== undefined) console.log(`  ${trek.naam}: variant ${n} tekent precies hetzelfde als variant ${al}`)
       else afdrukken.set(afdruk, n)
     }
-    eis(afdrukken.size === 8, `${trek.naam}: 8 varianten die allemaal anders tekenen (${afdrukken.size} uniek)`)
+    eis(
+      afdrukken.size === trek.aantal,
+      `${trek.naam}: ${trek.aantal} varianten die allemaal anders tekenen (${afdrukken.size} uniek)`,
+    )
   }
 
   /* en een plaatje van vier heel verschillende personages naast elkaar, want

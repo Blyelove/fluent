@@ -117,6 +117,41 @@ window.__auditFluent = async function auditFluent() {
     return { aantal: n, soorten: [...namen].slice(0, 6) }
   }
 
+  /**
+   * Tekst die buiten zijn vak breekt.
+   *
+   * Punt 5 zegt: geen tekst die in een andere taal langer wordt en dan breekt.
+   * Dat gebeurt niet op een woord maar op een vak dat te krap is gemaakt voor
+   * de Nederlandse tekst en dus geen ruimte overhoudt. Hier wordt gemeten of
+   * de inhoud breder is dan het vak dat hem moet dragen.
+   *
+   * Stroken die je bewust met je duim veegt tellen niet mee: die horen breder
+   * te zijn dan het scherm.
+   */
+  function tekstBreekt() {
+    const uit = []
+    document.querySelectorAll('body *').forEach((e) => {
+      const t = (e.textContent || '').trim()
+      if (!t || e.children.length > 0) return
+      const cs = getComputedStyle(e)
+      if (cs.display === 'none' || cs.visibility === 'hidden') return
+      if (cs.overflowX === 'auto' || cs.overflowX === 'scroll') return
+      // een voorouder die bewust veegt telt ook niet
+      let n = e.parentElement
+      let veegt = false
+      while (n && n !== el) {
+        const o = getComputedStyle(n)
+        if (o.overflowX === 'auto' || o.overflowX === 'scroll') veegt = true
+        n = n.parentElement
+      }
+      if (veegt) return
+      if (e.scrollWidth > e.clientWidth + 2 && e.clientWidth > 0) {
+        uit.push({ t: t.slice(0, 24), vak: e.clientWidth, inhoud: e.scrollWidth })
+      }
+    })
+    return uit
+  }
+
   function echteHorizontaleScroll() {
     const voor = window.scrollX
     window.scrollTo(600, window.scrollY)
@@ -153,6 +188,7 @@ window.__auditFluent = async function auditFluent() {
     oneindigeAnimaties: oneindigeAnimaties(),
     horizontaalScroll: echteHorizontaleScroll(),
     middenstreepjes: middenstreepjes(),
+    tekstBreekt: tekstBreekt(),
   }
 }
 'audit geladen'
