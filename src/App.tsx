@@ -70,9 +70,13 @@ export default function App() {
   const wereldKeuze = useStore((s) => s.wereld)
   const taalNu = useStore((s) => s.courseId)
   const niveauNu = useStore((s) => skillStand(s.progress[s.courseId]?.xp ?? 0).level)
+  // ?wereld=papier dwingt één wereld af zonder iets in te stellen: zo is elke
+  // wereld op elk scherm vast te leggen met een kale link
+  const wereldUitLink = useMemo(() => new URLSearchParams(window.location.search).get('wereld'), [])
   useEffect(() => {
-    pasWereldToe(wereldKeuze, taalNu, niveauNu)
-  }, [wereldKeuze, taalNu, niveauNu])
+    if (wereldUitLink) document.documentElement.setAttribute('data-wereld', wereldUitLink)
+    else pasWereldToe(wereldKeuze, taalNu, niveauNu)
+  }, [wereldKeuze, taalNu, niveauNu, wereldUitLink])
 
   // ?demo=1 vult een wegwerpprofiel met voortgang en ?tab= opent een tabblad
   // direct: zo is elk scherm vast te leggen via een kale link, zonder inloggen

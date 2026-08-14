@@ -173,7 +173,10 @@ export function ProfileScreen() {
                         fontSize: 11.5,
                         fontWeight: 800,
                         marginTop: 4,
-                        color: huidig ? 'var(--gold)' : bereikt ? 'var(--text)' : 'var(--text-faint)',
+                        // geen goud op de goudwaas van het huidige stadium: dat
+                        // haalde in de lichte werelden nog geen 2 op 1. De gouden
+                        // ring eromheen zegt al genoeg dat je hier staat.
+                        color: bereikt ? 'var(--text)' : 'var(--text-faint)',
                       }}
                     >
                       {bereikt ? `Niveau ${niv}` : `Niveau ${niv} 🔒`}

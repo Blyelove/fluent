@@ -80,6 +80,21 @@
      waar het verloop licht begint (jade in Trencadis) moet het donker. */
   --ink-op-hot: #ffffff;
 
+  /* de inkt op een unitkleur. Die kleuren zijn altijd fel en licht (amber,
+     roze, cyaan, limoen), dus daar hoort altijd donkere inkt op, ook in een
+     lichte wereld waar --ink-on-gold juist licht is. */
+  --ink-op-unit: #1a1206;
+
+  /* de slagschaduw onder inkt op een hotkleur. Hoort bij lichte inkt; een
+     wereld met donkere inkt op hot zet hem uit, anders wordt het vies. */
+  --schaduw-op-hot: 0 1px 2px rgba(0, 0, 0, 0.25);
+
+  /* goud als tekstkleur, niet als vlak. In een donkere wereld mag dat het
+     felle goud zijn, in een lichte wereld moet het juist het diepe goud
+     worden, anders verdwijnen de vaardigheidsgetallen in het papier. */
+  --goud-tekst: var(--gold-bright);
+  --goud-tekst-dim: var(--gold);
+
   --beweging-duur: 0.38s;
   --beweging-curve: cubic-bezier(0.2, 0.8, 0.2, 1);
   --beweging-tik: 0.08s;
@@ -91,10 +106,17 @@ html, body { height: 100%; }
 
 /* De pagina is een rechte kolom: opzij scrollen bestaat niet. `clip` in
    plaats van `hidden`, want hidden maakt een scrollcontainer en dan kan een
-   mobiele browser hem alsnog opzij duwen. Alleen op html: een overflow op
-   body maakt bódy het scrollvak en dan doet window.scrollTo niets meer.
-   Decor dat breder is dan het scherm (sfeerorbs, gloed) snijdt hier af. */
+   mobiele browser hem alsnog opzij duwen.
+   Decor dat breder is dan het scherm (sfeerorbs, gloed) snijdt hier af.
+
+   Ook op body en niet alleen op html: Chromium geeft een `clip` op het
+   wortelelement niet door aan het venster, dus met alleen de html-regel kon je
+   op een scherm van 375 nog steeds 90 pixels opzij schuiven. Gemeten op een
+   echte 375, want op een breder venster valt het decor gewoon binnen en zie je
+   het probleem niet. `clip` maakt geen scrollvak, dus window.scrollTo en
+   sticky blijven werken. */
 html { overflow-x: clip; }
+body { overflow-x: clip; }
 
 /* Schuifbalken in de huisstijl. De grijze systeembalk van Windows viel hard
    uit de toon in het donkere neon-ontwerp; deze is dun, paars en verdwijnt in
@@ -282,6 +304,10 @@ input, textarea {
   --text: var(--hero-tekst);
   --text-dim: var(--hero-dim);
   --text-faint: var(--hero-faint);
+  /* de held blijft donker, ook in een lichte wereld, dus hier hoort het felle
+     goud en niet het diepe goud dat de rest van een lichte wereld gebruikt */
+  --goud-tekst: var(--gold-bright);
+  --goud-tekst-dim: var(--gold-bright);
 }
 
 /* drukbare statuschips: dezelfde drukfysica als elke knop in de app */
@@ -341,9 +367,9 @@ input, textarea {
 
 .btn-primary {
   background: var(--grad-hot);
-  color: #fff;
+  color: var(--ink-op-hot);
   box-shadow: 0 5px 0 #7e22ce, 0 10px 28px rgba(168, 85, 247, 0.4);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  text-shadow: var(--schaduw-op-hot);
 }
 
 .btn-primary:hover { filter: brightness(1.1); }
@@ -879,7 +905,10 @@ input, textarea {
 
 .unit-banner-done {
   background: var(--uc, var(--grad-gold));
-  color: var(--ink-on-gold);
+  color: var(--ink-op-unit, #1a1206);
+  --text: var(--ink-op-unit, #1a1206);
+  --text-dim: var(--ink-op-unit, #1a1206);
+  --text-faint: var(--ink-op-unit, #1a1206);
   border-color: transparent;
   box-shadow: 0 4px 0 color-mix(in srgb, var(--uc, #ffb300) 55%, black);
 }
@@ -907,7 +936,10 @@ input, textarea {
 /* voltooid = een paspoortstempel: scheef geslagen, gestreepte inktrand met
    een binnenring — de reismetafoor tot in elke les */
 .node-big.done {
-  background: color-mix(in srgb, var(--uc, #ffb300) 14%, var(--bg-2));
+  /* mengen met het diepe paneel in plaats van met de achtergrond: in een
+     lichte wereld werd dit vlak anders bijna wit, met een felle unitkleur
+     erop die dan onleesbaar is */
+  background: color-mix(in srgb, var(--uc, #ffb300) 16%, var(--paneel-diep));
   color: var(--uc, #ffb300);
   border: 2.5px dashed var(--uc, #ffb300);
   box-shadow: 0 6px 0 rgba(0, 0, 0, 0.45);

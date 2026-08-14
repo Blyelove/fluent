@@ -54,13 +54,13 @@ function SkillTegel({ r, actief, onClick }: { r: Rij; actief: boolean; onClick: 
       <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1, flex: 1 }}>
         <span
           className="num"
-          style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 16, color: 'var(--gold-bright)', alignSelf: 'flex-start' }}
+          style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 16, color: 'var(--goud-tekst)', alignSelf: 'flex-start' }}
         >
           {r.stand.level}
         </span>
         <span
           className="num"
-          style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 13, color: 'var(--gold)', opacity: 0.75, alignSelf: 'flex-end', marginTop: 1 }}
+          style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 13, color: 'var(--goud-tekst-dim)', opacity: 0.8, alignSelf: 'flex-end', marginTop: 1 }}
         >
           {MAX_SKILL_LEVEL}
         </span>

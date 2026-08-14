@@ -20,8 +20,10 @@ export interface ArenaRang {
 
 /** De ladder. Winst levert 30 bekers op, verlies kost er 10. */
 export const ARENAS: ArenaRang[] = [
-  { naam: 'Houten Arena', emoji: '🪵', vanaf: 0 },
-  { naam: 'Stenen Arena', emoji: '🪨', vanaf: 90 },
+  // bewust geen hout- of steenemoji uit 2020: die missen in de lettertypes van
+  // oudere toestellen en verschijnen dan als leeg blokje, gezien op Windows 10
+  { naam: 'Houten Arena', emoji: '🌳', vanaf: 0 },
+  { naam: 'Stenen Arena', emoji: '🗿', vanaf: 90 },
   { naam: 'Bronzen Arena', emoji: '🥉', vanaf: 210 },
   { naam: 'Zilveren Arena', emoji: '🥈', vanaf: 390 },
   { naam: 'Gouden Arena', emoji: '🥇', vanaf: 630 },

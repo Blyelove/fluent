@@ -68,6 +68,8 @@ interface GameDef {
   /** Korte uitleg op de spelkaart */
   how: string
   grad: string
+  /** de inkt die op dit verloop leesbaar is: licht verloop vraagt donkere tekst */
+  ink: string
   /** Donkere onderrand voor het 3D-effect */
   shade: string
   glow: string
@@ -92,6 +94,7 @@ const GAMES: GameDef[] = [
     tagline: '60 seconden pure snelheid',
     how: 'Zoveel mogelijk vertalingen goed. Goed geeft tijd erbij, fout kost 2 seconden.',
     grad: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
+    ink: '#ffffff',
     shade: '#6b21a8',
     glow: 'rgba(236, 72, 153, 0.45)',
     medailles: [60, 110, 170],
@@ -103,6 +106,8 @@ const GAMES: GameDef[] = [
     tagline: '8 paren, zo snel als je kunt',
     how: 'Tik twee tegels die bij elkaar horen. De klok tikt door en missen kost 3 seconden.',
     grad: 'linear-gradient(135deg, #22d3ee 0%, #6366f1 100%)',
+    // begint in helder cyaan: daar leest wit niet op
+    ink: '#07243a',
     shade: '#0e7490',
     glow: 'rgba(34, 211, 238, 0.42)',
     medailles: [120, 180, 230],
@@ -114,6 +119,8 @@ const GAMES: GameDef[] = [
     tagline: '10 rondes op je gehoor',
     how: 'Je hoort een woord en kiest razendsnel de juiste betekenis.',
     grad: 'linear-gradient(135deg, #ffe08a 0%, #f59e0b 100%)',
+    // licht goud: donkere inkt, anders verdwijnt de tekst
+    ink: '#2b1a02',
     shade: '#b45309',
     glow: 'rgba(255, 197, 61, 0.45)',
     medailles: [60, 105, 145],
@@ -330,12 +337,12 @@ export function ArcadeScreen({ onPlayingChange, onDuels }: { onPlayingChange?: (
                 padding: '20px 20px 18px',
                 borderRadius: 26,
                 background: g.grad,
-                color: '#fff',
+                color: g.ink,
                 position: 'relative',
                 overflow: 'hidden',
                 cursor: locked ? 'default' : 'pointer',
                 boxShadow: `0 7px 0 ${g.shade}, 0 16px 36px ${g.glow}`,
-                textShadow: '0 1px 2px rgba(0,0,0,0.25)',
+                textShadow: g.ink === '#ffffff' ? '0 1px 2px rgba(0,0,0,0.25)' : 'none',
               }}
             >
               {/* glans over de kaart */}

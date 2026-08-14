@@ -78,6 +78,8 @@
   --gold-deep: #6f4d18;
   --grad-gold: linear-gradient(135deg, #b8862f 0%, #6f4d18 100%);
   --ink-on-gold: #fdfbf5;
+  --goud-tekst: var(--gold-deep);
+  --goud-tekst-dim: #5a3d11;
   --cyan: #1d6a7a;
   --ok: #15803d;
   --ok-bg: rgba(21, 128, 61, 0.12);
@@ -235,6 +237,8 @@
   /* dieper goud, want de lichte inkt erop moet leesbaar blijven */
   --grad-gold: linear-gradient(135deg, #9c6c14 0%, #5c3a08 100%);
   --ink-on-gold: #fdf8ee;
+  --goud-tekst: var(--gold-deep);
+  --goud-tekst-dim: #63400b;
   --cyan: #0d6070;
   --ok: #15803d;
   --ok-bg: rgba(21, 128, 61, 0.12);
@@ -288,6 +292,7 @@
   --gold-deep: #c99a20;
   --cyan: #2de2e6;
   --ink-op-hot: #0a0a14;
+  --schaduw-op-hot: none;
   --glow-hot: 0 0 0 1px rgba(255, 62, 120, 0.6), 0 0 14px rgba(255, 62, 120, 0.5), 0 0 40px rgba(45, 226, 230, 0.35);
   --sfeer:
     radial-gradient(880px 600px at 10% -8%, rgba(45, 226, 230, 0.26), transparent 56%),

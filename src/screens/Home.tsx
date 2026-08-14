@@ -212,7 +212,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
               <FlameIcon />
             </span>
             {streak > 0 ? (
-              <span className="num" style={{ fontWeight: 700, fontSize: 15 }}>{streak}</span>
+              <span className="num" style={{ fontWeight: 700, fontSize: 15, color: 'var(--text)' }}>{streak}</span>
             ) : (
               <span className="faint" style={{ fontSize: 12, fontWeight: 700 }}>Start je reeks</span>
             )}

@@ -115,6 +115,8 @@
   --hot1: #00b39a;
   --hot2: #ff7a4d;
   --grad-hot: linear-gradient(135deg, #00b39a 0%, #ff7a4d 100%);
+  --ink-op-hot: #0d2a22;
+  --schaduw-op-hot: none;
   --gold: #ffcf5c;
   --cyan: #2ee6c8;
   /* het jade verloop is licht: witte tekst erop leest niet */
@@ -172,6 +174,8 @@
   --gold-deep: #92400e;
   --grad-gold: linear-gradient(135deg, #d97706 0%, #92400e 100%);
   --ink-on-gold: #fff8ec;
+  --goud-tekst: var(--gold-deep);
+  --goud-tekst-dim: #7c3a0c;
   --cyan: #0e7490;
   --ok: #15803d;
   --ok-bg: rgba(21, 128, 61, 0.12);
