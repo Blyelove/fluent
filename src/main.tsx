@@ -18,3 +18,11 @@ createRoot(document.getElementById('root')!).render(
     <XpDrops />
   </>
 )
+
+/* De opening uit index.html verdwijnt vanzelf zodra de wortel gevuld is; dat
+   staat als regel in de stijl. Dit is alleen het vangnet voor een browser die
+   :has nog niet kent, en een tijdslimiet zodat er nooit iemand naar een
+   opening blijft kijken die om wat voor reden dan ook niet wegging. */
+const verbergOpening = () => document.body.classList.add('app-staat')
+requestAnimationFrame(() => requestAnimationFrame(verbergOpening))
+window.setTimeout(verbergOpening, 1200)
