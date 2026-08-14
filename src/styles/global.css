@@ -197,6 +197,35 @@ body { overflow-x: clip; }
    De correcties zijn bewust klein. Wie ze los ziet merkt niets; wie het scherm
    in zijn geheel ziet merkt dat het klopt. */
 
+/* ═══ ELKE KNOP REAGEERT OP JE DUIM ═══
+
+   De knoppen met een eigen klasse deden dit al, maar alles wat met losse
+   stijlen was gebouwd niet: de reeksteller, de vaardigheidstegels, de kaarten
+   in de speelhal, de rijen op je profiel. Vierendertig knoppen die wel werken
+   maar niets terugzeggen, en dat voelt kapot ook al is het dat niet.
+
+   Eén regel voor alles wat je kunt aantikken, zodat het ook klopt voor elke
+   knop die er hierna nog bij komt. Wie een eigen reactie heeft, wint gewoon:
+   die keuzes zijn specifieker. */
+button,
+[role='button'] {
+  transition: transform 130ms cubic-bezier(0.2, 0.8, 0.2, 1), filter 130ms ease;
+}
+
+button:active,
+[role='button']:active {
+  transform: scale(0.97);
+}
+
+/* wie beweging heeft uitgezet krijgt geen krimp maar wel een reactie */
+@media (prefers-reduced-motion: reduce) {
+  button:active,
+  [role='button']:active {
+    transform: none;
+    filter: brightness(1.2);
+  }
+}
+
 /* Een kop die over twee regels valt, hoort in twee gelijke regels te vallen.
    Zonder dit blijft er van "Vrienden & mensen" één woord op de tweede regel
    achter, en dat is precies het soort scheefheid dat je niet kunt aanwijzen

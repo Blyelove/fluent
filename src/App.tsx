@@ -105,7 +105,7 @@ export default function App() {
   // duim tijdens een potje op de klok = één misveeg en je run is weg
   const [gamePlaying, setGamePlaying] = useState(false)
   // waar je vandaan kwam, om de richting van de overgang te bepalen
-  const vorigeTab = useRef<Tab>('home')
+  const vorigeTab = useRef<Tab | null>(null)
   /* Waar je op elk tabblad gebleven was. Zonder dit bleef de scrollstand
      gewoon staan bij het wisselen: scrol je op Leren naar beneden en tik je
      op Profiel, dan landde je negenhonderd pixels diep in dat scherm, midden
@@ -246,7 +246,12 @@ export default function App() {
      is het verschil tussen tabbladen die verwisselen en een app waar je
      doorheen loopt: je weet waar je vandaan komt. */
   const volgorde: Tab[] = ['home', 'play', 'league', 'review', 'profile']
-  const richting = volgorde.indexOf(tab) >= volgorde.indexOf(vorigeTab.current) ? 1 : -1
+  /* Alleen bewegen bij een échte wissel. Een scherm dat je zojuist hebt
+     geopend hoort er gewoon te staan: schuift dat óók binnen, dan begint elk
+     bezoek met een zijwaartse ruk. Bij de eerste tekening is er nog geen
+     vorige tab, en dan is er dus ook geen richting. */
+  const eersteTekening = vorigeTab.current === null
+  const richting = eersteTekening || volgorde.indexOf(tab) >= volgorde.indexOf(vorigeTab.current!) ? 1 : -1
   vorigeTab.current = tab
 
   return (
@@ -257,7 +262,7 @@ export default function App() {
           voelen en te kort om erop te wachten. */}
       <motion.div
         key={tab}
-        initial={kalmeBeweging ? false : { opacity: 0, x: richting * 16 }}
+        initial={kalmeBeweging || eersteTekening ? false : { opacity: 0, x: richting * 16 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.19, ease: [0.2, 0.8, 0.2, 1] }}
       >

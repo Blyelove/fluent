@@ -337,7 +337,10 @@ export function ArenaScreen({
         <p className="eyebrow" style={{ color: 'var(--goud-tekst-dim)' }}>
           {rang.emoji} {rang.naam}
         </p>
-        <div className="row" style={{ justifyContent: 'center', gap: 16, margin: '22px 0 10px', alignItems: 'center' }}>
+        {/* 24 boven en 12 onder: tweeëntwintig en tien staan allebei net naast
+            de maatladder, en juist in de opkomst van een gevecht moet het
+            ritme kloppen omdat er verder niets afleidt */}
+        <div className="row" style={{ justifyContent: 'center', gap: 16, margin: '24px 0 12px', alignItems: 'center' }}>
           <motion.div initial={{ x: kalm ? 0 : -60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ type: 'spring', stiffness: 200, damping: 20 }} className="col center" style={{ gap: 4 }}>
             <Avatar size={92} look={look} courseId={courseId} meester={meester} />
             <strong className="card-title">Jij</strong>

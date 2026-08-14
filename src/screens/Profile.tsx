@@ -98,7 +98,11 @@ export function ProfileScreen() {
           </span>
         </button>
       </div>
-      <div style={{ margin: '14px 0 18px' }}>
+      {/* 16 boven en onder: veertien en achttien zijn allebei halve stappen die
+          niet op de maatladder staan, en twee van zulke afstanden vlak onder
+          elkaar maken de kop van je profiel onrustig zonder dat je kunt
+          aanwijzen waarom */}
+      <div style={{ margin: '16px 0' }}>
         <div className="progress-track" style={{ height: 8 }}>
           <div className="progress-fill" style={{ width: `${Math.round(lp.frac * 100)}%` }} />
         </div>

@@ -287,7 +287,9 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
     return (
       <div className="shell">
         <p className="eyebrow">Oefenen</p>
-        <h1 className="display" style={{ fontSize: 28, margin: '8px 0 20px' }}>
+        {/* 24 en niet 20: de maatladder kent geen 20, en twintig pixels lucht
+            onder een kop leest als een halve stap die nergens bij hoort */}
+        <h1 className="display" style={{ fontSize: 28, margin: '8px 0 24px' }}>
           Train jezelf
         </h1>
 
