@@ -106,7 +106,23 @@ export default function App() {
   const [gamePlaying, setGamePlaying] = useState(false)
   // waar je vandaan kwam, om de richting van de overgang te bepalen
   const vorigeTab = useRef<Tab>('home')
+  /* Waar je op elk tabblad gebleven was. Zonder dit bleef de scrollstand
+     gewoon staan bij het wisselen: scrol je op Leren naar beneden en tik je
+     op Profiel, dan landde je negenhonderd pixels diep in dat scherm, midden
+     in het niets. Een nieuw scherm hoort bovenaan te beginnen, en een scherm
+     waar je terugkomt hoort te staan waar je het achterliet. */
+  const scrolPerTab = useRef<Partial<Record<Tab, number>>>({})
   const kalmeBeweging = Boolean(useReducedMotion())
+  useEffect(() => {
+    // twee beeldjes wachten: het nieuwe scherm moet eerst hoog genoeg zijn,
+    // anders knipt de browser de stand af naar wat er dan past
+    const doel = scrolPerTab.current[tab] ?? 0
+    const id1 = requestAnimationFrame(() => {
+      const id2 = requestAnimationFrame(() => window.scrollTo({ top: doel, behavior: 'auto' }))
+      return id2
+    })
+    return () => cancelAnimationFrame(id1)
+  }, [tab])
 
   // duel-uitnodiging uit de link halen (eenmalig bij het openen)
   const incomingDuel = useMemo(() => readDuelFromUrl(), [])
@@ -296,7 +312,11 @@ export default function App() {
               <button
                 key={it.id}
                 className={`nav-item ${tab === it.id ? 'active' : ''}`}
-                onClick={() => setTab(it.id)}
+                onClick={() => {
+                  // onthouden waar je op dít tabblad was, vóór je vertrekt
+                  scrolPerTab.current[tab] = window.scrollY
+                  setTab(it.id)
+                }}
                 style={{ padding: '6px 10px', minWidth: 60, position: 'relative' }}
               >
                 {/* De pil schuift van tab naar tab in plaats van te
@@ -312,8 +332,11 @@ export default function App() {
                       position: 'absolute',
                       inset: 0,
                       borderRadius: 16,
-                      background: 'linear-gradient(135deg, var(--hot-25), var(--hot-16))',
-                      boxShadow: 'inset 0 1px 0 var(--glans-16), 0 0 16px var(--hot-25)',
+                      /* stevig genoeg om onmiskenbaar te zijn: bij de eerste
+                         poging was hij zo zacht dat je moest zoeken welke tab
+                         aanstond, en dat is erger dan een pil die verspringt */
+                      background: 'linear-gradient(135deg, var(--hot-50), var(--hot-35))',
+                      boxShadow: 'inset 0 1px 0 var(--glans-25), 0 0 18px var(--hot-35)',
                       zIndex: -1,
                     }}
                     transition={{ type: 'spring', stiffness: 420, damping: 34 }}
