@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState, type ComponentType } from 'react'
+import { useEffect, useMemo, useRef, useState, type ComponentType } from 'react'
 import { useRegisterSW } from 'virtual:pwa-register/react'
+import { motion, useReducedMotion } from 'motion/react'
 import { pasEigenDraaiToe, pasWereldToe } from './werelden'
 import { STANDAARD_STIJLEN, stijlUitLink } from './stijlen'
 import { skillStand } from './skills'
@@ -103,6 +104,9 @@ export default function App() {
   // tijdens een minigame of duel verdwijnt de onderbalk: vijf tabs onder je
   // duim tijdens een potje op de klok = één misveeg en je run is weg
   const [gamePlaying, setGamePlaying] = useState(false)
+  // waar je vandaan kwam, om de richting van de overgang te bepalen
+  const vorigeTab = useRef<Tab>('home')
+  const kalmeBeweging = Boolean(useReducedMotion())
 
   // duel-uitnodiging uit de link halen (eenmalig bij het openen)
   const incomingDuel = useMemo(() => readDuelFromUrl(), [])
@@ -221,21 +225,40 @@ export default function App() {
     { id: 'profile', icon: ProfileIcon, label: 'Profiel' },
   ]
 
+  /* De richting waarin je door de app beweegt. Van Leren naar Profiel is naar
+     rechts, terug is naar links, en het scherm komt uit die kant binnen. Dat
+     is het verschil tussen tabbladen die verwisselen en een app waar je
+     doorheen loopt: je weet waar je vandaan komt. */
+  const volgorde: Tab[] = ['home', 'play', 'league', 'review', 'profile']
+  const richting = volgorde.indexOf(tab) >= volgorde.indexOf(vorigeTab.current) ? 1 : -1
+  vorigeTab.current = tab
+
   return (
     <>
-      {tab === 'home' && (
-        <HomeScreen
-          onStartLesson={(course, l) => setLesson({ course, lesson: l })}
-          onReview={() => setTab('review')}
-          onLeague={() => setTab('league')}
-          onPlay={() => setTab('play')}
-          onPraten={() => setPraten(true)}
-        />
-      )}
-      {tab === 'play' && <PlayScreen incomingDuel={incomingDuel} schaduw={schaduw} onPlayingChange={setGamePlaying} />}
-      {tab === 'league' && <LeagueScreen onLeren={() => setTab('home')} />}
-      {tab === 'review' && <ReviewScreen onGoLearn={() => setTab('home')} onPraten={() => setPraten(true)} />}
-      {tab === 'profile' && <ProfileScreen />}
+      {/* Bewust alleen een binnenkomst en geen vertrek: twee schermen tegelijk
+          in beeld houden kost een dubbele opbouw en dus tijd, en de regel is
+          dat het nooit trager mag worden. 190 milliseconde is genoeg om het te
+          voelen en te kort om erop te wachten. */}
+      <motion.div
+        key={tab}
+        initial={kalmeBeweging ? false : { opacity: 0, x: richting * 16 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.19, ease: [0.2, 0.8, 0.2, 1] }}
+      >
+        {tab === 'home' && (
+          <HomeScreen
+            onStartLesson={(course, l) => setLesson({ course, lesson: l })}
+            onReview={() => setTab('review')}
+            onLeague={() => setTab('league')}
+            onPlay={() => setTab('play')}
+            onPraten={() => setPraten(true)}
+          />
+        )}
+        {tab === 'play' && <PlayScreen incomingDuel={incomingDuel} schaduw={schaduw} onPlayingChange={setGamePlaying} />}
+        {tab === 'league' && <LeagueScreen onLeren={() => setTab('home')} />}
+        {tab === 'review' && <ReviewScreen onGoLearn={() => setTab('home')} onPraten={() => setPraten(true)} />}
+        {tab === 'profile' && <ProfileScreen />}
+      </motion.div>
 
       {/* het ornament van je taalwereld, dat met je niveau meegroeit */}
       <div className="wereld-laag" aria-hidden="true" />
@@ -274,8 +297,28 @@ export default function App() {
                 key={it.id}
                 className={`nav-item ${tab === it.id ? 'active' : ''}`}
                 onClick={() => setTab(it.id)}
-                style={{ padding: '6px 10px', minWidth: 60 }}
+                style={{ padding: '6px 10px', minWidth: 60, position: 'relative' }}
               >
+                {/* De pil schuift van tab naar tab in plaats van te
+                    verspringen. Eén gedeelde laag met dezelfde naam is genoeg:
+                    de beweging ertussen wordt vanzelf uitgerekend. Dit is de
+                    beweging die je het vaakst van de hele app maakt, en het
+                    was de enige die nergens over ging. */}
+                {tab === it.id && !kalmeBeweging && (
+                  <motion.span
+                    layoutId="nav-pil"
+                    aria-hidden
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      borderRadius: 16,
+                      background: 'linear-gradient(135deg, var(--hot-25), var(--hot-16))',
+                      boxShadow: 'inset 0 1px 0 var(--glans-16), 0 0 16px var(--hot-25)',
+                      zIndex: -1,
+                    }}
+                    transition={{ type: 'spring', stiffness: 420, damping: 34 }}
+                  />
+                )}
                 {it.badge && (
                   <span
                     className="nav-badge"

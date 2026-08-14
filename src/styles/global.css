@@ -830,11 +830,20 @@ input, textarea {
 
 .nav-item:active { transform: scale(0.92); }
 
-/* gloeiende pil onder de actieve tab; geen filter op een schalend element */
+/* De actieve tab. De pil zelf wordt als losse laag getekend zodat hij van tab
+   naar tab kan schuiven; hier blijft alleen de inkt over. De kleuren komen uit
+   de wereld: eerder stond hier het paars en roze van neon, en dat gloeide dus
+   ook in de vijftien andere werelden. Wie beweging heeft uitgezet krijgt de
+   pil gewoon als achtergrond, zonder dat er iets schuift. */
 .nav-item.active {
-  color: #fff;
-  background: linear-gradient(135deg, rgba(168, 85, 247, 0.3), rgba(236, 72, 153, 0.3));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 0 18px rgba(236, 72, 153, 0.35);
+  color: var(--text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-item.active {
+    background: linear-gradient(135deg, var(--hot-25), var(--hot-16));
+    box-shadow: inset 0 1px 0 var(--glans-16), 0 0 16px var(--hot-25);
+  }
 }
 
 .nav-badge {
