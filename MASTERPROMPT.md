@@ -434,6 +434,18 @@ Stoppen kan met `/loop stop` of door de cron-taak te verwijderen.
 
 ## Logboek
 
+- **14-08-2026, ronde 75** - **Bewijs in plaats van bewering, en dat legde een gebroken belofte bloot.**
+
+  **Punt 1a is nu aangetoond voor álle tien de onderdelen**, niet als lijst met namen maar als evenveel verschillende tekeningen: gezichtsvorm 8, ogen 8, wenkbrauwen 8, neus 8, mond 8, lichaamsbouw 8, haarmodel 10, huidtint 8, haarkleur 12, kledingkleur 10.
+
+  **Punt 1c ook**: zestien werelden geven zestien verschillende garderobes, gemeten op stof, kraag, accent én de tekening zelf. Twee voorbeelden laten zien was geen bewijs.
+
+  **DE GEBROKEN BELOFTE die dit vond:** je gekozen kledingkleur werd vanaf niveau 4 stilletjes overschreven door het tenue van je land. Je koos dus iets in de kiezer dat na een paar lessen verdween. Nu wint jouw keuze altijd, behalve als je hem nooit hebt aangeraakt: kleur nul betekent "de kleur van mijn land".
+
+  **LES: kleur is soms ruis en soms het onderwerp.** Mijn proef vergeleek tekeningen zonder kleur, want een andere taalwereld verft alles anders en dat zou vals alarm geven. Maar bij huidtint en kledingkleur ís de kleur precies het verschil, en dan meldt diezelfde proef dat acht tinten identiek zijn. De vergelijking weet nu per onderdeel of kleur meetelt.
+
+  **Punt 5 meet nu ook of tekst uit zijn vak breekt.** Tekst die in een andere taal langer wordt loopt niet stuk op een woord maar op een vak dat te krap is gemaakt. Op alle 96 combinaties breekt er niets uit.
+
 - **14-08-2026, ronde 74** - **Je wereld groeit nu aan vier dingen, en de gevaarlijkste fout tot nu toe.**
 
   Punt 3a noemt ornament, textuur, licht en letter. Alleen de textuur groeide. Nu komen vanaf trede 2 de hoekstukken op (van 54 naar 92 pixels), vanaf trede 3 het licht, en vanaf trede 5 gaat de app rustiger praten met meer lucht tussen de letters. Met `?groei=1..10` en `?niveau=1..99` is elke trede via een kale link te zien.

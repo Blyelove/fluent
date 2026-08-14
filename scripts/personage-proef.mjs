@@ -147,6 +147,41 @@ try {
     )
   }
 
+  /* ---------- zestien werelden, zestien garderobes ----------
+     Punt 1c zegt dat je personage zich kleedt in jouw taalwereld. Twee
+     voorbeelden laten zien is geen bewijs; zestien verschillende tekeningen
+     wel. Hier wordt per wereld de tekening mét kleur vergeleken, want stof,
+     snit én kleur horen te verschillen. */
+  const WERELDEN = [
+    'neon', 'azulejo', 'flamenco', 'trencadis', 'solysombra', 'encre', 'nuit', 'papier',
+    'raster', 'schwarzwald', 'fresco', 'notte', 'calcada', 'saudade', 'messing', 'soho',
+  ]
+  const garderobes = new Map()
+  for (const wereld of WERELDEN) {
+    await stuur('Page.navigate', { url: `${BASIS}?demo=1&tab=profiel&wereld=${wereld}` })
+    await wacht(1600)
+    await stuur('Emulation.setDeviceMetricsOverride', { width: 375, height: 812, deviceScaleFactor: 1, mobile: false })
+    await wacht(400)
+    const echt = await ev('document.documentElement.getAttribute("data-wereld")')
+    if (echt !== wereld) throw new Error(`wereld klopt niet: ${echt} in plaats van ${wereld}`)
+    /* De stof en de kraag zitten in stijlvariabelen en niet in de tekening
+       zelf, dus die worden er apart bij gelezen. Alleen de vormen vergelijken
+       zou zestien keer hetzelfde opleveren terwijl de kleding wel degelijk
+       verschilt. */
+    const kleding = await ev([
+      '(() => {',
+      '  const cs = getComputedStyle(document.documentElement);',
+      '  const namen = ["--stof-streep", "--stof-stip", "--stof-ruit", "--stof-visgraat", "--stof-golf", "--kraag-v", "--kraag-hoog", "--kleding-accent"];',
+      '  return namen.map((n) => n + "=" + cs.getPropertyValue(n).trim()).join(",");',
+      '})()',
+    ].join('\n'))
+    const afdruk = kleding + '//' + (await ev(afdrukVoor(true)))
+    const al = garderobes.get(afdruk)
+    if (al !== undefined) console.log(`  garderobe: ${wereld} is precies dezelfde als ${al}`)
+    else garderobes.set(afdruk, wereld)
+  }
+  eis(garderobes.size === 16, `zestien werelden geven zestien garderobes (${garderobes.size} uniek)`)
+
   /* en een plaatje van vier heel verschillende personages naast elkaar, want
      een tabel met getallen bewijst niet dat het er ook goed uitziet */
   const POSEN = [

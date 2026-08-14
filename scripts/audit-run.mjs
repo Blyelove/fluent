@@ -168,11 +168,8 @@ try {
 
 const stuk = uitslagen.filter((u) => telFouten(u) > 0)
 console.log(`\n${uitslagen.length} combinaties gemeten op ${BREEDTE}px`)
-console.log(
-  'gemeten per combinatie: contrast onder 3 op 1, tikdoelen onder 44 pixels, horizontale scroll,
-' +
-    'middenstreepjes, tekst die uit zijn vak breekt, en hoogstens drie oneindige animaties',
-)
+console.log('gemeten per combinatie: contrast onder 3 op 1, tikdoelen onder 44 pixels, horizontale scroll,')
+console.log('middenstreepjes, tekst die uit zijn vak breekt, en hoogstens drie oneindige animaties')
 if (!stuk.length) {
   console.log('SCHOON')
   process.exit(0)
