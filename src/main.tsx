@@ -8,6 +8,7 @@ import './styles/werelden-talen.css'
 import './styles/werelden-beweging.css'
 import './styles/werelden-typografie.css'
 import './styles/werelden-opties.css'
+import './styles/werelden-materiaal.css'
 
 createRoot(document.getElementById('root')!).render(
   <>

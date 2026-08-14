@@ -174,7 +174,9 @@ body::before {
   content: '';
   position: fixed;
   inset: 0;
-  z-index: -2;
+  /* onderop: hierboven ligt het materiaal van de wereld op -2 en het vignet
+     op -1, en pas daarboven de app zelf */
+  z-index: -3;
   pointer-events: none;
   background: var(--sfeer);
 }

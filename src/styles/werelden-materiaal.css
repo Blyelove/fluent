@@ -1,0 +1,141 @@
+/**
+ * HET MATERIAAL VAN ELKE WERELD
+ *
+ * De achtergrond was overal een kleurverloop. Een kleurverloop komt nergens
+ * vandaan: het is de standaardoplossing van iedereen. Elke wereld krijgt hier
+ * een echt materiaal uit dat land, als een patroon dat over de sfeer heen ligt.
+ * Azulejo-tegels, trencadís-scherven, de golf van de Portugese calçada, het
+ * Bauhaus-raster, het krijtstreepje van Savile Row.
+ *
+ * Drie regels die dit bruikbaar houden in plaats van druk:
+ *
+ * 1. Alles staat in svg dat rechtstreeks in de stijl zit. Geen enkel bestand
+ *    erbij, dus geen extra verzoek en geen wachttijd.
+ * 2. De dekking hangt aan --materiaal-kracht, en die groeit met je niveau via
+ *    data-rijkdom. Op niveau 1 is je wereld kaal, op 99 staat het materiaal er
+ *    vol op. Het ontwerp groeit dus mee met jou.
+ * 3. De kleur komt uit currentColor via de laag zelf, niet uit het patroon, en
+ *    de dekking blijft laag genoeg dat er nooit tekst op wegvalt. De
+ *    contrastaudit meet dat na.
+ */
+
+/* Op html::before en niet op een element in de app: zo ligt het materiaal er
+   op élk scherm, ook op het inlogscherm en tijdens een les, zonder dat er ook
+   maar iets aan de opbouw van de app verandert. body::before en body::after
+   waren al bezet door de sfeer en het vignet. */
+html::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background-image: var(--materiaal, none);
+  background-repeat: repeat;
+  background-size: var(--materiaal-maat, 120px 120px);
+  opacity: var(--materiaal-kracht, 0);
+  transition: opacity 900ms ease;
+}
+
+/* de rijkdom die met je niveau groeit: van kaal naar vol */
+:root { --materiaal-kracht: 0.1; }
+[data-rijkdom='1'] { --materiaal-kracht: 0.05; }
+[data-rijkdom='2'] { --materiaal-kracht: 0.1; }
+[data-rijkdom='3'] { --materiaal-kracht: 0.16; }
+[data-rijkdom='4'] { --materiaal-kracht: 0.22; }
+[data-rijkdom='5'] { --materiaal-kracht: 0.3; }
+
+/* ---------- NEON: het raster van een speelhal ---------- */
+:root {
+  --materiaal-maat: 64px 64px;
+  --materiaal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Cpath d='M0 .5H64M.5 0V64' stroke='%23a855f7' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+}
+
+/* ---------- AZULEJO: de blauwe tegel van Lissabon en Sevilla ---------- */
+[data-wereld='azulejo'] {
+  --materiaal-maat: 90px 90px;
+  --materiaal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cg fill='none' stroke='%233b6fc4' stroke-width='2'%3E%3Cpath d='M45 8 L82 45 L45 82 L8 45 Z'/%3E%3Cpath d='M45 24 L66 45 L45 66 L24 45 Z'/%3E%3Ccircle cx='45' cy='45' r='7'/%3E%3Cpath d='M0 0 L14 14M90 0 L76 14M0 90 L14 76M90 90 L76 76'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ---------- FLAMENCO: de stippen van een volantjurk ---------- */
+[data-wereld='flamenco'] {
+  --materiaal-maat: 72px 72px;
+  --materiaal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72'%3E%3Cg fill='%23ff2d55'%3E%3Ccircle cx='18' cy='18' r='6'/%3E%3Ccircle cx='54' cy='54' r='6'/%3E%3Ccircle cx='54' cy='18' r='3'/%3E%3Ccircle cx='18' cy='54' r='3'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ---------- TRENCADIS: de gebroken mozaïekscherven van Gaudí ---------- */
+[data-wereld='trencadis'] {
+  --materiaal-maat: 110px 110px;
+  --materiaal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='110'%3E%3Cg fill='none' stroke='%2300b39a' stroke-width='2.4'%3E%3Cpath d='M0 22 L34 6 L62 26 L48 58 L12 52 Z'/%3E%3Cpath d='M62 26 L102 14 L110 48 L74 62 Z'/%3E%3Cpath d='M12 52 L48 58 L40 96 L4 88 Z'/%3E%3Cpath d='M48 58 L74 62 L84 100 L40 96 Z'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ---------- SOL Y SOMBRA: het gestreepte zonnescherm van een patio ---------- */
+[data-wereld='solysombra'] {
+  --materiaal-maat: 48px 48px;
+  --materiaal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cpath d='M0 0 L48 48M-12 36 L12 60M36 -12 L60 12' stroke='%23b45309' stroke-width='9' fill='none'/%3E%3C/svg%3E");
+}
+
+/* ---------- ENCRE: de arcering van een inkttekening ---------- */
+[data-wereld='encre'] {
+  --materiaal-maat: 40px 40px;
+  --materiaal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M0 40 L40 0M-10 10 L10 -10M30 50 L50 30' stroke='%23c9d3e8' stroke-width='1.2' fill='none'/%3E%3C/svg%3E");
+}
+
+/* ---------- NUIT: de waaier van de art deco ---------- */
+[data-wereld='nuit'] {
+  --materiaal-maat: 88px 44px;
+  --materiaal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='88' height='44'%3E%3Cg fill='none' stroke='%23d4af6a' stroke-width='1.6'%3E%3Cpath d='M0 44 A44 44 0 0 1 88 44'/%3E%3Cpath d='M15 44 A29 29 0 0 1 73 44'/%3E%3Cpath d='M30 44 A14 14 0 0 1 58 44'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ---------- PAPIER: de lijnen van geschept papier ---------- */
+[data-wereld='papier'] {
+  --materiaal-maat: 26px 26px;
+  --materiaal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Cg stroke='%2314162e' stroke-width='0.9' fill='none'%3E%3Cpath d='M0 6.5H26M0 19.5H26'/%3E%3Cpath d='M6.5 0V26M19.5 0V26' stroke-width='0.5'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ---------- RASTER: het raster van Bauhaus en Dessau ---------- */
+[data-wereld='raster'] {
+  --materiaal-maat: 80px 80px;
+  --materiaal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cg fill='none' stroke='%23e8e2d6' stroke-width='1.4'%3E%3Crect x='8' y='8' width='28' height='28'/%3E%3Ccircle cx='58' cy='22' r='14'/%3E%3Cpath d='M8 58 L36 58 L22 72 Z'/%3E%3Crect x='46' y='46' width='26' height='26' rx='13'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ---------- SCHWARZWALD: de dennen van het Zwarte Woud ---------- */
+[data-wereld='schwarzwald'] {
+  --materiaal-maat: 70px 96px;
+  --materiaal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='70' height='96'%3E%3Cg fill='none' stroke='%2382a882' stroke-width='1.6'%3E%3Cpath d='M18 78 L18 62M18 8 L6 34 L30 34 Z M18 26 L9 48 L27 48 Z'/%3E%3Cpath d='M52 92 L52 78M52 40 L42 60 L62 60 Z'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ---------- FRESCO: het terrazzo van een Florentijnse vloer ---------- */
+[data-wereld='fresco'] {
+  --materiaal-maat: 96px 96px;
+  --materiaal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cg fill='%23c98a5b'%3E%3Cellipse cx='14' cy='20' rx='7' ry='4' transform='rotate(24 14 20)'/%3E%3Cellipse cx='62' cy='12' rx='5' ry='3' transform='rotate(-40 62 12)'/%3E%3Cellipse cx='84' cy='44' rx='8' ry='4' transform='rotate(12 84 44)'/%3E%3Cellipse cx='36' cy='54' rx='6' ry='3.4' transform='rotate(-18 36 54)'/%3E%3Cellipse cx='70' cy='78' rx='7' ry='3.6' transform='rotate(52 70 78)'/%3E%3Cellipse cx='18' cy='84' rx='5' ry='3' transform='rotate(-8 18 84)'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ---------- NOTTE: de aders van Carrara-marmer ---------- */
+[data-wereld='notte'] {
+  --materiaal-maat: 140px 140px;
+  --materiaal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cg fill='none' stroke='%23d8cdb4' stroke-width='1.3'%3E%3Cpath d='M-10 30 C30 18 46 54 84 40 C112 30 124 62 150 50'/%3E%3Cpath d='M-10 96 C24 84 44 116 78 104 C110 92 126 118 150 108'/%3E%3Cpath d='M20 -10 C32 26 8 44 22 78 C34 106 14 124 26 150' stroke-width='0.8'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ---------- CALCADA: de golf van de Portugese stoep ---------- */
+[data-wereld='calcada'] {
+  --materiaal-maat: 120px 60px;
+  --materiaal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='60'%3E%3Cg fill='none' stroke='%23f2efe6' stroke-width='6' stroke-linecap='round'%3E%3Cpath d='M0 42 C20 12 40 12 60 42 C80 72 100 72 120 42'/%3E%3Cpath d='M0 18 C20 -12 40 -12 60 18 C80 48 100 48 120 18' stroke-width='3'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ---------- SAUDADE: de gekalkte muur met tegelrand aan de Taag ---------- */
+[data-wereld='saudade'] {
+  --materiaal-maat: 84px 84px;
+  --materiaal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='84' height='84'%3E%3Cg fill='none' stroke='%230d5b6b' stroke-width='1.8'%3E%3Cpath d='M42 6 C58 22 58 22 42 42 C26 22 26 22 42 6 Z'/%3E%3Cpath d='M42 42 C58 62 58 62 42 78 C26 62 26 62 42 42 Z'/%3E%3Cpath d='M0 42 H14M70 42 H84'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ---------- MESSING: de geslepen lijnen van gepolijst messing ---------- */
+[data-wereld='messing'] {
+  --materiaal-maat: 60px 60px;
+  --materiaal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cg stroke='%23c6964a' fill='none'%3E%3Cpath d='M0 8H60M0 22H60M0 36H60M0 50H60' stroke-width='0.7'/%3E%3Cpath d='M0 15H60M0 43H60' stroke-width='1.6'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ---------- SOHO: het krijtstreepje van een Londens pak ---------- */
+[data-wereld='soho'] {
+  --materiaal-maat: 34px 34px;
+  --materiaal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34' height='34'%3E%3Cg stroke='%23ffd166' fill='none'%3E%3Cpath d='M8.5 0V34' stroke-width='1.2' stroke-dasharray='3 4'/%3E%3Cpath d='M25.5 0V34' stroke-width='1.2' stroke-dasharray='3 4'/%3E%3C/g%3E%3C/svg%3E");
+}
