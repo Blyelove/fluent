@@ -389,7 +389,7 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
                 transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut', repeatDelay: 0.6 }}
                 onClick={onGoLearn}
               >
-                ▶ Start je eerste les
+                ▶︎ Start je eerste les
               </motion.button>
             )
           ) : (
@@ -603,7 +603,7 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
                   setPauze(false)
                 }}
               >
-                ▶ Doorgaan
+                ▶︎ Doorgaan
               </button>
               <button
                 className="btn btn-ghost"

@@ -130,7 +130,7 @@ export function StreakScreen({ onBack, onLeren }: { onBack?: () => void; onLeren
               onLeren()
             }}
           >
-            {streak === 0 ? '▶ Ontsteek je vlam' : vandaagGeleerd ? '▶ Nog een les erbij' : '▶ Houd je vlam brandend'}
+            {streak === 0 ? '▶︎ Ontsteek je vlam' : vandaagGeleerd ? '▶︎ Nog een les erbij' : '▶︎ Houd je vlam brandend'}
           </button>
         </div>
       )}

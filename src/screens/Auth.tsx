@@ -96,7 +96,7 @@ export function AuthScreen() {
                 startGuest(look)
               }}
             >
-              ▶ Start direct, zonder account
+              ▶︎ Start direct, zonder account
             </motion.button>
             <p className="faint" style={{ fontSize: 11, marginTop: 8 }}>
               Je voortgang wordt op dit apparaat bewaard. Een account maken kan altijd nog.

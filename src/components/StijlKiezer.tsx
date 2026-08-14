@@ -116,7 +116,7 @@ export function StijlKiezer() {
                           awardXp(1)
                         }}
                       >
-                        ▶ Speel af
+                        ▶︎ Speel af
                       </button>
                     )}
                   </div>

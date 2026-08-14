@@ -433,7 +433,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
               transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut', repeatDelay: 0.6 }}
               onClick={() => onStartLesson(course, next.lesson)}
             >
-              {completed.length === 0 ? '▶  Beginnen' : '▶  Doorgaan'}
+              {completed.length === 0 ? '▶︎ Beginnen' : '▶︎ Doorgaan'}
             </motion.button>
           </motion.div>
         )
@@ -484,7 +484,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                   if (next) onStartLesson(course, next.lesson)
                 }}
               >
-                ▶ Rustig weer beginnen
+                ▶︎ Rustig weer beginnen
               </button>
               <button
                 className="btn-quiet center"

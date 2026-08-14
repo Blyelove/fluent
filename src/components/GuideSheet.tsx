@@ -54,7 +54,7 @@ export function GuideSheet({
           fontSize: 12.5,
         }}
       >
-        ▶
+        ▶︎
       </span>
       <span className="col" style={{ gap: 0, flex: 1, minWidth: 0 }}>
         <strong style={{ fontSize: 14 }}>{target}</strong>

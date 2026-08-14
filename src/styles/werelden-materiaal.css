@@ -277,3 +277,94 @@ html.wereld-groeit[data-groeistijl='omslag']::before {
   55% { opacity: 0.5; transform: rotate(var(--eigen-draai, 0deg)) scale(1.5) rotateY(-12deg); }
   100% { opacity: var(--materiaal-kracht); transform: rotate(var(--eigen-draai, 0deg)) scale(1.5) rotateY(0deg); }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   WAT ER PRECIES BIJKOMT PER TIEN NIVEAUS
+
+   Punt 3a noemt vier dingen die moeten aangroeien: ornament, textuur, licht en
+   letter. Textuur was er al (de dichtheid van het materiaal). Hier komen de
+   andere drie bij, elk met een eigen instapmoment, zodat je bij elke trede
+   iets nieuws ziet in plaats van alleen iets meer.
+
+   Niveau 1 tot 9   kaal: alleen een zweem materiaal
+   Vanaf 10         het ornament in de hoeken komt op
+   Vanaf 30         het licht: een warme gloed die met je meegroeit
+   Vanaf 50         de letter wordt royaler gespatieerd, de app gaat rustiger praten
+   Vanaf 70         het ornament wordt dubbel en vult de randen
+   Vanaf 90         alles staat er, en de gloed wordt goud
+   ═══════════════════════════════════════════════════════════════ */
+
+/* DE HOEKSTUKKEN: een lijst om het scherm die opkomt als je wereld voller
+   wordt. Bewust --hoekstuk en niet --ornament: die naam was al in gebruik door
+   het bestaande wereldsysteem, en door hem te hergebruiken werd mijn tekening
+   in hún laag gezet. Het stond daardoor over het hele scherm terwijl het in
+   vier hoeken hoorde, en het was zichtbaar terwijl de dekking nul was. */
+html::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  opacity: var(--hoek-kracht, 0);
+  transition: opacity 900ms ease;
+  background-repeat: no-repeat;
+  background-position: left 8px top 8px, right 8px top 8px, left 8px bottom 8px, right 8px bottom 8px;
+  background-size: var(--hoek-maat, 54px) var(--hoek-maat, 54px);
+  background-image: var(--hoekstuk), var(--hoekstuk), var(--hoekstuk), var(--hoekstuk);
+}
+
+:root {
+  --hoek-kracht: 0;
+  --hoek-maat: 54px;
+  /* een hoekstuk in de kleur van de wereld, als een lijst om het scherm */
+  --hoekstuk: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='54' height='54'%3E%3Cg fill='none' stroke='%23a855f7' stroke-width='2'%3E%3Cpath d='M2 20 V6 A4 4 0 0 1 6 2 H20'/%3E%3Cpath d='M8 26 V12 A4 4 0 0 1 12 8 H26' opacity='0.55'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+[data-groei='2'], [data-groei='3'] { --hoek-kracht: 0.35; }
+[data-groei='4'], [data-groei='5'] { --hoek-kracht: 0.5; }
+[data-groei='6'], [data-groei='7'] { --hoek-kracht: 0.62; --hoek-maat: 66px; }
+[data-groei='8'], [data-groei='9'] { --hoek-kracht: 0.72; --hoek-maat: 78px; }
+[data-groei='10'] { --hoek-kracht: 0.85; --hoek-maat: 92px; }
+
+/* HET LICHT: vanaf de derde trede krijgt je wereld een eigen gloed, en op de
+   hoogste treden wordt die goud. Bewust heel zacht: dit is sfeer, geen lamp. */
+[data-groei='3'] body::before,
+[data-groei='4'] body::before,
+[data-groei='5'] body::before { filter: brightness(1.04) saturate(1.05); }
+[data-groei='6'] body::before,
+[data-groei='7'] body::before { filter: brightness(1.07) saturate(1.1); }
+[data-groei='8'] body::before,
+[data-groei='9'] body::before,
+[data-groei='10'] body::before { filter: brightness(1.1) saturate(1.16); }
+
+/* DE LETTER: vanaf de vijfde trede gaat de app rustiger praten. Koppen krijgen
+   meer lucht tussen de letters en iets meer gewicht: hetzelfde verschil als
+   tussen een mededeling en een uitnodiging. */
+[data-groei='5'] .display,
+[data-groei='6'] .display { letter-spacing: 0.004em; }
+[data-groei='7'] .display,
+[data-groei='8'] .display { letter-spacing: 0.008em; }
+[data-groei='9'] .display,
+[data-groei='10'] .display { letter-spacing: 0.012em; }
+
+[data-groei='7'] .eyebrow,
+[data-groei='8'] .eyebrow,
+[data-groei='9'] .eyebrow,
+[data-groei='10'] .eyebrow { letter-spacing: 0.18em; }
+
+/* het ornament neemt de kleur van de wereld over */
+[data-wereld='azulejo'] { --hoekstuk: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='54' height='54'%3E%3Cg fill='none' stroke='%233b6fc4' stroke-width='2'%3E%3Cpath d='M2 20 V6 A4 4 0 0 1 6 2 H20'/%3E%3Cpath d='M8 26 V12 A4 4 0 0 1 12 8 H26' opacity='0.55'/%3E%3C/g%3E%3C/svg%3E"); }
+[data-wereld='flamenco'] { --hoekstuk: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='54' height='54'%3E%3Cg fill='none' stroke='%23ff2d55' stroke-width='2'%3E%3Cpath d='M2 20 V6 A4 4 0 0 1 6 2 H20'/%3E%3Cpath d='M8 26 V12 A4 4 0 0 1 12 8 H26' opacity='0.55'/%3E%3C/g%3E%3C/svg%3E"); }
+[data-wereld='trencadis'] { --hoekstuk: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='54' height='54'%3E%3Cg fill='none' stroke='%2300b39a' stroke-width='2'%3E%3Cpath d='M2 20 V6 A4 4 0 0 1 6 2 H20'/%3E%3Cpath d='M8 26 V12 A4 4 0 0 1 12 8 H26' opacity='0.55'/%3E%3C/g%3E%3C/svg%3E"); }
+[data-wereld='solysombra'] { --hoekstuk: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='54' height='54'%3E%3Cg fill='none' stroke='%23b45309' stroke-width='2'%3E%3Cpath d='M2 20 V6 A4 4 0 0 1 6 2 H20'/%3E%3Cpath d='M8 26 V12 A4 4 0 0 1 12 8 H26' opacity='0.55'/%3E%3C/g%3E%3C/svg%3E"); }
+[data-wereld='encre'] { --hoekstuk: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='54' height='54'%3E%3Cg fill='none' stroke='%23c9d3e8' stroke-width='2'%3E%3Cpath d='M2 20 V6 A4 4 0 0 1 6 2 H20'/%3E%3Cpath d='M8 26 V12 A4 4 0 0 1 12 8 H26' opacity='0.55'/%3E%3C/g%3E%3C/svg%3E"); }
+[data-wereld='nuit'] { --hoekstuk: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='54' height='54'%3E%3Cg fill='none' stroke='%23d4af6a' stroke-width='2'%3E%3Cpath d='M2 20 V6 A4 4 0 0 1 6 2 H20'/%3E%3Cpath d='M8 26 V12 A4 4 0 0 1 12 8 H26' opacity='0.55'/%3E%3C/g%3E%3C/svg%3E"); }
+[data-wereld='papier'] { --hoekstuk: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='54' height='54'%3E%3Cg fill='none' stroke='%2314162e' stroke-width='2'%3E%3Cpath d='M2 20 V6 A4 4 0 0 1 6 2 H20'/%3E%3Cpath d='M8 26 V12 A4 4 0 0 1 12 8 H26' opacity='0.55'/%3E%3C/g%3E%3C/svg%3E"); }
+[data-wereld='raster'] { --hoekstuk: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='54' height='54'%3E%3Cg fill='none' stroke='%23e8e2d6' stroke-width='2'%3E%3Cpath d='M2 20 V6 A4 4 0 0 1 6 2 H20'/%3E%3Cpath d='M8 26 V12 A4 4 0 0 1 12 8 H26' opacity='0.55'/%3E%3C/g%3E%3C/svg%3E"); }
+[data-wereld='schwarzwald'] { --hoekstuk: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='54' height='54'%3E%3Cg fill='none' stroke='%2382a882' stroke-width='2'%3E%3Cpath d='M2 20 V6 A4 4 0 0 1 6 2 H20'/%3E%3Cpath d='M8 26 V12 A4 4 0 0 1 12 8 H26' opacity='0.55'/%3E%3C/g%3E%3C/svg%3E"); }
+[data-wereld='fresco'] { --hoekstuk: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='54' height='54'%3E%3Cg fill='none' stroke='%23c98a5b' stroke-width='2'%3E%3Cpath d='M2 20 V6 A4 4 0 0 1 6 2 H20'/%3E%3Cpath d='M8 26 V12 A4 4 0 0 1 12 8 H26' opacity='0.55'/%3E%3C/g%3E%3C/svg%3E"); }
+[data-wereld='notte'] { --hoekstuk: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='54' height='54'%3E%3Cg fill='none' stroke='%23d8cdb4' stroke-width='2'%3E%3Cpath d='M2 20 V6 A4 4 0 0 1 6 2 H20'/%3E%3Cpath d='M8 26 V12 A4 4 0 0 1 12 8 H26' opacity='0.55'/%3E%3C/g%3E%3C/svg%3E"); }
+[data-wereld='calcada'] { --hoekstuk: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='54' height='54'%3E%3Cg fill='none' stroke='%23f2efe6' stroke-width='2'%3E%3Cpath d='M2 20 V6 A4 4 0 0 1 6 2 H20'/%3E%3Cpath d='M8 26 V12 A4 4 0 0 1 12 8 H26' opacity='0.55'/%3E%3C/g%3E%3C/svg%3E"); }
+[data-wereld='saudade'] { --hoekstuk: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='54' height='54'%3E%3Cg fill='none' stroke='%230d5b6b' stroke-width='2'%3E%3Cpath d='M2 20 V6 A4 4 0 0 1 6 2 H20'/%3E%3Cpath d='M8 26 V12 A4 4 0 0 1 12 8 H26' opacity='0.55'/%3E%3C/g%3E%3C/svg%3E"); }
+[data-wereld='messing'] { --hoekstuk: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='54' height='54'%3E%3Cg fill='none' stroke='%23c6964a' stroke-width='2'%3E%3Cpath d='M2 20 V6 A4 4 0 0 1 6 2 H20'/%3E%3Cpath d='M8 26 V12 A4 4 0 0 1 12 8 H26' opacity='0.55'/%3E%3C/g%3E%3C/svg%3E"); }
+[data-wereld='soho'] { --hoekstuk: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='54' height='54'%3E%3Cg fill='none' stroke='%23ffd166' stroke-width='2'%3E%3Cpath d='M2 20 V6 A4 4 0 0 1 6 2 H20'/%3E%3Cpath d='M8 26 V12 A4 4 0 0 1 12 8 H26' opacity='0.55'/%3E%3C/g%3E%3C/svg%3E"); }

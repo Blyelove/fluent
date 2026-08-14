@@ -329,7 +329,7 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
                   setPauze(false)
                 }}
               >
-                ▶ Doorgaan
+                ▶︎ Doorgaan
               </button>
               <button className="btn btn-ghost" style={{ padding: 12, fontSize: 14 }} onClick={onExit}>
                 Toch stoppen
@@ -523,7 +523,7 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
                                     fontSize: 11,
                                   }}
                                 >
-                                  ▶
+                                  ▶︎
                                 </span>
                                 <span className="col" style={{ gap: 0, flex: 1, minWidth: 0 }}>
                                   <strong style={{ fontSize: 14 }}>{v.target}</strong>
@@ -647,7 +647,7 @@ function CompleteView({
           }}
           style={{ fontSize: 16 }}
         >
-          ▶ Nog één les
+          ▶︎ Nog één les
         </motion.button>
         <p className="faint" style={{ fontSize: 12.5, marginTop: -2 }}>
           Volgende: {nextTitle}

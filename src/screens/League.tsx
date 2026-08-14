@@ -567,10 +567,10 @@ export function LeagueScreen({ onLeren }: { onLeren?: () => void } = {}) {
             }}
           >
             {zone === 'promotie'
-              ? '▶ Houd je plek vast: doe een les'
+              ? '▶︎ Houd je plek vast: doe een les'
               : climb !== null && above
-                ? `▶ Nog ${fmt(climb)} XP en je gaat ${above.name} voorbij`
-                : '▶ Pak die plek: start een les'}
+                ? `▶︎ Nog ${fmt(climb)} XP en je gaat ${above.name} voorbij`
+                : '▶︎ Pak die plek: start een les'}
           </button>
         </div>
       )}

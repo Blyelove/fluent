@@ -79,12 +79,22 @@ export function rijkdomVoor(level: number): 1 | 2 | 3 | 4 | 5 {
  * ?wereld=azulejo, en met &rijkdom=1..5 ook de trap. Handig om twee werelden
  * naast elkaar te zetten zonder in de app te hoeven klikken.
  */
-export function wereldUitLink(): { wereld?: string; rijkdom?: number } {
+export function wereldUitLink(): { wereld?: string; rijkdom?: number; groei?: number; niveau?: number } {
   try {
     const p = new URLSearchParams(window.location.search)
     const w = p.get('wereld') ?? undefined
     const r = Number(p.get('rijkdom'))
-    return { wereld: w ?? undefined, rijkdom: r >= 1 && r <= 5 ? r : undefined }
+    // ?groei=1..10 zet de groeitrap rechtstreeks, ?niveau=1..99 rekent hem uit
+    // je niveau. Zonder zoiets is een trede alleen te zien door hem te
+    // verdienen, en dan is er niets te vergelijken of vast te leggen.
+    const g = Number(p.get('groei'))
+    const n = Number(p.get('niveau'))
+    return {
+      wereld: w ?? undefined,
+      rijkdom: r >= 1 && r <= 5 ? r : undefined,
+      groei: g >= 1 && g <= 10 ? g : undefined,
+      niveau: n >= 1 && n <= 99 ? n : undefined,
+    }
   } catch {
     return {}
   }
@@ -126,9 +136,10 @@ export function pasWereldToe(keuze: string, taal: CourseId, level: number): void
   const id = uitLink.wereld ?? (keuze || WERELD_PER_TAAL[taal] || '')
   if (id && id !== 'neon') el.setAttribute('data-wereld', id)
   else el.removeAttribute('data-wereld')
-  el.setAttribute('data-rijkdom', String(uitLink.rijkdom ?? rijkdomVoor(level)))
+  const echtNiveau = uitLink.niveau ?? level
+  el.setAttribute('data-rijkdom', String(uitLink.rijkdom ?? rijkdomVoor(echtNiveau)))
   // de fijnere trap: tien stappen, één per tien niveaus
-  const groei = uitLink.rijkdom ? Math.min(10, uitLink.rijkdom * 2) : groeiVoor(level)
+  const groei = uitLink.groei ?? groeiVoor(echtNiveau)
   const vorige = Number(el.getAttribute('data-groei') ?? 0)
   el.setAttribute('data-groei', String(groei))
   /* Een groeisprong is een moment en geen verversing. Bij een stap omhoog
