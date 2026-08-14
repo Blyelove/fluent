@@ -25,6 +25,14 @@ export function ProfileScreen() {
   const [skillsOpen, setSkillsOpen] = useState(false)
   /** aangetikt stadium in de evolutierij */
   const [toonNiveau, setToonNiveau] = useState<number | null>(null)
+  const houdingUitLink = ((): 'idle' | 'run' | 'cheer' | 'verslagen' | 'denk' => {
+    try {
+      const h = new URLSearchParams(window.location.search).get('houding')
+      return h === 'run' || h === 'cheer' || h === 'verslagen' || h === 'denk' ? h : 'idle'
+    } catch {
+      return 'idle'
+    }
+  })()
 
   if (view === 'badges') {
     return (
@@ -59,7 +67,17 @@ export function ProfileScreen() {
           aria-label="Personage aanpassen"
           style={{ position: 'relative' }}
         >
-          <Avatar size={80} mode="idle" level={lp.level} courseId={state.courseId} look={state.avatarLook} meester={isMeester(progress.xp)} />
+          {/* ?houding=verslagen laat elke houding zien zonder ervoor te hoeven
+              verliezen of rennen. Zonder zo'n link is een houding alleen op
+              het juiste moment te betrappen, en dus niet te vergelijken. */}
+          <Avatar
+            size={80}
+            mode={houdingUitLink}
+            level={lp.level}
+            courseId={state.courseId}
+            look={state.avatarLook}
+            meester={isMeester(progress.xp)}
+          />
           <span
             style={{
               position: 'absolute',

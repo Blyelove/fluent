@@ -62,7 +62,23 @@ export const GROEI_STIJLEN: Richting[] = [
   { id: 'omslag', naam: 'Omslag', kern: 'Het scherm klapt om als een tegel en de nieuwe wereld staat er', gedurfd: true },
 ]
 
-export type StijlSleutel = 'xp' | 'levelup' | 'arena' | 'breuk' | 'materiaal' | 'groei'
+/** Hoe de personagekiezer zijn keuzes voorlegt */
+export const KIEZER_STIJLEN: Richting[] = [
+  { id: 'raster', naam: 'Raster', kern: 'Alle varianten in een rooster, zodat je in één blik vergelijkt' },
+  { id: 'strook', naam: 'Strook', kern: 'Per trek één rij die je opzij veegt, rustiger en minder hoog' },
+  { id: 'groot', naam: 'Groot', kern: 'Minder tegels naast elkaar, maar elk gezicht flink groter' },
+  { id: 'dobbel', naam: 'Dobbelsteen', kern: 'Geen rijen maar één knop die je telkens een heel nieuw personage geeft', gedurfd: true },
+]
+
+/** Hoe je ziet wat je nog niet verdiend hebt in de garderobe */
+export const KAST_STIJLEN: Richting[] = [
+  { id: 'silhouet', naam: 'Silhouet', kern: 'Zwart silhouet: je ziet de vorm, niet de pracht' },
+  { id: 'nevel', naam: 'Nevel', kern: 'Wazig en bleek, alsof het er al hangt maar nog niet scherp is' },
+  { id: 'omtrek', naam: 'Omtrek', kern: 'Alleen de contour, als een tekening die nog moet worden ingekleurd' },
+  { id: 'kier', naam: 'Kier', kern: 'Bijna helemaal verborgen, met één streep licht eroverheen', gedurfd: true },
+]
+
+export type StijlSleutel = 'xp' | 'levelup' | 'arena' | 'breuk' | 'materiaal' | 'groei' | 'kiezer' | 'kast'
 
 export const STANDAARD_STIJLEN: Record<StijlSleutel, string> = {
   xp: 'klassiek',
@@ -71,6 +87,8 @@ export const STANDAARD_STIJLEN: Record<StijlSleutel, string> = {
   breuk: 'scherven',
   materiaal: 'waas',
   groei: 'aangroeien',
+  kiezer: 'raster',
+  kast: 'silhouet',
 }
 
 /** Een stijl uit de link halen, om te proeven of vast te leggen */

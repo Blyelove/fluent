@@ -5,6 +5,7 @@ import { isMeester, skillStand } from '../skills'
 import { levelProgress } from '../levels'
 import { KAST, PLEKKEN, heeft, kastStand, volgendStuk, type Stuk } from '../garderobe'
 import { Avatar } from './Avatar'
+import { STANDAARD_STIJLEN, stijlUitLink } from '../stijlen'
 import { sfx } from '../audio'
 
 /**
@@ -25,6 +26,7 @@ export function Garderobe() {
   const look = useStore((s) => s.avatarLook)
   const meester = useStore((s) => isMeester(s.progress[s.courseId]?.xp ?? 0))
   const taalNiveau = useStore((s) => skillStand(s.progress[s.courseId]?.xp ?? 0).level)
+  const kastStijl = useStore((s) => stijlUitLink('kast') ?? s.stijlen.kast ?? STANDAARD_STIJLEN.kast)
   const niveau = levelProgress(xpAll).level
   const stand = kastStand(niveau, meester)
   const volgende = volgendStuk(niveau, meester)
@@ -43,6 +45,7 @@ export function Garderobe() {
           border: `1.5px solid ${heb ? 'var(--line-gold)' : 'var(--line)'}`,
           padding: '4px 2px 3px',
           textAlign: 'center',
+          position: 'relative',
         }}
       >
         <div
@@ -52,8 +55,18 @@ export function Garderobe() {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'flex-start',
-            // wat je nog niet hebt is een silhouet: je ziet de vorm, niet de pracht
-            filter: heb ? undefined : 'brightness(0) opacity(0.34)',
+            /* Wat je nog niet hebt, laat zien dát het er is zonder al te
+               verklappen hoe mooi het is. Vier richtingen, want dit is precies
+               het soort beslissing waar smaak over gaat. */
+            filter: heb
+              ? undefined
+              : kastStijl === 'nevel'
+                ? 'blur(3px) grayscale(0.7) opacity(0.5)'
+                : kastStijl === 'omtrek'
+                  ? 'brightness(0) opacity(0.22) drop-shadow(0 0 1px var(--text))'
+                  : kastStijl === 'kier'
+                    ? 'brightness(0) opacity(0.12)'
+                    : 'brightness(0) opacity(0.34)',
           }}
         >
           <Avatar
@@ -65,6 +78,20 @@ export function Garderobe() {
             meester={stuk.vanaf >= 99}
           />
         </div>
+        {!heb && kastStijl === 'kier' && (
+          /* één streep licht over het verborgen stuk: je weet dat er iets is */
+          <span
+            aria-hidden
+            style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: 24,
+              height: 2,
+              background: 'linear-gradient(90deg, transparent, var(--goud-50), transparent)',
+            }}
+          />
+        )}
         <p style={{ fontSize: 11, fontWeight: 700, color: heb ? 'var(--text)' : 'var(--text-faint)', lineHeight: 1.15 }}>
           {stuk.naam}
         </p>

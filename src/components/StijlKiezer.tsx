@@ -5,6 +5,8 @@ import {
   ARENA_STIJLEN,
   BREUK_STIJLEN,
   GROEI_STIJLEN,
+  KAST_STIJLEN,
+  KIEZER_STIJLEN,
   LEVELUP_STIJLEN,
   MATERIAAL_STIJLEN,
   STANDAARD_STIJLEN,
@@ -22,7 +24,7 @@ import { sfx } from '../audio'
  * moment af zodat je het ziet voordat je kiest.
  */
 
-type Sleutel = 'xp' | 'levelup' | 'arena' | 'breuk' | 'materiaal' | 'groei'
+type Sleutel = 'xp' | 'levelup' | 'arena' | 'breuk' | 'materiaal' | 'groei' | 'kiezer' | 'kast'
 
 const GROEPEN: { sleutel: Sleutel; titel: string; uitleg: string; opties: Richting[] }[] = [
   { sleutel: 'xp', titel: 'De XP-drop', uitleg: 'Wat je ziet na elk goed antwoord', opties: XP_STIJLEN },
@@ -31,6 +33,8 @@ const GROEPEN: { sleutel: Sleutel; titel: string; uitleg: string; opties: Richti
   { sleutel: 'arena', titel: 'De arena-opkomst', uitleg: 'Hoe het gevecht zich opent', opties: ARENA_STIJLEN },
   { sleutel: 'materiaal', titel: 'Het materiaal', uitleg: 'Hoe de muur van jouw taalwereld op het scherm ligt', opties: MATERIAAL_STIJLEN },
   { sleutel: 'groei', titel: 'De wereldgroei', uitleg: 'Wat er gebeurt als je wereld een trede voller wordt', opties: GROEI_STIJLEN },
+  { sleutel: 'kiezer', titel: 'De personagekiezer', uitleg: 'Hoe de kiezer zijn varianten voorlegt', opties: KIEZER_STIJLEN },
+  { sleutel: 'kast', titel: 'Wat je nog niet hebt', uitleg: 'Hoe een stuk uit je garderobe eruitziet voordat je het verdient', opties: KAST_STIJLEN },
 ]
 
 export function StijlKiezer() {

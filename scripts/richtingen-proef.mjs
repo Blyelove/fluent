@@ -35,6 +35,8 @@ const GROEPEN = [
   { naam: 'De arena-opkomst', lijst: 'ARENA_STIJLEN', bestand: 'screens/Arena.tsx', standaard: 'duel' },
   { naam: 'Het materiaal', lijst: 'MATERIAAL_STIJLEN', bestand: 'styles/werelden-materiaal.css', standaard: 'waas' },
   { naam: 'De wereldgroei', lijst: 'GROEI_STIJLEN', bestand: 'styles/werelden-materiaal.css', standaard: 'aangroeien' },
+  { naam: 'De personagekiezer', lijst: 'KIEZER_STIJLEN', bestand: 'components/PersonaPicker.tsx', standaard: 'raster' },
+  { naam: 'Wat je nog niet hebt', lijst: 'KAST_STIJLEN', bestand: 'components/Garderobe.tsx', standaard: 'silhouet' },
 ]
 
 let fouten = 0

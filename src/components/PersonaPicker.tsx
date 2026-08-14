@@ -11,6 +11,8 @@ import {
 } from './Avatar'
 import { GALERIJ } from './avatarGallery'
 import { BOUW_NAMEN, BROW_NAMEN, GEZICHT_NAMEN, NEUS_NAMEN, OOG_NAMEN } from './avatar-trekken'
+import { STANDAARD_STIJLEN, stijlUitLink } from '../stijlen'
+import { useStore } from '../store'
 import { sfx } from '../audio'
 
 /**
@@ -19,9 +21,31 @@ import { sfx } from '../audio'
  * maal acht wenkbrauwen maal acht neuzen maal acht monden maal acht bouwen.
  */
 export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChange: (p: AvatarStyle) => void }) {
+  const kiezerStijl = useStore((s) => stijlUitLink('kiezer') ?? s.stijlen.kiezer ?? STANDAARD_STIJLEN.kiezer)
   const set = (patch: Partial<AvatarStyle>) => {
     sfx('tap')
     onChange({ ...value, ...patch })
+  }
+
+  /* De dobbelsteen: één knop die een heel nieuw personage geeft. Bewust álle
+     onderdelen tegelijk, want een dobbelsteen die maar de helft gooit is geen
+     verrassing maar een storing. */
+  const gooi = () => {
+    sfx('tap')
+    const n = (max: number) => Math.floor(Math.random() * max)
+    onChange({
+      ...value,
+      face: n(8),
+      eyes: n(8),
+      brows: n(8),
+      nose: n(8),
+      mouth: n(8),
+      build: n(8),
+      hair: n(10),
+      skin: n(8),
+      hairColor: n(12),
+      outfit: n(10),
+    })
   }
 
   /**
@@ -43,11 +67,25 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
     /** het hele lijf laten zien in plaats van alleen het hoofd */
     heel?: boolean
   }) => (
-    <div>
+    <div style={{ display: kiezerStijl === 'dobbel' ? 'none' : undefined }}>
       <p className="eyebrow" style={{ fontSize: 11, marginBottom: 4, color: 'var(--text-faint)' }}>
         {titel}
       </p>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(60px, 1fr))', gap: 4 }}>
+      {/* Vier richtingen om dezelfde keuzes voor te leggen: een rooster om te
+          vergelijken, een strook om te vegen, groot om te bewonderen, of de
+          dobbelsteen die alles in één klap voor je kiest. */}
+      <div
+        className={kiezerStijl === 'strook' ? 'row no-scrollbar' : undefined}
+        style={
+          kiezerStijl === 'strook'
+            ? { gap: 4, overflowX: 'auto', paddingBottom: 4 }
+            : {
+                display: 'grid',
+                gridTemplateColumns: `repeat(auto-fill, minmax(${kiezerStijl === 'groot' ? 96 : 60}px, 1fr))`,
+                gap: 4,
+              }
+        }
+      >
         {namen.map((naam, i) => {
           const aan = ((value[sleutel] as number | undefined) ?? 0) === i
           return (
@@ -59,6 +97,8 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
               style={{
                 borderRadius: 12,
                 overflow: 'hidden',
+                flexShrink: 0,
+                minWidth: kiezerStijl === 'strook' ? 68 : undefined,
                 background: aan ? 'var(--hot-16)' : 'var(--surface-2)',
                 border: aan ? '2px solid var(--hot2)' : '1.5px solid var(--line)',
                 padding: '3px 0 2px',
@@ -253,6 +293,18 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
           <p className="faint" style={{ fontSize: 11, marginTop: 0 }}>
             Dit ben jij
           </p>
+          {/* De dobbelsteen, de gedurfde richting: geen rijen om door te lopen
+              maar één knop die je telkens een heel nieuw personage geeft. Wie
+              hem kiest krijgt de rijen niet meer te zien. */}
+          {kiezerStijl === 'dobbel' && (
+            <button
+              className="btn btn-primary"
+              style={{ marginTop: 8, padding: 12, fontSize: 14, minHeight: 44, maxWidth: 240 }}
+              onClick={gooi}
+            >
+              Gooi een nieuw personage
+            </button>
+          )}
         </div>
         <div className="col" style={{ gap: 8, minWidth: 0 }}>
           <div>
