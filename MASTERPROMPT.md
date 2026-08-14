@@ -434,6 +434,16 @@ Stoppen kan met `/loop stop` of door de cron-taak te verwijderen.
 
 ## Logboek
 
+- **14-08-2026, ronde 74** - **Je wereld groeit nu aan vier dingen, en de gevaarlijkste fout tot nu toe.**
+
+  Punt 3a noemt ornament, textuur, licht en letter. Alleen de textuur groeide. Nu komen vanaf trede 2 de hoekstukken op (van 54 naar 92 pixels), vanaf trede 3 het licht, en vanaf trede 5 gaat de app rustiger praten met meer lucht tussen de letters. Met `?groei=1..10` en `?niveau=1..99` is elke trede via een kale link te zien.
+
+  **LES: hergebruik nooit een variabelenaam die je niet zelf hebt bedacht.** Mijn hoekstukken gebruikten `--ornament`, en die naam was al in gebruik door het bestaande wereldsysteem. Mijn tekening kwam daardoor in hún laag terecht: de hoekstukken stonden over het hele scherm herhaald in plaats van in vier hoeken, en ze waren zichtbaar terwijl hun eigen dekking nul was. Álle meters zeiden dat het klopte, want de variabele die ik uitlas hád de goede waarde. Alleen de schermafdruk liet het zien. **Regel: grep vóór je een nieuwe custom property invoert of die naam al bestaat.**
+
+  **LES: meet de bron, niet het geanimeerde gevolg.** De gerenderde dekking van een laag op `html::before` bevriest in een headless browser zonder grafische kaart: hij bleef op zijn oude waarde staan terwijl de stand er wel degelijk was. Drie ronden lang zocht ik een fout die niet in de app zat. De proef meet nu de ontwerpstand zelf, die de tekening aanstuurt.
+
+  **En een eerdere versie van diezelfde proef zette het kenmerk zelf op het document**, waarna de app het bij zijn volgende hertekening terugschreef: hoe langer je wachtte, hoe zekerder je de verkeerde waarde mat. Dezelfde val als eerder bij de taalwereld, en opnieuw opgelost door het via de link te pinnen.
+
 - **14-08-2026, ronde 73** - **Punt 2 en punt 4 afgemaakt: één hoekenfamilie, haarlijnranden, een vast regelritme, en zes groepen richtingen.**
 
   Veertien verschillende hoekstralen door elkaar (2, 3, 5, 6, 8, 9, 10, 12, 14, 15, 16, 18, 26 en de pil) zijn er zes geworden uit één familie. Randdiktes terug op de haarlijnen 1, 1,5 en 2. Koppen breken nu in twee gelijke regels, en er is één regelritme per maat.
