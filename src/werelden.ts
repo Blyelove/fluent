@@ -54,6 +54,18 @@ export const WERELDEN: Wereld[] = [
  * is de wereld een schets; hoe dichter bij 99, hoe voller. Zo zie je aan je
  * scherm hoe ver je bent zonder één cijfer te lezen.
  */
+/**
+ * De groeitrap: elke tien niveaus komt er materiaal bij.
+ *
+ * De rijkdom hierboven loopt in vijf grove stappen en stuurt de bestaande
+ * wereldstijlen aan. Die blijft, want daar hangt van alles aan. Hiernaast
+ * loopt een fijnere trap van tien, zodat je elke tien niveaus écht ziet dat je
+ * wereld voller is geworden dan die van gisteren.
+ */
+export function groeiVoor(level: number): number {
+  return Math.max(1, Math.min(10, Math.floor(level / 10) + 1))
+}
+
 export function rijkdomVoor(level: number): 1 | 2 | 3 | 4 | 5 {
   if (level >= 75) return 5
   if (level >= 50) return 4
@@ -115,6 +127,17 @@ export function pasWereldToe(keuze: string, taal: CourseId, level: number): void
   if (id && id !== 'neon') el.setAttribute('data-wereld', id)
   else el.removeAttribute('data-wereld')
   el.setAttribute('data-rijkdom', String(uitLink.rijkdom ?? rijkdomVoor(level)))
+  // de fijnere trap: tien stappen, één per tien niveaus
+  const groei = uitLink.rijkdom ? Math.min(10, uitLink.rijkdom * 2) : groeiVoor(level)
+  const vorige = Number(el.getAttribute('data-groei') ?? 0)
+  el.setAttribute('data-groei', String(groei))
+  /* Een groeisprong is een moment en geen verversing. Bij een stap omhoog
+     krijgt het document even een klasse, en de stijl laat het ornament dan
+     zichtbaar aangroeien in plaats van het stilletjes te verwisselen. */
+  if (vorige && groei > vorige) {
+    el.classList.add('wereld-groeit')
+    window.setTimeout(() => el.classList.remove('wereld-groeit'), 2400)
+  }
 }
 
 /**

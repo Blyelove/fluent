@@ -44,13 +44,33 @@ html::before {
   filter: hue-rotate(var(--eigen-tint, 0deg));
 }
 
-/* de rijkdom die met je niveau groeit: van kaal naar vol */
+/* De trap die met je niveau groeit: elke tien niveaus komt er materiaal bij.
+   Op niveau 1 is je wereld bijna kaal, op 90 staat het er vol op. Tien stappen
+   in plaats van vijf, want een sprong die je één keer per vijfentwintig
+   niveaus meemaakt voelt niet als groeien. */
 :root { --materiaal-kracht: 0.1; }
-[data-rijkdom='1'] { --materiaal-kracht: 0.05; }
-[data-rijkdom='2'] { --materiaal-kracht: 0.1; }
-[data-rijkdom='3'] { --materiaal-kracht: 0.16; }
-[data-rijkdom='4'] { --materiaal-kracht: 0.22; }
-[data-rijkdom='5'] { --materiaal-kracht: 0.3; }
+[data-groei='1'] { --materiaal-kracht: 0.04; }
+[data-groei='2'] { --materiaal-kracht: 0.08; }
+[data-groei='3'] { --materiaal-kracht: 0.12; }
+[data-groei='4'] { --materiaal-kracht: 0.16; }
+[data-groei='5'] { --materiaal-kracht: 0.2; }
+[data-groei='6'] { --materiaal-kracht: 0.24; }
+[data-groei='7'] { --materiaal-kracht: 0.27; }
+[data-groei='8'] { --materiaal-kracht: 0.3; }
+[data-groei='9'] { --materiaal-kracht: 0.32; }
+[data-groei='10'] { --materiaal-kracht: 0.34; }
+
+/* Het moment zelf: het ornament groeit voor je ogen aan in plaats van er
+   ineens te staan. Even doorschieten, dan terugzakken naar de nieuwe stand. */
+html.wereld-groeit::before {
+  animation: wereld-aangroeien 2400ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes wereld-aangroeien {
+  0% { opacity: 0; transform: rotate(var(--eigen-draai, 0deg)) scale(1.9); }
+  38% { opacity: 0.62; transform: rotate(var(--eigen-draai, 0deg)) scale(1.42); }
+  100% { opacity: var(--materiaal-kracht); transform: rotate(var(--eigen-draai, 0deg)) scale(1.5); }
+}
 
 /* ---------- NEON: het raster van een speelhal ---------- */
 :root {

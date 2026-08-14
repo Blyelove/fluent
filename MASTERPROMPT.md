@@ -434,6 +434,20 @@ Stoppen kan met `/loop stop` of door de cron-taak te verwijderen.
 
 ## Logboek
 
+- **14-08-2026, ronde 72** - **Het pixelwerk en de kleurtaal, en de wereld groeit nu echt elke tien niveaus.**
+
+  **918 afwijkingen van de ladders opgeruimd.** Op het leerscherm stonden achttien verschillende lettergroottes: 10,5 en 11 en 11,5 en 12 en 12,5 en 13 en 13,5 en 14 en 14,5. Elk verschil op zich zie je niet, achttien ervan bij elkaar zie je wél, en dat is precies waarom een scherm rommelig aanvoelt zonder dat je kunt aanwijzen waarom. Eén typeladder van acht tekstmaten plus drie displaymaten, één maatladder van 4, 8, 12, 16, 24, 32, 48. Het leerscherm gebruikt er nu zeven.
+
+  **Eén schaduwtaal en één randtaal.** In de componenten stonden 386 losse kleuren, en bijna allemaal waren het kleuren van de neonwereld: `rgba(255,197,61,0.12)` is het goud van neon, dus stond dat goud ook in de vijftien andere werelden. De wasjes zijn nu tokens die de wereldkleur zélf mengen, dus `--goud-25` is in Sol y sombra het goud van Sol y sombra. Van 386 naar 53, en die 53 zitten in tekeningen waar de kleur het onderwerp is.
+
+  **De confetti was het hardnekkigste geval**, want een tekenblad kent geen tokens. `src/wereldkleuren.ts` leest de kleuren nu uit de stijl.
+
+  **De wereld groeit elke tien niveaus** in plaats van vier keer in je hele leven, en de sprong is een moment: het ornament groeit voor je ogen aan, schiet even door en zakt terug naar de nieuwe stand. Tien standen, alle tien gemeten en verschillend.
+
+  **LES: een ladder mag nooit een knop kleiner maken dan een duim aankan.** Het snappen op de maatladder duwde de knop "Reis verder" naar 43 pixels, net onder de tikgrens van 44. De audit ving het meteen. Een opruimactie die zichzelf niet laat nameten is geen opruimactie maar een gok.
+
+  **LES: backslashes overleven het knippen en plakken door meerdere lagen niet.** Een codemod met `\s*` in een sjabloonliteraal kwam als `s*` in de zoekopdracht aan en veranderde nul bestanden, terwijl hij meldde dat hij klaar was. Zonder de controle achteraf had ik gedacht dat er niets te doen viel. **Regel: schrijf zoekopdrachten zonder backslash-klassen, en controleer altijd of een codemod ook echt iets heeft aangeraakt.**
+
 - **14-08-2026, ronde 71** - **Het ontwerp komt nu ergens vandaan: materiaal, garderobe, houdingen en jouw eigen hand op je wereld.**
 
   **De achtergrond is geen kleurverloop meer.** Elke wereld heeft een echt materiaal uit dat land: de azulejo-tegel, de scherven van Gaudí, de golf van de Portugese calçada, het Bauhaus-raster, het krijtstreepje van Savile Row, Carrara-marmer. Alles als svg rechtstreeks in de stijl, dus geen enkel extra bestand, en de dekking groeit met je niveau via `data-rijkdom`. De laag zit op `html::before`, zodat hij op élk scherm ligt zonder dat er iets aan de opbouw van de app verandert.
