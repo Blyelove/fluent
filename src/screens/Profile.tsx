@@ -2,10 +2,11 @@ import { useState } from 'react'
 import { courseList, courses } from '../content'
 import { courseProgress, totalXp, useStore, wordsLearned } from '../store'
 import { levelProgress, levelTitle, nextReward, wardrobeFor } from '../levels'
-import { skillStand } from '../skills'
+import { isMeester, skillStand } from '../skills'
 import { arenaVoor } from '../arena'
 import { SkillRaster, SkillsSheet } from '../components/SkillsSheet'
 import { WereldKiezer } from '../components/WereldKiezer'
+import { StijlKiezer } from '../components/StijlKiezer'
 import { courseFlagCode } from '../countries'
 import { Flag } from '../components/Flag'
 import { Avatar, normalizePersona } from '../components/Avatar'
@@ -57,7 +58,7 @@ export function ProfileScreen() {
           aria-label="Personage aanpassen"
           style={{ position: 'relative' }}
         >
-          <Avatar size={80} mode="idle" level={lp.level} courseId={state.courseId} look={state.avatarLook} />
+          <Avatar size={80} mode="idle" level={lp.level} courseId={state.courseId} look={state.avatarLook} meester={isMeester(progress.xp)} />
           <span
             style={{
               position: 'absolute',
@@ -317,6 +318,7 @@ export function ProfileScreen() {
           </div>
         </div>
         <WereldKiezer />
+        <StijlKiezer />
         {/* stond hier als dode tekst; nu draai je er zo doorheen */}
         <div className="spread" style={{ padding: '10px 0', borderBottom: '1px solid var(--line)' }}>
           <span style={{ fontWeight: 500 }}>Dagelijks doel</span>

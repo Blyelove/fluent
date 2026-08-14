@@ -161,6 +161,10 @@ interface AureaState {
   wereld: string
   setWereld: (id: string) => void
 
+  /** Gekozen richting per beslissing (proeverij): xp, levelup, arena */
+  stijlen: Record<string, string>
+  setStijl: (sleutel: string, id: string) => void
+
   /** Arena-bekers: winst +30, verlies -10, nooit onder nul */
   bekers: number
   /** Gespeelde en gewonnen arenagevechten */
@@ -290,6 +294,7 @@ export type Profiel = Pick<
   | 'stamps'
   | 'gesprekken'
   | 'duelName'
+  | 'stijlen'
   | 'bekers'
   | 'arenaGevechten'
   | 'arenaWinsten'
@@ -351,6 +356,7 @@ function nieuwProfiel(): Profiel {
     stamps: {},
     gesprekken: {},
     duelName: '',
+    stijlen: {},
     bekers: 0,
     arenaGevechten: 0,
     arenaWinsten: 0,
@@ -870,6 +876,8 @@ export const useStore = create<AureaState>()(
       setDuelName: (n) => set({ duelName: n.slice(0, 24) }),
 
       setWereld: (id) => set({ wereld: id }),
+
+      setStijl: (sleutel, id) => set({ stijlen: { ...get().stijlen, [sleutel]: id } }),
 
       boekArena: (gewonnen) => {
         const s = get()

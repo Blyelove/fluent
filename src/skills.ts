@@ -84,3 +84,8 @@ export function volgendeMijlpaal(level: number): number | null {
   for (const m of MIJLPALEN) if (level < m) return m
   return null
 }
+
+/** Draagt deze taal de meestermantel? Alleen bij niveau 99. */
+export function isMeester(xp: number): boolean {
+  return skillLevel(xp) >= MAX_SKILL_LEVEL
+}

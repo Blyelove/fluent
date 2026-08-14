@@ -5,6 +5,7 @@ import { useStore } from '../store'
 import { MIJLPALEN, skillLevel, volgendeMijlpaal } from '../skills'
 import type { CourseId } from '../types'
 import { sfx } from '../audio'
+import { STANDAARD_STIJLEN, stijlUitLink } from '../stijlen'
 import confetti from 'canvas-confetti'
 
 /**
@@ -36,6 +37,9 @@ export function XpDrops() {
   const [drops, setDrops] = useState<Drop[]>([])
   const [viering, setViering] = useState<Viering | null>(null)
   const kalm = Boolean(useReducedMotion())
+  // de gekozen richting uit de proeverij; de link wint, zodat je kunt proeven
+  const xpStijl = useStore((s) => stijlUitLink('xp') ?? s.stijlen.xp ?? STANDAARD_STIJLEN.xp)
+  const levelStijl = useStore((s) => stijlUitLink('levelup') ?? s.stijlen.levelup ?? STANDAARD_STIJLEN.levelup)
 
   useEffect(() => {
     // vorige stand per taal, om echte boekingen en echte sprongen te zien
@@ -91,28 +95,82 @@ export function XpDrops() {
       {/* de vallende XP, rechtsboven waar je voortgang leeft */}
       <div style={{ position: 'fixed', top: 64, right: 18, zIndex: 60, pointerEvents: 'none' }} aria-hidden="true">
         <AnimatePresence>
-          {drops.map((d) => (
-            <motion.div
-              key={d.id}
-              initial={{ opacity: 0, y: 14, scale: 0.85 }}
-              animate={{ opacity: 1, y: kalm ? 0 : -34, scale: 1 }}
-              exit={{ opacity: 0, y: kalm ? 0 : -52 }}
-              transition={{ duration: 1.1, ease: [0.2, 0.7, 0.3, 1] }}
-              className="num"
-              style={{
-                position: 'absolute',
-                right: 0,
-                whiteSpace: 'nowrap',
-                fontFamily: 'var(--font-display)',
-                fontWeight: 800,
-                fontSize: 17,
-                color: 'var(--gold-bright)',
-                textShadow: '0 1px 3px rgba(0,0,0,0.65), 0 0 14px rgba(255,197,61,0.55)',
-              }}
-            >
-              +{d.xp} xp
-            </motion.div>
-          ))}
+          {drops.map((d, i) => {
+            const basis = {
+              position: 'absolute' as const,
+              right: 0,
+              whiteSpace: 'nowrap' as const,
+              fontFamily: 'var(--font-display)',
+              fontWeight: 800,
+              color: 'var(--gold-bright)',
+              textShadow: '0 1px 3px rgba(0,0,0,0.65), 0 0 14px rgba(255,197,61,0.55)',
+            }
+            // REGEN: het bedrag valt uiteen in losse cijfers die wegdwarrelen
+            if (xpStijl === 'regen') {
+              return (
+                <div key={d.id} style={{ position: 'absolute', right: 0, display: 'flex', gap: 1 }}>
+                  {`+${d.xp}`.split('').map((teken, j) => (
+                    <motion.span
+                      key={j}
+                      initial={{ opacity: 0, y: 0, x: 0, rotate: 0 }}
+                      animate={{ opacity: [0, 1, 1, 0], y: kalm ? 0 : -46 - j * 7, x: kalm ? 0 : (j - 1) * 11, rotate: kalm ? 0 : (j - 1) * 22 }}
+                      transition={{ duration: 1.5, delay: j * 0.06, ease: [0.2, 0.7, 0.3, 1] }}
+                      className="num"
+                      style={{ ...basis, position: 'relative', fontSize: 19 }}
+                    >
+                      {teken}
+                    </motion.span>
+                  ))}
+                </div>
+              )
+            }
+            // INSLAG: groot binnenkomen en wegkrimpen
+            if (xpStijl === 'inslag') {
+              return (
+                <motion.div
+                  key={d.id}
+                  initial={{ opacity: 0, scale: kalm ? 1 : 2.2 }}
+                  animate={{ opacity: [0, 1, 1, 0], scale: 1, y: kalm ? 0 : -18 }}
+                  transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1] }}
+                  className="num"
+                  style={{ ...basis, fontSize: 22 }}
+                >
+                  +{d.xp} xp
+                </motion.div>
+              )
+            }
+            // STAPEL: elke nieuwe drop duwt de vorige omhoog, je reeks blijft staan
+            if (xpStijl === 'stapel') {
+              const vanOnder = drops.length - 1 - i
+              return (
+                <motion.div
+                  key={d.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1 - vanOnder * 0.28, y: kalm ? 0 : -vanOnder * 26 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ type: 'spring', stiffness: 260, damping: 24 }}
+                  className="num"
+                  style={{ ...basis, fontSize: 17 }}
+                >
+                  +{d.xp} xp
+                </motion.div>
+              )
+            }
+            // KLASSIEK: één getal dat rustig omhoog zweeft, zoals toen
+            return (
+              <motion.div
+                key={d.id}
+                initial={{ opacity: 0, y: 14, scale: 0.85 }}
+                animate={{ opacity: 1, y: kalm ? 0 : -34, scale: 1 }}
+                exit={{ opacity: 0, y: kalm ? 0 : -52 }}
+                transition={{ duration: 1.1, ease: [0.2, 0.7, 0.3, 1] }}
+                className="num"
+                style={{ ...basis, fontSize: 17 }}
+              >
+                +{d.xp} xp
+              </motion.div>
+            )
+          })}
         </AnimatePresence>
       </div>
 
@@ -131,7 +189,10 @@ export function XpDrops() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              background: 'rgba(4, 2, 12, 0.66)',
+              background:
+                levelStijl === 'zonsopgang'
+                  ? 'radial-gradient(120% 90% at 50% 108%, rgba(255,214,130,0.96) 0%, rgba(255,168,76,0.9) 38%, rgba(60,26,8,0.9) 100%)'
+                  : 'rgba(4, 2, 12, 0.66)',
               backdropFilter: 'blur(3px)',
               WebkitBackdropFilter: 'blur(3px)',
               padding: 24,
@@ -154,13 +215,37 @@ export function XpDrops() {
               />
             )}
             <motion.div
-              initial={{ scale: 0.7, y: 22 }}
-              animate={{ scale: 1, y: 0 }}
+              initial={
+                levelStijl === 'banier'
+                  ? { y: kalm ? 0 : -220, opacity: 0 }
+                  : levelStijl === 'inslag'
+                    ? { scale: kalm ? 1 : 2.6, opacity: 0 }
+                    : { scale: 0.7, y: 22 }
+              }
+              animate={{ scale: 1, y: 0, opacity: 1 }}
               exit={{ scale: 0.85, opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 260, damping: 17 }}
+              transition={
+                levelStijl === 'inslag'
+                  ? { type: 'spring', stiffness: 420, damping: 15 }
+                  : levelStijl === 'banier'
+                    ? { type: 'spring', stiffness: 200, damping: 18 }
+                    : { type: 'spring', stiffness: 260, damping: 17 }
+              }
               onClick={(e) => e.stopPropagation()}
-              className="card-hero center"
-              style={{ padding: viering.mijlpaal ? '30px 26px' : '24px 24px', maxWidth: 320, width: '100%' }}
+              className={levelStijl === 'banier' ? 'center' : 'card-hero center'}
+              style={
+                levelStijl === 'banier'
+                  ? {
+                      padding: '26px 22px',
+                      width: '100%',
+                      maxWidth: 420,
+                      background: 'var(--hero-vlak)',
+                      borderTop: '3px solid var(--gold)',
+                      borderBottom: '3px solid var(--gold)',
+                      color: 'var(--hero-tekst)',
+                    }
+                  : { padding: viering.mijlpaal ? '30px 26px' : '24px 24px', maxWidth: 320, width: '100%' }
+              }
             >
               <p className="eyebrow" style={{ color: 'var(--hero-eyebrow)' }}>
                 {viering.mijlpaal ? 'Mijlpaal bereikt' : 'Niveau omhoog'}

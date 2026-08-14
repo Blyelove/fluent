@@ -17,6 +17,8 @@ import {
   type Gladiator,
 } from '../arena'
 import { Avatar } from '../components/Avatar'
+import { isMeester } from '../skills'
+import { STANDAARD_STIJLEN, stijlUitLink } from '../stijlen'
 import { courseFlagCode } from '../countries'
 import { Flag } from '../components/Flag'
 import { sfx, speak } from '../audio'
@@ -45,6 +47,8 @@ export function ArenaScreen({ onTerug, onPlayingChange }: { onTerug: () => void;
   const boekArena = useStore((s) => s.boekArena)
   const addMistake = useStore((s) => s.addMistake)
   const look = useStore((s) => s.avatarLook)
+  const meester = useStore((s) => isMeester(s.progress[s.courseId]?.xp ?? 0))
+  const opkomstStijl = useStore((s) => stijlUitLink('arena') ?? s.stijlen.arena ?? STANDAARD_STIJLEN.arena)
   const course = courses[courseId]
   const kalm = Boolean(useReducedMotion())
 
@@ -173,13 +177,56 @@ export function ArenaScreen({ onTerug, onPlayingChange }: { onTerug: () => void;
   /* ---------- de opkomst ---------- */
   if (fase.naam === 'opkomst') {
     return (
-      <div className="shell shell--bare center" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '100dvh' }}>
+      <div
+        className="shell shell--bare center"
+        style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '100dvh', position: 'relative', overflow: 'hidden' }}
+      >
+        {/* POORT: twee deuren zwaaien open en onthullen de arena */}
+        {opkomstStijl === 'poort' && !kalm && (
+          <>
+            {[-1, 1].map((kant) => (
+              <motion.div
+                key={kant}
+                initial={{ x: 0 }}
+                animate={{ x: kant * 400 }}
+                transition={{ duration: 1.5, delay: 0.2, ease: [0.7, 0, 0.3, 1] }}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  bottom: 0,
+                  [kant === -1 ? 'left' : 'right']: 0,
+                  width: '50%',
+                  background: 'var(--paneel-diep)',
+                  borderRight: kant === -1 ? '3px solid var(--gold)' : undefined,
+                  borderLeft: kant === 1 ? '3px solid var(--gold)' : undefined,
+                  zIndex: 3,
+                  pointerEvents: 'none',
+                }}
+              />
+            ))}
+          </>
+        )}
+        {/* SPOTLICHT: donker, dan valt er één spot op elke vechter */}
+        {opkomstStijl === 'spot' && !kalm && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            animate={{ opacity: 0 }}
+            transition={{ duration: 1.6, ease: 'easeOut' }}
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'radial-gradient(circle at 30% 42%, transparent 12%, rgba(0,0,0,0.94) 30%), radial-gradient(circle at 70% 42%, transparent 12%, rgba(0,0,0,0.94) 30%)',
+              zIndex: 3,
+              pointerEvents: 'none',
+            }}
+          />
+        )}
         <p className="eyebrow" style={{ color: 'var(--hero-eyebrow)' }}>
           {rang.emoji} {rang.naam}
         </p>
         <div className="row" style={{ justifyContent: 'center', gap: 18, margin: '22px 0 10px', alignItems: 'center' }}>
           <motion.div initial={{ x: kalm ? 0 : -60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ type: 'spring', stiffness: 200, damping: 20 }} className="col center" style={{ gap: 6 }}>
-            <Avatar size={92} look={look} courseId={courseId} />
+            <Avatar size={92} look={look} courseId={courseId} meester={meester} />
             <strong className="card-title">Jij</strong>
           </motion.div>
           <motion.span
@@ -296,7 +343,7 @@ export function ArenaScreen({ onTerug, onPlayingChange }: { onTerug: () => void;
       {/* de stand: twee vechters, twee rijen schilden */}
       <div className="spread" style={{ padding: '10px 0 12px', borderBottom: '1px solid var(--line)' }}>
         <div className="row" style={{ gap: 9 }}>
-          <Avatar size={40} look={look} courseId={courseId} still />
+          <Avatar size={40} look={look} courseId={courseId} meester={meester} still />
           <div className="col" style={{ gap: 2 }}>
             <strong style={{ fontSize: 13, fontWeight: 700 }}>Jij</strong>
             {schild(mijnSchilden, 'ik')}

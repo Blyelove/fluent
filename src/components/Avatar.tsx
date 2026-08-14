@@ -201,6 +201,7 @@ export function Avatar({
   look = 'a',
   still = false,
   label,
+  meester = false,
 }: {
   size?: number
   mode?: 'idle' | 'run' | 'cheer'
@@ -212,6 +213,8 @@ export function Avatar({
   still?: boolean
   /** Voorleestekst; zonder label is het personage decoratief en slaat de schermlezer het over */
   label?: string
+  /** Draagt de meestermantel: deze taal staat op niveau 99 */
+  meester?: boolean
 }) {
   // unieke id's per personage — anders botsen de gradiënten en het clip-pad
   // zodra er meerdere personages tegelijk op het scherm staan (galerij, maker)
@@ -356,7 +359,36 @@ export function Avatar({
       )}
 
       {/* vlaggen-cape (niveau 8+), achter het lijf */}
-      {hasCape && (
+      {/* DE MEESTERMANTEL: alleen wie een taal op 99 zette draagt hem, en hij
+          neemt de kleuren van die taalwereld mee. Overal zichtbaar waar je
+          personage staat, want dit is het bewijs van jaren trainen. */}
+      {meester && (
+        <motion.g
+          animate={running ? { rotate: [0, 5, 0] } : amb({ rotate: [0, 2.2, 0] })}
+          transition={{ duration: running ? 0.32 : 3.2, repeat: Infinity, ease: 'easeInOut' }}
+          style={{ originX: '100px', originY: '108px' }}
+        >
+          <defs>
+            <linearGradient id={`meester-${uid}`} x1="0" y1="0" x2="0.6" y2="1">
+              <stop offset="0%" stopColor="var(--gold-bright, #ffe08a)" />
+              <stop offset="45%" stopColor="var(--hot2, #ec4899)" />
+              <stop offset="100%" stopColor="var(--hot1, #a855f7)" />
+            </linearGradient>
+          </defs>
+          {/* de mantel valt breder en langer dan elke andere cape */}
+          <path d="M68 108 Q48 162 56 204 L144 204 Q152 162 132 108 Z" fill={`url(#meester-${uid})`} opacity="0.96" />
+          <path d="M84 108 Q74 160 78 204 L122 204 Q126 160 116 108 Z" fill="var(--gold, #ffc53d)" opacity="0.28" />
+          {/* de gouden zoom en de kraag: het teken van een meester */}
+          <path d="M56 204 L144 204" stroke="var(--gold-bright, #ffe08a)" strokeWidth="4" strokeLinecap="round" />
+          <path d="M68 108 Q100 122 132 108" stroke="var(--gold-bright, #ffe08a)" strokeWidth="4.5" fill="none" strokeLinecap="round" />
+          <circle cx="100" cy="116" r="5.5" fill="var(--gold-bright, #ffe08a)" />
+          <text x="100" y="120" textAnchor="middle" fontSize="8" fontWeight="900" fill="var(--ink-on-gold, #1a1033)">
+            99
+          </text>
+        </motion.g>
+      )}
+
+      {hasCape && !meester && (
         <motion.g
           animate={running ? { rotate: [0, 4, 0] } : amb({ rotate: [0, 1.5, 0] })}
           transition={{ duration: running ? 0.32 : 2.6, repeat: Infinity, ease: 'easeInOut' }}
