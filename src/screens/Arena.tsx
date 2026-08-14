@@ -58,12 +58,20 @@ export function ArenaScreen({ onTerug, onPlayingChange }: { onTerug: () => void;
 
   const [fase, setFase] = useState<Fase>({ naam: 'opkomst', tel: 3 })
   const [vraagIdx, setVraagIdx] = useState(0)
-  const [mijnSchilden, setMijnSchilden] = useState(SCHILDEN)
-  const [zijnSchilden, setZijnSchilden] = useState(SCHILDEN)
+  // ?matchpoint=1 start het gevecht meteen op het scherpst van de snede
+  const opScherp = new URLSearchParams(window.location.search).has('matchpoint')
+  const [mijnSchilden, setMijnSchilden] = useState(opScherp ? 1 : SCHILDEN)
+  const [zijnSchilden, setZijnSchilden] = useState(opScherp ? 1 : SCHILDEN)
   const [gekozen, setGekozen] = useState<number | null>(null)
   const [botDenkt, setBotDenkt] = useState(false)
   const [melding, setMelding] = useState<string | null>(null)
+  /** de korte stilte na een nederlaag: het scherm valt even weg */
+  const [stilte, setStilte] = useState(false)
   const [klap, setKlap] = useState<'ik' | 'hij' | null>(null)
+  /** de slag die nu over het scherm trekt: van wie naar wie */
+  const [slag, setSlag] = useState<'ik' | 'hij' | null>(null)
+  /** matchpoint: iemand staat op één schild, het scherm houdt zijn adem in */
+  const matchpoint = fase.naam === 'strijd' && (mijnSchilden === 1 || zijnSchilden === 1)
   const vraagStart = useRef(0)
   const geboekt = useRef(false)
   const timers = useRef<number[]>([])
@@ -101,8 +109,11 @@ export function ArenaScreen({ onTerug, onPlayingChange }: { onTerug: () => void;
     if (gewonnen) {
       sfx('complete')
       confetti({ particleCount: 170, spread: 110, origin: { y: 0.5 }, colors: ['#FFC53D', '#FFE08A', '#FFFFFF'], disableForReducedMotion: true })
+    } else {
+      // geen geluid bij verlies: de stilte is het effect
+      setStilte(true)
     }
-    later(gewonnen ? 700 : 900, () => setFase({ naam: 'uitslag', gewonnen, bekersNa }))
+    later(gewonnen ? 700 : 1300, () => setFase({ naam: 'uitslag', gewonnen, bekersNa }))
   }
 
   /* ---------- een slagwissel ---------- */
@@ -114,6 +125,9 @@ export function ArenaScreen({ onTerug, onPlayingChange }: { onTerug: () => void;
     if (goed) {
       sfx('correct')
       speak(vraag.zeg, course.ttsLang)
+      // jouw slag trekt naar rechts, naar je tegenstander toe
+      setSlag('ik')
+      later(420, () => setSlag(null))
     } else {
       sfx('wrong')
       setKlap('ik')
@@ -136,6 +150,8 @@ export function ArenaScreen({ onTerug, onPlayingChange }: { onTerug: () => void;
         later(500, () => setKlap(null))
       } else {
         setMelding(`${tegenstander.naam} pareerde jouw slag`)
+        setSlag('hij')
+        later(420, () => setSlag(null))
       }
       later(650, () => {
         setMelding(null)
@@ -320,6 +336,7 @@ export function ArenaScreen({ onTerug, onPlayingChange }: { onTerug: () => void;
             onClick={() => {
               sfx('tap')
               geboekt.current = false
+              setStilte(false)
               setMijnSchilden(SCHILDEN)
               setZijnSchilden(SCHILDEN)
               setGekozen(null)
@@ -339,7 +356,90 @@ export function ArenaScreen({ onTerug, onPlayingChange }: { onTerug: () => void;
 
   /* ---------- de strijd ---------- */
   return (
-    <div className="shell shell--bare" style={{ display: 'flex', flexDirection: 'column', minHeight: '100dvh', paddingBottom: 16 }}>
+    <div
+      className="shell shell--bare"
+      style={{ display: 'flex', flexDirection: 'column', minHeight: '100dvh', paddingBottom: 16, position: 'relative', overflow: 'hidden' }}
+    >
+      {/* MATCHPOINT: iemand staat op één schild. Het scherm houdt zijn adem in
+          met een rode rand die traag pulseert, en zegt het er ook bij. */}
+      {matchpoint && (
+        <>
+          <motion.div
+            aria-hidden="true"
+            animate={kalm ? { opacity: 0.5 } : { opacity: [0.28, 0.62, 0.28] }}
+            transition={{ duration: 1.9, repeat: Infinity, ease: 'easeInOut' }}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 1,
+              pointerEvents: 'none',
+              boxShadow: `inset 0 0 90px ${mijnSchilden === 1 ? 'rgba(251,113,133,0.55)' : 'rgba(74,222,128,0.45)'}`,
+            }}
+          />
+          <p
+            className="center num"
+            style={{
+              position: 'relative',
+              zIndex: 2,
+              fontSize: 11.5,
+              fontWeight: 800,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              color: mijnSchilden === 1 ? 'var(--err)' : 'var(--ok)',
+              marginBottom: 2,
+            }}
+          >
+            {mijnSchilden === 1 && zijnSchilden === 1
+              ? 'Allebei één schild. Alles of niets.'
+              : mijnSchilden === 1
+                ? 'Nog één schild. Hou stand.'
+                : 'Matchpoint. Nog één rake klap.'}
+          </p>
+        </>
+      )}
+
+      {/* DE SLAGWISSEL: een lichtveeg die van de aanvaller naar de ander trekt */}
+      <AnimatePresence>
+        {slag && !kalm && (
+          <motion.div
+            key={slag + Date.now()}
+            aria-hidden="true"
+            initial={{ x: slag === 'ik' ? '-60%' : '60%', opacity: 0 }}
+            animate={{ x: slag === 'ik' ? '60%' : '-60%', opacity: [0, 0.9, 0] }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.42, ease: 'easeOut' }}
+            style={{
+              position: 'fixed',
+              top: 44,
+              left: 0,
+              right: 0,
+              height: 46,
+              zIndex: 2,
+              pointerEvents: 'none',
+              background:
+                slag === 'ik'
+                  ? 'linear-gradient(90deg, transparent, var(--cyan), transparent)'
+                  : 'linear-gradient(90deg, transparent, var(--err), transparent)',
+              filter: 'blur(7px)',
+            }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* DE STILTE: na een nederlaag valt het scherm even helemaal weg */}
+      <AnimatePresence>
+        {stilte && (
+          <motion.div
+            aria-hidden="true"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.55 }}
+            style={{ position: 'fixed', inset: 0, zIndex: 40, background: 'rgba(2, 1, 6, 0.9)', pointerEvents: 'none' }}
+          />
+        )}
+      </AnimatePresence>
+
       {/* de stand: twee vechters, twee rijen schilden */}
       <div className="spread" style={{ padding: '10px 0 12px', borderBottom: '1px solid var(--line)' }}>
         <div className="row" style={{ gap: 9 }}>
