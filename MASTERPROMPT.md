@@ -434,6 +434,18 @@ Stoppen kan met `/loop stop` of door de cron-taak te verwijderen.
 
 ## Logboek
 
+- **15-08-2026, ronde 77** - **De eerste seconde en de beweging die je het vaakst maakt.**
+
+  **De eerste seconde was leeg.** De app is ruim een megabyte javascript; op een telefoon met matig bereik duurt het seconden voordat daar iets van te zien is. Er staat nu een opening in `index.html` zelf: de naam in het merkverloop, een vullende lijn, een regel eronder. Op een nagebootste trage telefoon staat hij er na 700 ms.
+
+  **LES: laat een overdracht niet van een terugmelding afhangen.** De opening zou verdwijnen zodra de app een klasse zette. Die klasse werd nooit gezet en de opening bleef eeuwig staan, terwijl de app er allang was. Nu doet de stijl het zelf met `:has(#root > *)`, dus de app hoeft niets te melden en er kan niets misgaan in die melding. Het javascript blijft als vangnet met een tijdslimiet.
+
+  **LES: onzichtbaar is niet gestopt.** De vullende lijn draaide door nadat de app het had overgenomen, en telde als vierde oneindige animatie op elk scherm. De audit ving het in dezelfde ronde.
+
+  **Van tab wisselen ging nergens over.** Nu komt een scherm binnen uit de kant waar je vandaan komt, en de pil onder de actieve tab schuift mee in plaats van te verspringen (gemeten: 25, onderweg 265, tot rust op 290). Bewust alleen een binnenkomst en geen vertrek: twee schermen tegelijk kost een dubbele opbouw, en het mag nooit trager worden.
+
+  **En een echte fout die niemand meldt maar iedereen voelt:** de scrollstand bleef staan bij het wisselen. Scrol je op Leren naar beneden en tik je op Profiel, dan landde je negenhonderd pixels diep in dat scherm. Nu begint een nieuw scherm bovenaan en kom je terug waar je was.
+
 - **14-08-2026, ronde 76** - **Elk punt van het ontwerpdoel is nu gemeten in plaats van beweerd, en er zijn acht groepen richtingen.**
 
   **Twee groepen erbij**, zodat élke beslissing zijn richtingen heeft: de personagekiezer (Raster, Strook, Groot, en de gedurfde Dobbelsteen die de rijen vervangt door één knop) en wat je nog niet hebt in je garderobe (Silhouet, Nevel, Omtrek, en de gedurfde Kier). Daarmee **31 richtingen over 8 groepen**, elke groep met een gedurfde.
