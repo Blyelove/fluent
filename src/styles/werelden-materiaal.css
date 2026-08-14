@@ -34,6 +34,14 @@ html::before {
   background-size: var(--materiaal-maat, 120px 120px);
   opacity: var(--materiaal-kracht, 0);
   transition: opacity 900ms ease;
+  /* de eigen hand van deze speler: een kleine draai, maat en tint uit zijn
+     naam. Twee spelers op hetzelfde niveau in dezelfde taal krijgen daardoor
+     niet dezelfde wereld, en dat is het verschil tussen een thema en iets van
+     jou. De laag is groter dan het scherm zodat de draai geen hoeken leeg laat. */
+  transform: rotate(var(--eigen-draai, 0deg)) scale(1.5);
+  transform-origin: center;
+  zoom: var(--eigen-maat, 100%);
+  filter: hue-rotate(var(--eigen-tint, 0deg));
 }
 
 /* de rijkdom die met je niveau groeit: van kaal naar vol */

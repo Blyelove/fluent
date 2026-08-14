@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type ComponentType } from 'react'
 import { useRegisterSW } from 'virtual:pwa-register/react'
-import { pasWereldToe } from './werelden'
+import { pasEigenDraaiToe, pasWereldToe } from './werelden'
 import { skillStand } from './skills'
 import type { Course, Lesson } from './types'
 import { courses } from './content'
@@ -70,6 +70,9 @@ export default function App() {
   // de taalwereld hoort op élk scherm te staan, ook op het inlogscherm; de
   // kiezer laadt daar niet, dus zetten we hem hier op het document
   const wereldKeuze = useStore((s) => s.wereld)
+  // wie je bent bepaalt de eigen draai op je wereld, zodat twee spelers op
+  // hetzelfde niveau in dezelfde taal er tóch niet hetzelfde uitzien
+  const gebruiker = useStore((s) => s.currentUser)
   const taalNu = useStore((s) => s.courseId)
   const niveauNu = useStore((s) => skillStand(s.progress[s.courseId]?.xp ?? 0).level)
   // ?wereld=papier dwingt één wereld af zonder iets in te stellen: zo is elke
@@ -78,7 +81,9 @@ export default function App() {
   useEffect(() => {
     if (wereldUitLink) document.documentElement.setAttribute('data-wereld', wereldUitLink)
     else pasWereldToe(wereldKeuze, taalNu, niveauNu)
-  }, [wereldKeuze, taalNu, niveauNu, wereldUitLink])
+    // altijd, ook als de wereld uit de link komt: dit is jouw hand erop
+    pasEigenDraaiToe(gebruiker ?? 'gast')
+  }, [wereldKeuze, taalNu, niveauNu, wereldUitLink, gebruiker])
 
   // ?demo=1 vult een wegwerpprofiel met voortgang en ?tab= opent een tabblad
   // direct: zo is elk scherm vast te leggen via een kale link, zonder inloggen

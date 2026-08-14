@@ -82,6 +82,32 @@ export function wereldUitLink(): { wereld?: string; rijkdom?: number } {
  * Zet wereld en rijkdom op het document. Een lege keuze betekent: volg de
  * taal die je leert, want dat is het hele idee.
  */
+/**
+ * Jouw eigen hand in je wereld.
+ *
+ * Twee spelers op hetzelfde niveau in dezelfde taal kregen tot nu toe precies
+ * dezelfde wereld. Dan is het een thema en niet jóuw wereld. Uit je naam komt
+ * hier een klein, vast getal dat het patroon een eigen draai, maat en tint
+ * geeft. Klein genoeg om het ontwerp heel te laten, groot genoeg om te zien
+ * dat de wereld van je vriend een andere is dan die van jou.
+ */
+export function eigenDraai(naam: string): { draai: number; maat: number; tint: number } {
+  let h = 2166136261
+  for (let i = 0; i < naam.length; i++) {
+    h ^= naam.charCodeAt(i)
+    h = Math.imul(h, 16777619)
+  }
+  const n = (verschuiving: number, delen: number) => Math.abs(h >> verschuiving) % delen
+  return {
+    // hoogstens een kwartslag, anders herken je het materiaal niet meer
+    draai: n(0, 17) - 8,
+    // tussen 88 en 124 procent van de gewone maat
+    maat: 88 + n(5, 37),
+    // een klein kleurduwtje, nooit zo veel dat de wereld een andere wordt
+    tint: n(11, 25) - 12,
+  }
+}
+
 export function pasWereldToe(keuze: string, taal: CourseId, level: number): void {
   const el = document.documentElement
   const uitLink = wereldUitLink()
@@ -89,4 +115,17 @@ export function pasWereldToe(keuze: string, taal: CourseId, level: number): void
   if (id && id !== 'neon') el.setAttribute('data-wereld', id)
   else el.removeAttribute('data-wereld')
   el.setAttribute('data-rijkdom', String(uitLink.rijkdom ?? rijkdomVoor(level)))
+}
+
+/**
+ * De eigen draai op het document zetten. Bewust los van pasWereldToe: die
+ * wordt overgeslagen zodra de wereld uit de link komt, en dan zou jouw eigen
+ * hand er ineens niet meer op liggen.
+ */
+export function pasEigenDraaiToe(naam: string): void {
+  const el = document.documentElement
+  const eigen = eigenDraai(naam || 'gast')
+  el.style.setProperty('--eigen-draai', `${eigen.draai}deg`)
+  el.style.setProperty('--eigen-maat', `${eigen.maat}%`)
+  el.style.setProperty('--eigen-tint', `${eigen.tint}deg`)
 }

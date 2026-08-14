@@ -238,7 +238,12 @@ export function Avatar({
   meester = false,
 }: {
   size?: number
-  mode?: 'idle' | 'run' | 'cheer'
+  /**
+   * De houding. Een personage dat stilstaat terwijl er iets gebeurt is geen
+   * personage maar een plaatje: als je verliest hoort hij te zakken, en als
+   * hij nadenkt hoort hij te wiegen.
+   */
+  mode?: 'idle' | 'run' | 'cheer' | 'verslagen' | 'denk'
   level?: number
   courseId?: CourseId
   /** legacy: los personage a t/m h; nieuw: AvatarStyle-object uit de personage-maker */
@@ -267,6 +272,8 @@ export function Avatar({
   const mouthLine = MOUTH_LINES[p.skin]
   const running = mode === 'run'
   const cheering = mode === 'cheer'
+  const verslagen = mode === 'verslagen'
+  const denkt = mode === 'denk'
   /* De lichaamsbouw als factor op de bestaande maten. Zo blijven de emblemen,
      de strepen en de halsdoek die op de torso staan gewoon kloppen, en hoeft
      er niets opnieuw ingemeten te worden. */
@@ -317,9 +324,10 @@ export function Avatar({
       viewBox="0 0 200 230"
       initial={still ? false : { scale: 0, rotate: -6 }}
       animate={{
-        scale: cheering ? [1, 1.06, 1] : 1,
-        rotate: 0,
-        y: running ? [0, -7, 0] : cheering ? [0, -4, 0] : 0,
+        scale: cheering ? [1, 1.06, 1] : verslagen ? 0.97 : 1,
+        // verslagen: het hoofd zakt en het lijf kantelt een tikje voorover
+        rotate: verslagen ? 4 : denkt ? [-1.5, 1.5, -1.5] : 0,
+        y: running ? [0, -7, 0] : cheering ? [0, -4, 0] : verslagen ? 6 : denkt ? [0, -2, 0] : 0,
       }}
       transition={{
         scale: cheering ? { duration: 0.7, repeat: Infinity, ease: 'easeInOut' } : { type: 'spring', stiffness: 260, damping: 18 },
@@ -719,8 +727,10 @@ export function Avatar({
       )}
       {/* neus: die was er niet, en juist daardoor leek elk gezicht op elk ander */}
       <Neus vorm={p.nose ?? 0} kleur={lk.shade} />
-      {/* mond: acht vormen, allemaal leesbaar tot op 56 pixels */}
-      <Mond vorm={p.mouth ?? 0} lijn={mouthLine} />
+      {/* De mond volgt de houding: wie net verloor lacht niet, en wie nadenkt
+          trekt zijn mond tot een streep. Een vast gezicht bij elke gebeurtenis
+          is precies wat een personage weer een plaatje maakt. */}
+      <Mond vorm={verslagen ? 2 : denkt ? 5 : (p.mouth ?? 0)} lijn={mouthLine} />
 
       {/* blos */}
       <circle cx="76" cy="78" r="4.5" fill="#E89B6F" opacity="0.55" />

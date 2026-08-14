@@ -409,7 +409,11 @@ export function ArenaScreen({
     return (
       <div className="shell shell--bare center" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '100dvh' }}>
         <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
-          <p style={{ fontSize: 64, lineHeight: 1 }}>{fase.gewonnen ? '🏆' : '🛡️'}</p>
+          {/* geen emoji als vervanging voor een ontwerp: je eigen personage
+              juicht of staat verslagen, en dat zegt meer dan een beker */}
+          <div className="center" style={{ display: 'flex', justifyContent: 'center' }}>
+            <Avatar size={104} look={look} courseId={courseId} meester={meester} mode={fase.gewonnen ? 'cheer' : 'verslagen'} />
+          </div>
           <h1 className="display" style={{ fontSize: 32, margin: '10px 0 4px' }}>
             {fase.gewonnen ? 'Overwinning!' : 'Nipt verloren'}
           </h1>
@@ -577,7 +581,17 @@ export function ArenaScreen({
       {/* de stand: twee vechters, twee rijen schilden */}
       <div className="spread" style={{ padding: '10px 0 12px', borderBottom: '1px solid var(--line)' }}>
         <div className="row" style={{ gap: 9 }}>
-          <Avatar size={40} look={look} courseId={courseId} meester={meester} still />
+          {/* je personage speelt mee: hij zakt als hij een klap krijgt en
+              wiegt terwijl de ander nadenkt. Stilstaan terwijl er iets gebeurt
+              maakt van een personage weer een plaatje. */}
+          <Avatar
+            size={40}
+            look={look}
+            courseId={courseId}
+            meester={meester}
+            mode={klap === 'ik' ? 'verslagen' : botDenkt ? 'denk' : 'idle'}
+            still={!klap && !botDenkt}
+          />
           <div className="col" style={{ gap: 2 }}>
             <strong style={{ fontSize: 13, fontWeight: 700 }}>Jij</strong>
             {schild(mijnSchilden, 'ik')}
