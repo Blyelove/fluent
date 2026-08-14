@@ -46,13 +46,31 @@ export const BREUK_STIJLEN: Richting[] = [
   { id: 'as', naam: 'As', kern: 'Hij brandt van de rand naar binnen weg en dwarrelt als sintels op', gedurfd: true },
 ]
 
-export type StijlSleutel = 'xp' | 'levelup' | 'arena' | 'breuk'
+/** Hoe het materiaal van je taalwereld op het scherm ligt */
+export const MATERIAAL_STIJLEN: Richting[] = [
+  { id: 'waas', naam: 'Waas', kern: 'Het patroon ligt gelijkmatig over het hele scherm, rustig en overal' },
+  { id: 'rand', naam: 'Rand', kern: 'Alleen langs de randen, zodat het midden helemaal leeg blijft' },
+  { id: 'diep', naam: 'Diep', kern: 'Voller en zwaarder, het materiaal is duidelijk aanwezig' },
+  { id: 'adem', naam: 'Ademend', kern: 'Het patroon zwelt heel traag op en weer weg, als een levende muur', gedurfd: true },
+]
+
+/** Hoe je wereld groeit op het moment dat je een trede stijgt */
+export const GROEI_STIJLEN: Richting[] = [
+  { id: 'aangroeien', naam: 'Aangroeien', kern: 'Het ornament komt groot binnen, schiet door en zakt naar zijn nieuwe stand' },
+  { id: 'oplichten', naam: 'Oplichten', kern: 'De hele wereld licht één keer op en staat daarna voller' },
+  { id: 'opbouwen', naam: 'Opbouwen', kern: 'Het patroon schuift van onder naar boven op zijn plek' },
+  { id: 'omslag', naam: 'Omslag', kern: 'Het scherm klapt om als een tegel en de nieuwe wereld staat er', gedurfd: true },
+]
+
+export type StijlSleutel = 'xp' | 'levelup' | 'arena' | 'breuk' | 'materiaal' | 'groei'
 
 export const STANDAARD_STIJLEN: Record<StijlSleutel, string> = {
   xp: 'klassiek',
   levelup: 'kaart',
   arena: 'duel',
   breuk: 'scherven',
+  materiaal: 'waas',
+  groei: 'aangroeien',
 }
 
 /** Een stijl uit de link halen, om te proeven of vast te leggen */

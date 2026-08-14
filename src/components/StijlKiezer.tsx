@@ -1,7 +1,16 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useStore } from '../store'
-import { ARENA_STIJLEN, BREUK_STIJLEN, LEVELUP_STIJLEN, STANDAARD_STIJLEN, XP_STIJLEN, type Richting } from '../stijlen'
+import {
+  ARENA_STIJLEN,
+  BREUK_STIJLEN,
+  GROEI_STIJLEN,
+  LEVELUP_STIJLEN,
+  MATERIAAL_STIJLEN,
+  STANDAARD_STIJLEN,
+  XP_STIJLEN,
+  type Richting,
+} from '../stijlen'
 import { Schildbreuk, type BreukStijl } from './Schildbreuk'
 import { sfx } from '../audio'
 
@@ -13,13 +22,15 @@ import { sfx } from '../audio'
  * moment af zodat je het ziet voordat je kiest.
  */
 
-type Sleutel = 'xp' | 'levelup' | 'arena' | 'breuk'
+type Sleutel = 'xp' | 'levelup' | 'arena' | 'breuk' | 'materiaal' | 'groei'
 
 const GROEPEN: { sleutel: Sleutel; titel: string; uitleg: string; opties: Richting[] }[] = [
   { sleutel: 'xp', titel: 'De XP-drop', uitleg: 'Wat je ziet na elk goed antwoord', opties: XP_STIJLEN },
   { sleutel: 'levelup', titel: 'Het niveau omhoog', uitleg: 'Het moment waar alles voor gebeurt', opties: LEVELUP_STIJLEN },
   { sleutel: 'breuk', titel: 'De schildbreuk', uitleg: 'De klap als er in de arena een schild sneuvelt', opties: BREUK_STIJLEN },
   { sleutel: 'arena', titel: 'De arena-opkomst', uitleg: 'Hoe het gevecht zich opent', opties: ARENA_STIJLEN },
+  { sleutel: 'materiaal', titel: 'Het materiaal', uitleg: 'Hoe de muur van jouw taalwereld op het scherm ligt', opties: MATERIAAL_STIJLEN },
+  { sleutel: 'groei', titel: 'De wereldgroei', uitleg: 'Wat er gebeurt als je wereld een trede voller wordt', opties: GROEI_STIJLEN },
 ]
 
 export function StijlKiezer() {
@@ -89,6 +100,15 @@ export function StijlKiezer() {
                           if (g.sleutel === 'breuk') {
                             sfx('wrong')
                             setBreukTik((t) => t + 1)
+                            return
+                          }
+                          if (g.sleutel === 'groei' || g.sleutel === 'materiaal') {
+                            // het echte moment op het echte document afspelen
+                            const el = document.documentElement
+                            el.classList.remove('wereld-groeit')
+                            void el.offsetWidth
+                            el.classList.add('wereld-groeit')
+                            window.setTimeout(() => el.classList.remove('wereld-groeit'), 2400)
                             return
                           }
                           // een echte boeking van 1 XP: de drop en, als je toevallig

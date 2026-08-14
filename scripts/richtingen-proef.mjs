@@ -33,6 +33,8 @@ const GROEPEN = [
   { naam: 'Het niveau omhoog', lijst: 'LEVELUP_STIJLEN', bestand: 'components/XpDrops.tsx', standaard: 'kaart' },
   { naam: 'De schildbreuk', lijst: 'BREUK_STIJLEN', bestand: 'components/Schildbreuk.tsx', standaard: 'scherven' },
   { naam: 'De arena-opkomst', lijst: 'ARENA_STIJLEN', bestand: 'screens/Arena.tsx', standaard: 'duel' },
+  { naam: 'Het materiaal', lijst: 'MATERIAAL_STIJLEN', bestand: 'styles/werelden-materiaal.css', standaard: 'waas' },
+  { naam: 'De wereldgroei', lijst: 'GROEI_STIJLEN', bestand: 'styles/werelden-materiaal.css', standaard: 'aangroeien' },
 ]
 
 let fouten = 0

@@ -214,3 +214,66 @@ html.wereld-groeit::before {
 /* Engeland: messing en het krijtstreepje van Savile Row */
 [data-wereld='messing'] { --stof-visgraat: 0.75; --kleding-accent: #f0d9a8; --kraag-hoog: 0.85; }
 [data-wereld='soho'] { --stof-streep: 0.7; --kleding-accent: #ffe9b0; --kraag-v: 0.8; }
+
+/* ═══════════════════════════════════════════════════════════════
+   VIER RICHTINGEN VOOR HET MATERIAAL, VIER VOOR DE GROEI
+
+   Per beslissing meerdere volledig uitgewerkte richtingen, live in de app te
+   kiezen, met altijd één gedurfde erbij. Wat je kiest werkt meteen overal.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* RAND: alleen langs de randen, het midden blijft helemaal leeg */
+html[data-materiaal='rand']::before {
+  -webkit-mask-image: radial-gradient(ellipse 66% 52% at 50% 46%, transparent 40%, #000 100%);
+  mask-image: radial-gradient(ellipse 66% 52% at 50% 46%, transparent 40%, #000 100%);
+}
+
+/* DIEP: voller en zwaarder aanwezig */
+html[data-materiaal='diep']::before {
+  opacity: calc(var(--materiaal-kracht, 0.1) * 1.85);
+}
+
+/* ADEMEND, de gedurfde: de muur zwelt heel traag op en weer weg. Bewust traag
+   en klein: spektakel is kruid, en dit is de enige plek waar de achtergrond
+   zelf beweegt. */
+html[data-materiaal='adem']::before {
+  animation: materiaal-ademen 11s ease-in-out infinite;
+}
+
+@keyframes materiaal-ademen {
+  0%, 100% { opacity: calc(var(--materiaal-kracht, 0.1) * 0.72); }
+  50% { opacity: calc(var(--materiaal-kracht, 0.1) * 1.5); }
+}
+
+/* wie beweging heeft uitgezet krijgt geen ademende muur */
+@media (prefers-reduced-motion: reduce) {
+  html[data-materiaal='adem']::before { animation: none; }
+}
+
+/* ---------- de vier groeimomenten ---------- */
+
+html.wereld-groeit[data-groeistijl='oplichten']::before {
+  animation: wereld-oplichten 2000ms ease-out;
+}
+@keyframes wereld-oplichten {
+  0% { opacity: 0.8; filter: hue-rotate(var(--eigen-tint, 0deg)) brightness(3); }
+  100% { opacity: var(--materiaal-kracht); filter: hue-rotate(var(--eigen-tint, 0deg)) brightness(1); }
+}
+
+html.wereld-groeit[data-groeistijl='opbouwen']::before {
+  animation: wereld-opbouwen 2200ms cubic-bezier(0.3, 1, 0.4, 1);
+}
+@keyframes wereld-opbouwen {
+  0% { opacity: 0; background-position: 0 220px; }
+  100% { opacity: var(--materiaal-kracht); background-position: 0 0; }
+}
+
+/* OMSLAG, de gedurfde: het scherm klapt om als een tegel */
+html.wereld-groeit[data-groeistijl='omslag']::before {
+  animation: wereld-omslaan 1500ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes wereld-omslaan {
+  0% { opacity: 0; transform: rotate(var(--eigen-draai, 0deg)) scale(1.5) rotateY(90deg); }
+  55% { opacity: 0.5; transform: rotate(var(--eigen-draai, 0deg)) scale(1.5) rotateY(-12deg); }
+  100% { opacity: var(--materiaal-kracht); transform: rotate(var(--eigen-draai, 0deg)) scale(1.5) rotateY(0deg); }
+}

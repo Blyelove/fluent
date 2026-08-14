@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type ComponentType } from 'react'
 import { useRegisterSW } from 'virtual:pwa-register/react'
 import { pasEigenDraaiToe, pasWereldToe } from './werelden'
+import { STANDAARD_STIJLEN, stijlUitLink } from './stijlen'
 import { skillStand } from './skills'
 import type { Course, Lesson } from './types'
 import { courses } from './content'
@@ -73,6 +74,8 @@ export default function App() {
   // wie je bent bepaalt de eigen draai op je wereld, zodat twee spelers op
   // hetzelfde niveau in dezelfde taal er tóch niet hetzelfde uitzien
   const gebruiker = useStore((s) => s.currentUser)
+  const materiaalStijl = useStore((s) => stijlUitLink('materiaal') ?? s.stijlen.materiaal ?? STANDAARD_STIJLEN.materiaal)
+  const groeiStijl = useStore((s) => stijlUitLink('groei') ?? s.stijlen.groei ?? STANDAARD_STIJLEN.groei)
   const taalNu = useStore((s) => s.courseId)
   const niveauNu = useStore((s) => skillStand(s.progress[s.courseId]?.xp ?? 0).level)
   // ?wereld=papier dwingt één wereld af zonder iets in te stellen: zo is elke
@@ -83,7 +86,10 @@ export default function App() {
     else pasWereldToe(wereldKeuze, taalNu, niveauNu)
     // altijd, ook als de wereld uit de link komt: dit is jouw hand erop
     pasEigenDraaiToe(gebruiker ?? 'gast')
-  }, [wereldKeuze, taalNu, niveauNu, wereldUitLink, gebruiker])
+    // de gekozen richtingen voor het materiaal en de groei op het document
+    document.documentElement.setAttribute('data-materiaal', materiaalStijl)
+    document.documentElement.setAttribute('data-groeistijl', groeiStijl)
+  }, [wereldKeuze, taalNu, niveauNu, wereldUitLink, gebruiker, materiaalStijl, groeiStijl])
 
   // ?demo=1 vult een wegwerpprofiel met voortgang en ?tab= opent een tabblad
   // direct: zo is elk scherm vast te leggen via een kale link, zonder inloggen
