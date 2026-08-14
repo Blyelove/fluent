@@ -10,6 +10,7 @@ import { levelForXp } from '../levels'
 import { totalXp, useStore } from '../store'
 import { sfx } from '../audio'
 import { GrensproefScreen } from './Grensproef'
+import { feestPalet } from '../wereldkleuren'
 
 /**
  * De Wereldreis — fase 1: de kaart.
@@ -207,7 +208,7 @@ export function WorldMapScreen({
             origin: r
               ? { x: (r.left + r.width / 2) / window.innerWidth, y: (r.top + 32) / window.innerHeight }
               : { y: 0.4 },
-            colors: ['#A855F7', '#EC4899', '#FFC53D', '#22D3EE'],
+            colors: feestPalet(),
             disableForReducedMotion: true,
           })
           // daarna wandelt de held rustig door naar zijn plek op de volgende etappe
@@ -268,14 +269,14 @@ export function WorldMapScreen({
       >
         <defs>
           <linearGradient id="reis-hot" x1="0" y1="1" x2="0.6" y2="0">
-            <stop offset="0" stopColor="#A855F7" />
-            <stop offset="1" stopColor="#EC4899" />
+            <stop offset="0" stopColor="var(--hot1)" />
+            <stop offset="1" stopColor="var(--hot2)" />
           </linearGradient>
         </defs>
         {/* gestippelde basislijn: de hele route, ook wat nog komt */}
-        {eerste && <path d={eerste} fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth={5} strokeDasharray="3 13" strokeLinecap="round" />}
+        {eerste && <path d={eerste} fill="none" stroke="var(--glans-16)" strokeWidth={5} strokeDasharray="3 13" strokeLinecap="round" />}
         {segmenten.map((s) => (
-          <path key={`basis-${s.key}`} d={s.d} fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth={5} strokeDasharray="3 13" strokeLinecap="round" />
+          <path key={`basis-${s.key}`} d={s.d} fill="none" stroke="var(--glans-16)" strokeWidth={5} strokeDasharray="3 13" strokeLinecap="round" />
         ))}
         {/* veroverde etappes: eerst een brede zachte gloed, dan de hete lijn */}
         {knopen[0]?.conquered && eerste && (
@@ -293,7 +294,7 @@ export function WorldMapScreen({
             </g>
           ))}
         {/* het vertrekpunt */}
-        <circle cx={start.x} cy={start.y} r={9} fill={knopen[0]?.conquered ? 'url(#reis-hot)' : 'rgba(255,255,255,0.25)'} />
+        <circle cx={start.x} cy={start.y} r={9} fill={knopen[0]?.conquered ? 'url(#reis-hot)' : 'var(--glans-25)'} />
       </svg>
     )
   }, [knopen, hoogte])
@@ -384,8 +385,8 @@ export function WorldMapScreen({
             >
               <defs>
                 <linearGradient id="reis-actief" x1="0" y1="1" x2="0.6" y2="0">
-                  <stop offset="0" stopColor="#EC4899" />
-                  <stop offset="1" stopColor="#FFC53D" />
+                  <stop offset="0" stopColor="var(--hot2)" />
+                  <stop offset="1" stopColor="var(--gold)" />
                 </linearGradient>
               </defs>
               <motion.path
@@ -419,7 +420,7 @@ export function WorldMapScreen({
                 zIndex: 2,
               }}
             >
-              <div style={{ transform: 'translate(-50%, -88%)', filter: 'drop-shadow(0 6px 10px rgba(0,0,0,0.5))' }}>
+              <div style={{ transform: 'translate(-50%, -88%)', filter: 'drop-shadow(0 6px 10px var(--inkt-50))' }}>
                 <motion.div
                   initial={{ opacity: 0, scale: 0.6 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -488,13 +489,13 @@ export function WorldMapScreen({
                       alignItems: 'center',
                       justifyContent: 'center',
                       overflow: 'hidden',
-                      background: alsVeroverd ? 'rgba(255, 197, 61, 0.16)' : 'var(--surface-2)',
+                      background: alsVeroverd ? 'var(--goud-16)' : 'var(--surface-2)',
                       border: alsVeroverd
                         ? '3px solid var(--gold)'
                         : k.isVolgende
                           ? '3px solid var(--gold)'
                           : '2.5px solid var(--line)',
-                      boxShadow: alsVeroverd ? '0 0 22px rgba(255, 197, 61, 0.35)' : '0 3px 0 rgba(0,0,0,0.35)',
+                      boxShadow: alsVeroverd ? '0 0 22px var(--goud-35)' : '0 3px 0 var(--inkt-35)',
                       // verte blijft herkenbaar: te grijs oogt als een kapotte
                       // afbeelding in plaats van als een bestemming die wacht
                       opacity: alsVeroverd || k.isVolgende ? 1 : 0.62,
@@ -520,7 +521,7 @@ export function WorldMapScreen({
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        boxShadow: '0 2px 6px rgba(0,0,0,0.4)',
+                        boxShadow: '0 2px 6px var(--inkt-35)',
                       }}
                     >
                       ✓
@@ -533,7 +534,7 @@ export function WorldMapScreen({
                     fontSize: 12.5,
                     fontWeight: 800,
                     color: alsVeroverd ? 'var(--gold)' : k.isVolgende ? 'var(--text)' : 'var(--text-faint)',
-                    textShadow: '0 2px 6px rgba(0,0,0,0.6)',
+                    textShadow: '0 2px 6px var(--inkt-65)',
                   }}
                 >
                   {k.name}
@@ -617,7 +618,7 @@ export function WorldMapScreen({
               padding: '12px 22px',
               borderRadius: 999,
               background: 'var(--grad-hot)',
-              boxShadow: '0 6px 26px rgba(168, 85, 247, 0.55)',
+              boxShadow: '0 6px 26px var(--hot-50)',
               whiteSpace: 'nowrap',
             }}
           >

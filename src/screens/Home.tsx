@@ -18,6 +18,7 @@ import { StreakScreen } from './Streak'
 import { WorldMapScreen } from './WorldMap'
 import { WorldPeek } from '../components/WorldPeek'
 import { sfx } from '../audio'
+import { feestPalet } from '../wereldkleuren'
 
 interface Props {
   onStartLesson: (course: Course, lesson: Lesson) => void
@@ -46,7 +47,7 @@ function GoalRing({ value, goal }: { value: number; goal: number }) {
   return (
     <div className="row" style={{ gap: 8 }}>
       <svg width="38" height="38" viewBox="0 0 38 38">
-        <circle cx="19" cy="19" r={r} fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="4.5" />
+        <circle cx="19" cy="19" r={r} fill="none" stroke="var(--glans-10)" strokeWidth="4.5" />
         <motion.circle
           cx="19"
           cy="19"
@@ -60,13 +61,13 @@ function GoalRing({ value, goal }: { value: number; goal: number }) {
           transition={{ type: 'spring', stiffness: 90, damping: 20 }}
           transform="rotate(-90 19 19)"
           // beweegt alleen bij XP-verandering, dus de drop-shadow mag
-          style={{ filter: 'drop-shadow(0 0 4px rgba(255,197,61,0.5))' }}
+          style={{ filter: 'drop-shadow(0 0 4px var(--goud-50))' }}
         />
         <defs>
           {/* het eerste goudmoment van de dag matcht het frisse systeemgoud, geen dof brons */}
           <linearGradient id="goldgrad" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#FFE08A" />
-            <stop offset="100%" stopColor="#FFB300" />
+            <stop offset="0%" stopColor="var(--gold-bright)" />
+            <stop offset="100%" stopColor="var(--gold)" />
           </linearGradient>
         </defs>
       </svg>
@@ -264,7 +265,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                     className="opt"
                     style={
                       dailyGoalXp === g.xp
-                        ? { borderColor: 'var(--gold)', background: 'rgba(255,197,61,0.12)' }
+                        ? { borderColor: 'var(--gold)', background: 'var(--goud-10)' }
                         : undefined
                     }
                     onClick={() => {
@@ -321,7 +322,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                     fontFamily: 'var(--font-display)',
                     fontWeight: 800,
                     fontSize: 11,
-                    boxShadow: '0 0 8px rgba(255,197,61,0.5)',
+                    boxShadow: '0 0 8px var(--goud-50)',
                   }}
                   title={`${course.name}: level ${skillStand(progressMap[courseId]?.xp ?? 0).level} van 99`}
                 >
@@ -366,7 +367,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                 padding: 16,
                 marginBottom: 16,
                 borderColor: 'var(--line-gold)',
-                background: 'linear-gradient(135deg, rgba(255,197,61,0.16), rgba(236,72,153,0.10))',
+                background: 'linear-gradient(135deg, var(--goud-16), var(--hot-10))',
               }}
             >
               <div style={{ fontSize: 34, lineHeight: 1 }}>🏆</div>
@@ -452,7 +453,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
               marginBottom: 16,
               overflow: 'hidden',
               borderColor: 'var(--line-gold)',
-              background: 'linear-gradient(135deg, rgba(255,197,61,0.14), rgba(168,85,247,0.10))',
+              background: 'linear-gradient(135deg, var(--goud-16), var(--hot-10))',
             }}
           >
             <div className="row" style={{ gap: 12, marginBottom: 8 }}>
@@ -564,7 +565,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
       {boostUntil > Date.now() && (
         <div
           className="glass row"
-          style={{ padding: '12px 16px', marginBottom: 12, gap: 8, borderColor: 'var(--line-gold)', boxShadow: '0 0 24px rgba(255,197,61,0.35)' }}
+          style={{ padding: '12px 16px', marginBottom: 12, gap: 8, borderColor: 'var(--line-gold)', boxShadow: '0 0 24px var(--goud-35)' }}
         >
           <span style={{ fontSize: 23 }}>⚡</span>
           <span className="col" style={{ gap: 0, flex: 1 }}>
@@ -634,7 +635,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
           <div className="glass unit-card rise" id="vandaag" style={{ order: 0, scrollMarginTop: 16, '--d': '180ms' } as CSSProperties}>
             <div className="spread">
               <span className="row" style={{ gap: 8 }}>
-                <span style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(255,197,61,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>⚜️</span>
+                <span style={{ width: 32, height: 32, borderRadius: 10, background: 'var(--goud-16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>⚜️</span>
                 <strong className="card-title">Dagelijkse missies</strong>
               </span>
               <span className="gold-text num" style={{ fontWeight: 700, fontSize: 14 }}>
@@ -683,7 +684,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                   marginTop: 12,
                   padding: '10px 12px',
                   borderRadius: 14,
-                  background: 'rgba(255, 197, 61, 0.12)',
+                  background: 'var(--goud-10)',
                   border: '1.5px solid var(--line-gold)',
                 }}
               >
@@ -721,7 +722,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
           <div className="glass unit-card" style={alles && !geopend ? { borderColor: 'var(--line-gold)', order: 1 } : { order: 1 }}>
             <div className="spread">
               <span className="row" style={{ gap: 8 }}>
-                <span style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(34,211,238,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🎁</span>
+                <span style={{ width: 32, height: 32, borderRadius: 10, background: 'var(--cyaan-16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🎁</span>
                 <strong className="card-title">Weekmissies</strong>
               </span>
               <span className="gold-text num" style={{ fontWeight: 700, fontSize: 14 }}>
@@ -754,7 +755,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                 transition={{ type: 'spring', stiffness: 260, damping: 14 }}
                 onClick={() => {
                   sfx('complete')
-                  confetti({ particleCount: 140, spread: 100, origin: { y: 0.7 }, colors: ['#A855F7', '#EC4899', '#FFC53D', '#22D3EE'], disableForReducedMotion: true })
+                  confetti({ particleCount: 140, spread: 100, origin: { y: 0.7 }, colors: feestPalet(), disableForReducedMotion: true })
                   claimWeekChest()
                 }}
               >
@@ -781,7 +782,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
           <div className="glass unit-card" style={{ order: 1 }}>
             <div className="spread">
               <span className="row" style={{ gap: 8 }}>
-                <span style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(236,72,153,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🎯</span>
+                <span style={{ width: 32, height: 32, borderRadius: 10, background: 'var(--hot-16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🎯</span>
                 <strong className="card-title">Jouw doelen</strong>
               </span>
               <span className="faint num" style={{ fontSize: 12.5 }}>
@@ -872,7 +873,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
           <button className="glass unit-card" onClick={() => { sfx('tap'); setSkillsOpen(true) }} style={{ order: 1, width: '100%', textAlign: 'left' }}>
             <div className="spread">
               <span className="row" style={{ gap: 8 }}>
-                <span style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(255,197,61,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🎓</span>
+                <span style={{ width: 32, height: 32, borderRadius: 10, background: 'var(--goud-16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🎓</span>
                 <strong className="card-title">Vaardigheden</strong>
               </span>
               <span className="gold-text num" style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 14 }}>
@@ -918,7 +919,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
               justifyContent: 'center',
               fontSize: 23,
               background: 'linear-gradient(135deg, var(--hot1), var(--hot2))',
-              boxShadow: '0 0 16px rgba(168, 85, 247, 0.4)',
+              boxShadow: '0 0 16px var(--hot-35)',
               flexShrink: 0,
             }}
           >
@@ -942,7 +943,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
       )}
 
       {(() => {
-        const UNIT_COLORS = ['#FFB300', '#FF5C8A', '#22D3EE', '#A3E635', '#A855F7', '#FF8A3D']
+        const UNIT_COLORS = ['var(--gold)', '#FF5C8A', 'var(--cyan)', '#A3E635', 'var(--hot1)', '#FF8A3D']
         let gi = 0
         let ui = 0
         const elements: ReactNode[] = []
@@ -999,7 +1000,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontSize: 14,
-                  background: unitDone ? 'rgba(0,0,0,0.18)' : 'var(--surface-2)',
+                  background: unitDone ? 'var(--inkt-16)' : 'var(--surface-2)',
                   border: '1px solid var(--line)',
                 }}
               >

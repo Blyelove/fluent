@@ -73,7 +73,7 @@ export function ProfileScreen() {
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: 14,
-              boxShadow: '0 2px 6px rgba(0,0,0,0.45)',
+              boxShadow: '0 2px 6px var(--inkt-50)',
             }}
           >
             ✏️
@@ -152,7 +152,7 @@ export function ProfileScreen() {
                       padding: '10px 4px 8px',
                       borderRadius: 16,
                       scrollSnapAlign: 'start',
-                      background: huidig ? 'rgba(255,197,61,0.12)' : 'var(--surface-2)',
+                      background: huidig ? 'var(--goud-10)' : 'var(--surface-2)',
                       border: huidig ? '2px solid var(--gold)' : '1.5px solid var(--line)',
                     }}
                   >

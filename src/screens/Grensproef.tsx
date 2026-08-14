@@ -13,6 +13,7 @@ import { ShareButton } from '../components/ShareButton'
 import { levelForXp } from '../levels'
 import { totalXp } from '../store'
 import { FillEx, ListenEx, SelectEx, TypeEx, WordBankEx, type EvalResult, type Registration } from './exercises'
+import { feestPalet } from '../wereldkleuren'
 
 /**
  * De Grensproef: de eindbaas van een veroverd land.
@@ -126,7 +127,7 @@ export function GrensproefScreen({
         spread: 110,
         startVelocity: 40,
         origin: { y: 0.55 },
-        colors: ['#FFC53D', '#A855F7', '#EC4899', '#22D3EE', '#FFFFFF'],
+        colors: feestPalet(),
         disableForReducedMotion: true,
       })
     }

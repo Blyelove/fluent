@@ -68,7 +68,11 @@ for (const pad of lijst) {
   /* Losse kleuren in een component. De tekening van het personage en de
      wereldstijlen mogen ze wél hebben: dáár zijn kleuren de inhoud en geen
      opmaak. Overal anders hoort het uit een token te komen. */
-  const magKleuren = /Avatar|avatar-|Schildbreuk|avatarGallery|werelden|stijlen|leagues|arena\.ts|countries/.test(kort)
+  /* Tekeningen en inhoud mogen wél kleuren hebben: daar ís de kleur het
+     onderwerp. Het personage, de mascotte, de deelplaatjes, de spelletjes in
+     de speelhal, de metalen van de divisies en de ontwerpgalerij. Overal
+     anders is een kleur opmaak en hoort hij uit een token te komen. */
+  const magKleuren = /Avatar|avatar-|Schildbreuk|avatarGallery|werelden|stijlen|leagues|arena\.ts|countries|Auro|share\.ts|Arcade|League|Gallery|wereldkleuren/.test(kort)
   if (!magKleuren) {
     for (const m of bron.matchAll(/(rgba?\([^)]*\)|#[0-9a-fA-F]{6}\b|#[0-9a-fA-F]{3}\b)/g)) {
       gevonden.kleur.push(m[1])

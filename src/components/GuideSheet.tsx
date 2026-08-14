@@ -46,8 +46,8 @@ export function GuideSheet({
           height: 30,
           borderRadius: 9,
           flexShrink: 0,
-          background: 'rgba(168,85,247,0.25)',
-          border: '1px solid rgba(168,85,247,0.5)',
+          background: 'var(--hot-25)',
+          border: '1px solid var(--hot-50)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -116,7 +116,7 @@ export function GuideSheet({
                 <div
                   key={i}
                   className="glass"
-                  style={{ padding: '14px 16px', marginBottom: 12, background: 'rgba(255,255,255,0.03)' }}
+                  style={{ padding: '14px 16px', marginBottom: 12, background: 'var(--glans-05)' }}
                 >
                   <strong className="hot-text" style={{ fontSize: 14, display: 'block', marginBottom: 4 }}>
                     {r.title}

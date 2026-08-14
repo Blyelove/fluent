@@ -59,7 +59,7 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
               style={{
                 borderRadius: 12,
                 overflow: 'hidden',
-                background: aan ? 'rgba(236,72,153,0.16)' : 'var(--surface-2)',
+                background: aan ? 'var(--hot-16)' : 'var(--surface-2)',
                 border: aan ? '2px solid var(--hot2)' : '1.5px solid var(--line)',
                 padding: '3px 0 2px',
                 minHeight: 44,
@@ -110,8 +110,8 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
               height: 30,
               borderRadius: '50%',
               background: c,
-              border: active === i ? '3px solid var(--hot2)' : '2px solid rgba(255,255,255,0.25)',
-              boxShadow: active === i ? '0 0 12px rgba(236,72,153,0.5)' : '0 2px 0 rgba(0,0,0,0.35)',
+              border: active === i ? '3px solid var(--hot2)' : '2px solid var(--glans-25)',
+              boxShadow: active === i ? '0 0 12px var(--hot-50)' : '0 2px 0 var(--inkt-35)',
               transition: 'transform 0.1s ease',
               transform: active === i ? 'scale(1.12)' : 'scale(1)',
             }}
@@ -155,7 +155,7 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
               background: geslacht === gi ? 'var(--grad-hot)' : 'var(--surface-2)',
               color: geslacht === gi ? '#fff' : 'var(--text-dim)',
               border: geslacht === gi ? 'none' : '1.5px solid var(--line)',
-              boxShadow: geslacht === gi ? '0 3px 0 #7e22ce' : '0 3px 0 rgba(0,0,0,0.3)',
+              boxShadow: geslacht === gi ? '0 3px 0 #7e22ce' : '0 3px 0 var(--inkt-25)',
             }}
           >
             {gi === 0 ? '♂' : '♀'} {name}
@@ -221,7 +221,7 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
                 minHeight: 76,
                 borderRadius: 14,
                 padding: '3px 0 2px',
-                background: actief ? 'rgba(236,72,153,0.16)' : 'var(--surface-2)',
+                background: actief ? 'var(--hot-16)' : 'var(--surface-2)',
                 border: actief ? '2px solid var(--hot2)' : '1.5px solid var(--line)',
               }}
             >
@@ -273,7 +273,7 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
                   style={{
                     borderRadius: 12,
                     overflow: 'hidden',
-                    background: value.hair === i ? 'rgba(236,72,153,0.16)' : 'var(--surface-2)',
+                    background: value.hair === i ? 'var(--hot-16)' : 'var(--surface-2)',
                     border: value.hair === i ? '2px solid var(--hot2)' : '1.5px solid var(--line)',
                     padding: '3px 0 2px',
                   }}

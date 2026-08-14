@@ -25,6 +25,7 @@ import { encodeSchaduw, schaduwLink, type SchaduwBeurt, type SchaduwDuel } from 
 import { courseFlagCode } from '../countries'
 import { Flag } from '../components/Flag'
 import { sfx, speak } from '../audio'
+import { feestGoud } from '../wereldkleuren'
 
 /**
  * De Arena: één tegen één, drie schilden elk, wie het eerst door zijn
@@ -155,7 +156,7 @@ export function ArenaScreen({
     }
     if (gewonnen) {
       sfx('complete')
-      confetti({ particleCount: 170, spread: 110, origin: { y: 0.5 }, colors: ['#FFC53D', '#FFE08A', '#FFFFFF'], disableForReducedMotion: true })
+      confetti({ particleCount: 170, spread: 110, origin: { y: 0.5 }, colors: feestGoud(), disableForReducedMotion: true })
     } else {
       // geen geluid bij verlies: de stilte is het effect
       setStilte(true)
@@ -271,7 +272,7 @@ export function ArenaScreen({
                   fontSize: 23,
                   lineHeight: 1,
                   opacity: breekt ? 0 : 1,
-                  filter: heel ? 'drop-shadow(0 0 7px rgba(34,211,238,0.65))' : 'grayscale(1) opacity(0.22)',
+                  filter: heel ? 'drop-shadow(0 0 7px var(--cyaan-65))' : 'grayscale(1) opacity(0.22)',
                 }}
               >
                 🛡️
@@ -511,7 +512,7 @@ export function ArenaScreen({
               inset: 0,
               zIndex: 1,
               pointerEvents: 'none',
-              boxShadow: `inset 0 0 90px ${mijnSchilden === 1 ? 'rgba(251,113,133,0.55)' : 'rgba(74,222,128,0.45)'}`,
+              boxShadow: `inset 0 0 90px ${mijnSchilden === 1 ? 'var(--hot-50)' : 'rgba(74,222,128,0.45)'}`,
             }}
           />
           <p

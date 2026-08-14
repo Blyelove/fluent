@@ -134,7 +134,7 @@ function Medal({ leagueId, calm }: { leagueId: number; calm: boolean }) {
         <circle cx="69" cy="69" r="53" fill="none" stroke={alpha(c, 0.55)} strokeWidth="3" strokeDasharray="5 7" strokeLinecap="round" />
         {/* medailleschijf */}
         <circle cx="69" cy="69" r="45" fill={`url(#${gid})`} />
-        <circle cx="69" cy="69" r="45" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2" />
+        <circle cx="69" cy="69" r="45" fill="none" stroke="var(--glans-50)" strokeWidth="2" />
         <circle cx="69" cy="69" r="37" fill="none" stroke={alpha(ink === '#1A1033' ? '#1A1033' : '#FFFFFF', 0.28)} strokeWidth="1.5" />
 
         {/* divisienummer */}
@@ -170,7 +170,7 @@ function DivisionDots({ leagueId }: { leagueId: number }) {
           top: 24,
           height: 2,
           borderRadius: 2,
-          background: 'linear-gradient(90deg, rgba(255,255,255,0.18), rgba(255,255,255,0.06))',
+          background: 'linear-gradient(90deg, var(--glans-16), var(--glans-05))',
         }}
       />
       <div className="spread" style={{ position: 'relative' }}>
@@ -196,7 +196,7 @@ function DivisionDots({ leagueId }: { leagueId: number }) {
                       : done
                         ? l.color
                         : 'var(--surface-2)',
-                    border: current ? '2px solid rgba(255,255,255,0.75)' : done ? 'none' : '1.5px solid var(--line)',
+                    border: current ? '2px solid var(--glans-65)' : done ? 'none' : '1.5px solid var(--line)',
                     opacity: current ? 1 : done ? 0.8 : 0.32,
                     boxShadow: current ? `0 0 16px ${alpha(l.color, 0.9)}` : 'none',
                   }}
@@ -220,7 +220,7 @@ function DivisionDots({ leagueId }: { leagueId: number }) {
 function ZoneDivider({ kind }: { kind: 'promotie' | 'degradatie' }) {
   const promo = kind === 'promotie'
   const c = promo ? 'var(--ok)' : 'var(--err)'
-  const glow = promo ? 'rgba(74, 222, 128, 0.45)' : 'rgba(251, 113, 133, 0.45)'
+  const glow = promo ? 'rgba(74, 222, 128, 0.45)' : 'var(--hot-50)'
   return (
     <motion.div
       initial={{ opacity: 0, scaleX: 0.7 }}
@@ -270,9 +270,9 @@ function Row({ player, rank, delay }: { player: Competitor; rank: number; delay:
         marginBottom: 4,
         borderRadius: 'var(--r-md)',
         minHeight: 48,
-        background: you ? 'rgba(236, 72, 153, 0.14)' : 'transparent',
+        background: you ? 'var(--hot-16)' : 'transparent',
         border: you ? '2px solid var(--hot2)' : '2px solid transparent',
-        boxShadow: you ? '0 0 24px rgba(236, 72, 153, 0.35), 0 3px 0 rgba(0,0,0,0.3)' : 'none',
+        boxShadow: you ? '0 0 24px var(--hot-35), 0 3px 0 var(--inkt-25)' : 'none',
       }}
     >
       <span
@@ -427,8 +427,8 @@ export function LeagueScreen({ onLeren }: { onLeren?: () => void } = {}) {
   const zoneCard = empty
     ? {
         c: 'var(--cyaan-tekst, var(--cyan))',
-        bg: 'rgba(34, 211, 238, 0.1)',
-        glow: 'rgba(34, 211, 238, 0.25)',
+        bg: 'var(--cyaan-10)',
+        glow: 'var(--cyaan-25)',
         title: 'De competitie start binnenkort',
         body: 'Zodra de week loopt zie je hier je plek, je tegenstanders en wat je nodig hebt om te klimmen.',
       }
@@ -446,14 +446,14 @@ export function LeagueScreen({ onLeren }: { onLeren?: () => void } = {}) {
         ? {
             c: 'var(--err-tekst, var(--err))',
             bg: 'var(--err-bg)',
-            glow: 'rgba(251, 113, 133, 0.3)',
+            glow: 'var(--hot-25)',
             title: 'Pas op: je zakt uit deze divisie',
             body: `Nog ${fmt(toSafe)} XP en je staat weer veilig op plek ${safeRank}. Eén les kan al genoeg zijn.`,
           }
         : {
             c: 'var(--cyaan-tekst, var(--cyan))',
-            bg: 'rgba(34, 211, 238, 0.1)',
-            glow: 'rgba(34, 211, 238, 0.25)',
+            bg: 'var(--cyaan-10)',
+            glow: 'var(--cyaan-25)',
             title: `Veilig in de ${thisLabel}`,
             body:
               league.promote > 0
@@ -578,7 +578,7 @@ export function LeagueScreen({ onLeren }: { onLeren?: () => void } = {}) {
       {/* ---------- aftelbalk ---------- */}
       <motion.div
         className="glass"
-        animate={urgent && !calm ? { boxShadow: ['0 0 0 rgba(251,113,133,0)', '0 0 26px rgba(251,113,133,0.45)', '0 0 0 rgba(251,113,133,0)'] } : {}}
+        animate={urgent && !calm ? { boxShadow: ['0 0 0 var(--hot-05)', '0 0 26px var(--hot-50)', '0 0 0 var(--hot-05)'] } : {}}
         transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         style={{
           padding: '13px 16px',

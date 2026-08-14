@@ -200,7 +200,7 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
         ontdekFamilie(fam.id, zusters)
         setBoom({ familie: fam, bonus: zusters })
         sfx('complete')
-        confetti({ particleCount: 80, spread: 70, origin: { y: 0.55 }, colors: ['#FFC53D', '#A855F7', '#EC4899'], disableForReducedMotion: true })
+        confetti({ particleCount: 80, spread: 70, origin: { y: 0.55 }, colors: ['var(--gold)', 'var(--hot1)', 'var(--hot2)'], disableForReducedMotion: true })
         return
       }
       advance()
@@ -493,7 +493,7 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
                         >
                           <div
                             className="glass"
-                            style={{ padding: '13px 15px', background: 'rgba(255,255,255,0.05)', textAlign: 'left' }}
+                            style={{ padding: '13px 15px', background: 'var(--glans-05)', textAlign: 'left' }}
                           >
                             <strong className="hot-text" style={{ fontSize: 14, display: 'block', marginBottom: 4 }}>
                               💡 {regel.title}
@@ -515,8 +515,8 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
                                     height: 26,
                                     borderRadius: 8,
                                     flexShrink: 0,
-                                    background: 'rgba(168,85,247,0.25)',
-                                    border: '1px solid rgba(168,85,247,0.5)',
+                                    background: 'var(--hot-25)',
+                                    border: '1px solid var(--hot-50)',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
@@ -676,7 +676,7 @@ function CompleteView({
         particleCount: mijlpaal ? 150 : 60,
         spread: mijlpaal ? 110 : 70,
         origin: { y: 0.55 },
-        colors: ['#FF8A3D', '#FFC53D', '#EC4899', '#FFFFFF'],
+        colors: ['#FF8A3D', 'var(--gold)', 'var(--hot2)', '#FFFFFF'],
         disableForReducedMotion: true,
       })
     }

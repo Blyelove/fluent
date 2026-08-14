@@ -75,7 +75,7 @@ export function WoordBoom({
             style={{
               padding: '14px 16px',
               borderRadius: 18,
-              background: 'rgba(255, 197, 61, 0.1)',
+              background: 'var(--goud-10)',
               border: '1.5px solid var(--line-gold)',
               boxShadow: 'var(--glow-gold)',
             }}
@@ -137,7 +137,7 @@ export function WoordBoom({
                     minHeight: 48,
                     borderRadius: 14,
                     textAlign: 'left',
-                    background: jouwe ? 'rgba(236, 72, 153, 0.14)' : 'var(--surface-2)',
+                    background: jouwe ? 'var(--hot-16)' : 'var(--surface-2)',
                     border: `1.5px solid ${jouwe ? 'var(--line-hot)' : 'var(--line)'}`,
                   }}
                 >

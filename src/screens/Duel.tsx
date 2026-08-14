@@ -12,6 +12,7 @@ import { courseFlagCode } from '../countries'
 import { decodeDuel, duelAfgerond, duelLink, encodeDuel, markeerDuelAfgerond, seededPick, type DuelPayload } from '../duel'
 import { isHerhaalbaar } from '../mistakes'
 import { FillEx, ListenEx, SelectEx, TypeEx, WordBankEx, type EvalResult, type Registration } from './exercises'
+import { feestPalet } from '../wereldkleuren'
 
 /** Alleen oefeningen waar je een antwoord op kunt geven — geen 'new' en geen 'match' */
 type QuizEx = Select | TypeAnswer | Listen | Fill | WordBank
@@ -137,7 +138,7 @@ function burst() {
     particleCount: 140,
     spread: 110,
     origin: { y: 0.6 },
-    colors: ['#A855F7', '#EC4899', '#FFC53D', '#22D3EE'],
+    colors: feestPalet(),
     disableForReducedMotion: true,
   })
 }
@@ -574,8 +575,8 @@ export function DuelScreen({
                       : 'var(--err)'
                     : i === marks.length
                       ? 'var(--gold)'
-                      : 'rgba(255,255,255,0.16)',
-                boxShadow: i === marks.length ? '0 0 10px rgba(255,197,61,0.7)' : undefined,
+                      : 'var(--glans-16)',
+                boxShadow: i === marks.length ? '0 0 10px var(--goud-65)' : undefined,
               }}
             />
           ))}
@@ -873,7 +874,7 @@ export function DuelScreen({
             padding: 24,
             marginBottom: 16,
             borderColor: 'var(--line-hot)',
-            boxShadow: '0 0 30px rgba(236,72,153,0.28)',
+            boxShadow: '0 0 30px var(--hot-25)',
           }}
         >
           <div className="row" style={{ gap: 8, marginBottom: 4 }}>
@@ -961,7 +962,7 @@ export function DuelScreen({
                     display: 'flex',
                     alignItems: 'center',
                     gap: 8,
-                    ...(verslagen ? { borderColor: 'var(--line-gold)', background: 'rgba(255,197,61,0.09)' } : {}),
+                    ...(verslagen ? { borderColor: 'var(--line-gold)', background: 'var(--goud-10)' } : {}),
                   }}
                   onClick={() => challengeBot(bot)}
                 >

@@ -44,9 +44,9 @@ function SkillTegel({ r, actief, onClick }: { r: Rij; actief: boolean; onClick: 
         padding: '9px 8px',
         minHeight: 52,
         borderRadius: 12,
-        background: actief ? 'rgba(255, 197, 61, 0.12)' : 'var(--surface-2)',
+        background: actief ? 'var(--goud-10)' : 'var(--surface-2)',
         border: `1.5px solid ${actief ? 'var(--gold)' : r.stand.meester ? 'var(--line-gold)' : 'var(--line)'}`,
-        boxShadow: r.stand.meester ? 'var(--glow-gold)' : 'inset 0 1px 0 rgba(255,255,255,0.08)',
+        boxShadow: r.stand.meester ? 'var(--glow-gold)' : 'inset 0 1px 0 var(--glans-10)',
       }}
     >
       <Flag code={courseFlagCode[r.id]} size={22} />
@@ -113,7 +113,7 @@ export function SkillRaster({ actief, onTegel }: { actief?: CourseId; onTegel: (
           marginTop: 8,
           padding: '11px 14px',
           borderRadius: 12,
-          background: 'rgba(255, 197, 61, 0.1)',
+          background: 'var(--goud-10)',
           border: '1.5px solid var(--line-gold)',
         }}
       >
@@ -225,7 +225,7 @@ export function SkillsSheet({ onClose }: { onClose: () => void }) {
                       style={{
                         lineHeight: 0,
                         opacity: l.conquered ? 1 : 0.25,
-                        filter: l.conquered ? 'drop-shadow(0 0 5px rgba(255,197,61,0.55))' : 'grayscale(0.8)',
+                        filter: l.conquered ? 'drop-shadow(0 0 5px var(--goud-50))' : 'grayscale(0.8)',
                       }}
                     >
                       <Flag code={l.code} size={17} />
@@ -250,7 +250,7 @@ export function SkillsSheet({ onClose }: { onClose: () => void }) {
                 aria-hidden="true"
                 style={{
                   flexShrink: 0,
-                  filter: detail.stand.meester ? 'drop-shadow(0 0 8px rgba(255,197,61,0.6))' : 'none',
+                  filter: detail.stand.meester ? 'drop-shadow(0 0 8px var(--goud-65))' : 'none',
                   opacity: detail.stand.meester ? 1 : 0.5,
                 }}
               >

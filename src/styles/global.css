@@ -85,6 +85,57 @@
      lichte wereld waar --ink-on-gold juist licht is. */
   --ink-op-unit: #1a1206;
 
+  /* ═══ DE WAS: ÉÉN SCHADUWTAAL EN ÉÉN RANDTAAL ═══
+     Componenten stonden vol met losse kleuren als rgba(255,197,61,0.12). Dat
+     is het goud van de neonwereld, en dus fout in de vijftien andere werelden:
+     een gouden waas hoort in Sol y sombra het goud van Sol y sombra te zijn.
+
+     Deze wasjes mengen de wereldkleur zelf met niets, dus ze kloppen overal
+     vanzelf. Zeven stappen is genoeg voor elke schaduw, elke rand en elke
+     gloed die deze app nodig heeft. */
+  --goud-05: color-mix(in srgb, var(--gold) 5%, transparent);
+  --goud-10: color-mix(in srgb, var(--gold) 10%, transparent);
+  --goud-16: color-mix(in srgb, var(--gold) 16%, transparent);
+  --goud-25: color-mix(in srgb, var(--gold) 25%, transparent);
+  --goud-35: color-mix(in srgb, var(--gold) 35%, transparent);
+  --goud-50: color-mix(in srgb, var(--gold) 50%, transparent);
+  --goud-65: color-mix(in srgb, var(--gold) 65%, transparent);
+
+  --cyaan-05: color-mix(in srgb, var(--cyan) 5%, transparent);
+  --cyaan-10: color-mix(in srgb, var(--cyan) 10%, transparent);
+  --cyaan-16: color-mix(in srgb, var(--cyan) 16%, transparent);
+  --cyaan-25: color-mix(in srgb, var(--cyan) 25%, transparent);
+  --cyaan-35: color-mix(in srgb, var(--cyan) 35%, transparent);
+  --cyaan-50: color-mix(in srgb, var(--cyan) 50%, transparent);
+  --cyaan-65: color-mix(in srgb, var(--cyan) 65%, transparent);
+
+  --hot-05: color-mix(in srgb, var(--hot2) 5%, transparent);
+  --hot-10: color-mix(in srgb, var(--hot2) 10%, transparent);
+  --hot-16: color-mix(in srgb, var(--hot2) 16%, transparent);
+  --hot-25: color-mix(in srgb, var(--hot2) 25%, transparent);
+  --hot-35: color-mix(in srgb, var(--hot2) 35%, transparent);
+  --hot-50: color-mix(in srgb, var(--hot2) 50%, transparent);
+  --hot-65: color-mix(in srgb, var(--hot2) 65%, transparent);
+
+  /* inkt en glans blijven zwart en wit: een schaduw is een schaduw in elke
+     wereld, en een glans op een rand ook. Wél als token, zodat er nergens meer
+     een los getal in een component staat. */
+  --inkt-05: rgba(0, 0, 0, 0.05);
+  --inkt-10: rgba(0, 0, 0, 0.1);
+  --inkt-16: rgba(0, 0, 0, 0.16);
+  --inkt-25: rgba(0, 0, 0, 0.25);
+  --inkt-35: rgba(0, 0, 0, 0.35);
+  --inkt-50: rgba(0, 0, 0, 0.5);
+  --inkt-65: rgba(0, 0, 0, 0.65);
+
+  --glans-05: rgba(255, 255, 255, 0.05);
+  --glans-10: rgba(255, 255, 255, 0.1);
+  --glans-16: rgba(255, 255, 255, 0.16);
+  --glans-25: rgba(255, 255, 255, 0.25);
+  --glans-35: rgba(255, 255, 255, 0.35);
+  --glans-50: rgba(255, 255, 255, 0.5);
+  --glans-65: rgba(255, 255, 255, 0.65);
+
   /* de slagschaduw onder inkt op een hotkleur. Hoort bij lichte inkt; een
      wereld met donkere inkt op hot zet hem uit, anders wordt het vies. */
   --schaduw-op-hot: 0 1px 2px rgba(0, 0, 0, 0.25);

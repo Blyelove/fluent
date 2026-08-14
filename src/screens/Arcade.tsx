@@ -96,7 +96,7 @@ const GAMES: GameDef[] = [
     grad: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
     ink: '#ffffff',
     shade: '#6b21a8',
-    glow: 'rgba(236, 72, 153, 0.45)',
+    glow: 'var(--hot-50)',
     medailles: [60, 110, 170],
   },
   {
@@ -109,7 +109,7 @@ const GAMES: GameDef[] = [
     // begint in helder cyaan: daar leest wit niet op
     ink: '#07243a',
     shade: '#0e7490',
-    glow: 'rgba(34, 211, 238, 0.42)',
+    glow: 'var(--cyaan-35)',
     medailles: [120, 180, 230],
   },
   {
@@ -122,7 +122,7 @@ const GAMES: GameDef[] = [
     // licht goud: donkere inkt, anders verdwijnt de tekst
     ink: '#2b1a02',
     shade: '#b45309',
-    glow: 'rgba(255, 197, 61, 0.45)',
+    glow: 'var(--goud-50)',
     medailles: [60, 105, 145],
   },
 ]
@@ -255,7 +255,7 @@ export function ArcadeScreen({ onPlayingChange, onDuels }: { onPlayingChange?: (
             padding: '8px 13px',
             borderRadius: 999,
             border: `1.5px solid ${weekArcade >= 3 ? 'var(--line-gold)' : 'var(--line)'}`,
-            background: weekArcade >= 3 ? 'rgba(255, 197, 61, 0.12)' : 'var(--surface-2)',
+            background: weekArcade >= 3 ? 'var(--goud-10)' : 'var(--surface-2)',
             width: 'fit-content',
           }}
         >
@@ -278,7 +278,7 @@ export function ArcadeScreen({ onPlayingChange, onDuels }: { onPlayingChange?: (
           className="glass"
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
-          style={{ padding: 16, marginTop: 16, borderColor: 'var(--line-gold)', background: 'rgba(255, 197, 61, 0.09)' }}
+          style={{ padding: 16, marginTop: 16, borderColor: 'var(--line-gold)', background: 'var(--goud-10)' }}
         >
           <div className="row" style={{ alignItems: 'flex-start', gap: 12 }}>
             <span style={{ fontSize: 28, lineHeight: 1 }}>🔒</span>
@@ -342,7 +342,7 @@ export function ArcadeScreen({ onPlayingChange, onDuels }: { onPlayingChange?: (
                 overflow: 'hidden',
                 cursor: locked ? 'default' : 'pointer',
                 boxShadow: `0 7px 0 ${g.shade}, 0 16px 36px ${g.glow}`,
-                textShadow: g.ink === '#ffffff' ? '0 1px 2px rgba(0,0,0,0.25)' : 'none',
+                textShadow: g.ink === '#ffffff' ? '0 1px 2px var(--inkt-25)' : 'none',
               }}
             >
               {/* glans over de kaart */}
@@ -351,7 +351,7 @@ export function ArcadeScreen({ onPlayingChange, onDuels }: { onPlayingChange?: (
                 style={{
                   position: 'absolute',
                   inset: 0,
-                  background: 'linear-gradient(120deg, rgba(255,255,255,0.28) 0%, transparent 42%)',
+                  background: 'linear-gradient(120deg, var(--glans-25) 0%, transparent 42%)',
                   pointerEvents: 'none',
                 }}
               />
@@ -378,7 +378,7 @@ export function ArcadeScreen({ onPlayingChange, onDuels }: { onPlayingChange?: (
                     marginTop: 12,
                     padding: '7px 13px',
                     borderRadius: 999,
-                    background: 'rgba(0,0,0,0.26)',
+                    background: 'var(--inkt-25)',
                     fontSize: 12.5,
                     fontWeight: 800,
                     letterSpacing: '0.04em',
@@ -495,9 +495,9 @@ function TimerBar({ pct, danger }: { pct: number; danger: boolean }) {
       style={{
         height: 18,
         borderRadius: 999,
-        background: 'rgba(255,255,255,0.1)',
+        background: 'var(--glans-10)',
         overflow: 'hidden',
-        boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.45)',
+        boxShadow: 'inset 0 2px 6px var(--inkt-50)',
       }}
     >
       <div
@@ -507,7 +507,7 @@ function TimerBar({ pct, danger }: { pct: number; danger: boolean }) {
           borderRadius: 999,
           transition: 'width 0.12s linear, background 0.3s ease',
           background: danger ? 'linear-gradient(90deg, #f43f5e, #fb7185)' : 'var(--grad-gold)',
-          boxShadow: danger ? '0 0 20px rgba(251,113,133,0.65)' : 'var(--glow-gold)',
+          boxShadow: danger ? '0 0 20px var(--hot-65)' : 'var(--glow-gold)',
           animation: danger ? 'breathe 0.7s ease-in-out infinite' : undefined,
         }}
       />
@@ -807,7 +807,7 @@ function Bliksem({ words, all, onExit, onFinish }: GameProps) {
                     padding: '8px 14px',
                     borderRadius: 999,
                     background: multiplier > 1 ? 'var(--grad-hot)' : 'var(--surface-2)',
-                    boxShadow: multiplier > 1 ? '0 0 22px rgba(236,72,153,0.5)' : undefined,
+                    boxShadow: multiplier > 1 ? '0 0 22px var(--hot-50)' : undefined,
                     fontSize: 16,
                     color: '#fff',
                   }}
@@ -821,7 +821,7 @@ function Bliksem({ words, all, onExit, onFinish }: GameProps) {
           <motion.div key={q.prompt + q.word} initial={{ opacity: 0, x: 26 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.18 }}>
             <div
               className="glass center"
-              style={{ padding: '26px 18px', marginTop: 12, marginBottom: 16, borderColor: 'var(--line-hot)', background: 'rgba(168,85,247,0.1)' }}
+              style={{ padding: '26px 18px', marginTop: 12, marginBottom: 16, borderColor: 'var(--line-hot)', background: 'var(--hot-10)' }}
             >
               <p className="eyebrow">{q.toTarget ? 'Hoe zeg je dit?' : 'Wat betekent dit?'}</p>
               <p className="display" style={{ fontSize: 28, marginTop: 8 }}>
@@ -1071,10 +1071,10 @@ function Storm({ words, onExit, onFinish }: GameProps) {
                       : isWrong
                         ? 'var(--err-bg)'
                         : nl
-                          ? 'rgba(168,85,247,0.14)'
-                          : 'rgba(34,211,238,0.13)',
-                    border: `2px solid ${isSel ? 'transparent' : isWrong ? 'var(--err)' : nl ? 'rgba(168,85,247,0.42)' : 'rgba(34,211,238,0.42)'}`,
-                    boxShadow: isSel ? '0 4px 0 #6b21a8, 0 0 20px rgba(236,72,153,0.45)' : '0 4px 0 rgba(0,0,0,0.35)',
+                          ? 'var(--hot-16)'
+                          : 'var(--cyaan-10)',
+                    border: `2px solid ${isSel ? 'transparent' : isWrong ? 'var(--err)' : nl ? 'var(--hot-35)' : 'var(--cyaan-35)'}`,
+                    boxShadow: isSel ? '0 4px 0 #6b21a8, 0 0 20px var(--hot-50)' : '0 4px 0 var(--inkt-35)',
                   }}
                 >
                   {t.text}
@@ -1228,7 +1228,7 @@ function Luister({ words, all, ttsLang, onExit, onFinish }: GameProps) {
           // zonder geluid is dit spel onspeelbaar; dat zeggen we vóór de klok loopt
           <div
             className="glass"
-            style={{ padding: 12, marginTop: 4, borderColor: 'var(--line-gold)', background: 'rgba(255,197,61,0.09)' }}
+            style={{ padding: 12, marginTop: 4, borderColor: 'var(--line-gold)', background: 'var(--goud-10)' }}
           >
             <p style={{ fontSize: 14, fontWeight: 700 }}>🔇 Geen geluid beschikbaar</p>
             <p className="faint" style={{ fontSize: 12.5, marginTop: 4 }}>
@@ -1357,7 +1357,7 @@ function Result({
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.14, type: 'spring', stiffness: 200, damping: 14 }}
           className="glass"
-          style={{ padding: '26px 18px', marginTop: 24, background: 'rgba(255,255,255,0.05)' }}
+          style={{ padding: '26px 18px', marginTop: 24, background: 'var(--glans-05)' }}
         >
           <p className="eyebrow">Jouw score</p>
           <p className="display gold-text" style={{ fontSize: 64, lineHeight: 1.05 }}>

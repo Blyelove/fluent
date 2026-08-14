@@ -57,7 +57,7 @@ export function PassportStamp({
             strokeWidth={behaald ? 3 : 2}
             strokeDasharray={behaald ? undefined : '5 6'}
           />
-          <circle cx="50" cy="50" r="37" fill="none" stroke={behaald ? 'rgba(255,197,61,0.55)' : 'var(--line)'} strokeWidth={1.5} />
+          <circle cx="50" cy="50" r="37" fill="none" stroke={behaald ? 'var(--goud-50)' : 'var(--line)'} strokeWidth={1.5} />
           {behaald && (
             <text fill="var(--gold)" fontSize="10" fontWeight="800" letterSpacing="1.1">
               <textPath href={`#ring-${uid}`} startOffset="50%" textAnchor="middle">

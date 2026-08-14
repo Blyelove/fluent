@@ -79,7 +79,7 @@ export function Gallery() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 12 }}>
           {SWATCHES.map((s) => (
             <div key={s.hex} className="glass" style={{ padding: 12, borderRadius: 14 }}>
-              <div style={{ height: 56, borderRadius: 10, background: s.hex, border: '1px solid rgba(255,255,255,0.12)' }} />
+              <div style={{ height: 56, borderRadius: 10, background: s.hex, border: '1px solid var(--glans-10)' }} />
               <p style={{ fontSize: 12.5, fontWeight: 700, marginTop: 8 }}>{s.name}</p>
               <p className="faint" style={{ fontSize: 11 }}>
                 {s.hex} · {s.note}
@@ -361,7 +361,7 @@ export function Gallery() {
         </p>
         <div className="glass" style={{ padding: '8px 20px' }}>
           {wardrobeFor('es').map((w, i) => (
-            <div key={w.level} className="spread" style={{ padding: '9px 0', borderBottom: i < 8 ? '1px solid rgba(255,255,255,0.09)' : 'none' }}>
+            <div key={w.level} className="spread" style={{ padding: '9px 0', borderBottom: i < 8 ? '1px solid var(--glans-10)' : 'none' }}>
               <span style={{ fontSize: 14, fontWeight: 500 }}>{w.item}</span>
               <span className="faint" style={{ fontSize: 12.5 }}>
                 Niveau {w.level}

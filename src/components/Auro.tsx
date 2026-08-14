@@ -222,7 +222,7 @@ export function Auro({
       {/* monocle (niveau 3+) */}
       {hasMonocle && (
         <g>
-          <circle cx="48" cy="60" r="9.5" fill="rgba(255,255,255,0.07)" stroke="#FFE08A" strokeWidth="2.2" />
+          <circle cx="48" cy="60" r="9.5" fill="var(--glans-05)" stroke="#FFE08A" strokeWidth="2.2" />
           <path d="M54 68 Q60 78 58 88" stroke="#FFC53D" strokeWidth="1.4" fill="none" />
         </g>
       )}

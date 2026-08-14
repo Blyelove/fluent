@@ -11,6 +11,7 @@ import { totalXp } from '../store'
 import { sfx, speak } from '../audio'
 import { Avatar } from '../components/Avatar'
 import { FillEx, ListenEx, SelectEx, TypeEx, WordBankEx, type EvalResult, type Registration } from './exercises'
+import { feestPalet } from '../wereldkleuren'
 
 /** stabiele lege lijst: een nieuwe array per render zou de selector laten ratelen */
 const GEEN_LESSEN: string[] = []
@@ -250,7 +251,7 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
         // de store rekent (inclusief boost) en zegt wat er echt is geboekt
         const verdiend = addReviewXp(courseId, xp)
         if (phase.mode === 'fouten' && finalCorrect === total && total > 0) {
-          confetti({ particleCount: 120, spread: 100, origin: { y: 0.6 }, colors: ['#A855F7', '#EC4899', '#FFC53D', '#22D3EE'], disableForReducedMotion: true })
+          confetti({ particleCount: 120, spread: 100, origin: { y: 0.6 }, colors: feestPalet(), disableForReducedMotion: true })
         }
         setPhase({ name: 'done', mode: phase.mode, correct: finalCorrect, total, label: phase.label, passed: true, xp: verdiend })
       } else {
@@ -267,7 +268,7 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
           courseId,
         })
         if (passed) {
-          confetti({ particleCount: 110, spread: 100, origin: { y: 0.6 }, colors: ['#A855F7', '#EC4899', '#FFC53D', '#22D3EE'], disableForReducedMotion: true })
+          confetti({ particleCount: 110, spread: 100, origin: { y: 0.6 }, colors: feestPalet(), disableForReducedMotion: true })
         }
         setPhase({ name: 'done', mode: 'test', correct: finalCorrect, total, label: phase.label, passed, xp: verdiend, units: phase.units })
       }
@@ -302,7 +303,7 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
                 justifyContent: 'center',
                 fontSize: 23,
                 background: 'linear-gradient(135deg, var(--hot1), var(--hot2))',
-                boxShadow: '0 0 16px rgba(168, 85, 247, 0.4)',
+                boxShadow: '0 0 16px var(--hot-35)',
                 flexShrink: 0,
               }}
             >
@@ -325,7 +326,7 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
           <div className="card-hero" style={{ padding: 24, marginBottom: 16 }}>
             <div className="spread">
               <span className="row" style={{ gap: 8 }}>
-                <span style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(236,72,153,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🎯</span>
+                <span style={{ width: 32, height: 32, borderRadius: 10, background: 'var(--hot-16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🎯</span>
                 <strong className="card-title">Jouw fouten</strong>
               </span>
               <span className="hot-text num" style={{ fontWeight: 700, fontSize: 16 }}>
@@ -361,7 +362,7 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
         <div className={mijnFouten.length === 0 && due.length > 0 ? 'card-hero' : 'glass'} style={{ padding: 24, marginBottom: 16 }}>
           <div className="spread">
             <span className="row" style={{ gap: 8 }}>
-              <span style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(168,85,247,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🧠</span>
+              <span style={{ width: 32, height: 32, borderRadius: 10, background: 'var(--hot-16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🧠</span>
               <strong className="card-title">Herhaling</strong>
             </span>
             {due.length > 0 && <span className="gold-text num" style={{ fontWeight: 700 }}>{due.length} klaar</span>}
@@ -401,7 +402,7 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
 
         <div className="glass" style={{ padding: 24 }}>
           <span className="row" style={{ gap: 8 }}>
-            <span style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(34,211,238,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>📝</span>
+            <span style={{ width: 32, height: 32, borderRadius: 10, background: 'var(--cyaan-16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>📝</span>
             <strong className="card-title">Eigen toets</strong>
           </span>
           <p className="dim" style={{ fontSize: 14, margin: '8px 0 12px' }}>
@@ -427,7 +428,7 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
                     !geleerd
                       ? { opacity: 0.4, filter: 'grayscale(0.8)' }
                       : on
-                        ? { background: 'rgba(168,85,247,0.25)', borderColor: 'var(--hot1)', boxShadow: '0 3px 0 rgba(126,34,206,0.6)' }
+                        ? { background: 'var(--hot-25)', borderColor: 'var(--hot1)', boxShadow: '0 3px 0 rgba(126,34,206,0.6)' }
                         : undefined
                   }
                   onClick={() => {
@@ -509,7 +510,7 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
           <p style={{ marginTop: 8 }}>
             <span
               className="tile"
-              style={{ background: 'rgba(255,197,61,0.12)', borderColor: 'var(--gold)', display: 'inline-flex' }}
+              style={{ background: 'var(--goud-10)', borderColor: 'var(--gold)', display: 'inline-flex' }}
             >
               <span className="gold-text num" style={{ fontWeight: 800 }}>+{phase.xp} XP</span>
             </span>

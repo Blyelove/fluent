@@ -110,7 +110,7 @@ export function StijlKiezer() {
                           key={i}
                           style={{ position: 'relative', width: 22, height: 24, display: 'inline-grid', placeItems: 'center' }}
                         >
-                          <span style={{ fontSize: 19, opacity: i === 2 && breukTik > 0 ? 0 : 1, filter: 'drop-shadow(0 0 6px rgba(34,211,238,0.6))' }}>
+                          <span style={{ fontSize: 19, opacity: i === 2 && breukTik > 0 ? 0 : 1, filter: 'drop-shadow(0 0 6px var(--cyaan-65))' }}>
                             🛡️
                           </span>
                           {i === 2 && breukTik > 0 && (

@@ -58,7 +58,7 @@ export function WorldPeek({
     <div className="glass unit-card" style={{ order: 1 }}>
       <div className="spread">
         <span className="row" style={{ gap: 8 }}>
-          <span style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(34,211,238,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🌍</span>
+          <span style={{ width: 32, height: 32, borderRadius: 10, background: 'var(--cyaan-16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🌍</span>
           <strong className="card-title">Wereldverovering</strong>
         </span>
         <span className="gold-text num" style={{ fontWeight: 700, fontSize: 14 }}>
@@ -166,9 +166,9 @@ function Vlag({ x, y, code, veroverd }: { x: number; y: number; code: string; ve
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
-        background: veroverd ? 'rgba(255, 197, 61, 0.16)' : 'var(--surface-2)',
-        border: veroverd ? '2.5px solid var(--gold)' : '2px solid rgba(255, 197, 61, 0.45)',
-        boxShadow: veroverd ? '0 0 14px rgba(255, 197, 61, 0.35)' : 'none',
+        background: veroverd ? 'var(--goud-16)' : 'var(--surface-2)',
+        border: veroverd ? '2.5px solid var(--gold)' : '2px solid var(--goud-50)',
+        boxShadow: veroverd ? '0 0 14px var(--goud-35)' : 'none',
         opacity: veroverd ? 1 : 0.72,
         pointerEvents: 'none',
       }}

@@ -22,17 +22,17 @@ function flameStyle(streak: number): { filter: string; glow: string; naam: strin
   if (streak >= 365)
     return {
       filter: 'hue-rotate(280deg) saturate(2.4) brightness(1.25)',
-      glow: 'drop-shadow(0 0 26px rgba(236,72,153,0.85)) drop-shadow(0 0 46px rgba(34,211,238,0.6))',
+      glow: 'drop-shadow(0 0 26px var(--hot-65)) drop-shadow(0 0 46px var(--cyaan-65))',
       naam: 'Eeuwige regenboogvlam',
     }
   if (streak >= 200)
-    return { filter: 'hue-rotate(150deg) saturate(1.7) brightness(1.3)', glow: 'drop-shadow(0 0 24px rgba(34,211,238,0.85))', naam: 'Diamanten vlam' }
+    return { filter: 'hue-rotate(150deg) saturate(1.7) brightness(1.3)', glow: 'drop-shadow(0 0 24px var(--cyaan-65))', naam: 'Diamanten vlam' }
   if (streak >= 100)
-    return { filter: 'hue-rotate(255deg) saturate(1.9)', glow: 'drop-shadow(0 0 22px rgba(168,85,247,0.8))', naam: 'Legendarische vlam' }
+    return { filter: 'hue-rotate(255deg) saturate(1.9)', glow: 'drop-shadow(0 0 22px var(--hot-65))', naam: 'Legendarische vlam' }
   if (streak >= 60)
-    return { filter: 'hue-rotate(230deg) saturate(1.5)', glow: 'drop-shadow(0 0 18px rgba(168,85,247,0.6))', naam: 'Paarse vlam' }
+    return { filter: 'hue-rotate(230deg) saturate(1.5)', glow: 'drop-shadow(0 0 18px var(--hot-65))', naam: 'Paarse vlam' }
   if (streak >= 30)
-    return { filter: 'saturate(1.5) brightness(1.2)', glow: 'drop-shadow(0 0 20px rgba(255,197,61,0.85))', naam: 'Gouden vlam' }
+    return { filter: 'saturate(1.5) brightness(1.2)', glow: 'drop-shadow(0 0 20px var(--goud-65))', naam: 'Gouden vlam' }
   if (streak >= 14)
     return { filter: 'hue-rotate(185deg) saturate(1.4)', glow: 'drop-shadow(0 0 14px rgba(59,130,246,0.7))', naam: 'Blauwe vlam' }
   if (streak >= 3) return { filter: 'none', glow: 'drop-shadow(0 0 12px rgba(249,115,22,0.7))', naam: 'Oranje vlam' }
@@ -217,7 +217,7 @@ export function StreakScreen({ onBack, onLeren }: { onBack?: () => void; onLeren
                 background: c.done ? 'var(--grad-gold)' : c.day ? 'var(--surface)' : 'transparent',
                 color: c.done ? 'var(--ink-on-gold)' : 'var(--text-faint)',
                 border: c.isToday ? '2px solid var(--hot2)' : c.day ? '1px solid var(--line)' : 'none',
-                boxShadow: c.done ? '0 0 10px rgba(255,197,61,0.35)' : 'none',
+                boxShadow: c.done ? '0 0 10px var(--goud-35)' : 'none',
               }}
             >
               {c.day ?? ''}

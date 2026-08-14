@@ -7,6 +7,7 @@ import type { CourseId } from '../types'
 import { sfx } from '../audio'
 import { STANDAARD_STIJLEN, stijlUitLink } from '../stijlen'
 import confetti from 'canvas-confetti'
+import { feestGoud } from '../wereldkleuren'
 
 /**
  * De XP-drops en het niveau-omhoog-moment, in RuneScape-geest.
@@ -68,7 +69,7 @@ export function XpDrops() {
                 spread: mijlpaal ? 110 : 70,
                 startVelocity: mijlpaal ? 42 : 30,
                 origin: { y: 0.4 },
-                colors: ['#FFC53D', '#FFE08A', '#FFFFFF'],
+                colors: feestGoud(),
                 disableForReducedMotion: true,
               })
             }, 500)
@@ -103,7 +104,7 @@ export function XpDrops() {
               fontFamily: 'var(--font-display)',
               fontWeight: 800,
               color: 'var(--gold-bright)',
-              textShadow: '0 1px 3px rgba(0,0,0,0.65), 0 0 14px rgba(255,197,61,0.55)',
+              textShadow: '0 1px 3px var(--inkt-65), 0 0 14px var(--goud-50)',
             }
             // REGEN: het bedrag valt uiteen in losse cijfers die wegdwarrelen
             if (xpStijl === 'regen') {
@@ -209,7 +210,7 @@ export function XpDrops() {
                   width: 260,
                   height: 260,
                   borderRadius: '50%',
-                  background: 'radial-gradient(circle, rgba(255,224,138,0.85) 0%, rgba(255,197,61,0.3) 45%, transparent 70%)',
+                  background: 'radial-gradient(circle, var(--goud-65) 0%, var(--goud-25) 45%, transparent 70%)',
                   pointerEvents: 'none',
                 }}
               />

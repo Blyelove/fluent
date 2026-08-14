@@ -9,6 +9,7 @@ import { sfx, speak } from '../audio'
 import { Flag } from '../components/Flag'
 import { courseFlagCode } from '../countries'
 import { norm, zonderAccenten } from './exercises'
+import { feestPalet } from '../wereldkleuren'
 
 /**
  * Gesprekken: je praat écht met iemand in de doeltaal.
@@ -115,7 +116,7 @@ function PartnerKop({ naam, code, size = 40 }: { naam: string; code: string; siz
           fontWeight: 900,
           fontSize: size * 0.42,
           color: '#fff',
-          boxShadow: '0 0 14px rgba(168, 85, 247, 0.45)',
+          boxShadow: '0 0 14px var(--hot-50)',
         }}
       >
         {naam[0]}
@@ -399,7 +400,7 @@ function AntwoordPaneel({
               fontSize: 23,
               background: luistert ? 'linear-gradient(135deg, var(--hot1), var(--hot2))' : 'var(--surface-2)',
               border: luistert ? 'none' : '1.5px solid var(--line)',
-              boxShadow: luistert ? '0 0 18px rgba(236, 72, 153, 0.55)' : 'none',
+              boxShadow: luistert ? '0 0 18px var(--hot-50)' : 'none',
             }}
           >
             {luistert ? (
@@ -517,7 +518,7 @@ function GesprekSpeler({
           later(700, () => {
             setKlaar(true)
             sfx('complete')
-            confetti({ particleCount: 90, spread: 75, origin: { y: 0.7 }, colors: ['#A855F7', '#EC4899', '#FFC53D'] })
+            confetti({ particleCount: 90, spread: 75, origin: { y: 0.7 }, colors: feestPalet() })
           })
         })
       )
@@ -685,7 +686,7 @@ function VrijSpeler({ onTerug }: { onTerug: () => void }) {
         later(700, () => {
           setKlaar(true)
           sfx('complete')
-          confetti({ particleCount: 90, spread: 75, origin: { y: 0.7 }, colors: ['#A855F7', '#EC4899', '#FFC53D'] })
+          confetti({ particleCount: 90, spread: 75, origin: { y: 0.7 }, colors: feestPalet() })
         })
       })
     )
@@ -832,13 +833,13 @@ export function GesprekkenScreen({ onExit }: { onExit: () => void }) {
           whileTap={{ scale: 0.98 }}
           className="glass row"
           onClick={() => { sfx('tap'); setActief('vrij') }}
-          style={{ gap: 12, padding: 16, textAlign: 'left', alignItems: 'center', borderColor: 'var(--line-hot)', boxShadow: '0 0 20px rgba(236, 72, 153, 0.18)' }}
+          style={{ gap: 12, padding: 16, textAlign: 'left', alignItems: 'center', borderColor: 'var(--line-hot)', boxShadow: '0 0 20px var(--hot-16)' }}
         >
           <PartnerKop naam={vrij.partner} code={vlag} size={46} />
           <div className="col" style={{ flex: 1, minWidth: 0 }}>
             <strong style={{ fontSize: 16 }}>
               💬 Vrij gesprek{' '}
-              <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.06em', color: 'var(--cyan)', border: '1px solid rgba(34,211,238,0.5)', borderRadius: 6, padding: '1px 5px' }}>
+              <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.06em', color: 'var(--cyan)', border: '1px solid var(--cyaan-50)', borderRadius: 6, padding: '1px 5px' }}>
                 NIEUW
               </span>
             </strong>

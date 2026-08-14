@@ -6,7 +6,7 @@ export function Flag({ code, size = 20, round = false }: { code: string; size?: 
       style={{
         fontSize: size,
         borderRadius: round ? '50%' : 4,
-        boxShadow: '0 0 0 1px rgba(255,255,255,0.12)',
+        boxShadow: '0 0 0 1px var(--glans-10)',
         flexShrink: 0,
       }}
     />

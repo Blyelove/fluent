@@ -249,7 +249,7 @@ export default function App() {
               color: 'var(--ink-on-gold)',
               fontWeight: 700,
               fontSize: 14,
-              boxShadow: '0 8px 24px rgba(0,0,0,0.5), 0 0 18px rgba(255,197,61,0.45)',
+              boxShadow: '0 8px 24px var(--inkt-50), 0 0 18px var(--goud-50)',
               minHeight: 44,
             }}
           >

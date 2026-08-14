@@ -7,6 +7,7 @@ import { countryStates } from '../countries'
 import { totalXp, useStore, wordsLearned } from '../store'
 import { sfx } from '../audio'
 import type { Course } from '../types'
+import { feestPalet } from '../wereldkleuren'
 
 /**
  * De verzamelkast: alle 10 badges met 5 tiers elk (50 te verdienen sterren).
@@ -80,7 +81,7 @@ function TierPips({ tier, color }: { tier: number; color: string }) {
             width: 6,
             height: 6,
             borderRadius: '50%',
-            background: t <= tier ? color : 'rgba(255,255,255,0.16)',
+            background: t <= tier ? color : 'var(--glans-16)',
             boxShadow: t <= tier ? `0 0 6px ${color}` : 'none',
           }}
         />
@@ -116,7 +117,7 @@ function BadgeOrb({ b, size }: { b: BadgeState; size: number }) {
           opacity: locked ? 0.5 : 1,
         }}
       >
-        <span style={{ filter: locked ? 'none' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.45))' }}>{b.def.icon}</span>
+        <span style={{ filter: locked ? 'none' : 'drop-shadow(0 2px 4px var(--inkt-50))' }}>{b.def.icon}</span>
       </motion.div>
       {locked && (
         <span
@@ -172,7 +173,7 @@ export function BadgesScreen() {
         particleCount: 40 + nieuw * 20,
         spread: 95,
         origin: { y: 0.35 },
-        colors: ['#FFC53D', '#A855F7', '#EC4899', '#22D3EE'],
+        colors: feestPalet(),
         disableForReducedMotion: true,
       })
     }
