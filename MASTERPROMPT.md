@@ -434,6 +434,18 @@ Stoppen kan met `/loop stop` of door de cron-taak te verwijderen.
 
 ## Logboek
 
+- **15-08-2026, ronde 78** - **De millimetermaat: van 78 punten die niet klopten naar nul, op elk scherm.**
+
+  De audit meet of iets stuk is. `scripts/millimeter-run.mjs` meet of iets klópt, en dat is een andere vraag. Vier dingen die je met het oog nooit optelt: staat alles op één linkerlijn, komen de verticale afstanden uit de maatladder, reageert elke knop op je duim, en plakt er niets tegen de rand. Zes schermen, 78 punten, nu nul, ook gemeten tegen de live link.
+
+  **De grootste vondst: 34 knoppen reageerden nergens op.** De knoppen met een eigen klasse deden het al, maar alles wat met losse stijlen was gebouwd niet: de reeksteller, de vaardigheidstegels, de kaarten in de speelhal. Ze werkten wel, maar zeiden niets terug, en dat voelt kapot ook al is het dat niet. Eén regel voor `button, [role=button]` lost het op, ook voor elke knop die er hierna bij komt.
+
+  **LES: een regel die alleen tijdens het indrukken geldt, staat nooit in de berekende stijl.** Mijn eerste meting keek naar `getComputedStyle` en meldde daardoor zevenentwintig knoppen als kapot die het prima deden. De stijlbladen zelf lezen en kijken welke keuzes een `:active` hebben, is wél juist.
+
+  **En een fout van mezelf, één ronde oud:** de binnenkomst van een scherm gold ook bij het openen van de app, dus elk koud geopend scherm stond zestien pixels naar rechts en schoof daarna op zijn plek. Dat verklaarde ook zes randfouten die er geen waren. Alleen een echte tabwissel is een beweging.
+
+  **Regel voor elke nieuwe maat: stel hem bij tot hij alleen echte fouten meldt.** Deze moest drie keer bijgesteld voordat hij bruikbaar was: inhoud die onder een vaste balk doorschuift is normaal, decor dat bewust buiten beeld begint is geen uitlijnfout, en een veegstrook hóórt breder te zijn dan het scherm.
+
 - **15-08-2026, ronde 77** - **De eerste seconde en de beweging die je het vaakst maakt.**
 
   **De eerste seconde was leeg.** De app is ruim een megabyte javascript; op een telefoon met matig bereik duurt het seconden voordat daar iets van te zien is. Er staat nu een opening in `index.html` zelf: de naam in het merkverloop, een vullende lijn, een regel eronder. Op een nagebootste trage telefoon staat hij er na 700 ms.
