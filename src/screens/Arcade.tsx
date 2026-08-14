@@ -240,10 +240,10 @@ export function ArcadeScreen({ onPlayingChange, onDuels }: { onPlayingChange?: (
 
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
         <p className="eyebrow">Speelhal</p>
-        <h1 className="display" style={{ fontSize: 30, marginTop: 4 }}>
+        <h1 className="display" style={{ fontSize: 28, marginTop: 4 }}>
           Leren dat <span className="hot-text">niet voelt</span> als leren
         </h1>
-        <p className="dim" style={{ fontSize: 14, marginTop: 6 }}>
+        <p className="dim" style={{ fontSize: 14, marginTop: 4 }}>
           {arcadePlays > 0 ? `Je speelde al ${arcadePlays} ${arcadePlays === 1 ? 'potje' : 'potjes'}. Nog één dan?` : 'Kies een spel en verdien XP terwijl je speelt.'}
         </p>
         {/* de weekmissie telt hier mee, dus hier hoor je te zien hoe ver je bent */}
@@ -259,7 +259,7 @@ export function ArcadeScreen({ onPlayingChange, onDuels }: { onPlayingChange?: (
             width: 'fit-content',
           }}
         >
-          <span style={{ fontSize: 15 }}>🎁</span>
+          <span style={{ fontSize: 14 }}>🎁</span>
           <span style={{ fontSize: 12.5, fontWeight: 800 }}>
             {weekArcade >= 3 ? (
               <span className="gold-text">Weekmissie gehaald: 3/3 potjes</span>
@@ -278,15 +278,15 @@ export function ArcadeScreen({ onPlayingChange, onDuels }: { onPlayingChange?: (
           className="glass"
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
-          style={{ padding: 16, marginTop: 18, borderColor: 'var(--line-gold)', background: 'rgba(255, 197, 61, 0.09)' }}
+          style={{ padding: 16, marginTop: 16, borderColor: 'var(--line-gold)', background: 'rgba(255, 197, 61, 0.09)' }}
         >
           <div className="row" style={{ alignItems: 'flex-start', gap: 12 }}>
-            <span style={{ fontSize: 26, lineHeight: 1 }}>🔒</span>
+            <span style={{ fontSize: 28, lineHeight: 1 }}>🔒</span>
             <div>
               <p className="display" style={{ fontSize: 16 }}>
                 Deze cursus heeft nog te weinig woorden
               </p>
-              <p className="dim" style={{ fontSize: 13, marginTop: 4 }}>
+              <p className="dim" style={{ fontSize: 12.5, marginTop: 4 }}>
                 Er zijn minstens {MIN_WORDS} woorden nodig om te spelen.
               </p>
             </div>
@@ -299,15 +299,15 @@ export function ArcadeScreen({ onPlayingChange, onDuels }: { onPlayingChange?: (
           className="glass"
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
-          style={{ padding: 14, marginTop: 18, borderColor: 'var(--line-hot)' }}
+          style={{ padding: 12, marginTop: 16, borderColor: 'var(--line-hot)' }}
         >
           <div className="row" style={{ alignItems: 'flex-start', gap: 12 }}>
-            <span style={{ fontSize: 24, lineHeight: 1 }}>✨</span>
+            <span style={{ fontSize: 23, lineHeight: 1 }}>✨</span>
             <div>
-              <p className="display" style={{ fontSize: 15 }}>
+              <p className="display" style={{ fontSize: 14 }}>
                 Je speelt met de startwoorden
               </p>
-              <p className="dim" style={{ fontSize: 12.5, marginTop: 3 }}>
+              <p className="dim" style={{ fontSize: 12.5, marginTop: 4 }}>
                 Leer terwijl je speelt — hoe meer lessen je doet, hoe meer eigen woorden in de spellen komen.
               </p>
             </div>
@@ -315,7 +315,7 @@ export function ArcadeScreen({ onPlayingChange, onDuels }: { onPlayingChange?: (
         </motion.div>
       )}
 
-      <div className="col" style={{ gap: 16, marginTop: 20 }}>
+      <div className="col" style={{ gap: 16, marginTop: 16 }}>
         {GAMES.map((g, i) => {
           const best = arcadeBest[g.id] ?? 0
           return (
@@ -357,25 +357,25 @@ export function ArcadeScreen({ onPlayingChange, onDuels }: { onPlayingChange?: (
               />
               <span
                 aria-hidden
-                style={{ position: 'absolute', right: -12, bottom: -22, fontSize: 108, opacity: 0.24, lineHeight: 1, pointerEvents: 'none' }}
+                style={{ position: 'absolute', right: -12, bottom: -22, fontSize: 96, opacity: 0.24, lineHeight: 1, pointerEvents: 'none' }}
               >
                 {g.emoji}
               </span>
 
               <span style={{ position: 'relative', display: 'block' }}>
                 <span style={{ fontSize: 34, lineHeight: 1, display: 'block' }}>{g.emoji}</span>
-                <span className="display" style={{ fontSize: 25, display: 'block', marginTop: 8 }}>
+                <span className="display" style={{ fontSize: 23, display: 'block', marginTop: 8 }}>
                   {g.name}
                 </span>
-                <span style={{ display: 'block', fontSize: 13.5, fontWeight: 700, opacity: 0.92 }}>{g.tagline}</span>
-                <span style={{ display: 'block', fontSize: 13, marginTop: 8, opacity: 0.85, maxWidth: 260, lineHeight: 1.45 }}>{g.how}</span>
+                <span style={{ display: 'block', fontSize: 14, fontWeight: 700, opacity: 0.92 }}>{g.tagline}</span>
+                <span style={{ display: 'block', fontSize: 12.5, marginTop: 8, opacity: 0.85, maxWidth: 260, lineHeight: 1.45 }}>{g.how}</span>
 
                 <span
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: 6,
-                    marginTop: 14,
+                    gap: 4,
+                    marginTop: 12,
                     padding: '7px 13px',
                     borderRadius: 999,
                     background: 'rgba(0,0,0,0.26)',
@@ -416,29 +416,29 @@ export function ArcadeScreen({ onPlayingChange, onDuels }: { onPlayingChange?: (
           }}
           style={{
             width: '100%',
-            marginTop: 14,
+            marginTop: 12,
             padding: '16px 18px',
             textAlign: 'left',
             borderColor: 'var(--line-hot)',
             display: 'flex',
             alignItems: 'center',
-            gap: 14,
+            gap: 12,
           }}
         >
-          <span style={{ fontSize: 30, lineHeight: 1 }}>🤖</span>
-          <span className="col" style={{ gap: 3, flex: 1, minWidth: 0 }}>
-            <strong style={{ fontSize: 15.5 }}>Duel tegen een bot</strong>
+          <span style={{ fontSize: 28, lineHeight: 1 }}>🤖</span>
+          <span className="col" style={{ gap: 4, flex: 1, minWidth: 0 }}>
+            <strong style={{ fontSize: 16 }}>Duel tegen een bot</strong>
             <span className="faint" style={{ fontSize: 12.5 }}>
               Versla Robo Rens, Turbo Tessa of Meester Milan. Telt mee voor je weekkist.
             </span>
           </span>
-          <span className="hot-text" style={{ fontSize: 20, fontWeight: 800 }}>
+          <span className="hot-text" style={{ fontSize: 19, fontWeight: 800 }}>
             ›
           </span>
         </motion.button>
       )}
 
-      <p className="faint center" style={{ fontSize: 12.5, marginTop: 22, lineHeight: 1.5 }}>
+      <p className="faint center" style={{ fontSize: 12.5, marginTop: 24, lineHeight: 1.5 }}>
         Alle spellen gebruiken woorden uit je cursus {course.name}.
         <br />
         Punten worden omgezet in XP voor je divisie.
@@ -475,7 +475,7 @@ function CloseBtn({ onClick }: { onClick: () => void }) {
         background: 'var(--surface-2)',
         border: '1.5px solid var(--line)',
         color: 'var(--text-dim)',
-        fontSize: 24,
+        fontSize: 23,
         fontWeight: 700,
         lineHeight: 1,
         display: 'flex',
@@ -533,15 +533,15 @@ function NoWords({ onExit }: { onExit: () => void }) {
         <CloseBtn onClick={onExit} />
       </div>
       <div className="glass center" style={{ padding: '30px 20px', borderColor: 'var(--line-gold)' }}>
-        <p style={{ fontSize: 42, lineHeight: 1 }}>🔒</p>
-        <p className="display" style={{ fontSize: 18, marginTop: 12 }}>
+        <p style={{ fontSize: 48, lineHeight: 1 }}>🔒</p>
+        <p className="display" style={{ fontSize: 19, marginTop: 12 }}>
           Nog te weinig woorden
         </p>
-        <p className="dim" style={{ fontSize: 13.5, marginTop: 6, lineHeight: 1.5 }}>
+        <p className="dim" style={{ fontSize: 14, marginTop: 4, lineHeight: 1.5 }}>
           Doe eerst een paar lessen — daarna vullen de spellen zich vanzelf met jouw woorden.
         </p>
       </div>
-      <button className="btn btn-ghost" style={{ marginTop: 20 }} onClick={onExit}>
+      <button className="btn btn-ghost" style={{ marginTop: 16 }} onClick={onExit}>
         Terug naar de speelhal
       </button>
     </div>
@@ -598,7 +598,7 @@ function Countdown({ onDone, uitleg }: { onDone: () => void; uitleg?: string }) 
         </motion.div>
       </AnimatePresence>
       {uitleg && (
-        <p className="dim" style={{ fontSize: 15, maxWidth: 300, margin: '18px auto 0', lineHeight: 1.45 }}>
+        <p className="dim" style={{ fontSize: 14, maxWidth: 300, margin: '18px auto 0', lineHeight: 1.45 }}>
           {uitleg}
         </p>
       )}
@@ -754,14 +754,14 @@ function Bliksem({ words, all, onExit, onFinish }: GameProps) {
     <div className="shell">
       <div className="ambient-orb orb-a" />
 
-      <div className="row" style={{ gap: 14, marginBottom: 18 }}>
+      <div className="row" style={{ gap: 12, marginBottom: 16 }}>
         <CloseBtn onClick={onExit} />
         <div style={{ flex: 1 }}>
           <TimerBar pct={remaining / ROUND_MS} danger={danger} />
         </div>
         <div
           className="display"
-          style={{ fontSize: 22, minWidth: 46, textAlign: 'right', color: danger ? 'var(--err)' : 'var(--gold)' }}
+          style={{ fontSize: 23, minWidth: 46, textAlign: 'right', color: danger ? 'var(--err)' : 'var(--gold)' }}
         >
           {secs}s
         </div>
@@ -771,10 +771,10 @@ function Bliksem({ words, all, onExit, onFinish }: GameProps) {
         <Countdown onDone={start} uitleg="Zoveel mogelijk vertalingen goed in 60 seconden. Goed geeft een halve seconde erbij, fout kost 2 seconden. Elke 5 op rij verhoogt je multiplier, tot ×5." />
       ) : (
         <>
-          <div className="spread" style={{ marginBottom: 6 }}>
+          <div className="spread" style={{ marginBottom: 4 }}>
             <div>
               <p className="eyebrow">Punten</p>
-              <motion.p key={score} initial={{ scale: 1.35 }} animate={{ scale: 1 }} className="display gold-text" style={{ fontSize: 40, lineHeight: 1 }}>
+              <motion.p key={score} initial={{ scale: 1.35 }} animate={{ scale: 1 }} className="display gold-text" style={{ fontSize: 34, lineHeight: 1 }}>
                 {score}
               </motion.p>
             </div>
@@ -788,7 +788,7 @@ function Bliksem({ words, all, onExit, onFinish }: GameProps) {
                     animate={{ opacity: 1, y: -22, scale: 1 }}
                     exit={{ opacity: 0, y: -40 }}
                     className="display"
-                    style={{ position: 'absolute', right: 0, top: -6, fontSize: 24, color: pop.good ? 'var(--ok)' : 'var(--err)' }}
+                    style={{ position: 'absolute', right: 0, top: -6, fontSize: 23, color: pop.good ? 'var(--ok)' : 'var(--err)' }}
                   >
                     {pop.text}
                   </motion.div>
@@ -803,7 +803,7 @@ function Bliksem({ words, all, onExit, onFinish }: GameProps) {
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: 6,
+                    gap: 4,
                     padding: '8px 14px',
                     borderRadius: 999,
                     background: multiplier > 1 ? 'var(--grad-hot)' : 'var(--surface-2)',
@@ -812,7 +812,7 @@ function Bliksem({ words, all, onExit, onFinish }: GameProps) {
                     color: '#fff',
                   }}
                 >
-                  🔥 {combo} op rij {multiplier > 1 && <span style={{ fontSize: 18 }}>×{multiplier}</span>}
+                  🔥 {combo} op rij {multiplier > 1 && <span style={{ fontSize: 19 }}>×{multiplier}</span>}
                 </motion.div>
               )}
             </div>
@@ -821,10 +821,10 @@ function Bliksem({ words, all, onExit, onFinish }: GameProps) {
           <motion.div key={q.prompt + q.word} initial={{ opacity: 0, x: 26 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.18 }}>
             <div
               className="glass center"
-              style={{ padding: '26px 18px', marginTop: 14, marginBottom: 18, borderColor: 'var(--line-hot)', background: 'rgba(168,85,247,0.1)' }}
+              style={{ padding: '26px 18px', marginTop: 12, marginBottom: 16, borderColor: 'var(--line-hot)', background: 'rgba(168,85,247,0.1)' }}
             >
               <p className="eyebrow">{q.toTarget ? 'Hoe zeg je dit?' : 'Wat betekent dit?'}</p>
-              <p className="display" style={{ fontSize: 30, marginTop: 8 }}>
+              <p className="display" style={{ fontSize: 28, marginTop: 8 }}>
                 {q.prompt}
               </p>
             </div>
@@ -837,7 +837,7 @@ function Bliksem({ words, all, onExit, onFinish }: GameProps) {
                   <button
                     key={opt + i}
                     className={cls}
-                    style={{ justifyContent: 'center', textAlign: 'center', minHeight: 62, fontSize: 18 }}
+                    style={{ justifyContent: 'center', textAlign: 'center', minHeight: 62, fontSize: 19 }}
                     onClick={() => answer(i)}
                   >
                     {opt}
@@ -847,11 +847,11 @@ function Bliksem({ words, all, onExit, onFinish }: GameProps) {
             </div>
           </motion.div>
 
-          <p className="faint center" style={{ fontSize: 12, marginTop: 18 }}>
+          <p className="faint center" style={{ fontSize: 12.5, marginTop: 16 }}>
             Goed = +0,5 seconde · fout = −2 seconden · elke 5 goed op rij verhoogt je multiplier (tot ×5)
           </p>
           {bestCombo > 0 && (
-            <p className="faint center" style={{ fontSize: 12, marginTop: 4 }}>
+            <p className="faint center" style={{ fontSize: 12.5, marginTop: 4 }}>
               Beste combo deze ronde: {bestCombo}
             </p>
           )}
@@ -996,15 +996,15 @@ function Storm({ words, onExit, onFinish }: GameProps) {
     <div className="shell">
       <div className="ambient-orb orb-b" />
 
-      <div className="row" style={{ gap: 14, marginBottom: 20 }}>
+      <div className="row" style={{ gap: 12, marginBottom: 16 }}>
         <CloseBtn onClick={onExit} />
         <div style={{ flex: 1 }}>
           <p className="eyebrow">Woordstorm</p>
-          <p className="dim" style={{ fontSize: 13 }}>
+          <p className="dim" style={{ fontSize: 12.5 }}>
             {matched} van {totalPairs} paren
           </p>
         </div>
-        <div className="display" style={{ fontSize: 26, color: 'var(--cyan)', minWidth: 76, textAlign: 'right', position: 'relative' }}>
+        <div className="display" style={{ fontSize: 28, color: 'var(--cyan)', minWidth: 76, textAlign: 'right', position: 'relative' }}>
           {secs.toFixed(1)}s
           <AnimatePresence>
             {straf !== null && (
@@ -1014,7 +1014,7 @@ function Storm({ words, onExit, onFinish }: GameProps) {
                 animate={{ opacity: 1, y: -20, scale: 1 }}
                 exit={{ opacity: 0, y: -36 }}
                 className="display"
-                style={{ position: 'absolute', right: 0, top: -4, fontSize: 20, color: 'var(--err)' }}
+                style={{ position: 'absolute', right: 0, top: -4, fontSize: 19, color: 'var(--err)' }}
               >
                 +3s
               </motion.span>
@@ -1027,14 +1027,14 @@ function Storm({ words, onExit, onFinish }: GameProps) {
         <Countdown onDone={start} uitleg="Tik twee tegels die bij elkaar horen. Hoe sneller je alle 8 paren vindt, hoe hoger je score — missen kost 3 seconden." />
       ) : (
         <>
-          <div className="progress-track" style={{ marginBottom: 18 }}>
+          <div className="progress-track" style={{ marginBottom: 16 }}>
             <div
               className="progress-fill"
               style={{ width: `${(matched / totalPairs) * 100}%`, background: 'linear-gradient(90deg,#22d3ee,#6366f1)', transition: 'width 0.3s ease' }}
             />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 9 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
             {tiles.map((t) => {
               const isSel = selected === t.id
               const isWrong = wrong.includes(t.id)
@@ -1083,15 +1083,15 @@ function Storm({ words, onExit, onFinish }: GameProps) {
             })}
           </div>
 
-          <div className="row" style={{ justifyContent: 'center', gap: 18, marginTop: 20 }}>
-            <span className="faint" style={{ fontSize: 12 }}>
+          <div className="row" style={{ justifyContent: 'center', gap: 16, marginTop: 16 }}>
+            <span className="faint" style={{ fontSize: 12.5 }}>
               <span style={{ color: 'var(--hot1)' }}>■</span> Nederlands
             </span>
-            <span className="faint" style={{ fontSize: 12 }}>
+            <span className="faint" style={{ fontSize: 12.5 }}>
               <span style={{ color: 'var(--cyan)' }}>■</span> Vertaling
             </span>
           </div>
-          <p className="faint center" style={{ fontSize: 12, marginTop: 6 }}>
+          <p className="faint center" style={{ fontSize: 12.5, marginTop: 4 }}>
             Elke misser kost 3 seconden{misses > 0 ? ` · ${misses} tot nu toe` : ''}
           </p>
         </>
@@ -1220,7 +1220,7 @@ function Luister({ words, all, ttsLang, onExit, onFinish }: GameProps) {
     return (
       <div className="shell">
         <div className="ambient-orb orb-a" />
-        <div className="row" style={{ marginBottom: 10 }}>
+        <div className="row" style={{ marginBottom: 8 }}>
           <CloseBtn onClick={onExit} />
         </div>
         <Countdown onDone={() => setStarted(true)} uitleg="Je hoort een woord en kiest de juiste betekenis. Elke ronde duurt 8 seconden: hoe sneller je kiest, hoe meer tijdbonus." />
@@ -1228,9 +1228,9 @@ function Luister({ words, all, ttsLang, onExit, onFinish }: GameProps) {
           // zonder geluid is dit spel onspeelbaar; dat zeggen we vóór de klok loopt
           <div
             className="glass"
-            style={{ padding: 14, marginTop: 6, borderColor: 'var(--line-gold)', background: 'rgba(255,197,61,0.09)' }}
+            style={{ padding: 12, marginTop: 4, borderColor: 'var(--line-gold)', background: 'rgba(255,197,61,0.09)' }}
           >
-            <p style={{ fontSize: 13.5, fontWeight: 700 }}>🔇 Geen geluid beschikbaar</p>
+            <p style={{ fontSize: 14, fontWeight: 700 }}>🔇 Geen geluid beschikbaar</p>
             <p className="faint" style={{ fontSize: 12.5, marginTop: 4 }}>
               Je toestel heeft hiervoor geen stem. Het woord verschijnt na drie seconden in beeld, zodat je toch kunt spelen.
             </p>
@@ -1250,10 +1250,10 @@ function Luister({ words, all, ttsLang, onExit, onFinish }: GameProps) {
     <div className="shell">
       <div className="ambient-orb orb-a" />
 
-      <div className="row" style={{ gap: 14, marginBottom: 16 }}>
+      <div className="row" style={{ gap: 12, marginBottom: 16 }}>
         <CloseBtn onClick={onExit} />
         <div style={{ flex: 1 }}>
-          <div className="spread" style={{ marginBottom: 6 }}>
+          <div className="spread" style={{ marginBottom: 4 }}>
             <span className="eyebrow">
               Ronde {idx + 1}/{rounds.length}
             </span>
@@ -1272,7 +1272,7 @@ function Luister({ words, all, ttsLang, onExit, onFinish }: GameProps) {
           animate={{ scale: 1, opacity: 1 }}
           whileTap={{ scale: 0.93 }}
           className="speaker-btn"
-          style={{ color: 'var(--gold-bright)', width: 104, height: 104, marginBottom: 18 }}
+          style={{ color: 'var(--gold-bright)', width: 104, height: 104, marginBottom: 16 }}
           onClick={() => speak(q.word, ttsLang)}
           aria-label="Woord opnieuw afspelen"
         >
@@ -1292,7 +1292,7 @@ function Luister({ words, all, ttsLang, onExit, onFinish }: GameProps) {
             <button
               key={opt + i}
               className={cls}
-              style={{ justifyContent: 'center', textAlign: 'center', minHeight: 60, fontSize: 17 }}
+              style={{ justifyContent: 'center', textAlign: 'center', minHeight: 60, fontSize: 16 }}
               onClick={() => answer(i)}
             >
               {opt}
@@ -1301,7 +1301,7 @@ function Luister({ words, all, ttsLang, onExit, onFinish }: GameProps) {
         })}
       </div>
 
-      <p className="faint center" style={{ fontSize: 12, marginTop: 18 }}>
+      <p className="faint center" style={{ fontSize: 12.5, marginTop: 16 }}>
         Goed = 10 punten + 1 punt per resterende seconde
       </p>
     </div>
@@ -1335,17 +1335,17 @@ function Result({
         <CloseBtn onClick={onHub} />
       </div>
 
-      <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="center" style={{ marginTop: 14 }}>
+      <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="center" style={{ marginTop: 12 }}>
         <motion.div
           initial={{ scale: 0.4, rotate: -20 }}
           animate={{ scale: 1, rotate: 0 }}
           transition={{ type: 'spring', stiffness: 220, damping: 12 }}
-          style={{ fontSize: 74, lineHeight: 1 }}
+          style={{ fontSize: 64, lineHeight: 1 }}
         >
           {phase.record ? '🏆' : def.emoji}
         </motion.div>
 
-        <h1 className="display" style={{ fontSize: 28, marginTop: 10 }}>
+        <h1 className="display" style={{ fontSize: 28, marginTop: 8 }}>
           {phase.record ? <span className="gold-text">Nieuw record!</span> : 'Goed gespeeld!'}
         </h1>
         <p className="dim" style={{ fontSize: 14, marginTop: 4 }}>
@@ -1357,22 +1357,22 @@ function Result({
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.14, type: 'spring', stiffness: 200, damping: 14 }}
           className="glass"
-          style={{ padding: '26px 18px', marginTop: 22, background: 'rgba(255,255,255,0.05)' }}
+          style={{ padding: '26px 18px', marginTop: 24, background: 'rgba(255,255,255,0.05)' }}
         >
           <p className="eyebrow">Jouw score</p>
-          <p className="display gold-text" style={{ fontSize: 62, lineHeight: 1.05 }}>
+          <p className="display gold-text" style={{ fontSize: 64, lineHeight: 1.05 }}>
             {phase.score}
           </p>
           <div className="divider-gold" />
           <div className="stat-grid">
             <div className="glass stat-card">
-              <p className="stat-value" style={{ fontSize: 26 }}>
+              <p className="stat-value" style={{ fontSize: 28 }}>
                 {best}
               </p>
               <p className="stat-label">Beste ooit</p>
             </div>
             <div className="glass stat-card">
-              <p className="stat-value hot-text" style={{ fontSize: 26 }}>
+              <p className="stat-value hot-text" style={{ fontSize: 28 }}>
                 +{phase.gained}
               </p>
               <p className="stat-label">{phase.gained > phase.xp ? 'XP (2× boost)' : 'XP verdiend'}</p>
@@ -1385,11 +1385,11 @@ function Result({
               <p style={{ fontSize: 14, marginTop: 16, fontWeight: 700 }}>
                 {m.volgende ? (
                   <>
-                    {m.nu && <span style={{ fontSize: 18 }}>{m.nu} </span>}
+                    {m.nu && <span style={{ fontSize: 19 }}>{m.nu} </span>}
                     <span className="dim">Nog </span>
                     <span className="gold-text">{m.tekort}</span>
                     <span className="dim"> {m.tekort === 1 ? 'punt' : 'punten'} tot </span>
-                    <span style={{ fontSize: 18 }}>{m.volgende}</span>
+                    <span style={{ fontSize: 19 }}>{m.volgende}</span>
                   </>
                 ) : (
                   <span className="gold-text">🥇 Goud gehaald. Hoger dan dit gaat niet.</span>
@@ -1399,7 +1399,7 @@ function Result({
           })()}
         </motion.div>
 
-        <div className="col" style={{ gap: 12, marginTop: 26 }}>
+        <div className="col" style={{ gap: 12, marginTop: 24 }}>
           <button
             className="btn btn-primary"
             onClick={() => {

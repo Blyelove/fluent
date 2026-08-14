@@ -251,7 +251,7 @@ export function ArenaScreen({
     return (
       <motion.div
         className="row"
-        style={{ gap: 6 }}
+        style={{ gap: 4 }}
         aria-label={`${aantal} schilden over`}
         animate={geraakt && !kalm ? { x: [0, -5, 5, -3, 3, 0] } : { x: 0 }}
         transition={{ duration: 0.34 }}
@@ -268,7 +268,7 @@ export function ArenaScreen({
             >
               <span
                 style={{
-                  fontSize: 24,
+                  fontSize: 23,
                   lineHeight: 1,
                   opacity: breekt ? 0 : 1,
                   filter: heel ? 'drop-shadow(0 0 7px rgba(34,211,238,0.65))' : 'grayscale(1) opacity(0.22)',
@@ -336,8 +336,8 @@ export function ArenaScreen({
         <p className="eyebrow" style={{ color: 'var(--goud-tekst-dim)' }}>
           {rang.emoji} {rang.naam}
         </p>
-        <div className="row" style={{ justifyContent: 'center', gap: 18, margin: '22px 0 10px', alignItems: 'center' }}>
-          <motion.div initial={{ x: kalm ? 0 : -60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ type: 'spring', stiffness: 200, damping: 20 }} className="col center" style={{ gap: 6 }}>
+        <div className="row" style={{ justifyContent: 'center', gap: 16, margin: '22px 0 10px', alignItems: 'center' }}>
+          <motion.div initial={{ x: kalm ? 0 : -60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ type: 'spring', stiffness: 200, damping: 20 }} className="col center" style={{ gap: 4 }}>
             <Avatar size={92} look={look} courseId={courseId} meester={meester} />
             <strong className="card-title">Jij</strong>
           </motion.div>
@@ -350,7 +350,7 @@ export function ArenaScreen({
           >
             VS
           </motion.span>
-          <motion.div initial={{ x: kalm ? 0 : 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ type: 'spring', stiffness: 200, damping: 20 }} className="col center" style={{ gap: 6 }}>
+          <motion.div initial={{ x: kalm ? 0 : 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ type: 'spring', stiffness: 200, damping: 20 }} className="col center" style={{ gap: 4 }}>
             <div
               style={{
                 width: 92,
@@ -359,7 +359,7 @@ export function ArenaScreen({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: 44,
+                fontSize: 48,
                 background: 'var(--paneel-diep)',
                 border: '2px solid var(--line-hot)',
                 boxShadow: 'var(--glow-hot)',
@@ -380,10 +380,10 @@ export function ArenaScreen({
             <strong className="card-title">{tegenstander.naam}</strong>
           </motion.div>
         </div>
-        <p className="dim" style={{ fontSize: 13.5, marginBottom: 6 }}>
+        <p className="dim" style={{ fontSize: 14, marginBottom: 4 }}>
           {tegenstander.uitleg}
         </p>
-        <p className="faint" style={{ fontSize: 12.5, marginBottom: 18 }}>
+        <p className="faint" style={{ fontSize: 12.5, marginBottom: 16 }}>
           Drie schilden elk. Elke fout breekt er één. Snel goed antwoorden zet {tegenstander.naam} onder druk.
         </p>
         <motion.p
@@ -395,7 +395,7 @@ export function ArenaScreen({
         >
           {fase.tel}
         </motion.p>
-        <button className="dim" style={{ minHeight: 44, fontSize: 13.5, marginTop: 18 }} onClick={() => { sfx('tap'); onTerug() }}>
+        <button className="dim" style={{ minHeight: 44, fontSize: 14, marginTop: 16 }} onClick={() => { sfx('tap'); onTerug() }}>
           Toch niet, terug
         </button>
       </div>
@@ -414,10 +414,10 @@ export function ArenaScreen({
           <div className="center" style={{ display: 'flex', justifyContent: 'center' }}>
             <Avatar size={104} look={look} courseId={courseId} meester={meester} mode={fase.gewonnen ? 'cheer' : 'verslagen'} />
           </div>
-          <h1 className="display" style={{ fontSize: 32, margin: '10px 0 4px' }}>
+          <h1 className="display" style={{ fontSize: 34, margin: '10px 0 4px' }}>
             {fase.gewonnen ? 'Overwinning!' : 'Nipt verloren'}
           </h1>
-          <p className="dim" style={{ fontSize: 14.5 }}>
+          <p className="dim" style={{ fontSize: 14 }}>
             {schaduw
               ? fase.gewonnen
                 ? `Je versloeg de schaduw van ${tegenstander.naam} op zijn eigen vragen.`
@@ -426,19 +426,19 @@ export function ArenaScreen({
                 ? `Je sloeg ${tegenstander.naam} uit de ${rang.naam}.`
                 : `${tegenstander.naam} hield één schild over. De revanche staat klaar.`}
           </p>
-          <div className="card-hero" style={{ padding: 18, margin: '20px 0' }}>
+          <div className="card-hero" style={{ padding: 16, margin: '20px 0' }}>
             <div className="spread">
               <span style={{ fontWeight: 600, fontSize: 14 }}>Bekers</span>
-              <span className="gold-text num display" style={{ fontSize: 24 }}>
+              <span className="gold-text num display" style={{ fontSize: 23 }}>
                 {fase.gewonnen ? `+${WINST_BEKERS}` : `-${VERLIES_BEKERS}`} → {fase.bekersNa}
               </span>
             </div>
             <div className="spread" style={{ marginTop: 8 }}>
-              <span className="dim" style={{ fontSize: 13 }}>
+              <span className="dim" style={{ fontSize: 12.5 }}>
                 {rangNa.emoji} {rangNa.naam}
               </span>
               {volgende && (
-                <span className="faint num" style={{ fontSize: 12 }}>
+                <span className="faint num" style={{ fontSize: 12.5 }}>
                   nog {volgende.vanaf - fase.bekersNa} tot {volgende.naam}
                 </span>
               )}
@@ -446,7 +446,7 @@ export function ArenaScreen({
           </div>
           <button
             className="btn btn-primary"
-            style={{ padding: 14, fontSize: 15.5, marginBottom: 10 }}
+            style={{ padding: 12, fontSize: 16, marginBottom: 8 }}
             onClick={() => {
               sfx('tap')
               geboekt.current = false
@@ -466,7 +466,7 @@ export function ArenaScreen({
                dus het is een gevecht en geen scorevergelijking. */
             <button
               className="btn btn-ghost"
-              style={{ padding: 12, fontSize: 14, marginBottom: 10 }}
+              style={{ padding: 12, fontSize: 14, marginBottom: 8 }}
               onClick={() => {
                 sfx('tap')
                 const link = schaduwLink(uitdaging)
@@ -519,12 +519,12 @@ export function ArenaScreen({
             style={{
               position: 'relative',
               zIndex: 2,
-              fontSize: 11.5,
+              fontSize: 11,
               fontWeight: 800,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
               color: mijnSchilden === 1 ? 'var(--err)' : 'var(--ok)',
-              marginBottom: 2,
+              marginBottom: 0,
             }}
           >
             {mijnSchilden === 1 && zijnSchilden === 1
@@ -580,7 +580,7 @@ export function ArenaScreen({
 
       {/* de stand: twee vechters, twee rijen schilden */}
       <div className="spread" style={{ padding: '10px 0 12px', borderBottom: '1px solid var(--line)' }}>
-        <div className="row" style={{ gap: 9 }}>
+        <div className="row" style={{ gap: 8 }}>
           {/* je personage speelt mee: hij zakt als hij een klap krijgt en
               wiegt terwijl de ander nadenkt. Stilstaan terwijl er iets gebeurt
               maakt van een personage weer een plaatje. */}
@@ -592,23 +592,23 @@ export function ArenaScreen({
             mode={klap === 'ik' ? 'verslagen' : botDenkt ? 'denk' : 'idle'}
             still={!klap && !botDenkt}
           />
-          <div className="col" style={{ gap: 2 }}>
-            <strong style={{ fontSize: 13, fontWeight: 700 }}>Jij</strong>
+          <div className="col" style={{ gap: 0 }}>
+            <strong style={{ fontSize: 12.5, fontWeight: 700 }}>Jij</strong>
             {schild(mijnSchilden, 'ik')}
           </div>
         </div>
         <span className="display hot-text" style={{ fontSize: 19 }}>
           VS
         </span>
-        <div className="row" style={{ gap: 9 }}>
-          <div className="col" style={{ gap: 2, alignItems: 'flex-end' }}>
-            <strong style={{ fontSize: 13, fontWeight: 700 }}>{tegenstander.naam}</strong>
+        <div className="row" style={{ gap: 8 }}>
+          <div className="col" style={{ gap: 0, alignItems: 'flex-end' }}>
+            <strong style={{ fontSize: 12.5, fontWeight: 700 }}>{tegenstander.naam}</strong>
             {schild(zijnSchilden, 'hij')}
           </div>
           <motion.span
             animate={botDenkt && !kalm ? { rotate: [0, -8, 8, 0] } : {}}
             transition={{ duration: 0.9, repeat: botDenkt ? Infinity : 0 }}
-            style={{ fontSize: 30 }}
+            style={{ fontSize: 28 }}
           >
             ⚔️
           </motion.span>
@@ -624,10 +624,10 @@ export function ArenaScreen({
             <p className="eyebrow center" style={{ marginBottom: 8 }}>
               Wat is dit in het {course.name}?
             </p>
-            <h2 className="display center" style={{ fontSize: 30, marginBottom: 20 }}>
+            <h2 className="display center" style={{ fontSize: 28, marginBottom: 16 }}>
               {vraag?.prompt}
             </h2>
-            <div className="col" style={{ gap: 10 }}>
+            <div className="col" style={{ gap: 8 }}>
               {vraag?.opties.map((opt, i) => {
                 const vast = gekozen !== null
                 const kleur = !vast ? '' : i === vraag.juist ? 'correct' : i === gekozen ? 'wrong' : ''
@@ -640,7 +640,7 @@ export function ArenaScreen({
             </div>
         </div>
 
-        <div style={{ minHeight: 34, marginTop: 14 }} className="center">
+        <div style={{ minHeight: 34, marginTop: 12 }} className="center">
           {botDenkt && (
             /* Wat hij voelt hoort zichtbaar te zijn. Aarzelt hij, dan weet je
                dat je hem hebt; versnelt hij, dan weet je dat hij bloed ruikt.
@@ -661,7 +661,7 @@ export function ArenaScreen({
             </p>
           )}
           {melding && (
-            <motion.p initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="dim" style={{ fontSize: 13, fontWeight: 600 }}>
+            <motion.p initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="dim" style={{ fontSize: 12.5, fontWeight: 600 }}>
               {melding}
             </motion.p>
           )}
@@ -669,7 +669,7 @@ export function ArenaScreen({
       </div>
 
       <div className="center">
-        <span className="faint row" style={{ fontSize: 11.5, gap: 6, justifyContent: 'center' }}>
+        <span className="faint row" style={{ fontSize: 11, gap: 4, justifyContent: 'center' }}>
           <Flag code={courseFlagCode[courseId]} size={13} /> {rang.emoji} {rang.naam} · verliezen kost hier nooit je voortgang
         </span>
       </div>

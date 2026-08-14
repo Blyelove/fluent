@@ -286,12 +286,12 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
     return (
       <div className="shell">
         <p className="eyebrow">Oefenen</p>
-        <h1 className="display" style={{ fontSize: 30, margin: '8px 0 20px' }}>
+        <h1 className="display" style={{ fontSize: 28, margin: '8px 0 20px' }}>
           Train jezelf
         </h1>
 
         {onPraten && (
-          <button className="glass row" onClick={() => { sfx('tap'); onPraten() }} style={{ gap: 14, padding: 18, marginBottom: 16, width: '100%', textAlign: 'left', alignItems: 'center' }}>
+          <button className="glass row" onClick={() => { sfx('tap'); onPraten() }} style={{ gap: 12, padding: 16, marginBottom: 16, width: '100%', textAlign: 'left', alignItems: 'center' }}>
             <span
               style={{
                 width: 46,
@@ -310,11 +310,11 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
             </span>
             <span className="col" style={{ flex: 1, minWidth: 0 }}>
               <strong style={{ fontSize: 16 }}>Gesprekken</strong>
-              <span className="dim" style={{ fontSize: 13 }}>
+              <span className="dim" style={{ fontSize: 12.5 }}>
                 Voer een echt gesprek, met je stem of met keuzes
               </span>
             </span>
-            <span className="dim" style={{ fontSize: 20, flexShrink: 0 }}>
+            <span className="dim" style={{ fontSize: 19, flexShrink: 0 }}>
               ›
             </span>
           </button>
@@ -322,9 +322,9 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
 
         {mijnFouten.length > 0 && (
           // dé held van de hub: dit is wat je NU moet doen
-          <div className="card-hero" style={{ padding: 22, marginBottom: 16 }}>
+          <div className="card-hero" style={{ padding: 24, marginBottom: 16 }}>
             <div className="spread">
-              <span className="row" style={{ gap: 10 }}>
+              <span className="row" style={{ gap: 8 }}>
                 <span style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(236,72,153,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🎯</span>
                 <strong className="card-title">Jouw fouten</strong>
               </span>
@@ -332,16 +332,16 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
                 {mijnFouten.length}
               </span>
             </div>
-            <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 12px' }}>
+            <p className="dim" style={{ fontSize: 14, margin: '8px 0 12px' }}>
               Precies de vragen waar jij op struikelde, de hardnekkigste eerst. Heb je er één goed, dan verdwijnt hij uit je lijst,
               en fouten wegwerken levert dubbele punten op.
             </p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 14 }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 12 }}>
               {[...new Set(mijnFouten.map((f) => f.bron))].slice(0, 4).map((b) => (
                 <span
                   key={b}
                   className="faint"
-                  style={{ fontSize: 11.5, padding: '4px 10px', borderRadius: 999, border: '1px solid var(--line)' }}
+                  style={{ fontSize: 11, padding: '4px 10px', borderRadius: 999, border: '1px solid var(--line)' }}
                 >
                   {b}
                 </span>
@@ -358,15 +358,15 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
           </div>
         )}
 
-        <div className={mijnFouten.length === 0 && due.length > 0 ? 'card-hero' : 'glass'} style={{ padding: 22, marginBottom: 16 }}>
+        <div className={mijnFouten.length === 0 && due.length > 0 ? 'card-hero' : 'glass'} style={{ padding: 24, marginBottom: 16 }}>
           <div className="spread">
-            <span className="row" style={{ gap: 10 }}>
+            <span className="row" style={{ gap: 8 }}>
               <span style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(168,85,247,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🧠</span>
               <strong className="card-title">Herhaling</strong>
             </span>
             {due.length > 0 && <span className="gold-text num" style={{ fontWeight: 700 }}>{due.length} klaar</span>}
           </div>
-          <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 14px' }}>
+          <p className="dim" style={{ fontSize: 14, margin: '8px 0 14px' }}>
             {due.length > 0
               ? 'Herhaal op het perfecte moment, vlak voordat je vergeet. Zo blijft alles hangen.'
               : allCards.length === 0
@@ -399,22 +399,22 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
           )}
         </div>
 
-        <div className="glass" style={{ padding: 22 }}>
-          <span className="row" style={{ gap: 10 }}>
+        <div className="glass" style={{ padding: 24 }}>
+          <span className="row" style={{ gap: 8 }}>
             <span style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(34,211,238,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>📝</span>
             <strong className="card-title">Eigen toets</strong>
           </span>
-          <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 12px' }}>
+          <p className="dim" style={{ fontSize: 14, margin: '8px 0 12px' }}>
             {geleerdeUnits.size === 0
               ? 'Zodra je je eerste les hebt gedaan, kun je hier een eigen toets bouwen over wat je geleerd hebt.'
               : 'Kies zelf je onderwerpen, wij bouwen de toets. Haal 80% goed en je slaagt: dubbele punten plus bonus.'}
           </p>
           {slotHint && (
-            <p className="dim" style={{ fontSize: 12.5, marginBottom: 10 }}>
+            <p className="dim" style={{ fontSize: 12.5, marginBottom: 8 }}>
               🔒 {slotHint}
             </p>
           )}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 14 }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
             {allUnits.map((u) => {
               const on = pickedUnits.includes(u.id)
               // nooit gestart? dan is toetsen zinloos, dus grijs en niet kiesbaar
@@ -456,15 +456,15 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
           </button>
           {recentTests.length > 0 && (
             <div style={{ marginTop: 16, borderTop: '1.5px solid var(--line)', paddingTop: 10 }}>
-              <p className="eyebrow" style={{ fontSize: 10.5, marginBottom: 6 }}>
+              <p className="eyebrow" style={{ fontSize: 11, marginBottom: 4 }}>
                 Laatste toetsen
               </p>
               {recentTests.map((t, i) => (
                 <div className="spread" key={i} style={{ padding: '5px 0' }}>
-                  <span className="dim" style={{ fontSize: 13 }}>
+                  <span className="dim" style={{ fontSize: 12.5 }}>
                     {t.label}
                   </span>
-                  <span style={{ fontSize: 13, fontWeight: 800, color: t.passed ? 'var(--ok)' : 'var(--err)' }}>
+                  <span style={{ fontSize: 12.5, fontWeight: 800, color: t.passed ? 'var(--ok)' : 'var(--err)' }}>
                     {t.score}/{t.total} {t.passed ? '✓' : '✗'}
                   </span>
                 </div>
@@ -515,14 +515,14 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
             </span>
           </p>
           {phase.mode === 'fouten' && (
-            <p className="faint" style={{ fontSize: 13, marginTop: 6 }}>
+            <p className="faint" style={{ fontSize: 12.5, marginTop: 4 }}>
               {phase.correct === phase.total
                 ? 'Deze vragen staan niet meer op je foutenlijst.'
                 : `${phase.correct} van je fouten zijn weg. De rest komt terug tot je ze beheerst.`}
             </p>
           )}
           {phase.mode === 'test' && !phase.passed && (
-            <p className="faint" style={{ fontSize: 13, marginTop: 6 }}>
+            <p className="faint" style={{ fontSize: 12.5, marginTop: 4 }}>
               Nog {Math.max(1, Math.ceil(phase.total * 0.8) - phase.correct)} goede antwoorden en je was geslaagd. Zo weer gedaan.
             </p>
           )}
@@ -531,7 +531,7 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
             {phase.mode === 'test' && !phase.passed && phase.units && phase.units.length > 0 && (
               <button
                 className="btn btn-primary"
-                style={{ marginBottom: 10 }}
+                style={{ marginBottom: 8 }}
                 onClick={() => {
                   sfx('tap')
                   startTest(phase.units ?? [])
@@ -542,7 +542,7 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
             )}
             {/* nog fouten over? dan meteen nog een ronde */}
             {phase.mode === 'fouten' && phase.correct < phase.total && (
-              <button className="btn btn-primary" style={{ marginBottom: 10 }} onClick={startFouten}>
+              <button className="btn btn-primary" style={{ marginBottom: 8 }} onClick={startFouten}>
                 ↻ Nog een ronde
               </button>
             )}
@@ -586,17 +586,17 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="display" style={{ fontSize: 24, marginBottom: 6 }}>
+              <h3 className="display" style={{ fontSize: 23, marginBottom: 4 }}>
                 Even pauze?
               </h3>
-              <p className="dim" style={{ fontSize: 14.5, marginBottom: 18 }}>
+              <p className="dim" style={{ fontSize: 14, marginBottom: 16 }}>
                 {restVragen === 1
                   ? 'Nog één vraag en je bent er. Zonde om nu te stoppen.'
                   : `Nog ${restVragen} vragen en je bent er. Stop je nu, dan telt deze sessie niet mee.`}
               </p>
               <button
                 className="btn btn-primary"
-                style={{ padding: 15, fontSize: 15.5, marginBottom: 10 }}
+                style={{ padding: 16, fontSize: 16, marginBottom: 8 }}
                 onClick={() => {
                   sfx('tap')
                   setPauze(false)
@@ -622,7 +622,7 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
       <div className="lesson-top">
         <button
           className="btn-quiet"
-          style={{ padding: 8, fontSize: 22, lineHeight: 1, minWidth: 44, minHeight: 44 }}
+          style={{ padding: 8, fontSize: 23, lineHeight: 1, minWidth: 44, minHeight: 44 }}
           onClick={() => (idx > 0 ? setPauze(true) : setPhase({ name: 'hub' }))}
           aria-label="Stoppen"
         >
@@ -638,7 +638,7 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
             transition={{ type: 'spring', stiffness: 160, damping: 22 }}
           />
         </div>
-        <span className="faint" style={{ fontSize: 13, fontWeight: 700 }}>
+        <span className="faint" style={{ fontSize: 12.5, fontWeight: 700 }}>
           {idx + 1}/{phase.items.length}
         </span>
       </div>
@@ -664,7 +664,7 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
           ) : (
             <motion.div key="fb" initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 30, opacity: 0 }} transition={{ duration: 0.18 }}>
               <div className={`sheet-inner ${answered.correct ? 'good' : 'bad'}`}>
-                <p className={`feedback-title ${answered.correct ? 'ok-text' : 'err-text'}`} style={{ marginBottom: 10 }}>
+                <p className={`feedback-title ${answered.correct ? 'ok-text' : 'err-text'}`} style={{ marginBottom: 8 }}>
                   {answered.correct
                     ? phase.mode === 'fouten'
                       ? 'Rechtgezet!'
@@ -678,12 +678,12 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
                         : 'Helaas.'}
                 </p>
                 {!answered.correct && answered.correctAnswer && (
-                  <p className="dim" style={{ fontSize: 15, marginBottom: 10, marginTop: -6 }}>
+                  <p className="dim" style={{ fontSize: 14, marginBottom: 8, marginTop: -6 }}>
                     Juiste antwoord: <strong style={{ color: 'var(--text)' }}>{answered.correctAnswer}</strong>
                   </p>
                 )}
                 {answered.correct && answered.spellingTip && (
-                  <p className="dim" style={{ fontSize: 15, marginBottom: 10, marginTop: -6 }}>
+                  <p className="dim" style={{ fontSize: 14, marginBottom: 8, marginTop: -6 }}>
                     Let op de spelling: <strong style={{ color: 'var(--text)' }}>{answered.spellingTip}</strong>
                   </p>
                 )}

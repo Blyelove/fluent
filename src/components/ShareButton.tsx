@@ -46,7 +46,7 @@ export function ShareButton({
   return (
     <button
       className={variant === 'primary' ? 'btn btn-primary' : 'btn btn-ghost'}
-      style={{ fontSize: 14.5, padding: 13, ...style }}
+      style={{ fontSize: 14, padding: 12, ...style }}
       disabled={status === 'bezig'}
       onClick={() => {
         sfx('tap')

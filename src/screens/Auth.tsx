@@ -70,7 +70,7 @@ export function AuthScreen() {
       <div className="ambient-orb orb-a" />
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
         <div className="center">
-          <h1 className="display hot-text" style={{ fontSize: 46, margin: '0 0 2px' }}>
+          <h1 className="display hot-text" style={{ fontSize: 48, margin: '0 0 2px' }}>
             Fluent
           </h1>
           <p className="dim" style={{ fontSize: 14, marginBottom: 16 }}>
@@ -84,7 +84,7 @@ export function AuthScreen() {
             <div style={{ display: 'flex', justifyContent: 'center' }}>
               <Avatar size={84} look={look} />
             </div>
-            <p className="dim" style={{ fontSize: 13, margin: '8px 0 12px' }}>
+            <p className="dim" style={{ fontSize: 12.5, margin: '8px 0 12px' }}>
               Dit is jouw startheld. Aanpassen kan altijd, met meer dan 300.000 combinaties.
             </p>
             <motion.button
@@ -98,13 +98,13 @@ export function AuthScreen() {
             >
               ▶ Start direct, zonder account
             </motion.button>
-            <p className="faint" style={{ fontSize: 11.5, marginTop: 8 }}>
+            <p className="faint" style={{ fontSize: 11, marginTop: 8 }}>
               Je voortgang wordt op dit apparaat bewaard. Een account maken kan altijd nog.
             </p>
           </div>
         )}
 
-        <div className="row" style={{ gap: 8, marginBottom: 14 }}>
+        <div className="row" style={{ gap: 8, marginBottom: 12 }}>
           <button
             type="button"
             className="btn btn-ghost"
@@ -138,7 +138,7 @@ export function AuthScreen() {
             void submit()
           }}
         >
-          <div className="col" style={{ gap: 10 }}>
+          <div className="col" style={{ gap: 8 }}>
             <input
               className="type-input"
               placeholder="E-mailadres"
@@ -162,7 +162,7 @@ export function AuthScreen() {
             />
           </div>
 
-          <button type="button" className="row" style={{ gap: 10, padding: '14px 2px', width: '100%' }} onClick={() => setRemember(!remember)}>
+          <button type="button" className="row" style={{ gap: 8, padding: '14px 2px', width: '100%' }} onClick={() => setRemember(!remember)}>
             <span
               style={{
                 width: 24,
@@ -181,13 +181,13 @@ export function AuthScreen() {
             >
               {remember ? '✓' : ''}
             </span>
-            <span style={{ fontSize: 14.5, fontWeight: 600 }}>Ingelogd blijven</span>
-            <span className="faint" style={{ fontSize: 12 }}>
+            <span style={{ fontSize: 14, fontWeight: 600 }}>Ingelogd blijven</span>
+            <span className="faint" style={{ fontSize: 12.5 }}>
               zo zie je dit scherm nooit meer
             </span>
           </button>
 
-          {error && <p style={{ color: 'var(--err)', fontSize: 14, fontWeight: 600, marginBottom: 10 }}>{error}</p>}
+          {error && <p style={{ color: 'var(--err)', fontSize: 14, fontWeight: 600, marginBottom: 8 }}>{error}</p>}
 
           <button type="submit" className={tab === 'nieuw' ? 'btn btn-ghost' : 'btn btn-primary'} disabled={busy}>
             {tab === 'nieuw' ? 'Account maken met e-mail' : 'Inloggen'}

@@ -326,7 +326,7 @@ export function WorldMapScreen({
       >
         <button
           className="btn-quiet"
-          style={{ minWidth: 44, minHeight: 44, fontSize: 21, lineHeight: 1 }}
+          style={{ minWidth: 44, minHeight: 44, fontSize: 19, lineHeight: 1 }}
           onClick={() => {
             sfx('tap')
             onBack()
@@ -336,10 +336,10 @@ export function WorldMapScreen({
           ←
         </button>
         <div className="center">
-          <p className="eyebrow" style={{ fontSize: 10.5 }}>
+          <p className="eyebrow" style={{ fontSize: 11 }}>
             De Wereldreis
           </p>
-          <p className="display" style={{ fontSize: 17 }}>
+          <p className="display" style={{ fontSize: 16 }}>
             {course.name}
           </p>
         </div>
@@ -357,10 +357,10 @@ export function WorldMapScreen({
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 1,
+            gap: 0,
           }}
         >
-          <span style={{ fontSize: 17, lineHeight: 1 }}>🛂</span>
+          <span style={{ fontSize: 16, lineHeight: 1 }}>🛂</span>
           <span className="gold-text" style={{ fontWeight: 800, fontSize: 11 }}>
             {veroverd}/{landen.length}
           </span>
@@ -515,7 +515,7 @@ export function WorldMapScreen({
                         borderRadius: '50%',
                         background: 'var(--grad-gold)',
                         color: 'var(--ink-on-gold)',
-                        fontSize: 13,
+                        fontSize: 12.5,
                         fontWeight: 900,
                         display: 'flex',
                         alignItems: 'center',
@@ -529,7 +529,7 @@ export function WorldMapScreen({
                 </div>
                 <p
                   style={{
-                    marginTop: 7,
+                    marginTop: 8,
                     fontSize: 12.5,
                     fontWeight: 800,
                     color: alsVeroverd ? 'var(--gold)' : k.isVolgende ? 'var(--text)' : 'var(--text-faint)',
@@ -538,7 +538,7 @@ export function WorldMapScreen({
                 >
                   {k.name}
                 </p>
-                <p className="faint" style={{ fontSize: 10.5, marginTop: 1 }}>
+                <p className="faint" style={{ fontSize: 11, marginTop: 0 }}>
                   {alsVeroverd
                     ? 'veroverd'
                     : !k.inCourse
@@ -584,7 +584,7 @@ export function WorldMapScreen({
         >
           <button
             className="btn btn-primary"
-            style={{ padding: 15, fontSize: 15.5 }}
+            style={{ padding: 16, fontSize: 16 }}
             onClick={() => {
               sfx('tap')
               onVerderLeren()
@@ -621,7 +621,7 @@ export function WorldMapScreen({
               whiteSpace: 'nowrap',
             }}
           >
-            <span className="display" style={{ fontSize: 17, color: '#fff' }}>
+            <span className="display" style={{ fontSize: 16, color: '#fff' }}>
               🏆 {banner}
             </span>
           </motion.div>
@@ -649,10 +649,10 @@ export function WorldMapScreen({
               style={{ maxHeight: '82dvh', overflowY: 'auto' }}
               // eigen scrollvak: het paspoort kan lang worden
             >
-              <h3 className="display" style={{ fontSize: 24, marginBottom: 4 }}>
+              <h3 className="display" style={{ fontSize: 23, marginBottom: 4 }}>
                 🛂 Jouw paspoort
               </h3>
-              <p className="dim" style={{ fontSize: 13.5, marginBottom: 18 }}>
+              <p className="dim" style={{ fontSize: 14, marginBottom: 16 }}>
                 {aantalStempels === 0
                   ? 'Nog geen stempels. Versla een Poortwachter en je eerste stempel staat erin.'
                   : `${aantalStempels} van de ${landen.length} stempels. Elke Grensproef die je doorstaat laat een afdruk achter.`}
@@ -661,7 +661,7 @@ export function WorldMapScreen({
                 style={{
                   display: 'grid',
                   gridTemplateColumns: 'repeat(3, 1fr)',
-                  gap: 14,
+                  gap: 12,
                   justifyItems: 'center',
                   marginBottom: 16,
                 }}
@@ -703,7 +703,7 @@ export function WorldMapScreen({
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="row" style={{ gap: 14, marginBottom: 12 }}>
+              <div className="row" style={{ gap: 12, marginBottom: 12 }}>
                 <div
                   style={{
                     width: 56,
@@ -722,18 +722,18 @@ export function WorldMapScreen({
                   <Flag code={gekozen.code} size={36} />
                 </div>
                 <div>
-                  <h3 className="display" style={{ fontSize: 24 }}>
+                  <h3 className="display" style={{ fontSize: 23 }}>
                     {gekozen.name}
                   </h3>
                   {gekozen.conquered ? (
                     <span
                       className="gold-text"
-                      style={{ fontSize: 13, fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: 5 }}
+                      style={{ fontSize: 12.5, fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: 4 }}
                     >
                       🏆 Veroverd
                     </span>
                   ) : (
-                    <span className="dim" style={{ fontSize: 13 }}>
+                    <span className="dim" style={{ fontSize: 12.5 }}>
                       {gekozen.inCourse ? `Etappe ${gekozen.threshold} lessen` : 'Toekomstige bestemming'}
                     </span>
                   )}
@@ -742,7 +742,7 @@ export function WorldMapScreen({
 
               {gekozen.conquered ? (
                 <>
-                  <p className="dim" style={{ fontSize: 14, marginBottom: 14 }}>
+                  <p className="dim" style={{ fontSize: 14, marginBottom: 12 }}>
                     {stempels[gekozen.code]
                       ? `Grensproef doorstaan op ${stempels[gekozen.code]}. Dit land kent jou.`
                       : `Veroverd na ${gekozen.threshold} lessen. De Poortwachter wacht nog op je.`}
@@ -750,7 +750,7 @@ export function WorldMapScreen({
                   {/* de eindbaas: pure glorie, je kunt hier niets verliezen */}
                   <button
                     className="btn btn-primary"
-                    style={{ padding: 15, fontSize: 15.5, marginBottom: 10 }}
+                    style={{ padding: 16, fontSize: 16, marginBottom: 8 }}
                     onClick={() => {
                       sfx('tap')
                       setProef(gekozen)
@@ -762,7 +762,7 @@ export function WorldMapScreen({
                 </>
               ) : gekozen.isVolgende ? (
                 <>
-                  <p className="dim" style={{ fontSize: 14, marginBottom: 10 }}>
+                  <p className="dim" style={{ fontSize: 14, marginBottom: 8 }}>
                     Jouw volgende bestemming. Nog{' '}
                     <strong style={{ color: 'var(--gold)' }}>
                       {Math.max(0, gekozen.threshold - completedCount)}{' '}
@@ -779,7 +779,7 @@ export function WorldMapScreen({
                   {onVerderLeren && (
                     <button
                       className="btn btn-primary"
-                      style={{ padding: 15, fontSize: 15.5, marginBottom: 10 }}
+                      style={{ padding: 16, fontSize: 16, marginBottom: 8 }}
                       onClick={() => {
                         sfx('tap')
                         setGekozen(null)

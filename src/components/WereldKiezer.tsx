@@ -40,7 +40,7 @@ export function WereldKiezer() {
               <span key={c} style={{ width: 9, height: 18, background: c, borderTopLeftRadius: i === 0 ? 5 : 0, borderBottomLeftRadius: i === 0 ? 5 : 0, borderTopRightRadius: i === 2 ? 5 : 0, borderBottomRightRadius: i === 2 ? 5 : 0 }} />
             ))}
           </span>
-          <span className="dim" style={{ fontSize: 13.5 }}>{huidig?.naam ?? 'Neon arcade'}</span>
+          <span className="dim" style={{ fontSize: 14 }}>{huidig?.naam ?? 'Neon arcade'}</span>
           <span className="faint" style={{ fontSize: 16 }}>›</span>
         </span>
       </button>
@@ -63,7 +63,7 @@ export function WereldKiezer() {
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="display" style={{ fontSize: 23, marginBottom: 2 }}>
+              <h3 className="display" style={{ fontSize: 23, marginBottom: 0 }}>
                 🎨 Kies je taalwereld
               </h3>
               <p className="dim" style={{ fontSize: 12.5, marginBottom: 12 }}>
@@ -73,12 +73,12 @@ export function WereldKiezer() {
 
               {/* voor en na, naast elkaar en levend: links de oude wereld die
                   voor elke taal hetzelfde was, rechts die van jouw taal nu */}
-              <div className="row" style={{ gap: 10, marginBottom: 12, alignItems: 'stretch' }}>
+              <div className="row" style={{ gap: 8, marginBottom: 12, alignItems: 'stretch' }}>
                 {[
                   { id: 'neon', label: 'Voor', sub: 'Gelijk voor elke taal' },
                   { id: actiefId, label: 'Na', sub: huidig?.naam ?? 'Neon arcade' },
                 ].map((v, i) => (
-                  <div key={v.label} className="col" style={{ flex: 1, gap: 5, minWidth: 0 }}>
+                  <div key={v.label} className="col" style={{ flex: 1, gap: 4, minWidth: 0 }}>
                     <span data-wereld={v.id === 'neon' ? undefined : v.id} style={{ display: 'block' }}>
                       <span
                         style={{
@@ -125,11 +125,11 @@ export function WereldKiezer() {
               <div className="glass" style={{ padding: '11px 13px', marginBottom: 12 }}>
                 <div className="spread">
                   <span style={{ fontSize: 12.5, fontWeight: 600 }}>Rijkdom van je wereld</span>
-                  <span className="gold-text num" style={{ fontWeight: 800, fontSize: 13 }}>
+                  <span className="gold-text num" style={{ fontWeight: 800, fontSize: 12.5 }}>
                     {trap} / 5
                   </span>
                 </div>
-                <div className="row" style={{ gap: 4, marginTop: 7 }}>
+                <div className="row" style={{ gap: 4, marginTop: 8 }}>
                   {[1, 2, 3, 4, 5].map((t) => (
                     <span
                       key={t}
@@ -142,13 +142,13 @@ export function WereldKiezer() {
                     />
                   ))}
                 </div>
-                <p className="faint" style={{ fontSize: 11, marginTop: 6 }}>
+                <p className="faint" style={{ fontSize: 11, marginTop: 4 }}>
                   Niveau {niveau} in het {courses[taal].name}. Hoe dichter bij 99, hoe voller je wereld wordt: het ornament komt op,
                   het licht wordt dieper.
                 </p>
               </div>
 
-              <div className="col" style={{ gap: 9 }}>
+              <div className="col" style={{ gap: 8 }}>
                 {/* automatisch: de app volgt gewoon de taal die je leert */}
                 <button
                   onClick={() => { sfx('tap'); setWereld('') }}
@@ -164,10 +164,10 @@ export function WereldKiezer() {
                     boxShadow: wereld === '' ? 'var(--glow-hot)' : undefined,
                   }}
                 >
-                  <span style={{ fontSize: 22, flexShrink: 0, width: 45, textAlign: 'center' }}>🌍</span>
-                  <span className="col" style={{ flex: 1, minWidth: 0, gap: 1 }}>
+                  <span style={{ fontSize: 23, flexShrink: 0, width: 45, textAlign: 'center' }}>🌍</span>
+                  <span className="col" style={{ flex: 1, minWidth: 0, gap: 0 }}>
                     <strong className="card-title">Volg mijn taal</strong>
-                    <span className="faint" style={{ fontSize: 12 }}>
+                    <span className="faint" style={{ fontSize: 12.5 }}>
                       De app kiest de wereld die bij je taal hoort
                     </span>
                   </span>
@@ -237,9 +237,9 @@ export function WereldKiezer() {
                           <span style={{ position: 'absolute', right: 6, bottom: 6, width: 12, height: 9, borderRadius: 999, background: 'var(--grad-gold)' }} />
                         </span>
                       </span>
-                      <span className="col" style={{ flex: 1, minWidth: 0, gap: 1 }}>
+                      <span className="col" style={{ flex: 1, minWidth: 0, gap: 0 }}>
                         <strong className="card-title">{w.naam}</strong>
-                        <span className="faint" style={{ fontSize: 12 }}>
+                        <span className="faint" style={{ fontSize: 12.5 }}>
                           {w.herkomst}
                         </span>
                       </span>
@@ -253,11 +253,11 @@ export function WereldKiezer() {
                 })}
               </div>
 
-              <p className="faint center" style={{ fontSize: 11.5, marginTop: 12 }}>
+              <p className="faint center" style={{ fontSize: 11, marginTop: 12 }}>
                 Nu aan: {huidig?.naam ?? 'Neon arcade'}
                 {wereld === '' ? ', automatisch gekozen bij je taal' : ', jouw eigen keuze'}
               </p>
-              <button className="btn btn-ghost" style={{ marginTop: 10, padding: 12, fontSize: 14 }} onClick={() => { sfx('tap'); setOpen(false) }}>
+              <button className="btn btn-ghost" style={{ marginTop: 8, padding: 12, fontSize: 14 }} onClick={() => { sfx('tap'); setOpen(false) }}>
                 Sluiten en rondkijken
               </button>
             </motion.div>

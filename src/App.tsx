@@ -242,7 +242,7 @@ export default function App() {
             onClick={() => void updateServiceWorker(true)}
             className="row"
             style={{
-              gap: 10,
+              gap: 8,
               padding: '12px 18px',
               borderRadius: 999,
               background: 'var(--grad-gold)',

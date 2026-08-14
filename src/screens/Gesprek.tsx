@@ -254,7 +254,7 @@ function ChatKop({
 }) {
   return (
     <header className="row" style={{ gap: 12, paddingBottom: 12, borderBottom: '1px solid var(--line)' }}>
-      <button onClick={() => { sfx('tap'); onTerug() }} aria-label="Terug" style={{ minWidth: 44, minHeight: 44, fontSize: 22 }}>
+      <button onClick={() => { sfx('tap'); onTerug() }} aria-label="Terug" style={{ minWidth: 44, minHeight: 44, fontSize: 23 }}>
         ←
       </button>
       <PartnerKop naam={partner} code={vlag} />
@@ -268,7 +268,7 @@ function ChatKop({
         onClick={() => { sfx('tap'); opVertaling() }}
         className={vertaling ? 'gold-text' : 'dim'}
         aria-label="Vertaling aan of uit"
-        style={{ minWidth: 44, minHeight: 44, fontWeight: 800, fontSize: 13, border: '1.5px solid', borderColor: vertaling ? 'var(--gold)' : 'var(--line)', borderRadius: 12 }}
+        style={{ minWidth: 44, minHeight: 44, fontWeight: 800, fontSize: 12.5, border: '1.5px solid', borderColor: vertaling ? 'var(--gold)' : 'var(--line)', borderRadius: 12 }}
       >
         NL
       </button>
@@ -310,7 +310,7 @@ function Berichtenlijst({
               maxWidth: '78%',
               textAlign: 'left',
               padding: '11px 14px',
-              fontSize: 15.5,
+              fontSize: 16,
               lineHeight: 1.4,
               borderRadius: b.van === 'ik' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
               background: b.van === 'ik' ? 'linear-gradient(135deg, var(--hot1), var(--hot2))' : 'var(--surface-2)',
@@ -319,10 +319,10 @@ function Berichtenlijst({
               cursor: b.van === 'partner' ? 'pointer' : 'default',
             }}
           >
-            {b.gesproken && <span style={{ marginRight: 6 }}>🎤</span>}
+            {b.gesproken && <span style={{ marginRight: 4 }}>🎤</span>}
             {b.tekst}
             {vertaling && (
-              <span className="dim" style={{ display: 'block', fontSize: 12.5, marginTop: 3 }}>
+              <span className="dim" style={{ display: 'block', fontSize: 12.5, marginTop: 4 }}>
                 {b.nl}
               </span>
             )}
@@ -380,10 +380,10 @@ function AntwoordPaneel({
               key={a.tekst}
               className="glass"
               onClick={() => onKies(a)}
-              style={{ padding: '11px 14px', textAlign: 'left', fontSize: 15, minHeight: 44 }}
+              style={{ padding: '11px 14px', textAlign: 'left', fontSize: 14, minHeight: 44 }}
             >
               {a.tekst}
-              <span className="faint" style={{ display: 'block', fontSize: 12 }}>
+              <span className="faint" style={{ display: 'block', fontSize: 12.5 }}>
                 {a.nl}
               </span>
             </button>
@@ -396,7 +396,7 @@ function AntwoordPaneel({
             style={{
               width: 62,
               borderRadius: 18,
-              fontSize: 24,
+              fontSize: 23,
               background: luistert ? 'linear-gradient(135deg, var(--hot1), var(--hot2))' : 'var(--surface-2)',
               border: luistert ? 'none' : '1.5px solid var(--line)',
               boxShadow: luistert ? '0 0 18px rgba(236, 72, 153, 0.55)' : 'none',
@@ -412,7 +412,7 @@ function AntwoordPaneel({
           </button>
         )}
       </div>
-      <p className="faint center" style={{ fontSize: 11.5 }}>
+      <p className="faint center" style={{ fontSize: 11 }}>
         {kanSpreken ? 'Tik een antwoord of spreek het in met de microfoon' : 'Tik het antwoord dat jij zou geven'}
       </p>
     </div>
@@ -438,16 +438,16 @@ function KlaarKaart({
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       className="glass center col"
-      style={{ gap: 10, padding: 20, marginTop: 10, borderColor: 'var(--line-gold)' }}
+      style={{ gap: 8, padding: 16, marginTop: 8, borderColor: 'var(--line-gold)' }}
     >
       <span style={{ fontSize: 34 }}>{emoji}</span>
-      <strong className="display" style={{ fontSize: 20 }}>
+      <strong className="display" style={{ fontSize: 19 }}>
         {titel}
       </strong>
-      <span className="gold-text" style={{ fontWeight: 900, fontSize: 24 }}>
+      <span className="gold-text" style={{ fontWeight: 900, fontSize: 23 }}>
         +{xp} XP
       </span>
-      <p className="dim" style={{ fontSize: 13.5 }}>
+      <p className="dim" style={{ fontSize: 14 }}>
         {tekst}
       </p>
       {children}
@@ -556,8 +556,8 @@ function GesprekSpeler({
       </div>
 
       {/* het gesprek */}
-      <div ref={scroller} style={{ flex: 1, overflowY: 'auto', padding: '16px 2px', display: 'flex', flexDirection: 'column', gap: 10 }} className="no-scrollbar">
-        <p className="faint center" style={{ fontSize: 12.5, marginBottom: 6 }}>
+      <div ref={scroller} style={{ flex: 1, overflowY: 'auto', padding: '16px 2px', display: 'flex', flexDirection: 'column', gap: 8 }} className="no-scrollbar">
+        <p className="faint center" style={{ fontSize: 12.5, marginBottom: 4 }}>
           {scenario.emoji} {scenario.plek}
         </p>
         <Berichtenlijst berichten={berichten} typend={typend} partner={scenario.partner} vlag={vlag} ttsLang={course.ttsLang} vertaling={vertaling} />
@@ -574,7 +574,7 @@ function GesprekSpeler({
               {volgende && onVolgende ? (
                 <>
                   {/* het volgende gesprek staat al klaar: de lus blijft draaien */}
-                  <button className="btn btn-primary" style={{ padding: 13 }} onClick={() => { sfx('tap'); onVolgende(volgende) }}>
+                  <button className="btn btn-primary" style={{ padding: 12 }} onClick={() => { sfx('tap'); onVolgende(volgende) }}>
                     {volgende.emoji} Volgende gesprek: {volgende.titel}
                   </button>
                   <button className="dim" style={{ minHeight: 44, fontSize: 14 }} onClick={() => { sfx('tap'); onTerug() }}>
@@ -582,7 +582,7 @@ function GesprekSpeler({
                   </button>
                 </>
               ) : (
-                <button className="btn btn-primary" style={{ padding: 13 }} onClick={() => { sfx('tap'); onTerug() }}>
+                <button className="btn btn-primary" style={{ padding: 12 }} onClick={() => { sfx('tap'); onTerug() }}>
                   Verder
                 </button>
               )}
@@ -711,8 +711,8 @@ function VrijSpeler({ onTerug }: { onTerug: () => void }) {
         onTerug={onTerug}
       />
 
-      <div ref={scroller} style={{ flex: 1, overflowY: 'auto', padding: '16px 2px', display: 'flex', flexDirection: 'column', gap: 10 }} className="no-scrollbar">
-        <p className="faint center" style={{ fontSize: 12.5, marginBottom: 6 }}>
+      <div ref={scroller} style={{ flex: 1, overflowY: 'auto', padding: '16px 2px', display: 'flex', flexDirection: 'column', gap: 8 }} className="no-scrollbar">
+        <p className="faint center" style={{ fontSize: 12.5, marginBottom: 4 }}>
           💬 Jij kiest waar dit gesprek over gaat
         </p>
         <Berichtenlijst berichten={berichten} typend={typend} partner={vrij.partner} vlag={vlag} ttsLang={course.ttsLang} vertaling={vertaling} />
@@ -725,7 +725,7 @@ function VrijSpeler({ onTerug }: { onTerug: () => void }) {
               xp={verdiend}
               tekst={`Jullie hadden het over ${gedaan.length} ${gedaan.length === 1 ? 'onderwerp' : 'onderwerpen'}. Volgende keer kiest ${vrij.partner} vast weer iets nieuws uit.`}
             >
-              <button className="btn btn-primary" style={{ padding: 13 }} onClick={() => { sfx('tap'); onTerug() }}>
+              <button className="btn btn-primary" style={{ padding: 12 }} onClick={() => { sfx('tap'); onTerug() }}>
                 Verder
               </button>
             </KlaarKaart>
@@ -750,15 +750,15 @@ function VrijSpeler({ onTerug }: { onTerug: () => void }) {
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
             {openOnderwerpen.map((o) => (
-              <button key={o.id} className="glass col center" onClick={() => kiesOnderwerp(o)} style={{ gap: 3, padding: '10px 6px', minHeight: 56 }}>
-                <span style={{ fontSize: 20 }}>{o.emoji}</span>
-                <span style={{ fontSize: 12, fontWeight: 700 }}>{o.titel}</span>
+              <button key={o.id} className="glass col center" onClick={() => kiesOnderwerp(o)} style={{ gap: 4, padding: '10px 6px', minHeight: 56 }}>
+                <span style={{ fontSize: 19 }}>{o.emoji}</span>
+                <span style={{ fontSize: 12.5, fontWeight: 700 }}>{o.titel}</span>
               </button>
             ))}
             {gedaan.length > 0 && (
-              <button className="glass col center" onClick={rondAf} style={{ gap: 3, padding: '10px 6px', minHeight: 56, borderColor: 'var(--line-gold)' }}>
-                <span style={{ fontSize: 20 }}>🏁</span>
-                <span className="gold-text" style={{ fontSize: 12, fontWeight: 800 }}>Afronden</span>
+              <button className="glass col center" onClick={rondAf} style={{ gap: 4, padding: '10px 6px', minHeight: 56, borderColor: 'var(--line-gold)' }}>
+                <span style={{ fontSize: 19 }}>🏁</span>
+                <span className="gold-text" style={{ fontSize: 12.5, fontWeight: 800 }}>Afronden</span>
               </button>
             )}
           </div>
@@ -799,15 +799,15 @@ export function GesprekkenScreen({ onExit }: { onExit: () => void }) {
 
   return (
     <div className="shell shell--bare">
-      <header className="row" style={{ gap: 10, marginBottom: 6 }}>
-        <button onClick={() => { sfx('tap'); onExit() }} aria-label="Terug" style={{ minWidth: 44, minHeight: 44, fontSize: 22 }}>
+      <header className="row" style={{ gap: 8, marginBottom: 4 }}>
+        <button onClick={() => { sfx('tap'); onExit() }} aria-label="Terug" style={{ minWidth: 44, minHeight: 44, fontSize: 23 }}>
           ←
         </button>
-        <h1 className="display" style={{ fontSize: 26 }}>
+        <h1 className="display" style={{ fontSize: 28 }}>
           🗣️ Gesprekken
         </h1>
       </header>
-      <p className="dim" style={{ fontSize: 14, marginBottom: 14 }}>
+      <p className="dim" style={{ fontSize: 14, marginBottom: 12 }}>
         Praat écht in het {course.name}: jouw partner spreekt met een moedertaalstem en jij antwoordt door te kiezen of in te
         spreken. Fout bestaat hier niet.
       </p>
@@ -816,11 +816,11 @@ export function GesprekkenScreen({ onExit }: { onExit: () => void }) {
         const totaal = scenarios.length + 1
         const aantal = Math.min(klaar.length, totaal)
         return (
-          <div style={{ marginBottom: 18 }}>
+          <div style={{ marginBottom: 16 }}>
             <div className="progress-track" style={{ height: 6 }}>
               <div className="progress-fill" style={{ width: `${Math.round((aantal / totaal) * 100)}%` }} />
             </div>
-            <p className="faint num" style={{ fontSize: 12, marginTop: 5 }}>
+            <p className="faint num" style={{ fontSize: 12.5, marginTop: 4 }}>
               {aantal} van {totaal} gesprekken gevoerd
             </p>
           </div>
@@ -832,7 +832,7 @@ export function GesprekkenScreen({ onExit }: { onExit: () => void }) {
           whileTap={{ scale: 0.98 }}
           className="glass row"
           onClick={() => { sfx('tap'); setActief('vrij') }}
-          style={{ gap: 14, padding: 16, textAlign: 'left', alignItems: 'center', borderColor: 'var(--line-hot)', boxShadow: '0 0 20px rgba(236, 72, 153, 0.18)' }}
+          style={{ gap: 12, padding: 16, textAlign: 'left', alignItems: 'center', borderColor: 'var(--line-hot)', boxShadow: '0 0 20px rgba(236, 72, 153, 0.18)' }}
         >
           <PartnerKop naam={vrij.partner} code={vlag} size={46} />
           <div className="col" style={{ flex: 1, minWidth: 0 }}>
@@ -842,12 +842,12 @@ export function GesprekkenScreen({ onExit }: { onExit: () => void }) {
                 NIEUW
               </span>
             </strong>
-            <span className="dim" style={{ fontSize: 13 }}>
+            <span className="dim" style={{ fontSize: 12.5 }}>
               Met {vrij.partner} · elke keer een ander gesprek
             </span>
           </div>
           {/* het vrije gesprek is nooit "af": altijd de uitnodigende chevron */}
-          <span className="dim" style={{ fontSize: 20, flexShrink: 0 }}>
+          <span className="dim" style={{ fontSize: 19, flexShrink: 0 }}>
             ›
           </span>
         </motion.button>
@@ -860,28 +860,28 @@ export function GesprekkenScreen({ onExit }: { onExit: () => void }) {
               whileTap={{ scale: 0.98 }}
               className="glass row"
               onClick={() => { sfx('tap'); setActief(sc) }}
-              style={{ gap: 14, padding: 16, textAlign: 'left', alignItems: 'center', borderColor: af ? 'var(--line-gold)' : undefined }}
+              style={{ gap: 12, padding: 16, textAlign: 'left', alignItems: 'center', borderColor: af ? 'var(--line-gold)' : undefined }}
             >
               <PartnerKop naam={sc.partner} code={vlag} size={46} />
               <div className="col" style={{ flex: 1, minWidth: 0 }}>
                 <strong style={{ fontSize: 16 }}>
                   {sc.emoji} {sc.titel}
                 </strong>
-                <span className="dim" style={{ fontSize: 13 }}>
+                <span className="dim" style={{ fontSize: 12.5 }}>
                   Met {sc.partner} · {sc.plek}
                 </span>
               </div>
               {af ? (
-                <span className="col" style={{ flexShrink: 0, alignItems: 'flex-end', gap: 1 }}>
-                  <span className="gold-text" style={{ fontWeight: 800, fontSize: 13 }}>
+                <span className="col" style={{ flexShrink: 0, alignItems: 'flex-end', gap: 0 }}>
+                  <span className="gold-text" style={{ fontWeight: 800, fontSize: 12.5 }}>
                     ✓ Gevoerd
                   </span>
-                  <span className="faint" style={{ fontSize: 10.5 }}>
+                  <span className="faint" style={{ fontSize: 11 }}>
                     opnieuw voor 10 XP
                   </span>
                 </span>
               ) : (
-                <span className="dim" style={{ fontSize: 20, flexShrink: 0 }}>
+                <span className="dim" style={{ fontSize: 19, flexShrink: 0 }}>
                   ›
                 </span>
               )}
@@ -889,7 +889,7 @@ export function GesprekkenScreen({ onExit }: { onExit: () => void }) {
           )
         })}
       </div>
-      <p className="faint center" style={{ fontSize: 12.5, marginTop: 18 }}>
+      <p className="faint center" style={{ fontSize: 12.5, marginTop: 16 }}>
         Eerste keer 25 XP, daarna 10 XP per gesprek. Er komen er steeds meer bij.
       </p>
     </div>

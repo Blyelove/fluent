@@ -190,7 +190,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
   return (
     <div className="shell" style={{ display: 'flex', flexDirection: 'column' }}>
       <div className="ambient-orb orb-a" />
-      <header className="spread rise" style={{ marginBottom: 22 }}>
+      <header className="spread rise" style={{ marginBottom: 24 }}>
         {/* alleen de vlag als stille wegwijzer: van taal wisselen doe je op je
             profiel, zodat de kop hier ademt */}
         <span className="row" style={{ gap: 8, minHeight: 44, alignItems: 'center' }} aria-label={`Je leert ${course.name}`}>
@@ -201,7 +201,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
           <button
             className="row"
             style={{
-              gap: 5,
+              gap: 4,
               color: streak > 0 ? 'var(--gold-bright)' : 'var(--text-faint)',
               padding: '6px 10px',
               minWidth: 44,
@@ -215,9 +215,9 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
               <FlameIcon />
             </span>
             {streak > 0 ? (
-              <span className="num" style={{ fontWeight: 700, fontSize: 15, color: 'var(--text)' }}>{streak}</span>
+              <span className="num" style={{ fontWeight: 700, fontSize: 14, color: 'var(--text)' }}>{streak}</span>
             ) : (
-              <span className="faint" style={{ fontSize: 12, fontWeight: 700 }}>Start je reeks</span>
+              <span className="faint" style={{ fontSize: 12.5, fontWeight: 700 }}>Start je reeks</span>
             )}
           </button>
           {/* de ring was een dood plaatje; nu opent hij je dagdoel */}
@@ -254,10 +254,10 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
               <h3 className="display" style={{ fontSize: 23, marginBottom: 4 }}>
                 Jouw dagdoel
               </h3>
-              <p className="dim" style={{ fontSize: 13.5, marginBottom: 16 }}>
+              <p className="dim" style={{ fontSize: 14, marginBottom: 16 }}>
                 Vandaag {xpShown} van de {dailyGoalXp} XP. Een doel dat past, haal je vaker.
               </p>
-              <div className="col" style={{ gap: 10 }}>
+              <div className="col" style={{ gap: 8 }}>
                 {DAGDOELEN.map((g) => (
                   <button
                     key={g.xp}
@@ -273,9 +273,9 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                       setDoelOpen(false)
                     }}
                   >
-                    <span className="col" style={{ gap: 2, flex: 1 }}>
+                    <span className="col" style={{ gap: 0, flex: 1 }}>
                       <strong>{g.label}</strong>
-                      <span className="faint" style={{ fontSize: 13 }}>
+                      <span className="faint" style={{ fontSize: 12.5 }}>
                         {g.sub}
                       </span>
                     </span>
@@ -285,7 +285,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                   </button>
                 ))}
               </div>
-              <button className="btn btn-ghost" style={{ marginTop: 14, padding: 12, fontSize: 14 }} onClick={() => setDoelOpen(false)}>
+              <button className="btn btn-ghost" style={{ marginTop: 12, padding: 12, fontSize: 14 }} onClick={() => setDoelOpen(false)}>
                 Sluiten
               </button>
             </motion.div>
@@ -300,7 +300,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
         // secundaire blok, onder de missies
         return (
           <div className="glass" style={{ padding: '10px 16px', marginBottom: 16, order: 1 }}>
-            <div className="row" style={{ gap: 14 }}>
+            <div className="row" style={{ gap: 12 }}>
               {/* op je poppetje drukken opent je vaardigheden, RuneScape-stijl */}
               <button
                 onClick={() => { sfx('tap'); setSkillsOpen(true) }}
@@ -320,7 +320,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                     color: 'var(--ink-on-gold)',
                     fontFamily: 'var(--font-display)',
                     fontWeight: 800,
-                    fontSize: 11.5,
+                    fontSize: 11,
                     boxShadow: '0 0 8px rgba(255,197,61,0.5)',
                   }}
                   title={`${course.name}: level ${skillStand(progressMap[courseId]?.xp ?? 0).level} van 99`}
@@ -333,7 +333,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                   <strong style={{ fontSize: 14 }}>
                     Niveau {lp.level} · {levelTitle(lp.level)}
                   </strong>
-                  <span className="gold-text num" style={{ fontWeight: 700, fontSize: 13 }}>
+                  <span className="gold-text num" style={{ fontWeight: 700, fontSize: 12.5 }}>
                     {xpAll} XP totaal
                   </span>
                 </div>
@@ -363,26 +363,26 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               style={{
-                padding: 20,
-                marginBottom: 18,
+                padding: 16,
+                marginBottom: 16,
                 borderColor: 'var(--line-gold)',
                 background: 'linear-gradient(135deg, rgba(255,197,61,0.16), rgba(236,72,153,0.10))',
               }}
             >
               <div style={{ fontSize: 34, lineHeight: 1 }}>🏆</div>
-              <strong className="display gold-text" style={{ fontSize: 20, display: 'block', margin: '6px 0 4px' }}>
+              <strong className="display gold-text" style={{ fontSize: 19, display: 'block', margin: '6px 0 4px' }}>
                 Alle lessen voltooid!
               </strong>
-              <p className="dim" style={{ fontSize: 13.5, marginBottom: 14 }}>
+              <p className="dim" style={{ fontSize: 14, marginBottom: 12 }}>
                 Je hebt heel {course.name} tot en met A2 uitgespeeld. Houd het scherp met herhaling en minigames. Nieuwe secties zijn in de
                 maak.
               </p>
               <div className="row" style={{ gap: 8 }}>
-                <button className="btn btn-primary" style={{ fontSize: 15 }} onClick={onReview}>
+                <button className="btn btn-primary" style={{ fontSize: 14 }} onClick={onReview}>
                   ↻ Herhalen
                 </button>
                 {onPlay && (
-                  <button className="btn btn-ghost" style={{ fontSize: 15 }} onClick={onPlay}>
+                  <button className="btn btn-ghost" style={{ fontSize: 14 }} onClick={onPlay}>
                     🕹️ Spelen
                   </button>
                 )}
@@ -395,9 +395,9 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
             className="card-hero"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            style={{ padding: '22px 20px', marginBottom: 18 }}
+            style={{ padding: '22px 20px', marginBottom: 16 }}
           >
-            <div className="row" style={{ gap: 12, marginBottom: 14 }}>
+            <div className="row" style={{ gap: 12, marginBottom: 12 }}>
               <span
                 style={{
                   width: 54,
@@ -408,17 +408,17 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: 27,
+                  fontSize: 28,
                   flexShrink: 0,
                 }}
               >
                 {next.unit.icon}
               </span>
-              <span className="col" style={{ gap: 2, flex: 1, minWidth: 0 }}>
-                <span className="eyebrow" style={{ fontSize: 10.5, color: 'var(--hero-eyebrow)' }}>
+              <span className="col" style={{ gap: 0, flex: 1, minWidth: 0 }}>
+                <span className="eyebrow" style={{ fontSize: 11, color: 'var(--hero-eyebrow)' }}>
                   {activeSection.title} · {completed.length === 0 ? 'je eerste les' : 'verder waar je was'}
                 </span>
-                <strong className="display" style={{ fontSize: 21, lineHeight: 1.15 }}>{next.lesson.title}</strong>
+                <strong className="display" style={{ fontSize: 19, lineHeight: 1.15 }}>{next.lesson.title}</strong>
                 <span className="faint" style={{ fontSize: 12.5 }}>
                   {next.unit.title} · les {unitDone + 1} van {next.unit.lessons.length}
                 </span>
@@ -455,10 +455,10 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
               background: 'linear-gradient(135deg, rgba(255,197,61,0.14), rgba(168,85,247,0.10))',
             }}
           >
-            <div className="row" style={{ gap: 12, marginBottom: 10 }}>
-              <span style={{ fontSize: 26, lineHeight: 1 }}>👋</span>
-              <span className="col" style={{ gap: 2, flex: 1 }}>
-                <strong className="display" style={{ fontSize: 17 }}>
+            <div className="row" style={{ gap: 12, marginBottom: 8 }}>
+              <span style={{ fontSize: 28, lineHeight: 1 }}>👋</span>
+              <span className="col" style={{ gap: 0, flex: 1 }}>
+                <strong className="display" style={{ fontSize: 16 }}>
                   Fijn dat je er weer bent
                 </strong>
                 <span className="faint" style={{ fontSize: 12.5 }}>
@@ -466,7 +466,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                 </span>
               </span>
             </div>
-            <p className="dim" style={{ fontSize: 13, marginBottom: 12, lineHeight: 1.5 }}>
+            <p className="dim" style={{ fontSize: 12.5, marginBottom: 12, lineHeight: 1.5 }}>
               {streak > 0
                 ? `Je reeks van ${streak} ${streak === 1 ? 'dag' : 'dagen'} staat nog${freezes > 0 ? ' en je bescherming is intact' : ''}. `
                 : 'Je begint gewoon opnieuw, en dat telt hier net zo hard. '}
@@ -475,7 +475,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
             <div className="col" style={{ gap: 8 }}>
               <button
                 className="btn btn-primary"
-                style={{ fontSize: 15.5 }}
+                style={{ fontSize: 16 }}
                 onClick={() => {
                   sfx('tap')
                   dismissComeback()
@@ -487,7 +487,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
               </button>
               <button
                 className="btn-quiet center"
-                style={{ width: '100%', fontSize: 13, padding: '6px 0 2px' }}
+                style={{ width: '100%', fontSize: 12.5, padding: '6px 0 2px' }}
                 onClick={() => {
                   sfx('tap')
                   dismissComeback()
@@ -542,7 +542,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
             },
           })
         return (
-          <div className="row rise" style={{ gap: 8, marginBottom: 18, '--d': '120ms' } as CSSProperties}>
+          <div className="row rise" style={{ gap: 8, marginBottom: 16, '--d': '120ms' } as CSSProperties}>
             {chips.map((c) => (
               // kleurdiscipline: goud = behaald, cyaan = systeem (oefenen),
               // roze blijft exclusief voor de hero
@@ -551,8 +551,8 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                 className={`chip ${c.klaar ? 'chip--gold' : c.hot ? 'chip--cool' : ''}`}
                 onClick={c.actie}
               >
-                <span style={{ fontSize: 15 }}>{c.icon}</span>
-                <strong className={`num ${c.klaar ? 'gold-text' : ''}`} style={{ fontSize: 13.5, ...(c.hot ? { color: 'var(--cyan)' } : null) }}>
+                <span style={{ fontSize: 14 }}>{c.icon}</span>
+                <strong className={`num ${c.klaar ? 'gold-text' : ''}`} style={{ fontSize: 14, ...(c.hot ? { color: 'var(--cyan)' } : null) }}>
                   {c.label}
                 </strong>
               </button>
@@ -564,12 +564,12 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
       {boostUntil > Date.now() && (
         <div
           className="glass row"
-          style={{ padding: '12px 16px', marginBottom: 14, gap: 10, borderColor: 'var(--line-gold)', boxShadow: '0 0 24px rgba(255,197,61,0.35)' }}
+          style={{ padding: '12px 16px', marginBottom: 12, gap: 8, borderColor: 'var(--line-gold)', boxShadow: '0 0 24px rgba(255,197,61,0.35)' }}
         >
-          <span style={{ fontSize: 22 }}>⚡</span>
-          <span className="col" style={{ gap: 1, flex: 1 }}>
-            <strong className="gold-text" style={{ fontSize: 14.5 }}>Dubbele XP actief!</strong>
-            <span className="faint" style={{ fontSize: 12 }}>
+          <span style={{ fontSize: 23 }}>⚡</span>
+          <span className="col" style={{ gap: 0, flex: 1 }}>
+            <strong className="gold-text" style={{ fontSize: 14 }}>Dubbele XP actief!</strong>
+            <span className="faint" style={{ fontSize: 12.5 }}>
               Nog {Math.max(1, Math.ceil((boostUntil - Date.now()) / 60000))} minuten, speel nu door
             </span>
           </span>
@@ -598,14 +598,14 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
             >
               🏆
             </span>
-            <span className="col" style={{ gap: 2 }}>
-              <strong style={{ fontSize: 14.5 }}>{LEAGUES[leagueId].name}-divisie</strong>
+            <span className="col" style={{ gap: 0 }}>
+              <strong style={{ fontSize: 14 }}>{LEAGUES[leagueId].name}-divisie</strong>
               <span className="faint" style={{ fontSize: 12.5 }}>
                 Plek {leagueRank} van 30 · {weekXp} XP deze week
               </span>
             </span>
           </span>
-          <span className="hot-text" style={{ fontSize: 20, fontWeight: 800 }}>›</span>
+          <span className="hot-text" style={{ fontSize: 19, fontWeight: 800 }}>›</span>
         </button>
       )}
 
@@ -633,7 +633,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
           // het leerpad staan (order 1).
           <div className="glass unit-card rise" id="vandaag" style={{ order: 0, scrollMarginTop: 16, '--d': '180ms' } as CSSProperties}>
             <div className="spread">
-              <span className="row" style={{ gap: 10 }}>
+              <span className="row" style={{ gap: 8 }}>
                 <span style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(255,197,61,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>⚜️</span>
                 <strong className="card-title">Dagelijkse missies</strong>
               </span>
@@ -641,9 +641,9 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                 {doneCount} / 3
               </span>
             </div>
-            <div className="col" style={{ gap: 10, marginTop: 14 }}>
+            <div className="col" style={{ gap: 8, marginTop: 12 }}>
               {quests.map((q) => (
-                <div className="row" key={q.label} style={{ gap: 10 }}>
+                <div className="row" key={q.label} style={{ gap: 8 }}>
                   <span
                     style={{
                       width: 22,
@@ -653,7 +653,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: 12,
+                      fontSize: 12.5,
                       fontWeight: 700,
                       background: q.done ? 'var(--grad-gold)' : 'var(--surface-2)',
                       color: q.done ? 'var(--ink-on-gold)' : 'var(--text-faint)',
@@ -679,7 +679,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                 transition={{ type: 'spring', stiffness: 300, damping: 16 }}
                 className="row"
                 style={{
-                  gap: 10,
+                  gap: 8,
                   marginTop: 12,
                   padding: '10px 12px',
                   borderRadius: 14,
@@ -688,7 +688,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                 }}
               >
                 <motion.span
-                  style={{ fontSize: 22, lineHeight: 1 }}
+                  style={{ fontSize: 23, lineHeight: 1 }}
                   animate={{ rotate: [0, -12, 10, 0] }}
                   transition={{ duration: 0.7, ease: 'easeOut' }}
                 >
@@ -699,7 +699,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                 </span>
               </motion.div>
             ) : (
-              <p className="faint" style={{ fontSize: 12, marginTop: 12 }}>
+              <p className="faint" style={{ fontSize: 12.5, marginTop: 12 }}>
                 Alle drie gehaald = kist: +15 XP én 15 minuten dubbele XP
               </p>
             )}
@@ -720,7 +720,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
         return (
           <div className="glass unit-card" style={alles && !geopend ? { borderColor: 'var(--line-gold)', order: 1 } : { order: 1 }}>
             <div className="spread">
-              <span className="row" style={{ gap: 10 }}>
+              <span className="row" style={{ gap: 8 }}>
                 <span style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(34,211,238,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🎁</span>
                 <strong className="card-title">Weekmissies</strong>
               </span>
@@ -728,14 +728,14 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                 {klaar} / {missies.length}
               </span>
             </div>
-            <div className="col" style={{ gap: 9, marginTop: 13 }}>
+            <div className="col" style={{ gap: 8, marginTop: 12 }}>
               {missies.map((m) => {
                 const done = m.have >= m.need
                 return (
-                  <div className="row" key={m.label} style={{ gap: 10 }}>
+                  <div className="row" key={m.label} style={{ gap: 8 }}>
                     <span style={{ fontSize: 16, width: 22, textAlign: 'center', filter: done ? 'none' : 'grayscale(0.7)' }}>{m.icon}</span>
-                    <span style={{ flex: 1, fontSize: 13.5, fontWeight: 600, color: done ? 'var(--text)' : 'var(--text-dim)' }}>{m.label}</span>
-                    <span className="faint" style={{ fontSize: 11.5, minWidth: 52, textAlign: 'right' }}>
+                    <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: done ? 'var(--text)' : 'var(--text-dim)' }}>{m.label}</span>
+                    <span className="faint" style={{ fontSize: 11, minWidth: 52, textAlign: 'right' }}>
                       {Math.min(m.have, m.need)}/{m.need}
                     </span>
                     <div className="progress-track" style={{ height: 5, width: 52, flex: 'none' }}>
@@ -748,7 +748,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
             {alles && !geopend ? (
               <motion.button
                 className="btn btn-primary"
-                style={{ marginTop: 14 }}
+                style={{ marginTop: 12 }}
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ type: 'spring', stiffness: 260, damping: 14 }}
@@ -761,7 +761,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                 🎁 Open de weekkist · +100 XP
               </motion.button>
             ) : (
-              <p className={geopend ? 'gold-text' : 'faint'} style={{ fontSize: 12, fontWeight: geopend ? 700 : 500, marginTop: 12 }}>
+              <p className={geopend ? 'gold-text' : 'faint'} style={{ fontSize: 12.5, fontWeight: geopend ? 700 : 500, marginTop: 12 }}>
                 {geopend
                   ? '✦ Weekkist geopend: +100 XP en 30 min dubbele XP!'
                   : 'Alle vier gehaald = 100 XP + 30 minuten dubbele XP'}
@@ -780,31 +780,31 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
         return (
           <div className="glass unit-card" style={{ order: 1 }}>
             <div className="spread">
-              <span className="row" style={{ gap: 10 }}>
+              <span className="row" style={{ gap: 8 }}>
                 <span style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(236,72,153,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🎯</span>
                 <strong className="card-title">Jouw doelen</strong>
               </span>
-              <span className="faint num" style={{ fontSize: 13 }}>
+              <span className="faint num" style={{ fontSize: 12.5 }}>
                 {goalsDoneCount} gehaald
               </span>
             </div>
             {goals.length === 0 && (
-              <p className="dim" style={{ fontSize: 13, marginTop: 10 }}>
+              <p className="dim" style={{ fontSize: 12.5, marginTop: 8 }}>
                 Stel jezelf een doel mét deadline. Wie een doel stelt, haalt het vaker, en meestal eerder.
               </p>
             )}
-            <div className="col" style={{ gap: 14, marginTop: 12 }}>
+            <div className="col" style={{ gap: 12, marginTop: 12 }}>
               {goals.map((g) => {
                 const st = goalStatus(g, ctx)
                 const left = daysUntil(g.deadline)
                 return (
                   <div key={g.id}>
-                    <div className="spread" style={{ marginBottom: 5 }}>
+                    <div className="spread" style={{ marginBottom: 4 }}>
                       <span style={{ fontSize: 14, fontWeight: 500 }}>{g.label}</span>
-                      <span className="row" style={{ gap: 6 }}>
+                      <span className="row" style={{ gap: 4 }}>
                         <span
                           style={{
-                            fontSize: 12,
+                            fontSize: 12.5,
                             color: left < 0 ? 'var(--err)' : left <= 1 ? 'var(--gold-bright)' : 'var(--text-faint)',
                             fontWeight: left <= 1 ? 700 : 500,
                           }}
@@ -813,7 +813,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                         </span>
                         <button
                           className="btn-quiet"
-                          style={{ padding: '0 4px', fontSize: 13, lineHeight: 1 }}
+                          style={{ padding: '0 4px', fontSize: 12.5, lineHeight: 1 }}
                           onClick={() => removeGoal(g.id)}
                           aria-label="Doel verwijderen"
                         >
@@ -821,7 +821,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                         </button>
                       </span>
                     </div>
-                    <div className="row" style={{ gap: 10 }}>
+                    <div className="row" style={{ gap: 8 }}>
                       <div className="progress-track" style={{ height: 6 }}>
                         <div className="progress-fill" style={{ width: `${Math.max(3, Math.round(st.frac * 100))}%` }} />
                       </div>
@@ -837,7 +837,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
               })}
             </div>
             {goals.length < 3 && (
-              <button className="btn btn-ghost" style={{ marginTop: 14, padding: 12, fontSize: 14 }} onClick={() => setGoalModal(true)}>
+              <button className="btn btn-ghost" style={{ marginTop: 12, padding: 12, fontSize: 14 }} onClick={() => setGoalModal(true)}>
                 + Doel stellen
               </button>
             )}
@@ -848,17 +848,17 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
       {due.length > 0 && (
         <motion.button
           className="glass spread"
-          style={{ width: '100%', padding: '16px 18px', marginBottom: 18, borderColor: 'var(--line-gold)', textAlign: 'left', order: 1 }}
+          style={{ width: '100%', padding: '16px 18px', marginBottom: 16, borderColor: 'var(--line-gold)', textAlign: 'left', order: 1 }}
           whileTap={{ scale: 0.98 }}
           onClick={onReview}
         >
-          <div className="col" style={{ gap: 2 }}>
-            <strong style={{ fontSize: 15 }}>Herhaling staat klaar</strong>
-            <span className="dim" style={{ fontSize: 13 }}>
+          <div className="col" style={{ gap: 0 }}>
+            <strong style={{ fontSize: 14 }}>Herhaling staat klaar</strong>
+            <span className="dim" style={{ fontSize: 12.5 }}>
               {due.length} {due.length === 1 ? 'woord wacht' : 'woorden wachten'} op je geheugen
             </span>
           </div>
-          <span className="gold-text" style={{ fontSize: 22, fontWeight: 700 }}>
+          <span className="gold-text" style={{ fontSize: 23, fontWeight: 700 }}>
             ↻
           </span>
         </motion.button>
@@ -871,7 +871,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
         return (
           <button className="glass unit-card" onClick={() => { sfx('tap'); setSkillsOpen(true) }} style={{ order: 1, width: '100%', textAlign: 'left' }}>
             <div className="spread">
-              <span className="row" style={{ gap: 10 }}>
+              <span className="row" style={{ gap: 8 }}>
                 <span style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(255,197,61,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🎓</span>
                 <strong className="card-title">Vaardigheden</strong>
               </span>
@@ -881,12 +881,12 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
             </div>
             <div className="row" style={{ gap: 12, marginTop: 12 }}>
               <Flag code={courseFlagCode[courseId]} size={26} />
-              <span className="col" style={{ flex: 1, minWidth: 0, gap: 6 }}>
+              <span className="col" style={{ flex: 1, minWidth: 0, gap: 4 }}>
                 <span className="spread">
-                  <span style={{ fontSize: 13.5, fontWeight: 600 }}>{course.name}</span>
-                  <span className="num" style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 17, color: 'var(--gold-bright)' }}>
+                  <span style={{ fontSize: 14, fontWeight: 600 }}>{course.name}</span>
+                  <span className="num" style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 16, color: 'var(--gold-bright)' }}>
                     {stand.level}
-                    <span className="faint" style={{ fontSize: 12, fontWeight: 700 }}> / 99</span>
+                    <span className="faint" style={{ fontSize: 12.5, fontWeight: 700 }}> / 99</span>
                   </span>
                 </span>
                 <span className="progress-track" style={{ height: 6, display: 'block' }}>
@@ -894,7 +894,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                 </span>
               </span>
             </div>
-            <p className="faint num" style={{ fontSize: 11.5, marginTop: 7 }}>
+            <p className="faint num" style={{ fontSize: 11, marginTop: 8 }}>
               {stand.meester
                 ? `Meester van het ${course.name}. Niveau 99 bereikt.`
                 : `Nog ${stand.breedte - stand.binnen} XP tot niveau ${stand.level + 1}. Tik voor al je talen.`}
@@ -907,7 +907,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
 
       {/* gesprekken: echt praten in de doeltaal, het duolingo-max-gevoel zonder abonnement */}
       {onPraten && (
-        <button className="glass unit-card row" onClick={() => { sfx('tap'); onPraten() }} style={{ gap: 14, textAlign: 'left', alignItems: 'center', order: 1 }}>
+        <button className="glass unit-card row" onClick={() => { sfx('tap'); onPraten() }} style={{ gap: 12, textAlign: 'left', alignItems: 'center', order: 1 }}>
           <span
             style={{
               width: 48,
@@ -916,7 +916,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: 24,
+              fontSize: 23,
               background: 'linear-gradient(135deg, var(--hot1), var(--hot2))',
               boxShadow: '0 0 16px rgba(168, 85, 247, 0.4)',
               flexShrink: 0,
@@ -925,17 +925,17 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
             🗣️
           </span>
           <span className="col" style={{ flex: 1, minWidth: 0 }}>
-            <strong style={{ fontSize: 15 }}>
+            <strong style={{ fontSize: 14 }}>
               Gesprekken{' '}
               <span className="gold-text" style={{ fontSize: 11, fontWeight: 900, letterSpacing: '0.06em' }}>
                 NIEUW
               </span>
             </strong>
-            <span className="dim" style={{ fontSize: 13 }}>
+            <span className="dim" style={{ fontSize: 12.5 }}>
               Praat echt in het {course.name}, met je stem of met keuzes
             </span>
           </span>
-          <span className="dim" style={{ fontSize: 20, flexShrink: 0 }}>
+          <span className="dim" style={{ fontSize: 19, flexShrink: 0 }}>
             ›
           </span>
         </button>
@@ -977,9 +977,9 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
               key={unit.id}
               style={{ '--uc': uc } as CSSProperties}
             >
-              <span style={{ fontSize: 22 }}>{unit.icon}</span>
+              <span style={{ fontSize: 23 }}>{unit.icon}</span>
               <strong className="card-title" style={{ flex: 1 }}>{unit.title}</strong>
-              <span style={{ fontSize: 13, fontWeight: 700 }} className={unitDone ? '' : 'faint'}>
+              <span style={{ fontSize: 12.5, fontWeight: 700 }} className={unitDone ? '' : 'faint'}>
                 {unitDone ? '✓ Voltooid' : `${doneCount}/${unit.lessons.length}`}
               </span>
               <button
@@ -998,7 +998,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: 15,
+                  fontSize: 14,
                   background: unitDone ? 'rgba(0,0,0,0.18)' : 'var(--surface-2)',
                   border: '1px solid var(--line)',
                 }}
@@ -1046,7 +1046,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                     </span>
                   )}
                   {state === 'done' ? (
-                    <span className="display" style={{ fontSize: 22 }}>{lesson.title[0]}</span>
+                    <span className="display" style={{ fontSize: 23 }}>{lesson.title[0]}</span>
                   ) : (
                     <StarIcon filled={state === 'current'} />
                   )}
@@ -1065,7 +1065,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
         )
       })()}
 
-      <p className="faint center" style={{ fontSize: 13, marginTop: 26, order: 2 }}>
+      <p className="faint center" style={{ fontSize: 12.5, marginTop: 24, order: 2 }}>
         Sectie 4 en verder zijn in de maak. Jouw reis gaat door tot B2.
       </p>
 
@@ -1086,13 +1086,13 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
               transition={{ type: 'spring', stiffness: 260, damping: 28 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="display" style={{ fontSize: 22, marginBottom: 4 }}>
+              <h3 className="display" style={{ fontSize: 23, marginBottom: 4 }}>
                 Kies je doel
               </h3>
-              <p className="dim" style={{ fontSize: 13, marginBottom: 16 }}>
+              <p className="dim" style={{ fontSize: 12.5, marginBottom: 16 }}>
                 Haal je het vóór de deadline, dan telt dat, en de XP-beloning is van jou.
               </p>
-              <div className="col" style={{ gap: 10 }}>
+              <div className="col" style={{ gap: 8 }}>
                 {suggestGoals({ streak, totalXp: xpAll, course, completedCount: completed.length, active: goals }).map((s) => (
                   <button
                     key={`${s.type}-${s.target}`}
@@ -1112,9 +1112,9 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                       setGoalModal(false)
                     }}
                   >
-                    <span className="col" style={{ gap: 2, flex: 1 }}>
-                      <strong style={{ fontSize: 15 }}>{s.label}</strong>
-                      <span className="faint" style={{ fontSize: 12 }}>
+                    <span className="col" style={{ gap: 0, flex: 1 }}>
+                      <strong style={{ fontSize: 14 }}>{s.label}</strong>
+                      <span className="faint" style={{ fontSize: 12.5 }}>
                         Deadline: over {s.deadlineDays} dagen
                       </span>
                     </span>

@@ -40,7 +40,7 @@ function SkillTegel({ r, actief, onClick }: { r: Rij; actief: boolean; onClick: 
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: 6,
+        gap: 4,
         padding: '9px 8px',
         minHeight: 52,
         borderRadius: 12,
@@ -60,7 +60,7 @@ function SkillTegel({ r, actief, onClick }: { r: Rij; actief: boolean; onClick: 
         </span>
         <span
           className="num"
-          style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 13, color: 'var(--goud-tekst-dim)', opacity: 0.8, alignSelf: 'flex-end', marginTop: 1 }}
+          style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 12.5, color: 'var(--goud-tekst-dim)', opacity: 0.8, alignSelf: 'flex-end', marginTop: 0 }}
         >
           {MAX_SKILL_LEVEL}
         </span>
@@ -102,7 +102,7 @@ export function SkillRaster({ actief, onTegel }: { actief?: CourseId; onTegel: (
   const totaal = rijen.reduce((n, r) => n + r.stand.level, 0)
   return (
     <>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 7 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
         {rijen.map((r) => (
           <SkillTegel key={r.id} r={r} actief={r.id === actief} onClick={() => onTegel(r.id)} />
         ))}
@@ -110,7 +110,7 @@ export function SkillRaster({ actief, onTegel }: { actief?: CourseId; onTegel: (
       <div
         className="spread"
         style={{
-          marginTop: 7,
+          marginTop: 8,
           padding: '11px 14px',
           borderRadius: 12,
           background: 'rgba(255, 197, 61, 0.1)',
@@ -118,7 +118,7 @@ export function SkillRaster({ actief, onTegel }: { actief?: CourseId; onTegel: (
         }}
       >
         <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 14 }}>Totaalniveau</span>
-        <span className="gold-text num" style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 20 }}>
+        <span className="gold-text num" style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 19 }}>
           {totaal}
         </span>
       </div>
@@ -156,10 +156,10 @@ export function SkillsSheet({ onClose }: { onClose: () => void }) {
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           onClick={(e) => e.stopPropagation()}
         >
-          <h3 className="display" style={{ fontSize: 24, marginBottom: 2 }}>
+          <h3 className="display" style={{ fontSize: 23, marginBottom: 0 }}>
             🎓 Vaardigheden
           </h3>
-          <p className="dim" style={{ fontSize: 12.5, marginBottom: 14 }}>
+          <p className="dim" style={{ fontSize: 12.5, marginBottom: 12 }}>
             Elke taal train je van 1 naar 99. Tik een taal aan voor de details.
           </p>
 
@@ -173,9 +173,9 @@ export function SkillsSheet({ onClose }: { onClose: () => void }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
             className="glass"
-            style={{ padding: '14px 16px', marginTop: 14, borderColor: detail.stand.meester ? 'var(--line-gold)' : undefined }}
+            style={{ padding: '14px 16px', marginTop: 12, borderColor: detail.stand.meester ? 'var(--line-gold)' : undefined }}
           >
-            <div className="row" style={{ gap: 10 }}>
+            <div className="row" style={{ gap: 8 }}>
               <Flag code={courseFlagCode[detail.id]} size={24} />
               <strong className="card-title" style={{ flex: 1 }}>
                 {detail.naam}
@@ -183,7 +183,7 @@ export function SkillsSheet({ onClose }: { onClose: () => void }) {
               <span className={`num ${detail.stand.meester ? 'gold-text' : ''}`} style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 19 }}>
                 {detail.stand.meester && '🏆 '}
                 {detail.stand.level}
-                <span className="faint" style={{ fontSize: 12, fontWeight: 700 }}> /{MAX_SKILL_LEVEL}</span>
+                <span className="faint" style={{ fontSize: 12.5, fontWeight: 700 }}> /{MAX_SKILL_LEVEL}</span>
               </span>
             </div>
 
@@ -194,7 +194,7 @@ export function SkillsSheet({ onClose }: { onClose: () => void }) {
               />
             </div>
 
-            <p className="faint num" style={{ fontSize: 11.5 }}>
+            <p className="faint num" style={{ fontSize: 11 }}>
               {detail.stand.meester
                 ? `${detail.xp} XP · meester van het ${detail.naam}`
                 : `${detail.xp} XP · nog ${detail.stand.breedte - detail.stand.binnen} XP tot niveau ${detail.stand.level + 1}${
@@ -204,12 +204,12 @@ export function SkillsSheet({ onClose }: { onClose: () => void }) {
 
             {detail.xp > 0 && (
               <>
-                <p className="faint num" style={{ fontSize: 11, marginTop: 5 }}>
+                <p className="faint num" style={{ fontSize: 11, marginTop: 4 }}>
                   {detail.lessen} {detail.lessen === 1 ? 'les' : 'lessen'} · {detail.woorden} {detail.woorden === 1 ? 'woord' : 'woorden'} ·{' '}
                   {detail.gesprekken} {detail.gesprekken === 1 ? 'gesprek' : 'gesprekken'} · {detail.stempels}{' '}
                   {detail.stempels === 1 ? 'stempel' : 'stempels'}
                 </p>
-                <div className="spread" style={{ marginTop: 9 }}>
+                <div className="spread" style={{ marginTop: 8 }}>
                   <span className="faint" style={{ fontSize: 11 }}>
                     Soorten {detail.naam}
                   </span>
@@ -217,7 +217,7 @@ export function SkillsSheet({ onClose }: { onClose: () => void }) {
                     {detail.landen.filter((l) => l.conquered).length}/{detail.landen.length}
                   </span>
                 </div>
-                <div className="row" style={{ flexWrap: 'wrap', gap: 5, marginTop: 5 }}>
+                <div className="row" style={{ flexWrap: 'wrap', gap: 4, marginTop: 4 }}>
                   {detail.landen.map((l) => (
                     <span
                       key={l.name + l.threshold}
@@ -235,14 +235,14 @@ export function SkillsSheet({ onClose }: { onClose: () => void }) {
               </>
             )}
             {detail.xp === 0 && (
-              <p className="dim" style={{ fontSize: 12.5, marginTop: 6 }}>
+              <p className="dim" style={{ fontSize: 12.5, marginTop: 4 }}>
                 Nog niet begonnen. Eén les en je staat al op niveau 10.
               </p>
             )}
 
             {/* de meestermantel: het eindbeeld waar alles naartoe werkt. Tot
                 niveau 99 hangt hij hier als silhouet te wachten. */}
-            <div className="row" style={{ gap: 11, marginTop: 12, paddingTop: 11, borderTop: '1px solid var(--line)' }}>
+            <div className="row" style={{ gap: 12, marginTop: 12, paddingTop: 11, borderTop: '1px solid var(--line)' }}>
               <svg
                 width="34"
                 height="40"
@@ -278,11 +278,11 @@ export function SkillsSheet({ onClose }: { onClose: () => void }) {
                 {/* het embleem op de borst */}
                 <circle cx="17" cy="18" r="3.4" fill={detail.stand.meester ? 'var(--gold-bright)' : 'var(--line)'} />
               </svg>
-              <div className="col" style={{ gap: 1, minWidth: 0 }}>
-                <strong style={{ fontSize: 13, fontWeight: 700 }}>
+              <div className="col" style={{ gap: 0, minWidth: 0 }}>
+                <strong style={{ fontSize: 12.5, fontWeight: 700 }}>
                   {detail.stand.meester ? `De meestermantel van het ${detail.naam}` : 'De meestermantel'}
                 </strong>
-                <span className="faint" style={{ fontSize: 11.5 }}>
+                <span className="faint" style={{ fontSize: 11 }}>
                   {detail.stand.meester
                     ? 'Verdiend op niveau 99. Je personage draagt hem overal.'
                     : 'Wacht op je bij niveau 99, in de kleuren van jouw taalwereld.'}
@@ -294,11 +294,11 @@ export function SkillsSheet({ onClose }: { onClose: () => void }) {
           {/* De Woordenstamboom: je verzameling ontdekte woordfamilies */}
           <div className="glass" style={{ padding: '13px 15px', marginTop: 12 }}>
             <div className="spread">
-              <span className="row" style={{ gap: 10 }}>
-                <span style={{ width: 30, height: 30, borderRadius: 9, background: 'rgba(74,222,128,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, flexShrink: 0 }}>🌳</span>
+              <span className="row" style={{ gap: 8 }}>
+                <span style={{ width: 30, height: 30, borderRadius: 9, background: 'rgba(74,222,128,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0 }}>🌳</span>
                 <strong className="card-title">Woordenstamboom</strong>
               </span>
-              <span className="gold-text num" style={{ fontWeight: 700, fontSize: 13.5 }}>
+              <span className="gold-text num" style={{ fontWeight: 700, fontSize: 14 }}>
                 {ontdekt.length}/{AANTAL_FAMILIES}
               </span>
             </div>
@@ -308,7 +308,7 @@ export function SkillsSheet({ onClose }: { onClose: () => void }) {
                 : 'Woorden die over de talen heen dezelfde stam delen. Tik een familie aan om hem terug te zien.'}
             </p>
             {ontdekt.length > 0 && (
-              <div className="row" style={{ flexWrap: 'wrap', gap: 6 }}>
+              <div className="row" style={{ flexWrap: 'wrap', gap: 4 }}>
                 {ontdekt.slice(0, 12).map((f) => (
                   <button
                     key={f.id}
@@ -327,10 +327,10 @@ export function SkillsSheet({ onClose }: { onClose: () => void }) {
             <WoordBoom familie={familie} jouwTaal={huidig} ontdekt={false} onSluiten={() => setFamilie(null)} />
           )}
 
-          <p className="faint center" style={{ fontSize: 11.5, marginTop: 12 }}>
+          <p className="faint center" style={{ fontSize: 11, marginTop: 12 }}>
             Niveau 99 is een echte prestatie: wie hem haalt, is meester van die taal.
           </p>
-          <button className="btn btn-ghost" style={{ marginTop: 10, padding: 12, fontSize: 14 }} onClick={() => { sfx('tap'); onClose() }}>
+          <button className="btn btn-ghost" style={{ marginTop: 8, padding: 12, fontSize: 14 }} onClick={() => { sfx('tap'); onClose() }}>
             Sluiten
           </button>
         </motion.div>

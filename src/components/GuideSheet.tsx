@@ -34,7 +34,7 @@ export function GuideSheet({
   const Zin = ({ target, nl }: { target: string; nl: string }) => (
     <button
       className="row"
-      style={{ gap: 10, width: '100%', textAlign: 'left', padding: '9px 0', minHeight: 44 }}
+      style={{ gap: 8, width: '100%', textAlign: 'left', padding: '9px 0', minHeight: 44 }}
       onClick={() => {
         sfx('tap')
         speak(target, ttsLang)
@@ -51,13 +51,13 @@ export function GuideSheet({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: 13,
+          fontSize: 12.5,
         }}
       >
         ▶
       </span>
-      <span className="col" style={{ gap: 1, flex: 1, minWidth: 0 }}>
-        <strong style={{ fontSize: 14.5 }}>{target}</strong>
+      <span className="col" style={{ gap: 0, flex: 1, minWidth: 0 }}>
+        <strong style={{ fontSize: 14 }}>{target}</strong>
         <span className="faint" style={{ fontSize: 12.5 }}>
           {nl}
         </span>
@@ -82,10 +82,10 @@ export function GuideSheet({
           transition={{ type: 'spring', stiffness: 260, damping: 28 }}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="row" style={{ gap: 12, marginBottom: 6 }}>
+          <div className="row" style={{ gap: 12, marginBottom: 4 }}>
             <span style={{ fontSize: 28 }}>{unit.icon}</span>
-            <span className="col" style={{ gap: 2, flex: 1 }}>
-              <span className="eyebrow" style={{ fontSize: 10.5 }}>
+            <span className="col" style={{ gap: 0, flex: 1 }}>
+              <span className="eyebrow" style={{ fontSize: 11 }}>
                 Gids
               </span>
               <strong className="display" style={{ fontSize: 19 }}>
@@ -118,10 +118,10 @@ export function GuideSheet({
                   className="glass"
                   style={{ padding: '14px 16px', marginBottom: 12, background: 'rgba(255,255,255,0.03)' }}
                 >
-                  <strong className="hot-text" style={{ fontSize: 15, display: 'block', marginBottom: 5 }}>
+                  <strong className="hot-text" style={{ fontSize: 14, display: 'block', marginBottom: 4 }}>
                     {r.title}
                   </strong>
-                  <p style={{ fontSize: 13.5, lineHeight: 1.55, color: 'var(--text-dim)' }}>{r.explanation}</p>
+                  <p style={{ fontSize: 14, lineHeight: 1.55, color: 'var(--text-dim)' }}>{r.explanation}</p>
                   <div style={{ marginTop: 8, borderTop: '1px solid var(--line)' }}>
                     {r.examples.map((e, j) => (
                       <Zin key={j} target={e.target} nl={e.nl} />
@@ -132,7 +132,7 @@ export function GuideSheet({
 
               {guide.phrases.length > 0 && (
                 <div className="glass" style={{ padding: '10px 16px', marginBottom: 12 }}>
-                  <p className="eyebrow" style={{ fontSize: 10.5, padding: '6px 0' }}>
+                  <p className="eyebrow" style={{ fontSize: 11, padding: '6px 0' }}>
                     Meteen te gebruiken
                   </p>
                   {guide.phrases.map((p, i) => (
@@ -144,14 +144,14 @@ export function GuideSheet({
               {guide.tip && (
                 <div
                   className="glass row"
-                  style={{ padding: '13px 16px', gap: 11, alignItems: 'flex-start', borderColor: 'var(--line-gold)' }}
+                  style={{ padding: '13px 16px', gap: 12, alignItems: 'flex-start', borderColor: 'var(--line-gold)' }}
                 >
-                  <span style={{ fontSize: 20, lineHeight: 1 }}>💡</span>
-                  <span className="col" style={{ gap: 2 }}>
-                    <strong className="gold-text" style={{ fontSize: 13.5 }}>
+                  <span style={{ fontSize: 19, lineHeight: 1 }}>💡</span>
+                  <span className="col" style={{ gap: 0 }}>
+                    <strong className="gold-text" style={{ fontSize: 14 }}>
                       Let op als Nederlandstalige
                     </strong>
-                    <span style={{ fontSize: 13, lineHeight: 1.5, color: 'var(--text-dim)' }}>{guide.tip}</span>
+                    <span style={{ fontSize: 12.5, lineHeight: 1.5, color: 'var(--text-dim)' }}>{guide.tip}</span>
                   </span>
                 </div>
               )}

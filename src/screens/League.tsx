@@ -144,7 +144,7 @@ function Medal({ leagueId, calm }: { leagueId: number; calm: boolean }) {
           textAnchor="middle"
           dominantBaseline="central"
           fill={ink}
-          style={{ fontFamily: "'Baloo 2', system-ui, sans-serif", fontSize: 40, fontWeight: 800 }}
+          style={{ fontFamily: "'Baloo 2', system-ui, sans-serif", fontSize: 34, fontWeight: 800 }}
         >
           {id + 1}
         </text>
@@ -179,7 +179,7 @@ function DivisionDots({ leagueId }: { leagueId: number }) {
           const current = l.id === leagueId
           const size = current ? 22 : 12
           return (
-            <div key={l.id} className="col" style={{ alignItems: 'center', gap: 5, width: 28 }}>
+            <div key={l.id} className="col" style={{ alignItems: 'center', gap: 4, width: 28 }}>
               <div style={{ height: 22, display: 'flex', alignItems: 'center' }}>
                 <motion.div
                   title={divisionLabel(l.id)}
@@ -203,7 +203,7 @@ function DivisionDots({ leagueId }: { leagueId: number }) {
                 />
               </div>
               {current && (
-                <span className="display" style={{ fontSize: 9.5, letterSpacing: '0.06em', color: metaalInkt(l.color) }}>
+                <span className="display" style={{ fontSize: 11, letterSpacing: '0.06em', color: metaalInkt(l.color) }}>
                   NU
                 </span>
               )}
@@ -233,7 +233,7 @@ function ZoneDivider({ kind }: { kind: 'promotie' | 'degradatie' }) {
       <span
         className="display"
         style={{
-          fontSize: 10.5,
+          fontSize: 11,
           letterSpacing: '0.14em',
           color: metaalInkt(c),
           padding: '4px 10px',
@@ -265,7 +265,7 @@ function Row({ player, rank, delay }: { player: Competitor; rank: number; delay:
       transition={{ delay, duration: 0.24, ease: [0.2, 0.8, 0.2, 1] }}
       className="row"
       style={{
-        gap: 11,
+        gap: 12,
         padding: you ? '11px 12px' : '9px 12px',
         marginBottom: 4,
         borderRadius: 'var(--r-md)',
@@ -299,7 +299,7 @@ function Row({ player, rank, delay }: { player: Competitor; rank: number; delay:
           alignItems: 'center',
           justifyContent: 'center',
           flexShrink: 0,
-          fontSize: 15,
+          fontSize: 14,
           color: inkOn(player.color),
           background: `radial-gradient(circle at 34% 28%, #fff, ${player.color} 72%)`,
           boxShadow: you ? `0 0 16px ${alpha(player.color, 0.75)}` : `0 2px 0 ${alpha(player.color, 0.45)}`,
@@ -325,7 +325,7 @@ function Row({ player, rank, delay }: { player: Competitor; rank: number; delay:
 
       <span
         className={you ? 'display gold-text' : 'display'}
-        style={{ fontSize: 14.5, color: you ? undefined : 'var(--text-dim)', flexShrink: 0 }}
+        style={{ fontSize: 14, color: you ? undefined : 'var(--text-dim)', flexShrink: 0 }}
       >
         {fmt(player.xp)} XP
       </span>
@@ -473,23 +473,23 @@ export function LeagueScreen({ onLeren }: { onLeren?: () => void } = {}) {
           initial={{ opacity: 0, y: -14, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           style={{
-            padding: 20,
-            marginBottom: 18,
+            padding: 16,
+            marginBottom: 16,
             borderColor:
               uitslag.uitkomst === 'promotie' ? 'var(--ok)' : uitslag.uitkomst === 'degradatie' ? 'var(--line)' : 'var(--line-gold)',
           }}
         >
-          <p className="eyebrow" style={{ fontSize: 10.5 }}>
+          <p className="eyebrow" style={{ fontSize: 11 }}>
             Uitslag vorige week
           </p>
-          <p className="display" style={{ fontSize: 24, margin: '8px 0 4px' }}>
+          <p className="display" style={{ fontSize: 23, margin: '8px 0 4px' }}>
             {uitslag.uitkomst === 'promotie'
               ? `🎉 Plek #${uitslag.rank}: gepromoveerd!`
               : uitslag.uitkomst === 'degradatie'
                 ? `Plek #${uitslag.rank}, een stapje terug.`
                 : `Plek #${uitslag.rank}: je blijft ${divisionLabel(uitslag.nieuwLeagueId).toLowerCase()}.`}
           </p>
-          <p className="dim" style={{ fontSize: 13.5, marginBottom: 14 }}>
+          <p className="dim" style={{ fontSize: 14, marginBottom: 12 }}>
             {uitslag.uitkomst === 'promotie'
               ? `Je eindigde in de promotiezone van de ${divisionLabel(uitslag.leagueId).toLowerCase()} en speelt nu in de ${divisionLabel(uitslag.nieuwLeagueId).toLowerCase()}.`
               : uitslag.uitkomst === 'degradatie'
@@ -498,7 +498,7 @@ export function LeagueScreen({ onLeren }: { onLeren?: () => void } = {}) {
           </p>
           <button
             className="btn btn-primary"
-            style={{ padding: 13, fontSize: 14.5 }}
+            style={{ padding: 12, fontSize: 14 }}
             onClick={() => {
               sfx('tap')
               clearWeekUitslag()
@@ -520,11 +520,11 @@ export function LeagueScreen({ onLeren }: { onLeren?: () => void } = {}) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.12, duration: 0.3 }}
           className="display"
-          style={{ fontSize: 30, color: inkt, textShadow: `0 0 26px ${alpha(color, 0.55)}` }}
+          style={{ fontSize: 28, color: inkt, textShadow: `0 0 26px ${alpha(color, 0.55)}` }}
         >
           {divisionLabel(leagueId)}
         </motion.h1>
-        <p className="dim" style={{ fontSize: 13.5, marginTop: 2 }}>
+        <p className="dim" style={{ fontSize: 14, marginTop: 0 }}>
           Divisie {leagueId + 1} van {LEAGUES.length}
           {promotions > 0 && ` · ${promotions}× gepromoveerd`}
         </p>
@@ -533,22 +533,22 @@ export function LeagueScreen({ onLeren }: { onLeren?: () => void } = {}) {
       <DivisionDots leagueId={leagueId} />
 
       {/* ---------- eigen stand ---------- */}
-      <div className="stat-grid" style={{ gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginTop: 16 }}>
-        <div className="glass stat-card" style={{ padding: 14 }}>
-          <div className="stat-value hot-text" style={{ fontSize: 26 }}>
+      <div className="stat-grid" style={{ gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginTop: 16 }}>
+        <div className="glass stat-card" style={{ padding: 12 }}>
+          <div className="stat-value hot-text" style={{ fontSize: 28 }}>
             {empty ? '—' : `#${rank}`}
           </div>
           <div className="stat-label">Jouw plek</div>
         </div>
-        <div className="glass stat-card" style={{ padding: 14 }}>
-          <div className="stat-value gold-text" style={{ fontSize: 26 }}>
+        <div className="glass stat-card" style={{ padding: 12 }}>
+          <div className="stat-value gold-text" style={{ fontSize: 28 }}>
             {fmt(weekXp)}
           </div>
           <div className="stat-label">XP deze week</div>
         </div>
         {/* "Spelers: 30" stond hier altijd hetzelfde; dit getal beweegt met elke les */}
-        <div className="glass stat-card" style={{ padding: 14 }}>
-          <div className="stat-value" style={{ fontSize: 26, color: 'var(--cyan)' }}>
+        <div className="glass stat-card" style={{ padding: 12 }}>
+          <div className="stat-value" style={{ fontSize: 28, color: 'var(--cyan)' }}>
             {empty ? '—' : zone === 'promotie' ? '✓' : fmt(toPromoZone || 1)}
           </div>
           <div className="stat-label">{zone === 'promotie' ? 'In promotiezone' : 'XP tot promotie'}</div>
@@ -557,10 +557,10 @@ export function LeagueScreen({ onLeren }: { onLeren?: () => void } = {}) {
 
       {/* één duidelijke actie: de ranglijst is geen kijkspel */}
       {!empty && onLeren && (
-        <div style={{ marginTop: 14 }}>
+        <div style={{ marginTop: 12 }}>
           <button
             className="btn btn-primary"
-            style={{ padding: 15, fontSize: 15.5 }}
+            style={{ padding: 16, fontSize: 16 }}
             onClick={() => {
               sfx('tap')
               onLeren()
@@ -582,19 +582,19 @@ export function LeagueScreen({ onLeren }: { onLeren?: () => void } = {}) {
         transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         style={{
           padding: '13px 16px',
-          marginTop: 14,
+          marginTop: 12,
           border: urgent ? '1.5px solid var(--err)' : undefined,
         }}
       >
-        <div className="spread" style={{ marginBottom: 9 }}>
-          <span className="row" style={{ gap: 7, fontWeight: 700, fontSize: 14.5, color: urgent ? 'var(--err)' : 'var(--text)' }}>
+        <div className="spread" style={{ marginBottom: 8 }}>
+          <span className="row" style={{ gap: 8, fontWeight: 700, fontSize: 14, color: urgent ? 'var(--err)' : 'var(--text)' }}>
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <circle cx="12" cy="12" r="9" />
               <path d="M12 7v5l3 2" />
             </svg>
             Nog {fmt(hours)} uur deze week
           </span>
-          <span className="faint" style={{ fontSize: 12, fontWeight: 700 }}>
+          <span className="faint" style={{ fontSize: 12.5, fontWeight: 700 }}>
             {urgent ? 'LAATSTE DAG' : `${Math.round(elapsed * 100)}% voorbij`}
           </span>
         </div>
@@ -607,7 +607,7 @@ export function LeagueScreen({ onLeren }: { onLeren?: () => void } = {}) {
             style={{ background: urgent ? 'linear-gradient(135deg, #FB7185, #EF4444)' : undefined }}
           />
         </div>
-        <p className="faint" style={{ fontSize: 11.5, marginTop: 7 }}>
+        <p className="faint" style={{ fontSize: 11, marginTop: 8 }}>
           {urgent
             ? 'De week sluit vanavond. Dit is je laatste kans om te klimmen.'
             : 'Zondag om middernacht wordt de stand definitief.'}
@@ -621,7 +621,7 @@ export function LeagueScreen({ onLeren }: { onLeren?: () => void } = {}) {
         transition={{ delay: 0.2, duration: 0.35 }}
         className="card-hero"
         style={{
-          padding: 18,
+          padding: 16,
           marginTop: 16,
           borderLeft: `4px solid ${zoneCard.c}`,
           boxShadow: `0 0 28px ${zoneCard.glow}`,
@@ -630,11 +630,11 @@ export function LeagueScreen({ onLeren }: { onLeren?: () => void } = {}) {
         <p className="display" style={{ fontSize: 19, color: zoneCard.c }}>
           {zoneCard.title}
         </p>
-        <p className="dim" style={{ fontSize: 13.5, marginTop: 4 }}>
+        <p className="dim" style={{ fontSize: 14, marginTop: 4 }}>
           {zoneCard.body}
         </p>
         {weekXp === 0 && !empty && (
-          <p className="faint" style={{ fontSize: 12.5, marginTop: 6 }}>
+          <p className="faint" style={{ fontSize: 12.5, marginTop: 4 }}>
             Je hebt deze week nog geen XP verdiend. Je eerste les zet je meteen in beweging.
           </p>
         )}
@@ -643,21 +643,21 @@ export function LeagueScreen({ onLeren }: { onLeren?: () => void } = {}) {
 
         {climb === null || above === null ? (
           <>
-            <p className="display" style={{ fontSize: 17 }}>
+            <p className="display" style={{ fontSize: 16 }}>
               {empty ? 'Nog geen tegenstanders' : 'Je staat bovenaan. Verdedig je plek!'}
             </p>
             {runnerUp && (
-              <p className="faint" style={{ fontSize: 12.5, marginTop: 3 }}>
+              <p className="faint" style={{ fontSize: 12.5, marginTop: 4 }}>
                 {runnerUp.name} zit {fmt(Math.max(0, weekXp - runnerUp.xp))} XP achter je.
               </p>
             )}
           </>
         ) : (
           <>
-            <p className="display" style={{ fontSize: 17, lineHeight: 1.3 }}>
+            <p className="display" style={{ fontSize: 16, lineHeight: 1.3 }}>
               Nog <span className="gold-text">{fmt(climb)} XP</span> en je gaat {above.name} voorbij!
             </p>
-            <div className="row" style={{ gap: 10, marginTop: 10 }}>
+            <div className="row" style={{ gap: 8, marginTop: 8 }}>
               <div className="progress-track" style={{ height: 8 }}>
                 <motion.div
                   className="progress-fill"
@@ -666,7 +666,7 @@ export function LeagueScreen({ onLeren }: { onLeren?: () => void } = {}) {
                   transition={{ delay: 0.35, duration: 0.8, ease: [0.2, 0.8, 0.2, 1] }}
                 />
               </div>
-              <span className="faint" style={{ fontSize: 11.5, fontWeight: 700, whiteSpace: 'nowrap' }}>
+              <span className="faint" style={{ fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap' }}>
                 #{rank - 1}: {fmt(above.xp)}
               </span>
             </div>
@@ -682,7 +682,7 @@ export function LeagueScreen({ onLeren }: { onLeren?: () => void } = {}) {
       <div className="glass" style={{ padding: '12px 10px', marginTop: 16 }}>
         <div className="spread" style={{ padding: '2px 4px 10px' }}>
           <span className="eyebrow">Ranglijst</span>
-          <span className="faint" style={{ fontSize: 11.5, fontWeight: 700 }}>
+          <span className="faint" style={{ fontSize: 11, fontWeight: 700 }}>
             {league.promote > 0 && `TOP ${league.promote} PROMOVEERT`}
             {league.promote > 0 && league.demote > 0 && ' · '}
             {league.demote > 0 && `LAATSTE ${league.demote} ZAKKEN`}
@@ -694,7 +694,7 @@ export function LeagueScreen({ onLeren }: { onLeren?: () => void } = {}) {
             <p className="display" style={{ fontSize: 16 }}>
               De ranglijst wordt klaargezet
             </p>
-            <p className="faint" style={{ fontSize: 12.5, marginTop: 5 }}>
+            <p className="faint" style={{ fontSize: 12.5, marginTop: 4 }}>
               Zodra de week begint zie je hier je tegenstanders.
             </p>
           </div>
@@ -715,7 +715,7 @@ export function LeagueScreen({ onLeren }: { onLeren?: () => void } = {}) {
       </div>
 
       {/* ---------- uitleg ---------- */}
-      <div className="glass" style={{ padding: '4px 16px', marginTop: 14, marginBottom: 8 }}>
+      <div className="glass" style={{ padding: '4px 16px', marginTop: 12, marginBottom: 8 }}>
         <button
           type="button"
           className="spread"
@@ -726,8 +726,8 @@ export function LeagueScreen({ onLeren }: { onLeren?: () => void } = {}) {
           }}
           aria-expanded={explain}
         >
-          <span style={{ fontWeight: 700, fontSize: 14.5 }}>Hoe werkt de competitie?</span>
-          <motion.span animate={{ rotate: explain ? 180 : 0 }} transition={{ duration: 0.2 }} className="faint" style={{ fontSize: 12 }}>
+          <span style={{ fontWeight: 700, fontSize: 14 }}>Hoe werkt de competitie?</span>
+          <motion.span animate={{ rotate: explain ? 180 : 0 }} transition={{ duration: 0.2 }} className="faint" style={{ fontSize: 12.5 }}>
             ▾
           </motion.span>
         </button>
@@ -740,7 +740,7 @@ export function LeagueScreen({ onLeren }: { onLeren?: () => void } = {}) {
               transition={{ duration: 0.25, ease: [0.2, 0.8, 0.2, 1] }}
               style={{ overflow: 'hidden' }}
             >
-              <ul className="dim" style={{ fontSize: 13.5, paddingLeft: 18, paddingBottom: 16, display: 'grid', gap: 7 }}>
+              <ul className="dim" style={{ fontSize: 14, paddingLeft: 18, paddingBottom: 16, display: 'grid', gap: 8 }}>
                 <li>Je speelt elke week tegen {Math.max(1, total - 1)} andere leerlingen in de {thisLabel}.</li>
                 <li>Alle XP telt mee: lessen, herhalen, minigames en duels.</li>
                 {league.promote > 0 && (

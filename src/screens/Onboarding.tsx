@@ -21,7 +21,7 @@ export function Onboarding({ onKlaar }: { onKlaar?: (c: CourseId) => void }) {
             {/* geen "Stap 1 van 2" meer: het personagescherm telde ook al vanaf
                 stap 1, en twee tellers naast elkaar leest als teruggaan */}
             <p className="eyebrow center">Twee korte vragen</p>
-            <h2 className="display center" style={{ fontSize: 30, margin: '10px 0 28px' }}>
+            <h2 className="display center" style={{ fontSize: 28, margin: '10px 0 28px' }}>
               Welke taal wordt het?
             </h2>
             <div className="col" style={{ gap: 12 }}>
@@ -35,21 +35,21 @@ export function Onboarding({ onKlaar }: { onKlaar?: (c: CourseId) => void }) {
                   }}
                 >
                   <Flag code={courseFlagCode[c.id]} size={24} />
-                  <span className="col" style={{ gap: 2 }}>
+                  <span className="col" style={{ gap: 0 }}>
                     <strong>{c.name}</strong>
-                    <span className="faint" style={{ fontSize: 13 }}>
+                    <span className="faint" style={{ fontSize: 12.5 }}>
                       {c.tagline}
                     </span>
                   </span>
                 </button>
               ))}
             </div>
-            <div style={{ marginTop: 26 }}>
+            <div style={{ marginTop: 24 }}>
               <button className="btn btn-primary" disabled={!courseId} onClick={() => setStep(2)}>
                 Verder
               </button>
             </div>
-            <p className="faint center" style={{ fontSize: 12.5, marginTop: 18 }}>
+            <p className="faint center" style={{ fontSize: 12.5, marginTop: 16 }}>
               Geen hartjes die opraken. Geen straf. Alleen jij en een taal.
             </p>
           </motion.div>
@@ -58,7 +58,7 @@ export function Onboarding({ onKlaar }: { onKlaar?: (c: CourseId) => void }) {
         {step === 2 && (
           <motion.div key="s2" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.35 }}>
             <p className="eyebrow center">Laatste vraag</p>
-            <h2 className="display center" style={{ fontSize: 30, margin: '10px 0 6px' }}>
+            <h2 className="display center" style={{ fontSize: 28, margin: '10px 0 6px' }}>
               Hoeveel tijd per dag?
             </h2>
             {/* de gekozen taal blijft zichtbaar, en is met één tik te wijzigen */}
@@ -70,20 +70,20 @@ export function Onboarding({ onKlaar }: { onKlaar?: (c: CourseId) => void }) {
                   setStep(1)
                 }}
                 style={{
-                  gap: 7,
+                  gap: 8,
                   margin: '0 auto 24px',
                   padding: '8px 14px',
                   minHeight: 44,
                   borderRadius: 999,
                   background: 'var(--surface-2)',
                   border: '1.5px solid var(--line)',
-                  fontSize: 13,
+                  fontSize: 12.5,
                   fontWeight: 700,
                 }}
               >
                 <Flag code={courseFlagCode[courseId]} size={15} />
                 {courseList.find((c) => c.id === courseId)?.name}
-                <span className="faint" style={{ fontSize: 12 }}>· wijzig</span>
+                <span className="faint" style={{ fontSize: 12.5 }}>· wijzig</span>
               </button>
             )}
             <div className="col" style={{ gap: 12 }}>
@@ -100,9 +100,9 @@ export function Onboarding({ onKlaar }: { onKlaar?: (c: CourseId) => void }) {
                     onKlaar?.(courseId)
                   }}
                 >
-                  <span className="col" style={{ gap: 2, flex: 1 }}>
+                  <span className="col" style={{ gap: 0, flex: 1 }}>
                     <strong>{g.label}</strong>
-                    <span className="faint" style={{ fontSize: 13 }}>
+                    <span className="faint" style={{ fontSize: 12.5 }}>
                       {g.sub}
                     </span>
                   </span>
@@ -112,7 +112,7 @@ export function Onboarding({ onKlaar }: { onKlaar?: (c: CourseId) => void }) {
                 </button>
               ))}
             </div>
-            <p className="faint center" style={{ fontSize: 13, marginTop: 22 }}>
+            <p className="faint center" style={{ fontSize: 12.5, marginTop: 24 }}>
               Kies en je eerste woorden beginnen meteen. Je kunt dit later altijd aanpassen.
             </p>
           </motion.div>

@@ -434,6 +434,20 @@ Stoppen kan met `/loop stop` of door de cron-taak te verwijderen.
 
 ## Logboek
 
+- **14-08-2026, ronde 71** - **Het ontwerp komt nu ergens vandaan: materiaal, garderobe, houdingen en jouw eigen hand op je wereld.**
+
+  **De achtergrond is geen kleurverloop meer.** Elke wereld heeft een echt materiaal uit dat land: de azulejo-tegel, de scherven van Gaudí, de golf van de Portugese calçada, het Bauhaus-raster, het krijtstreepje van Savile Row, Carrara-marmer. Alles als svg rechtstreeks in de stijl, dus geen enkel extra bestand, en de dekking groeit met je niveau via `data-rijkdom`. De laag zit op `html::before`, zodat hij op élk scherm ligt zonder dat er iets aan de opbouw van de app verandert.
+
+  **Zestien werelden, zestien garderobes.** Je personage weet zelf niet in welke wereld het staat: élke stof ligt er altijd op met dekking nul, en de wereldstijl zet er precies één op één. Wisselen van wereld verkleedt je poppetje dus vanzelf, zonder één regel logica in het component.
+
+  **De kast staat op je profiel.** Zeven plekken, dertig stukken, wat je hebt in kleur en wat je nog niet hebt als zwart silhouet met de eis eronder. Daarbij bleek de kast twee dingen te beloven die de tekening niet waarmaakte: broek en schoenen stonden vast op één kleur. Die bestaan nu echt.
+
+  **Twee houdingen erbij**, verslagen en nadenken, en ze worden gebruikt: in de arena zakt je personage bij een klap en wiegt hij terwijl de ander nadenkt, en op de uitslag staat hij te juichen of verslagen in plaats van een bekeremoji.
+
+  **LES: een model uitbreiden is niet hetzelfde als het aansluiten.** De zes nieuwe gezichtstrekken stonden in het model én in de kiezer, en kwamen nooit bij de tekening aan, omdat de functie die een profiel opschoont alleen de oude velden doorgaf. Geen foutmelding, alleen een personage dat niet veranderde. Datzelfde patroon sloeg twee keer toe: de eigen draai op je wereld verdween zodra de wereld uit een link kwam, want die zat in de functie die dan wordt overgeslagen. **Regel: loop bij elke uitbreiding álle plekken na waar dat gegeven wordt gekopieerd, opgeschoond of overgeslagen.**
+
+  **LES: een proef die tegen de ontwikkelserver draait is niet traag maar onbruikbaar.** Achtenveertig navigaties duurden minuten omdat Vite elke keer de hele modulegraaf opbouwt, en de proef liep in een tijdslimiet. `scripts/serveer-dist.mjs` serveert nu de gebouwde versie lokaal: dezelfde proef draait in seconden en meet bovendien wat een bezoeker echt krijgt.
+
 - **14-08-2026, ronde 70** - **Nieuw doel: ontwerp tot de bodem. Begonnen bij het personage, want dat is het hart.**
 
   Het personage had haar, huid, outfit en mond. Daardoor leken twee mensen met dezelfde haarkleur precies op elkaar: een gezicht wordt herkenbaar van zijn vórm, de ogen, de wenkbrauwen en de neus, en die waren er niet of maar in één soort. Er is nu `src/components/avatar-trekken.tsx` met acht varianten per trek: gezichtsvorm, ogen, wenkbrauwen, neus, mond (van vier naar acht) en lichaamsbouw.

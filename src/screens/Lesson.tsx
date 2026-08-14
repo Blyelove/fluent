@@ -313,17 +313,17 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="display" style={{ fontSize: 24, marginBottom: 6 }}>
+              <h3 className="display" style={{ fontSize: 23, marginBottom: 4 }}>
                 Even pauze?
               </h3>
-              <p className="dim" style={{ fontSize: 14.5, marginBottom: 18 }}>
+              <p className="dim" style={{ fontSize: 14, marginBottom: 16 }}>
                 {restVragen === 1
                   ? 'Nog één vraag en je bent er.'
                   : `Nog ${restVragen} vragen. Stop je nu, dan begin je deze les later gewoon opnieuw.`}
               </p>
               <button
                 className="btn btn-primary"
-                style={{ padding: 15, fontSize: 15.5, marginBottom: 10 }}
+                style={{ padding: 16, fontSize: 16, marginBottom: 8 }}
                 onClick={() => {
                   sfx('tap')
                   setPauze(false)
@@ -342,7 +342,7 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
       <div className="lesson-top">
         <button
           className="btn-quiet"
-          style={{ padding: 8, fontSize: 22, lineHeight: 1, minWidth: 44, minHeight: 44 }}
+          style={{ padding: 8, fontSize: 23, lineHeight: 1, minWidth: 44, minHeight: 44 }}
           onClick={() => (idx > 0 ? setPauze(true) : onExit())}
           aria-label="Les sluiten"
         >
@@ -353,7 +353,7 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
         {unit && guide && (
           <button
             className="btn-quiet"
-            style={{ minWidth: 44, minHeight: 44, fontSize: 17, lineHeight: 1 }}
+            style={{ minWidth: 44, minHeight: 44, fontSize: 16, lineHeight: 1 }}
             onClick={() => {
               sfx('tap')
               setGidsOpen(true)
@@ -416,7 +416,7 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
             <motion.div key="check" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }} transition={{ duration: 0.18 }}>
               <div className="sheet-inner">
                 {ex.type === 'match' ? (
-                  <p className="center dim" style={{ padding: '8px 0', fontSize: 15 }}>
+                  <p className="center dim" style={{ padding: '8px 0', fontSize: 14 }}>
                     Match alle paren om verder te gaan
                   </p>
                 ) : (
@@ -444,12 +444,12 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
                           <span className="speaker-sm" style={{ width: 32, height: 32, flexShrink: 0 }}>
                             <SpeakerIcon size={16} />
                           </span>
-                          <span className="dim" style={{ fontSize: 15 }}>
+                          <span className="dim" style={{ fontSize: 14 }}>
                             Juiste antwoord: <strong style={{ color: 'var(--text)' }}>{result.correctAnswer}</strong>
                           </span>
                         </button>
                       ) : (
-                        <p className="dim" style={{ fontSize: 15 }}>
+                        <p className="dim" style={{ fontSize: 14 }}>
                           Juiste antwoord: <strong style={{ color: 'var(--text)' }}>{result.correctAnswer}</strong>
                         </p>
                       )
@@ -465,12 +465,12 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
                           <span className="speaker-sm" style={{ width: 32, height: 32, flexShrink: 0 }}>
                             <SpeakerIcon size={16} />
                           </span>
-                          <span className="dim" style={{ fontSize: 15 }}>
+                          <span className="dim" style={{ fontSize: 14 }}>
                             Let op de spelling: <strong style={{ color: 'var(--text)' }}>{result.spellingTip}</strong>
                           </span>
                         </button>
                       ) : (
-                        <p className="dim" style={{ fontSize: 15 }}>
+                        <p className="dim" style={{ fontSize: 14 }}>
                           Let op de spelling: <strong style={{ color: 'var(--text)' }}>{result.spellingTip}</strong>
                         </p>
                       )
@@ -498,12 +498,12 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
                             <strong className="hot-text" style={{ fontSize: 14, display: 'block', marginBottom: 4 }}>
                               💡 {regel.title}
                             </strong>
-                            <p style={{ fontSize: 13.5, lineHeight: 1.55, color: 'var(--text-dim)' }}>{regel.explanation}</p>
+                            <p style={{ fontSize: 14, lineHeight: 1.55, color: 'var(--text-dim)' }}>{regel.explanation}</p>
                             {regel.examples.slice(0, 2).map((v, i) => (
                               <button
                                 key={i}
                                 className="row"
-                                style={{ gap: 9, width: '100%', textAlign: 'left', padding: '7px 0', minHeight: 44 }}
+                                style={{ gap: 8, width: '100%', textAlign: 'left', padding: '7px 0', minHeight: 44 }}
                                 onClick={() => {
                                   sfx('tap')
                                   speak(v.target, course.ttsLang)
@@ -526,8 +526,8 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
                                   ▶
                                 </span>
                                 <span className="col" style={{ gap: 0, flex: 1, minWidth: 0 }}>
-                                  <strong style={{ fontSize: 13.5 }}>{v.target}</strong>
-                                  <span className="faint" style={{ fontSize: 12 }}>
+                                  <strong style={{ fontSize: 14 }}>{v.target}</strong>
+                                  <span className="faint" style={{ fontSize: 12.5 }}>
                                     {v.nl}
                                   </span>
                                 </span>
@@ -541,7 +541,7 @@ export function LessonScreen({ course, lesson, onExit, onNext }: Props) {
                           className="btn btn-ghost"
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
-                          style={{ padding: 12, fontSize: 14.5 }}
+                          style={{ padding: 12, fontSize: 14 }}
                           onClick={() => {
                             sfx('tap')
                             setUitlegOpen(true)
@@ -637,7 +637,7 @@ function CompleteView({
    */
   const chainFooter = (label = 'Verder') =>
     canChain ? (
-      <div className="col" style={{ marginTop: 22, padding: '0 8px', gap: 10 }}>
+      <div className="col" style={{ marginTop: 24, padding: '0 8px', gap: 8 }}>
         <motion.button
           className="btn btn-primary"
           whileTap={{ scale: 0.98 }}
@@ -645,19 +645,19 @@ function CompleteView({
             sfx('tap')
             onNext?.()
           }}
-          style={{ fontSize: 17 }}
+          style={{ fontSize: 16 }}
         >
           ▶ Nog één les
         </motion.button>
-        <p className="faint" style={{ fontSize: 12, marginTop: -2 }}>
+        <p className="faint" style={{ fontSize: 12.5, marginTop: -2 }}>
           Volgende: {nextTitle}
         </p>
-        <button className="btn btn-ghost" style={{ fontSize: 14.5, padding: 13 }} onClick={next}>
+        <button className="btn btn-ghost" style={{ fontSize: 14, padding: 12 }} onClick={next}>
           Klaar voor nu
         </button>
       </div>
     ) : (
-      <div style={{ marginTop: 26, padding: '0 8px' }}>
+      <div style={{ marginTop: 24, padding: '0 8px' }}>
         <button className="btn btn-primary" onClick={next}>
           {label}
         </button>
@@ -723,11 +723,11 @@ function CompleteView({
             <p className="eyebrow" style={{ marginTop: 8 }}>
               Les voltooid
             </p>
-            <h1 className="display" style={{ fontSize: 38, margin: '10px 0 4px' }}>
+            <h1 className="display" style={{ fontSize: 34, margin: '10px 0 4px' }}>
               {perfect ? 'Vlekkeloos.' : 'Goed gedaan.'}
             </h1>
             <div className="divider-gold" />
-            <div className="row" style={{ justifyContent: 'center', gap: 14, marginTop: 16 }}>
+            <div className="row" style={{ justifyContent: 'center', gap: 12, marginTop: 16 }}>
               <div className="glass stat-card" style={{ minWidth: 120, borderColor: dubbel ? 'var(--line-gold)' : undefined }}>
                 <div className="stat-value gold-text">+{shown}</div>
                 <div className="stat-label">{dubbel ? '⚡ XP × 2' : 'XP verdiend'}</div>
@@ -738,15 +738,15 @@ function CompleteView({
               </div>
             </div>
             {perfect && (
-              <p className="gold-text" style={{ marginTop: 18, fontWeight: 600 }}>
+              <p className="gold-text" style={{ marginTop: 16, fontWeight: 600 }}>
                 Foutloze les. Uitzonderlijk.
               </p>
             )}
 
             {/* Dagdoel: laat zien hoe dichtbij je bent — dat is de motor achter "nog één les" */}
-            <div className="glass" style={{ padding: '14px 16px', marginTop: 18, textAlign: 'left' }}>
+            <div className="glass" style={{ padding: '14px 16px', marginTop: 16, textAlign: 'left' }}>
               <div className="spread" style={{ marginBottom: 8 }}>
-                <span style={{ fontSize: 13.5, fontWeight: 700 }}>{goalReached ? '🎉 Dagdoel gehaald!' : 'Jouw dagdoel'}</span>
+                <span style={{ fontSize: 14, fontWeight: 700 }}>{goalReached ? '🎉 Dagdoel gehaald!' : 'Jouw dagdoel'}</span>
                 <span className={goalReached ? 'gold-text' : 'faint'} style={{ fontSize: 12.5, fontWeight: 700 }}>
                   {Math.min(todayXp, dailyGoalXp)} / {dailyGoalXp} XP
                 </span>
@@ -759,7 +759,7 @@ function CompleteView({
                   transition={{ duration: 0.9, ease: 'easeOut', delay: 0.2 }}
                 />
               </div>
-              <p className="faint" style={{ fontSize: 12, marginTop: 8 }}>
+              <p className="faint" style={{ fontSize: 12.5, marginTop: 8 }}>
                 {goalReached
                   ? 'Je reeks is veiliggesteld voor vandaag. Alles hierna is pure winst.'
                   : `Nog ${dailyGoalXp - todayXp} XP, dat is ongeveer ${Math.max(1, Math.ceil((dailyGoalXp - todayXp) / 10))} ${
@@ -776,17 +776,17 @@ function CompleteView({
           <motion.div key="reeks" initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, y: -18 }} transition={{ duration: 0.32 }}>
             <p className="eyebrow">Je reeks groeit</p>
             <motion.div
-              style={{ fontSize: 92, lineHeight: 1, marginTop: 6 }}
+              style={{ fontSize: 96, lineHeight: 1, marginTop: 4 }}
               initial={{ scale: 0.4, rotate: -12 }}
               animate={{ scale: [0.4, 1.18, 1], rotate: [-12, 6, 0] }}
               transition={{ duration: 0.7, times: [0, 0.6, 1], ease: 'easeOut' }}
             >
               🔥
             </motion.div>
-            <h1 className="display gold-text" style={{ fontSize: 44, margin: '6px 0 2px' }}>
+            <h1 className="display gold-text" style={{ fontSize: 48, margin: '6px 0 2px' }}>
               Dag {streak} op rij
             </h1>
-            <p className="dim" style={{ fontSize: 15.5 }}>
+            <p className="dim" style={{ fontSize: 16 }}>
               {streak === 7
                 ? 'Een hele week. Dit is precies waar het omslaat.'
                 : streak === 30
@@ -829,7 +829,7 @@ function CompleteView({
             </div>
             <motion.h1
               className="display gold-text"
-              style={{ fontSize: 32, margin: '8px 0 4px' }}
+              style={{ fontSize: 34, margin: '8px 0 4px' }}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.6 }}
@@ -839,7 +839,7 @@ function CompleteView({
             {conquered.length > 1 && (
               <p className="dim">+ nog {conquered.length - 1} {conquered.length - 1 === 1 ? 'gebied' : 'gebieden'}</p>
             )}
-            <motion.p className="dim" style={{ fontSize: 15, marginTop: 6 }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.8 }}>
+            <motion.p className="dim" style={{ fontSize: 14, marginTop: 4 }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.8 }}>
               Jij rent alvast vooruit naar het volgende land.
             </motion.p>
             <div style={{ marginTop: 16, padding: '0 8px' }}>
@@ -863,10 +863,10 @@ function CompleteView({
             <div style={{ display: 'flex', justifyContent: 'center' }}>
               <Avatar size={104} mode="cheer" level={curLevel} courseId={courseId} look={look} />
             </div>
-            <p className="eyebrow" style={{ marginTop: 10 }}>
+            <p className="eyebrow" style={{ marginTop: 8 }}>
               Doel gehaald
             </p>
-            <h1 className="display gold-text" style={{ fontSize: 30, margin: '10px 0 6px' }}>
+            <h1 className="display gold-text" style={{ fontSize: 28, margin: '10px 0 6px' }}>
               {goalsHit[0].label}
             </h1>
             {goalsHit[0].earlyDays > 0 && (
@@ -880,7 +880,7 @@ function CompleteView({
                 {goalsHit[0].earlyDays} {goalsHit[0].earlyDays === 1 ? 'dag' : 'dagen'} vóór je deadline.
               </motion.p>
             )}
-            <p className="gold-text" style={{ fontWeight: 700, fontSize: 17, marginTop: 8 }}>
+            <p className="gold-text" style={{ fontWeight: 700, fontSize: 16, marginTop: 8 }}>
               +{goalsHit[0].rewardXp} XP beloning
             </p>
             {goalsHit.length > 1 && (
@@ -898,16 +898,16 @@ function CompleteView({
             <div ref={figuurRef} style={{ display: 'flex', justifyContent: 'center' }}>
               <Avatar size={128} mode="cheer" level={newLevel} courseId={courseId} look={look} />
             </div>
-            <p className="eyebrow" style={{ marginTop: 10 }}>
+            <p className="eyebrow" style={{ marginTop: 8 }}>
               Niveau omhoog
             </p>
-            <h1 className="display gold-text" style={{ fontSize: 46, margin: '8px 0 2px' }}>
+            <h1 className="display gold-text" style={{ fontSize: 48, margin: '8px 0 2px' }}>
               Niveau {newLevel}
             </h1>
-            <p className="display dim" style={{ fontSize: 21 }}>
+            <p className="display dim" style={{ fontSize: 19 }}>
               {levelTitle(newLevel)}
             </p>
-            <div style={{ marginTop: 14 }}>
+            <div style={{ marginTop: 12 }}>
               <ShareButton
                 label="Laat je personage zien"
                 kaart={() => ({
@@ -923,7 +923,7 @@ function CompleteView({
             {levelReward(courseId, newLevel) && (
               <motion.p
                 className="gold-text"
-                style={{ fontWeight: 700, marginTop: 10 }}
+                style={{ fontWeight: 700, marginTop: 8 }}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.5, type: 'spring', stiffness: 220, damping: 16 }}

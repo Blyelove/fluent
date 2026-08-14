@@ -42,7 +42,7 @@ export function StijlKiezer() {
       >
         <span style={{ fontWeight: 500 }}>Momenten en effecten</span>
         <span className="row" style={{ gap: 8 }}>
-          <span className="dim" style={{ fontSize: 13.5 }}>
+          <span className="dim" style={{ fontSize: 14 }}>
             {XP_STIJLEN.find((x) => x.id === nu('xp'))?.naam ?? 'Klassiek'}
           </span>
           <span className="faint" style={{ fontSize: 16 }}>
@@ -69,7 +69,7 @@ export function StijlKiezer() {
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="display" style={{ fontSize: 23, marginBottom: 2 }}>
+              <h3 className="display" style={{ fontSize: 23, marginBottom: 0 }}>
                 ✨ Momenten en effecten
               </h3>
               <p className="dim" style={{ fontSize: 12.5, marginBottom: 16 }}>
@@ -77,7 +77,7 @@ export function StijlKiezer() {
               </p>
 
               {GROEPEN.map((g) => (
-                <div key={g.sleutel} style={{ marginBottom: 18 }}>
+                <div key={g.sleutel} style={{ marginBottom: 16 }}>
                   <div className="spread" style={{ marginBottom: 8 }}>
                     <strong className="card-title">{g.titel}</strong>
                     {g.sleutel !== 'arena' && (
@@ -100,11 +100,11 @@ export function StijlKiezer() {
                       </button>
                     )}
                   </div>
-                  <p className="faint" style={{ fontSize: 11.5, marginBottom: 9 }}>
+                  <p className="faint" style={{ fontSize: 11, marginBottom: 8 }}>
                     {g.uitleg}
                   </p>
                   {g.sleutel === 'breuk' && (
-                    <div className="row center" style={{ gap: 5, marginBottom: 10, justifyContent: 'center' }}>
+                    <div className="row center" style={{ gap: 4, marginBottom: 8, justifyContent: 'center' }}>
                       {[0, 1, 2].map((i) => (
                         <span
                           key={i}
@@ -134,7 +134,7 @@ export function StijlKiezer() {
                           }}
                           className="row"
                           style={{
-                            gap: 11,
+                            gap: 12,
                             padding: '11px 13px',
                             minHeight: 52,
                             borderRadius: 14,
@@ -144,13 +144,13 @@ export function StijlKiezer() {
                             boxShadow: actief ? 'var(--glow-hot)' : undefined,
                           }}
                         >
-                          <span className="col" style={{ flex: 1, minWidth: 0, gap: 1 }}>
-                            <span className="row" style={{ gap: 7 }}>
-                              <strong style={{ fontSize: 14.5, fontWeight: 700 }}>{o.naam}</strong>
+                          <span className="col" style={{ flex: 1, minWidth: 0, gap: 0 }}>
+                            <span className="row" style={{ gap: 8 }}>
+                              <strong style={{ fontSize: 14, fontWeight: 700 }}>{o.naam}</strong>
                               {o.gedurfd && (
                                 <span
                                   style={{
-                                    fontSize: 10,
+                                    fontSize: 11,
                                     fontWeight: 800,
                                     letterSpacing: '0.06em',
                                     color: 'var(--cyan)',
@@ -163,7 +163,7 @@ export function StijlKiezer() {
                                 </span>
                               )}
                             </span>
-                            <span className="faint" style={{ fontSize: 12 }}>
+                            <span className="faint" style={{ fontSize: 12.5 }}>
                               {o.kern}
                             </span>
                           </span>
@@ -179,7 +179,7 @@ export function StijlKiezer() {
                 </div>
               ))}
 
-              <p className="faint center" style={{ fontSize: 11.5, marginBottom: 10 }}>
+              <p className="faint center" style={{ fontSize: 11, marginBottom: 8 }}>
                 De arena-opkomst zie je bij je volgende gevecht. Proeven kan ook via de link, met ?arena=spot, ?breuk=as of ?levelup=92.
               </p>
               <button className="btn btn-ghost" style={{ padding: 12, fontSize: 14 }} onClick={() => { sfx('tap'); setOpen(false) }}>

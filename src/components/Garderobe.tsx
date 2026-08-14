@@ -65,10 +65,10 @@ export function Garderobe() {
             meester={stuk.vanaf >= 99}
           />
         </div>
-        <p style={{ fontSize: 9.5, fontWeight: 700, color: heb ? 'var(--text)' : 'var(--text-faint)', lineHeight: 1.15 }}>
+        <p style={{ fontSize: 11, fontWeight: 700, color: heb ? 'var(--text)' : 'var(--text-faint)', lineHeight: 1.15 }}>
           {stuk.naam}
         </p>
-        <p style={{ fontSize: 8.5, color: heb ? 'var(--goud-tekst-dim)' : 'var(--text-faint)', lineHeight: 1.2 }}>
+        <p style={{ fontSize: 11, color: heb ? 'var(--goud-tekst-dim)' : 'var(--text-faint)', lineHeight: 1.2 }}>
           {heb ? 'in bezit' : stuk.eis}
         </p>
       </div>
@@ -84,7 +84,7 @@ export function Garderobe() {
       >
         <span style={{ fontWeight: 500 }}>Garderobe</span>
         <span className="row" style={{ gap: 8 }}>
-          <span className="dim num" style={{ fontSize: 13.5 }}>
+          <span className="dim num" style={{ fontSize: 14 }}>
             {stand.heb} van {stand.totaal}
           </span>
           <span className="faint" style={{ fontSize: 16 }}>
@@ -111,20 +111,20 @@ export function Garderobe() {
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="display" style={{ fontSize: 23, marginBottom: 2 }}>
+              <h3 className="display" style={{ fontSize: 23, marginBottom: 0 }}>
                 Garderobe
               </h3>
               <p className="dim" style={{ fontSize: 12.5, marginBottom: 4 }}>
                 Alles wat je personage kan dragen. Wat je nog niet hebt staat er als silhouet, met wat je ervoor moet doen.
               </p>
-              <p className="faint num" style={{ fontSize: 11.5, marginBottom: 14 }}>
+              <p className="faint num" style={{ fontSize: 11, marginBottom: 12 }}>
                 {stand.heb} van de {stand.totaal} stukken in bezit
                 {volgende ? ` · hierna: ${volgende.naam}, ${volgende.eis.toLowerCase()}` : ' · de kast is compleet'}
               </p>
 
               {PLEKKEN.map((p) => (
                 <div key={p.plek} style={{ marginBottom: 16 }}>
-                  <div className="spread" style={{ marginBottom: 6 }}>
+                  <div className="spread" style={{ marginBottom: 4 }}>
                     <strong className="card-title" style={{ fontSize: 14 }}>
                       {p.naam}
                     </strong>
@@ -132,7 +132,7 @@ export function Garderobe() {
                       {p.uitleg}
                     </span>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(72px, 1fr))', gap: 6 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(72px, 1fr))', gap: 4 }}>
                     {KAST[p.plek].map((stuk) => (
                       <Tegel key={stuk.id} stuk={stuk} />
                     ))}
@@ -140,7 +140,7 @@ export function Garderobe() {
                 </div>
               ))}
 
-              <p className="faint center" style={{ fontSize: 11.5, marginBottom: 10 }}>
+              <p className="faint center" style={{ fontSize: 11, marginBottom: 8 }}>
                 Je draagt wat bij je taalwereld hoort: hetzelfde stuk valt in elke wereld anders. Je bent nu niveau {taalNiveau} in deze taal.
               </p>
               <button className="btn btn-ghost" style={{ padding: 12, fontSize: 14 }} onClick={() => { sfx('tap'); setOpen(false) }}>

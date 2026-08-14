@@ -99,7 +99,7 @@ export function Gatekeeper({
       </svg>
 
       {/* pantserbalk: acht segmenten die je eraf slaat */}
-      <div className="row" style={{ gap: 4, justifyContent: 'center', marginTop: 6 }}>
+      <div className="row" style={{ gap: 4, justifyContent: 'center', marginTop: 4 }}>
         {Array.from({ length: 8 }, (_, i) => (
           <motion.span
             key={i}

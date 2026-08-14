@@ -136,16 +136,16 @@ export function NewWordEx({ ex, ttsLang, register }: Common & { ex: NewWord }) {
         <button className="speaker-btn" onClick={() => speak(ex.word, ttsLang)} aria-label="Luister">
           <SpeakerIcon size={34} />
         </button>
-        <h2 className="display hot-text" style={{ fontSize: 40 }}>
+        <h2 className="display hot-text" style={{ fontSize: 34 }}>
           {ex.word}
         </h2>
-        <p className="dim" style={{ fontSize: 19, marginTop: 6 }}>
+        <p className="dim" style={{ fontSize: 19, marginTop: 4 }}>
           {ex.nl}
         </p>
       </div>
       {ex.example && (
-        <div className="glass" style={{ marginTop: 18, padding: '16px 18px', textAlign: 'left' }}>
-          <div className="row" style={{ gap: 10 }}>
+        <div className="glass" style={{ marginTop: 16, padding: '16px 18px', textAlign: 'left' }}>
+          <div className="row" style={{ gap: 8 }}>
             <button className="speaker-sm" onClick={() => speak(ex.example ?? '', ttsLang)} aria-label="Luister voorbeeld">
               <SpeakerIcon size={17} />
             </button>
@@ -219,7 +219,7 @@ export function SelectEx({ ex, ttsLang, locked, register }: Common & { ex: Selec
   return (
     <div className="float-in">
       <p className="eyebrow">Kies de juiste vertaling</p>
-      <div className="row" style={{ gap: 10 }}>
+      <div className="row" style={{ gap: 8 }}>
         <h2 className="prompt-big" style={{ flex: 1 }}>
           {ex.prompt}
         </h2>
@@ -229,7 +229,7 @@ export function SelectEx({ ex, ttsLang, locked, register }: Common & { ex: Selec
           </button>
         )}
       </div>
-      <div className="col" style={{ gap: 10 }}>
+      <div className="col" style={{ gap: 8 }}>
         {opties.map((opt, i) => (
           <button
             key={i}
@@ -369,18 +369,18 @@ export function MatchEx({
 
   return (
     <div className="float-in">
-      <p className="eyebrow" style={{ marginBottom: 18 }}>
+      <p className="eyebrow" style={{ marginBottom: 16 }}>
         Match de paren
       </p>
       <div className="match-grid">
-        <div className="col" style={{ gap: 10 }}>
+        <div className="col" style={{ gap: 8 }}>
           {left.map((v) => (
             <button key={v} className={cls(v, 'l')} style={{ justifyContent: 'center', textAlign: 'center' }} onClick={() => { sfx('tap'); setSelL(v) }}>
               {v}
             </button>
           ))}
         </div>
-        <div className="col" style={{ gap: 10 }}>
+        <div className="col" style={{ gap: 8 }}>
           {right.map((v) => (
             <button
               key={v}
@@ -422,7 +422,7 @@ export function ListenEx({ ex, ttsLang, locked, register }: Common & { ex: Liste
 
   return (
     <div className="float-in center">
-      <p className="eyebrow" style={{ marginBottom: 20 }}>
+      <p className="eyebrow" style={{ marginBottom: 16 }}>
         Wat hoor je?
       </p>
       <div className="row" style={{ gap: 12, justifyContent: 'center' }}>
@@ -441,7 +441,7 @@ export function ListenEx({ ex, ttsLang, locked, register }: Common & { ex: Liste
           🐢
         </button>
       </div>
-      <div className="col" style={{ gap: 10, textAlign: 'left' }}>
+      <div className="col" style={{ gap: 8, textAlign: 'left' }}>
         {opties.map((opt, i) => (
           <button
             key={i}
@@ -491,7 +491,7 @@ export function TypeEx({ ex, ttsLang, locked, register, onSubmit }: Common & { e
       <p className="eyebrow">Typ de vertaling</p>
       <h2 className="prompt-big">{ex.nl}</h2>
       {accenten && !locked && (
-        <div className="row" style={{ flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
+        <div className="row" style={{ flexWrap: 'wrap', gap: 4, marginBottom: 12 }}>
           {accenten.map((a) => (
             <button
               key={a}
@@ -568,11 +568,11 @@ export function FillEx({ ex, locked, register }: Common & { ex: Fill }) {
         {ex.after}
       </h2>
       {ex.nl && (
-        <p className="dim" style={{ marginTop: -16, marginBottom: 22, fontSize: 15 }}>
+        <p className="dim" style={{ marginTop: -16, marginBottom: 24, fontSize: 14 }}>
           {ex.nl}
         </p>
       )}
-      <div className="col" style={{ gap: 10 }}>
+      <div className="col" style={{ gap: 8 }}>
         {opties.map((opt, i) => (
           <button
             key={i}

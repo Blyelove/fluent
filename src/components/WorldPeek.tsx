@@ -57,7 +57,7 @@ export function WorldPeek({
   return (
     <div className="glass unit-card" style={{ order: 1 }}>
       <div className="spread">
-        <span className="row" style={{ gap: 10 }}>
+        <span className="row" style={{ gap: 8 }}>
           <span style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(34,211,238,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🌍</span>
           <strong className="card-title">Wereldverovering</strong>
         </span>
@@ -66,7 +66,7 @@ export function WorldPeek({
         </span>
       </div>
 
-      <div style={{ position: 'relative', marginTop: 10, width: '100%' }}>
+      <div style={{ position: 'relative', marginTop: 8, width: '100%' }}>
         <svg viewBox={`0 0 ${B} ${H}`} width="100%" style={{ display: 'block', overflow: 'visible' }} aria-hidden="true">
           <defs>
             <linearGradient id="peek-route" x1="0" y1="0" x2="1" y2="0">
@@ -114,12 +114,12 @@ export function WorldPeek({
       </div>
 
       {doel ? (
-        <div style={{ marginTop: 6 }}>
-          <div className="spread" style={{ marginBottom: 6 }}>
-            <span className="dim row" style={{ fontSize: 13, gap: 6 }}>
+        <div style={{ marginTop: 4 }}>
+          <div className="spread" style={{ marginBottom: 4 }}>
+            <span className="dim row" style={{ fontSize: 12.5, gap: 4 }}>
               Volgende: <Flag code={doel.code} size={14} /> {doel.name}
             </span>
-            <span className="faint" style={{ fontSize: 12 }}>
+            <span className="faint" style={{ fontSize: 12.5 }}>
               {doel.inCourse ? `nog ${restLessen} ${restLessen === 1 ? 'les' : 'lessen'}` : 'komt met nieuwe lessen'}
             </span>
           </div>
@@ -128,14 +128,17 @@ export function WorldPeek({
           </div>
         </div>
       ) : (
-        <p className="gold-text" style={{ fontSize: 13, fontWeight: 600, marginTop: 6 }}>
+        <p className="gold-text" style={{ fontSize: 12.5, fontWeight: 600, marginTop: 4 }}>
           De hele {course.name}talige wereld is van jou. Meesterlijk.
         </p>
       )}
 
       <button
         className="btn btn-primary"
-        style={{ marginTop: 14, padding: 13, fontSize: 14.5 }}
+        /* minHeight erbij: met padding 12 en tekst van 14 komt deze knop op
+           43 pixels uit, net onder de tikgrens van 44. De maatladder mag nooit
+           een knop kleiner maken dan een duim aankan. */
+        style={{ marginTop: 12, padding: 12, fontSize: 14, minHeight: 44 }}
         onClick={() => {
           sfx('tap')
           onOpen()

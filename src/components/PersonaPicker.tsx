@@ -44,10 +44,10 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
     heel?: boolean
   }) => (
     <div>
-      <p className="eyebrow" style={{ fontSize: 10, marginBottom: 5, color: 'var(--text-faint)' }}>
+      <p className="eyebrow" style={{ fontSize: 11, marginBottom: 4, color: 'var(--text-faint)' }}>
         {titel}
       </p>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(60px, 1fr))', gap: 6 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(60px, 1fr))', gap: 4 }}>
         {namen.map((naam, i) => {
           const aan = ((value[sleutel] as number | undefined) ?? 0) === i
           return (
@@ -78,7 +78,7 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
               >
                 <Avatar size={heel ? 54 : 62} look={{ ...value, [sleutel]: i }} courseId="es" still />
               </div>
-              <p style={{ fontSize: 9.5, fontWeight: 700, color: aan ? 'var(--hot2)' : 'var(--text-faint)' }}>{naam}</p>
+              <p style={{ fontSize: 11, fontWeight: 700, color: aan ? 'var(--hot2)' : 'var(--text-faint)' }}>{naam}</p>
             </button>
           )
         })}
@@ -87,7 +87,7 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
   )
 
   const Swatches = ({ colors, active, pick }: { colors: string[]; active: number; pick: (i: number) => void }) => (
-    <div className="row" style={{ gap: 2, flexWrap: 'wrap', marginLeft: -7 }}>
+    <div className="row" style={{ gap: 0, flexWrap: 'wrap', marginLeft: -7 }}>
       {colors.map((c, i) => (
         <button
           key={c}
@@ -137,10 +137,10 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
 
   return (
     <div className="glass" style={{ padding: 16, marginBottom: 16 }}>
-      <p className="eyebrow" style={{ fontSize: 10, marginBottom: 5 }}>
+      <p className="eyebrow" style={{ fontSize: 11, marginBottom: 4 }}>
         Stap 1: ik ben een...
       </p>
-      <div className="row" style={{ gap: 8, marginBottom: 14 }}>
+      <div className="row" style={{ gap: 8, marginBottom: 12 }}>
         {GENDER_NAMES.map((name, gi) => (
           <button
             key={name}
@@ -150,7 +150,7 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
               flex: 1,
               padding: '11px 10px',
               borderRadius: 12,
-              fontSize: 14.5,
+              fontSize: 14,
               fontWeight: 800,
               background: geslacht === gi ? 'var(--grad-hot)' : 'var(--surface-2)',
               color: geslacht === gi ? '#fff' : 'var(--text-dim)',
@@ -163,8 +163,8 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
         ))}
       </div>
 
-      <div className="spread" style={{ marginBottom: 6 }}>
-        <p className="eyebrow" style={{ fontSize: 10 }}>
+      <div className="spread" style={{ marginBottom: 4 }}>
+        <p className="eyebrow" style={{ fontSize: 11 }}>
           Stap 2: kies je held ({helden.length} karakters)
         </p>
         <button
@@ -176,7 +176,7 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
           style={{
             padding: '6px 12px',
             borderRadius: 999,
-            fontSize: 12,
+            fontSize: 12.5,
             fontWeight: 800,
             background: 'var(--surface-2)',
             border: '1.5px solid var(--line-hot)',
@@ -187,7 +187,7 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
           🎲 Verras me
         </button>
       </div>
-      <p className="faint" style={{ fontSize: 11.5, marginBottom: 10 }}>
+      <p className="faint" style={{ fontSize: 11, marginBottom: 8 }}>
         Allemaal uniek en direct te kiezen. Onderaan stel je hem zelf samen uit ruim 300.000 combinaties.
       </p>
       {/* de helden van jouw keuze in één raster; .galerij-cel rendert alleen
@@ -197,7 +197,7 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fill, minmax(58px, 1fr))',
-          gap: 6,
+          gap: 4,
           marginBottom: 12,
           maxHeight: 340,
           overflowY: 'auto',
@@ -228,7 +228,7 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
               <div style={{ height: 46, overflow: 'hidden', display: 'flex', justifyContent: 'center' }}>
                 <Avatar size={62} look={h.stijl} courseId="es" still />
               </div>
-              <p style={{ fontSize: 9.5, fontWeight: 700, color: actief ? 'var(--hot2)' : 'var(--text-faint)' }}>{h.naam}</p>
+              <p style={{ fontSize: 11, fontWeight: 700, color: actief ? 'var(--hot2)' : 'var(--text-faint)' }}>{h.naam}</p>
             </button>
           )
         })}
@@ -250,21 +250,21 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
           }}
         >
           <Avatar size={96} look={value} courseId="es" />
-          <p className="faint" style={{ fontSize: 10.5, marginTop: 2 }}>
+          <p className="faint" style={{ fontSize: 11, marginTop: 0 }}>
             Dit ben jij
           </p>
         </div>
-        <div className="col" style={{ gap: 10, minWidth: 0 }}>
+        <div className="col" style={{ gap: 8, minWidth: 0 }}>
           <div>
-            <p className="eyebrow" style={{ fontSize: 10, marginBottom: 5 }}>
+            <p className="eyebrow" style={{ fontSize: 11, marginBottom: 4 }}>
               Stap 3 (mag ook): maak hem helemaal eigen
             </p>
-            <p className="eyebrow" style={{ fontSize: 10, marginBottom: 5, color: 'var(--text-faint)' }}>
+            <p className="eyebrow" style={{ fontSize: 11, marginBottom: 4, color: 'var(--text-faint)' }}>
               Haarstijl, met jouw kleuren
             </p>
             {/* minimaal 60px per tegel: op 375px werden vijf kolommen te smal
                 voor de 56px-avatar en de 44px-tikgrens */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(60px, 1fr))', gap: 6 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(60px, 1fr))', gap: 4 }}>
               {HAIR_STYLE_NAMES.map((name, i) => (
                 <button
                   key={name}
@@ -281,16 +281,16 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
                   <div style={{ height: 38, overflow: 'hidden', display: 'flex', justifyContent: 'center' }}>
                     <Avatar size={56} look={{ ...value, hair: i }} courseId="es" still />
                   </div>
-                  <p style={{ fontSize: 9.5, fontWeight: 700, color: value.hair === i ? 'var(--hot2)' : 'var(--text-faint)' }}>{name}</p>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: value.hair === i ? 'var(--hot2)' : 'var(--text-faint)' }}>{name}</p>
                 </button>
               ))}
             </div>
           </div>
           <div>
-            <p className="eyebrow" style={{ fontSize: 10, marginBottom: 5 }}>
+            <p className="eyebrow" style={{ fontSize: 11, marginBottom: 4 }}>
               Extra
             </p>
-            <div className="row" style={{ gap: 6, flexWrap: 'wrap' }}>
+            <div className="row" style={{ gap: 4, flexWrap: 'wrap' }}>
               {EXTRA_NAMES.map((name, i) => (
                 <button
                   key={name}
@@ -299,7 +299,7 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
                     padding: '11px 14px',
                     minHeight: 44,
                     borderRadius: 999,
-                    fontSize: 11.5,
+                    fontSize: 11,
                     fontWeight: 700,
                     background: (value.extra ?? 0) === i ? 'var(--grad-hot)' : 'var(--surface-2)',
                     color: (value.extra ?? 0) === i ? '#fff' : 'var(--text-dim)',
@@ -321,26 +321,26 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
           <TrekRij titel="Mond" sleutel="mouth" namen={MOUTH_NAMES} />
           <TrekRij titel="Lichaamsbouw" sleutel="build" namen={BOUW_NAMEN} heel />
           <div>
-            <p className="eyebrow" style={{ fontSize: 10, marginBottom: 5 }}>
+            <p className="eyebrow" style={{ fontSize: 11, marginBottom: 4 }}>
               Huidskleur
             </p>
             <Swatches colors={SKINS} active={value.skin} pick={(i) => set({ skin: i })} />
           </div>
           <div>
-            <p className="eyebrow" style={{ fontSize: 10, marginBottom: 5 }}>
+            <p className="eyebrow" style={{ fontSize: 11, marginBottom: 4 }}>
               Haarkleur
             </p>
             <Swatches colors={HAIR_COLORS} active={value.hairColor} pick={(i) => set({ hairColor: i })} />
           </div>
           <div>
-            <p className="eyebrow" style={{ fontSize: 10, marginBottom: 5 }}>
+            <p className="eyebrow" style={{ fontSize: 11, marginBottom: 4 }}>
               Outfit
             </p>
             <Swatches colors={OUTFIT_COLORS} active={value.outfit} pick={(i) => set({ outfit: i })} />
           </div>
         </div>
       </div>
-      <p className="faint center" style={{ fontSize: 11, marginTop: 10 }}>
+      <p className="faint center" style={{ fontSize: 11, marginTop: 8 }}>
         Ruim 300.000 combinaties. Maak jezelf, en zie jezelf per niveau vetter worden.
       </p>
     </div>

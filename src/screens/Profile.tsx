@@ -44,10 +44,10 @@ export function ProfileScreen() {
       <div className="spread">
         <div>
           <p className="eyebrow">Profiel</p>
-          <h1 className="display" style={{ fontSize: 30, margin: '8px 0 4px' }}>
+          <h1 className="display" style={{ fontSize: 28, margin: '8px 0 4px' }}>
             Jouw reis
           </h1>
-          <p className="dim row" style={{ fontSize: 14, gap: 6 }}>
+          <p className="dim row" style={{ fontSize: 14, gap: 4 }}>
             Niveau {lp.level}, {levelTitle(lp.level)}, <Flag code={courseFlagCode[state.courseId]} size={14} /> {course.name}
           </p>
         </div>
@@ -84,7 +84,7 @@ export function ProfileScreen() {
         <div className="progress-track" style={{ height: 8 }}>
           <div className="progress-fill" style={{ width: `${Math.round(lp.frac * 100)}%` }} />
         </div>
-        <p className="faint" style={{ fontSize: 12, marginTop: 6 }}>
+        <p className="faint" style={{ fontSize: 12.5, marginTop: 4 }}>
           Nog {lp.needed - lp.current} XP tot niveau {lp.level + 1}: {levelTitle(lp.level + 1)}
         </p>
       </div>
@@ -92,7 +92,7 @@ export function ProfileScreen() {
       {/* het vaardighedenraster opent het profiel, zonder één tik: zes talen
           als skills richting 99, met het totaalniveau eronder. Wie RuneScape
           ooit speelde is meteen thuis. Tik een taal voor de details. */}
-      <div style={{ marginBottom: 10 }}>
+      <div style={{ marginBottom: 8 }}>
         <SkillRaster actief={state.courseId} onTegel={() => { sfx('tap'); setSkillsOpen(true) }} />
       </div>
 
@@ -122,10 +122,10 @@ export function ProfileScreen() {
         const wardrobe = wardrobeFor(state.courseId)
         const volgendItem = nextReward(state.courseId, lp.level)
         return (
-          <div className="card-hero" style={{ padding: 18, marginBottom: 24 }}>
+          <div className="card-hero" style={{ padding: 16, marginBottom: 24 }}>
             <div className="spread">
               <strong className="card-title">Jouw transformatie: {course.name}</strong>
-              <span className="faint num" style={{ fontSize: 13 }}>
+              <span className="faint num" style={{ fontSize: 12.5 }}>
                 {wardrobe.filter((w) => lp.level >= w.level).length} / {wardrobe.length}
               </span>
             </div>
@@ -134,7 +134,7 @@ export function ProfileScreen() {
                 verhaal van de app vertelt. */}
             <div
               className="no-scrollbar row"
-              style={{ gap: 10, overflowX: 'auto', padding: '14px 2px 6px', scrollSnapType: 'x mandatory' }}
+              style={{ gap: 8, overflowX: 'auto', padding: '14px 2px 6px', scrollSnapType: 'x mandatory' }}
             >
               {[1, 5, 10, 15, 20].map((niv) => {
                 const bereikt = lp.level >= niv
@@ -171,7 +171,7 @@ export function ProfileScreen() {
                     </div>
                     <p
                       style={{
-                        fontSize: 11.5,
+                        fontSize: 11,
                         fontWeight: 800,
                         marginTop: 4,
                         // geen goud op de goudwaas van het huidige stadium: dat
@@ -189,8 +189,8 @@ export function ProfileScreen() {
 
             {/* tik een stadium aan en je ziet welke items daarbij horen */}
             {toonNiveau !== null && (
-              <div className="glass" style={{ padding: '10px 14px', marginTop: 10, background: 'var(--surface-2)' }}>
-                <p className="eyebrow" style={{ fontSize: 10, marginBottom: 6 }}>
+              <div className="glass" style={{ padding: '10px 14px', marginTop: 8, background: 'var(--surface-2)' }}>
+                <p className="eyebrow" style={{ fontSize: 11, marginBottom: 4 }}>
                   Wat je tot niveau {toonNiveau} verdient
                 </p>
                 {wardrobe.filter((w) => w.level <= toonNiveau).length === 0 ? (
@@ -198,16 +198,16 @@ export function ProfileScreen() {
                     Hier begin je: je eigen personage, nog zonder culturele items.
                   </p>
                 ) : (
-                  <div className="col" style={{ gap: 5 }}>
+                  <div className="col" style={{ gap: 4 }}>
                     {wardrobe
                       .filter((w) => w.level <= toonNiveau)
                       .map((w) => (
                         <div className="spread" key={w.level}>
-                          <span style={{ fontSize: 13, color: lp.level >= w.level ? 'var(--text)' : 'var(--text-faint)' }}>
+                          <span style={{ fontSize: 12.5, color: lp.level >= w.level ? 'var(--text)' : 'var(--text-faint)' }}>
                             {lp.level >= w.level ? '✓ ' : ''}
                             {w.item}
                           </span>
-                          <span className="faint num" style={{ fontSize: 11.5 }}>
+                          <span className="faint num" style={{ fontSize: 11 }}>
                             niveau {w.level}
                           </span>
                         </div>
@@ -217,7 +217,7 @@ export function ProfileScreen() {
               </div>
             )}
 
-            <p className="faint center" style={{ fontSize: 12, marginTop: 12 }}>
+            <p className="faint center" style={{ fontSize: 12.5, marginTop: 12 }}>
               {volgendItem
                 ? `Nog ${volgendItem.level - lp.level} ${volgendItem.level - lp.level === 1 ? 'niveau' : 'niveaus'} tot je ${volgendItem.item.toLowerCase()}.`
                 : `Je bent volledig ${course.name}. Niemand die je nog voor een toerist aanziet.`}
@@ -227,10 +227,10 @@ export function ProfileScreen() {
       })()}
 
       {bewerkt && (
-        <div style={{ marginBottom: 18 }}>
+        <div style={{ marginBottom: 16 }}>
           {/* live opslaan: elke tik past je personage direct aan, overal in de app */}
           <PersonaPicker value={normalizePersona(state.avatarLook)} onChange={state.setAvatarLook} />
-          <button className="btn btn-primary" style={{ padding: 13, minHeight: 44, fontSize: 14.5 }} onClick={() => setBewerkt(false)}>
+          <button className="btn btn-primary" style={{ padding: 12, minHeight: 44, fontSize: 14 }} onClick={() => setBewerkt(false)}>
             Klaar, zo wil ik eruitzien
           </button>
         </div>
@@ -238,17 +238,17 @@ export function ProfileScreen() {
 
       <button
         className="glass spread"
-        style={{ width: '100%', padding: '16px 18px', marginBottom: 18, textAlign: 'left', borderColor: 'var(--line-hot)' }}
+        style={{ width: '100%', padding: '16px 18px', marginBottom: 16, textAlign: 'left', borderColor: 'var(--line-hot)' }}
         onClick={() => setView('badges')}
       >
         <span className="row" style={{ gap: 12 }}>
-          <span style={{ fontSize: 24 }}>🏅</span>
-          <span className="col" style={{ gap: 2 }}>
+          <span style={{ fontSize: 23 }}>🏅</span>
+          <span className="col" style={{ gap: 0 }}>
             <strong className="card-title">Prestaties & badges</strong>
             <span className="faint" style={{ fontSize: 12.5 }}>Bekijk je verzameling en volgende mijlpalen</span>
           </span>
         </span>
-        <span className="hot-text" style={{ fontSize: 20, fontWeight: 800 }}>›</span>
+        <span className="hot-text" style={{ fontSize: 19, fontWeight: 800 }}>›</span>
       </button>
 
       {skillsOpen && <SkillsSheet onClose={() => setSkillsOpen(false)} />}
@@ -272,7 +272,7 @@ export function ProfileScreen() {
         </div>
       </div>
 
-      <div className="glass" style={{ padding: '6px 18px', marginBottom: 28 }}>
+      <div className="glass" style={{ padding: '6px 18px', marginBottom: 24 }}>
         <div className="spread" style={{ padding: '14px 0', borderBottom: '1px solid var(--line)' }}>
           <span style={{ fontWeight: 500 }}>Beste reeks</span>
           <span className="gold-text num" style={{ fontWeight: 700 }}>
@@ -290,15 +290,15 @@ export function ProfileScreen() {
       </div>
 
       {/* al het beheer bij elkaar, onderaan: eerst je trofeeën, dan de knoppen */}
-      <p className="eyebrow" style={{ marginBottom: 10 }}>Instellingen</p>
-      <div className="glass" style={{ padding: '6px 18px', marginBottom: 20 }}>
+      <p className="eyebrow" style={{ marginBottom: 8 }}>Instellingen</p>
+      <div className="glass" style={{ padding: '6px 18px', marginBottom: 16 }}>
         {/* van taal wisselen woont hier, niet meer op het startscherm */}
         <div style={{ padding: '14px 0', borderBottom: '1px solid var(--line)' }}>
-          <div className="spread" style={{ marginBottom: 10 }}>
+          <div className="spread" style={{ marginBottom: 8 }}>
             <span style={{ fontWeight: 500 }}>Taal die je leert</span>
-            <span className="dim" style={{ fontSize: 13.5 }}>{course.name}</span>
+            <span className="dim" style={{ fontSize: 14 }}>{course.name}</span>
           </div>
-          <div className="row" style={{ gap: 7, flexWrap: 'wrap' }}>
+          <div className="row" style={{ gap: 8, flexWrap: 'wrap' }}>
             {courseList.map((c) => (
               <button
                 key={c.id}
@@ -327,7 +327,7 @@ export function ProfileScreen() {
         {/* stond hier als dode tekst; nu draai je er zo doorheen */}
         <div className="spread" style={{ padding: '10px 0', borderBottom: '1px solid var(--line)' }}>
           <span style={{ fontWeight: 500 }}>Dagelijks doel</span>
-          <div className="row" style={{ gap: 6 }}>
+          <div className="row" style={{ gap: 4 }}>
             {[20, 40, 60, 100].map((xp) => (
               <button
                 key={xp}
@@ -397,7 +397,7 @@ export function ProfileScreen() {
           <>
             <div className="spread" style={{ padding: '14px 0', borderBottom: '1px solid var(--line)' }}>
               <span style={{ fontWeight: 500 }}>Account</span>
-              <span className="dim" style={{ fontSize: 13, fontWeight: 600 }}>
+              <span className="dim" style={{ fontSize: 12.5, fontWeight: 600 }}>
                 {state.accounts[state.currentUser].email}
               </span>
             </div>
@@ -422,13 +422,13 @@ export function ProfileScreen() {
         </div>
       </div>
 
-      <p className="faint center" style={{ fontSize: 13, marginBottom: 16 }}>
+      <p className="faint center" style={{ fontSize: 12.5, marginBottom: 16 }}>
         Fluent leert je talen zonder straf: geen hartjes, geen energie, geen limiet. Alleen een reeks die om je geeft, met automatische
         bescherming als het leven ertussen komt.
       </p>
 
       {/* de bouwstempel: zo zie je op de live site wélke versie er draait */}
-      <p className="faint center" style={{ fontSize: 11.5, marginTop: 14 }}>
+      <p className="faint center" style={{ fontSize: 11, marginTop: 12 }}>
         Fluent · versie van {__BOUWSTEMPEL__}
       </p>
     </div>

@@ -72,7 +72,7 @@ function ctaFor(b: BadgeState): string {
 /** Vijf stipjes die laten zien hoever je in deze badge bent */
 function TierPips({ tier, color }: { tier: number; color: string }) {
   return (
-    <span className="row" style={{ gap: 3 }}>
+    <span className="row" style={{ gap: 4 }}>
       {Array.from({ length: MAX_TIER }, (_, i) => i + 1).map((t) => (
         <span
           key={t}
@@ -129,7 +129,7 @@ function BadgeOrb({ b, size }: { b: BadgeState; size: number }) {
             lineHeight: 1,
             background: 'var(--bg-2)',
             borderRadius: '50%',
-            padding: 3,
+            padding: 4,
             border: '1.5px solid var(--line)',
           }}
         >
@@ -205,33 +205,33 @@ export function BadgesScreen() {
       <div className="ambient-orb orb-b" />
 
       <p className="eyebrow">Verzamelkast</p>
-      <h1 className="display" style={{ fontSize: 30, margin: '8px 0 16px' }}>
+      <h1 className="display" style={{ fontSize: 28, margin: '8px 0 16px' }}>
         Jouw <span className="gold-text">prestaties</span>
       </h1>
 
       {/* ---------- totaalscore ---------- */}
       <motion.div
         className="glass"
-        style={{ padding: 20, marginBottom: 26 }}
+        style={{ padding: 16, marginBottom: 24 }}
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 200, damping: 24 }}
       >
         <div className="spread" style={{ alignItems: 'flex-end' }}>
           <div className="col">
-            <span className="display gold-text" style={{ fontSize: 52, lineHeight: 1 }}>
+            <span className="display gold-text" style={{ fontSize: 48, lineHeight: 1 }}>
               {points}
-              <span className="faint display" style={{ fontSize: 22, WebkitTextFillColor: 'var(--text-faint)' }}>
+              <span className="faint display" style={{ fontSize: 23, WebkitTextFillColor: 'var(--text-faint)' }}>
                 {' '}
                 / {MAX_POINTS}
               </span>
             </span>
-            <span className="stat-label" style={{ marginTop: 6 }}>
+            <span className="stat-label" style={{ marginTop: 4 }}>
               Behaalde tiers
             </span>
           </div>
           <motion.span
-            style={{ fontSize: 42, lineHeight: 1 }}
+            style={{ fontSize: 48, lineHeight: 1 }}
             animate={{ rotate: [0, -7, 7, 0] }}
             transition={{ duration: 3.6, repeat: Infinity, ease: 'easeInOut' }}
           >
@@ -248,7 +248,7 @@ export function BadgesScreen() {
           />
         </div>
 
-        <p className="dim" style={{ fontSize: 13, marginTop: 10 }}>
+        <p className="dim" style={{ fontSize: 12.5, marginTop: 8 }}>
           {started === 0 ? `Nog geen van de ${BADGES.length} badges gestart` : `${started} van de ${BADGES.length} badges gestart`}
           {maxed > 0 && (
             <>
@@ -265,16 +265,16 @@ export function BadgesScreen() {
       {!heeftData && (
         <motion.div
           className="glass center"
-          style={{ padding: 18, marginBottom: 26 }}
+          style={{ padding: 16, marginBottom: 24 }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, type: 'spring', stiffness: 220, damping: 24 }}
         >
-          <span style={{ fontSize: 30, lineHeight: 1 }}>✨</span>
-          <p className="display" style={{ fontSize: 17, marginTop: 8 }}>
+          <span style={{ fontSize: 28, lineHeight: 1 }}>✨</span>
+          <p className="display" style={{ fontSize: 16, marginTop: 8 }}>
             Nog niets verzameld
           </p>
-          <p className="dim" style={{ fontSize: 13, marginTop: 6 }}>
+          <p className="dim" style={{ fontSize: 12.5, marginTop: 4 }}>
             Rond je eerste les af en de eerste tier is meteen binnen. Hieronder zie je precies wat er te veroveren valt.
           </p>
         </motion.div>
@@ -282,16 +282,16 @@ export function BadgesScreen() {
 
       {/* ---------- bijna binnen ---------- */}
       {almost.length > 0 && (
-        <section style={{ marginBottom: 28 }}>
-          <div className="spread" style={{ marginBottom: 10 }}>
+        <section style={{ marginBottom: 24 }}>
+          <div className="spread" style={{ marginBottom: 8 }}>
             <h2 className="display" style={{ fontSize: 19 }}>
               {heeftData ? 'Bijna binnen!' : 'Hier begin je'}
             </h2>
-            <span className="faint" style={{ fontSize: 12 }}>
+            <span className="faint" style={{ fontSize: 12.5 }}>
               {heeftData ? 'dichtstbij' : 'eerste mijlpalen'}
             </span>
           </div>
-          <div className="col" style={{ gap: 10 }}>
+          <div className="col" style={{ gap: 8 }}>
             {almost.map((b, i) => (
               <motion.button
                 key={b.def.id}
@@ -308,13 +308,13 @@ export function BadgesScreen() {
                 aria-label={`${b.def.name} bekijken`}
               >
                 <BadgeOrb b={b} size={44} />
-                <span className="col" style={{ gap: 3, flex: 1, minWidth: 0 }}>
-                  <strong style={{ fontSize: 15 }}>{b.def.name}</strong>
-                  <span className="faint" style={{ fontSize: 12, fontWeight: 500 }}>
+                <span className="col" style={{ gap: 4, flex: 1, minWidth: 0 }}>
+                  <strong style={{ fontSize: 14 }}>{b.def.name}</strong>
+                  <span className="faint" style={{ fontSize: 12.5, fontWeight: 500 }}>
                     {ctaFor(b)} → {b.def.tierNames[b.tier]}
                   </span>
                   {/* flex uitzetten: .progress-track heeft flex:1, dat zou in een kolom de hoogte kapen */}
-                  <span className="progress-track" style={{ flex: '0 0 auto', height: 6, marginTop: 2 }}>
+                  <span className="progress-track" style={{ flex: '0 0 auto', height: 6, marginTop: 0 }}>
                     <motion.span
                       style={{ display: 'block', height: '100%', borderRadius: 999, background: b.def.color }}
                       initial={{ width: 0 }}
@@ -323,7 +323,7 @@ export function BadgesScreen() {
                     />
                   </span>
                 </span>
-                <span className="display" style={{ fontSize: 15, color: b.def.color, fontWeight: 800 }}>
+                <span className="display" style={{ fontSize: 14, color: b.def.color, fontWeight: 800 }}>
                   {pctOf(b.frac)}%
                 </span>
               </motion.button>
@@ -333,7 +333,7 @@ export function BadgesScreen() {
       )}
 
       {/* ---------- alle badges ---------- */}
-      <h2 className="display" style={{ fontSize: 19, marginBottom: 10 }}>
+      <h2 className="display" style={{ fontSize: 19, marginBottom: 8 }}>
         Alle badges
       </h2>
       <div className="stat-grid" style={{ gap: 12 }}>
@@ -374,7 +374,7 @@ export function BadgesScreen() {
                     position: 'absolute',
                     top: 8,
                     right: 8,
-                    fontSize: 10,
+                    fontSize: 11,
                     letterSpacing: '0.12em',
                     padding: '3px 8px',
                     borderRadius: 999,
@@ -393,7 +393,7 @@ export function BadgesScreen() {
                     position: 'absolute',
                     top: 8,
                     right: 8,
-                    fontSize: 10,
+                    fontSize: 11,
                     letterSpacing: '0.1em',
                     padding: '3px 8px',
                     borderRadius: 999,
@@ -410,11 +410,11 @@ export function BadgesScreen() {
 
               <BadgeOrb b={b} size={62} />
 
-              <span className="col" style={{ gap: 2, alignItems: 'center' }}>
+              <span className="col" style={{ gap: 0, alignItems: 'center' }}>
                 <strong style={{ fontSize: 14, lineHeight: 1.2 }}>{b.def.name}</strong>
                 <span
                   style={{
-                    fontSize: 11.5,
+                    fontSize: 11,
                     fontWeight: 700,
                     color: locked ? 'var(--text-faint)' : b.def.color,
                   }}
@@ -440,7 +440,7 @@ export function BadgesScreen() {
                     transition={{ type: 'spring', stiffness: 70, damping: 18, delay: 0.1 + 0.03 * i }}
                   />
                 </span>
-                <span className="faint" style={{ display: 'block', fontSize: 11.5, marginTop: 5, fontWeight: 600 }}>
+                <span className="faint" style={{ display: 'block', fontSize: 11, marginTop: 4, fontWeight: 600 }}>
                   {b.next === null ? `${fmt(b.value)} · voltooid` : `${fmt(b.value)} / ${fmt(b.next)}`}
                 </span>
               </div>
@@ -449,7 +449,7 @@ export function BadgesScreen() {
         })}
       </div>
 
-      <p className="faint center" style={{ fontSize: 13, margin: '26px 0 4px' }}>
+      <p className="faint center" style={{ fontSize: 12.5, margin: '26px 0 4px' }}>
         Elke badge heeft vijf tiers. Tik op een badge om te zien wat er nog te veroveren valt.
       </p>
 
@@ -479,7 +479,7 @@ export function BadgesScreen() {
                 // kan in principe niet gebeuren, maar zonder sluitknop zit je vast
                 if (!b)
                   return (
-                    <div className="col" style={{ gap: 14 }}>
+                    <div className="col" style={{ gap: 12 }}>
                       <p className="dim" style={{ fontSize: 14 }}>
                         Deze badge kon niet worden geladen.
                       </p>
@@ -490,16 +490,16 @@ export function BadgesScreen() {
                   )
                 return (
                   <>
-                    <div className="row" style={{ gap: 14, marginBottom: 6 }}>
+                    <div className="row" style={{ gap: 12, marginBottom: 4 }}>
                       <BadgeOrb b={b} size={64} />
-                      <div className="col" style={{ gap: 2, flex: 1 }}>
-                        <h3 className="display" style={{ fontSize: 22 }}>
+                      <div className="col" style={{ gap: 0, flex: 1 }}>
+                        <h3 className="display" style={{ fontSize: 23 }}>
                           {b.def.name}
                         </h3>
-                        <p className="dim" style={{ fontSize: 13 }}>
+                        <p className="dim" style={{ fontSize: 12.5 }}>
                           {b.def.desc}
                         </p>
-                        <p style={{ fontSize: 13, fontWeight: 700, color: b.def.color }}>
+                        <p style={{ fontSize: 12.5, fontWeight: 700, color: b.def.color }}>
                           {b.tier === 0 ? 'Nog niet behaald' : `Tier ${b.tier} · ${b.def.tierNames[b.tier - 1]}`}
                         </p>
                       </div>
@@ -507,10 +507,10 @@ export function BadgesScreen() {
 
                     <div className="glass" style={{ padding: '12px 14px', margin: '14px 0 18px' }}>
                       <div className="spread">
-                        <span className="dim" style={{ fontSize: 13, fontWeight: 600 }}>
+                        <span className="dim" style={{ fontSize: 12.5, fontWeight: 600 }}>
                           Jouw stand
                         </span>
-                        <span className="display gold-text" style={{ fontSize: 20 }}>
+                        <span className="display gold-text" style={{ fontSize: 19 }}>
                           {fmt(b.value)}
                         </span>
                       </div>
@@ -554,21 +554,21 @@ export function BadgesScreen() {
                             >
                               {done ? '✓' : idx + 1}
                             </span>
-                            <span className="col" style={{ gap: 1, flex: 1 }}>
-                              <strong style={{ fontSize: 14.5, color: done ? 'var(--text)' : 'var(--text-dim)' }}>
+                            <span className="col" style={{ gap: 0, flex: 1 }}>
+                              <strong style={{ fontSize: 14, color: done ? 'var(--text)' : 'var(--text-dim)' }}>
                                 {b.def.tierNames[idx]}
                               </strong>
-                              <span className="faint" style={{ fontSize: 12 }}>
+                              <span className="faint" style={{ fontSize: 12.5 }}>
                                 {b.def.desc}: {fmt(drempel)}
                               </span>
                             </span>
                             {current && (
-                              <span className="hot-text display" style={{ fontSize: 12, letterSpacing: '0.08em' }}>
+                              <span className="hot-text display" style={{ fontSize: 12.5, letterSpacing: '0.08em' }}>
                                 NU BEZIG
                               </span>
                             )}
                             {idx + 1 === MAX_TIER && done && (
-                              <span className="gold-text display" style={{ fontSize: 12, letterSpacing: '0.1em' }}>
+                              <span className="gold-text display" style={{ fontSize: 12.5, letterSpacing: '0.1em' }}>
                                 MAX
                               </span>
                             )}
@@ -577,7 +577,7 @@ export function BadgesScreen() {
                       })}
                     </div>
 
-                    <button className="btn btn-ghost" style={{ marginTop: 20 }} onClick={() => setOpen(null)}>
+                    <button className="btn btn-ghost" style={{ marginTop: 16 }} onClick={() => setOpen(null)}>
                       Sluiten
                     </button>
                   </>

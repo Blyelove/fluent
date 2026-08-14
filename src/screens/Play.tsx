@@ -53,13 +53,13 @@ export function PlayScreen({
               <button
                 key={id}
                 className={tab === id ? 'btn btn-primary' : 'btn btn-ghost'}
-                style={{ padding: '13px 10px', fontSize: 15 }}
+                style={{ padding: '13px 10px', fontSize: 14 }}
                 onClick={() => {
                   sfx('tap')
                   setTab(id)
                 }}
               >
-                <span style={{ fontSize: 17 }}>{icon}</span> {label}
+                <span style={{ fontSize: 16 }}>{icon}</span> {label}
               </button>
             ))}
           </div>

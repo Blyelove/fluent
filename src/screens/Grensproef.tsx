@@ -155,22 +155,22 @@ export function GrensproefScreen({
             </div>
           </motion.div>
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
-            <p className="eyebrow" style={{ marginTop: 18 }}>
+            <p className="eyebrow" style={{ marginTop: 16 }}>
               De Grensproef
             </p>
-            <h1 className="display" style={{ fontSize: 32, margin: '8px 0 6px' }}>
+            <h1 className="display" style={{ fontSize: 34, margin: '8px 0 6px' }}>
               De poort van {land.name}
             </h1>
-            <p className="dim" style={{ fontSize: 15, maxWidth: 320, margin: '0 auto 6px' }}>
+            <p className="dim" style={{ fontSize: 14, maxWidth: 320, margin: '0 auto 6px' }}>
               Tien vragen uit alles wat je tot hier leerde. Acht goed en de poort zwaait open.
             </p>
-            <p className="gold-text" style={{ fontSize: 13.5, fontWeight: 700, marginBottom: 26 }}>
+            <p className="gold-text" style={{ fontSize: 14, fontWeight: 700, marginBottom: 24 }}>
               Verliezen bestaat niet: je kunt hier alleen iets winnen.
             </p>
-            <button className="btn btn-primary" style={{ padding: 15, fontSize: 15.5 }} onClick={() => { sfx('tap'); setFase('strijd') }}>
+            <button className="btn btn-primary" style={{ padding: 16, fontSize: 16 }} onClick={() => { sfx('tap'); setFase('strijd') }}>
               ⚔️ Neem de proef
             </button>
-            <button className="btn btn-ghost" style={{ padding: 12, fontSize: 14, marginTop: 10 }} onClick={onKlaar}>
+            <button className="btn btn-ghost" style={{ padding: 12, fontSize: 14, marginTop: 8 }} onClick={onKlaar}>
               Nog even niet
             </button>
           </motion.div>
@@ -188,7 +188,7 @@ export function GrensproefScreen({
           {gewonnen ? (
             <>
               {/* de poort gaat open: twee deuren schuiven opzij */}
-              <div style={{ position: 'relative', height: 130, marginBottom: 10, overflow: 'hidden' }}>
+              <div style={{ position: 'relative', height: 130, marginBottom: 8, overflow: 'hidden' }}>
                 <motion.div
                   initial={{ x: 0 }}
                   animate={{ x: '-110%' }}
@@ -209,7 +209,7 @@ export function GrensproefScreen({
               <h1 className="display gold-text" style={{ fontSize: 34, margin: '8px 0 4px' }}>
                 {land.name} doorstaan
               </h1>
-              <p className="dim" style={{ fontSize: 15 }}>
+              <p className="dim" style={{ fontSize: 14 }}>
                 {goed} van de {items.length} goed. De Poortwachter buigt.
               </p>
               <motion.div
@@ -234,7 +234,7 @@ export function GrensproefScreen({
                   {land.name.toUpperCase().slice(0, 12)}
                 </span>
               </motion.div>
-              <p className="gold-text display" style={{ fontSize: 20, marginBottom: 20 }}>
+              <p className="gold-text display" style={{ fontSize: 19, marginBottom: 16 }}>
                 +{geboekt} XP · stempel verdiend
               </p>
               <ShareButton
@@ -247,7 +247,7 @@ export function GrensproefScreen({
                   bericht: `Ik heb de Grensproef van ${land.name} doorstaan in Fluent!`,
                 }}
               />
-              <button className="btn btn-primary" style={{ padding: 15, fontSize: 15.5, marginTop: 10 }} onClick={onKlaar}>
+              <button className="btn btn-primary" style={{ padding: 16, fontSize: 16, marginTop: 8 }} onClick={onKlaar}>
                 Reis verder →
               </button>
             </>
@@ -262,13 +262,13 @@ export function GrensproefScreen({
               <h1 className="display" style={{ fontSize: 28, margin: '8px 0 6px' }}>
                 Nog {NODIG - goed} {NODIG - goed === 1 ? 'raak antwoord' : 'rake antwoorden'}
               </h1>
-              <p className="dim" style={{ fontSize: 15, maxWidth: 300, margin: '0 auto 24px' }}>
+              <p className="dim" style={{ fontSize: 14, maxWidth: 300, margin: '0 auto 24px' }}>
                 Je haalde er {goed} van de {items.length}. Er is niets verloren gegaan: probeer het zo vaak als je wilt.
               </p>
-              <button className="btn btn-primary" style={{ padding: 15, fontSize: 15.5 }} onClick={opnieuw}>
+              <button className="btn btn-primary" style={{ padding: 16, fontSize: 16 }} onClick={opnieuw}>
                 ↻ Nog een ronde
               </button>
-              <button className="btn btn-ghost" style={{ padding: 12, fontSize: 14, marginTop: 10 }} onClick={onKlaar}>
+              <button className="btn btn-ghost" style={{ padding: 12, fontSize: 14, marginTop: 8 }} onClick={onKlaar}>
                 Terug naar de kaart
               </button>
             </>
@@ -284,7 +284,7 @@ export function GrensproefScreen({
     return (
       <div style={{ position: 'fixed', inset: 0, zIndex: 70, background: 'var(--bg)' }}>
         <div className="shell center" style={{ paddingTop: 60 }}>
-          <p className="dim" style={{ marginBottom: 18 }}>Er zijn nog te weinig vragen voor deze proef.</p>
+          <p className="dim" style={{ marginBottom: 16 }}>Er zijn nog te weinig vragen voor deze proef.</p>
           <button className="btn btn-primary" onClick={onKlaar}>Terug</button>
         </div>
       </div>
@@ -294,10 +294,10 @@ export function GrensproefScreen({
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 70, background: 'var(--bg)', overflowY: 'auto' }}>
       <div className="shell shell--bare" style={{ paddingBottom: 180 }}>
-        <div className="lesson-top" style={{ marginBottom: 10 }}>
+        <div className="lesson-top" style={{ marginBottom: 8 }}>
           <button
             className="btn-quiet"
-            style={{ minWidth: 44, minHeight: 44, fontSize: 21, lineHeight: 1 }}
+            style={{ minWidth: 44, minHeight: 44, fontSize: 19, lineHeight: 1 }}
             onClick={onKlaar}
             aria-label="Proef verlaten"
           >
@@ -313,13 +313,13 @@ export function GrensproefScreen({
               transition={{ type: 'spring', stiffness: 160, damping: 22 }}
             />
           </div>
-          <span className="gold-text" style={{ fontSize: 13, fontWeight: 800 }}>
+          <span className="gold-text" style={{ fontSize: 12.5, fontWeight: 800 }}>
             {goed}/{NODIG}
           </span>
         </div>
 
         {/* de baas kijkt mee: zijn pantser slinkt met elk goed antwoord */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 6 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 4 }}>
           <Gatekeeper code={land.code} size={92} pantser={Math.max(0, 8 - goed)} spot={spot} />
         </div>
 
@@ -344,16 +344,16 @@ export function GrensproefScreen({
             ) : (
               <motion.div key="fb" initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 30, opacity: 0 }} transition={{ duration: 0.18 }}>
                 <div className={`sheet-inner ${antwoord.correct ? 'good' : 'bad'}`}>
-                  <p className={`feedback-title ${antwoord.correct ? 'ok-text' : 'err-text'}`} style={{ marginBottom: 10 }}>
+                  <p className={`feedback-title ${antwoord.correct ? 'ok-text' : 'err-text'}`} style={{ marginBottom: 8 }}>
                     {antwoord.correct ? 'Pantser eraf!' : 'Hij houdt stand.'}
                   </p>
                   {!antwoord.correct && antwoord.correctAnswer && (
-                    <p className="dim" style={{ fontSize: 15, marginBottom: 10, marginTop: -6 }}>
+                    <p className="dim" style={{ fontSize: 14, marginBottom: 8, marginTop: -6 }}>
                       Juiste antwoord: <strong style={{ color: 'var(--text)' }}>{antwoord.correctAnswer}</strong>
                     </p>
                   )}
                   {antwoord.correct && antwoord.spellingTip && (
-                    <p className="dim" style={{ fontSize: 15, marginBottom: 10, marginTop: -6 }}>
+                    <p className="dim" style={{ fontSize: 14, marginBottom: 8, marginTop: -6 }}>
                       Let op de spelling: <strong style={{ color: 'var(--text)' }}>{antwoord.spellingTip}</strong>
                     </p>
                   )}

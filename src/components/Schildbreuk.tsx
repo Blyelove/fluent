@@ -50,7 +50,7 @@ export function Schildbreuk({ stijl, kalm }: { stijl: BreukStijl; kalm: boolean 
         initial={{ opacity: 1 }}
         animate={{ opacity: 0 }}
         transition={{ duration: 0.4 }}
-        style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', fontSize: 24 }}
+        style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', fontSize: 23 }}
       >
         🛡️
       </motion.span>
@@ -86,7 +86,7 @@ export function Schildbreuk({ stijl, kalm }: { stijl: BreukStijl; kalm: boolean 
           initial={{ opacity: 1, filter: 'brightness(1)' }}
           animate={{ opacity: [1, 1, 0], filter: ['brightness(1)', 'brightness(2.4)', 'brightness(3)'] }}
           transition={{ duration: 0.62, times: [0, 0.45, 1] }}
-          style={{ position: 'absolute', fontSize: 24 }}
+          style={{ position: 'absolute', fontSize: 23 }}
         >
           🛡️
         </motion.span>
@@ -118,7 +118,7 @@ export function Schildbreuk({ stijl, kalm }: { stijl: BreukStijl; kalm: boolean 
           initial={{ scale: 1, opacity: 1 }}
           animate={{ scale: [1, 1.15, 0.05], opacity: [1, 1, 0] }}
           transition={{ duration: 0.34, times: [0, 0.3, 1], ease: 'easeIn' }}
-          style={{ position: 'absolute', fontSize: 24 }}
+          style={{ position: 'absolute', fontSize: 23 }}
         >
           🛡️
         </motion.span>
@@ -151,7 +151,7 @@ export function Schildbreuk({ stijl, kalm }: { stijl: BreukStijl; kalm: boolean 
             transition={{ duration: 0.7, delay: 0.14, ease: [0.4, 0, 0.7, 1], times: [0, 0.5, 1] }}
             style={{
               position: 'absolute',
-              fontSize: 24,
+              fontSize: 23,
               // elke helft toont maar de helft van het schild
               clipPath: kant === -1 ? 'polygon(0 0, 52% 0, 44% 100%, 0 100%)' : 'polygon(52% 0, 100% 0, 100% 100%, 44% 100%)',
             }}
@@ -185,7 +185,7 @@ export function Schildbreuk({ stijl, kalm }: { stijl: BreukStijl; kalm: boolean 
         initial={{ scale: 1, opacity: 1 }}
         animate={{ scale: [1, 1.22, 1.05], opacity: [1, 1, 0] }}
         transition={{ duration: 0.2, times: [0, 0.5, 1] }}
-        style={{ position: 'absolute', fontSize: 24 }}
+        style={{ position: 'absolute', fontSize: 23 }}
       >
         🛡️
       </motion.span>

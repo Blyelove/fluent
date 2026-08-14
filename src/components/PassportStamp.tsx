@@ -76,18 +76,18 @@ export function PassportStamp({
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 3,
+            gap: 4,
           }}
         >
           {behaald ? (
             <>
               <Flag code={code} size={26} />
-              <span className="gold-text" style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '0.04em' }}>
+              <span className="gold-text" style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.04em' }}>
                 {datum?.slice(8, 10)}-{datum?.slice(5, 7)}-{datum?.slice(2, 4)}
               </span>
             </>
           ) : (
-            <span className="faint" style={{ fontSize: 26, fontWeight: 800 }}>
+            <span className="faint" style={{ fontSize: 28, fontWeight: 800 }}>
               ?
             </span>
           )}
@@ -97,7 +97,7 @@ export function PassportStamp({
         style={{
           fontSize: 11,
           fontWeight: 700,
-          marginTop: 2,
+          marginTop: 0,
           color: behaald ? 'var(--text)' : 'var(--text-faint)',
         }}
       >

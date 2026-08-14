@@ -215,12 +215,12 @@ function ShareBox({ value, waText, copyLabel }: { value: string; waText: string;
         readOnly
         value={value}
         onFocus={(e) => e.currentTarget.select()}
-        style={{ fontSize: 13, marginBottom: 10, letterSpacing: '0.01em' }}
+        style={{ fontSize: 12.5, marginBottom: 8, letterSpacing: '0.01em' }}
         aria-label="Jouw duel-code"
       />
       <button
         className="btn btn-primary"
-        style={{ marginBottom: 10 }}
+        style={{ marginBottom: 8 }}
         onClick={() => {
           sfx('tap')
           void copyText(value).then((ok) => {
@@ -253,7 +253,7 @@ function ShareBox({ value, waText, copyLabel }: { value: string; waText: string;
 
 function ScoreBar({ you, them, name, total }: { you: number; them: number; name: string; total: number }) {
   return (
-    <div className="row" style={{ gap: 10, marginBottom: 18 }}>
+    <div className="row" style={{ gap: 8, marginBottom: 16 }}>
       <motion.div
         className="glass"
         key={`you-${you}`}
@@ -262,21 +262,21 @@ function ScoreBar({ you, them, name, total }: { you: number; them: number; name:
         transition={{ type: 'spring', stiffness: 420, damping: 16 }}
         style={{ flex: 1, minWidth: 0, padding: '10px 12px', borderColor: 'var(--line-hot)' }}
       >
-        <p className="eyebrow" style={{ fontSize: 10 }}>
+        <p className="eyebrow" style={{ fontSize: 11 }}>
           Jij
         </p>
-        <strong className="display hot-text" style={{ fontSize: 24 }}>
+        <strong className="display hot-text" style={{ fontSize: 23 }}>
           {you}
         </strong>
       </motion.div>
-      <span className="faint display" style={{ fontSize: 17 }}>
+      <span className="faint display" style={{ fontSize: 16 }}>
         vs
       </span>
       <div className="glass" style={{ flex: 1, minWidth: 0, padding: '10px 12px', textAlign: 'right' }}>
-        <p className="eyebrow" style={{ fontSize: 10, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        <p className="eyebrow" style={{ fontSize: 11, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {name}
         </p>
-        <strong className="display gold-text" style={{ fontSize: 24 }}>
+        <strong className="display gold-text" style={{ fontSize: 23 }}>
           {them >= 0 ? them : '?'}
           {them >= 0 && <span className="faint display" style={{ fontSize: 14 }}>/{total}</span>}
         </strong>
@@ -523,7 +523,7 @@ export function DuelScreen({
     if (!course || !ex) {
       return (
         <div className="shell center" style={{ paddingTop: 40 }}>
-          <p className="dim" style={{ fontSize: 15, marginBottom: 18 }}>
+          <p className="dim" style={{ fontSize: 14, marginBottom: 16 }}>
             Er ging iets mis met dit duel. Probeer het opnieuw.
           </p>
           <button className="btn btn-primary" onClick={() => setPhase({ name: 'hub' })}>
@@ -538,7 +538,7 @@ export function DuelScreen({
         <div className="lesson-top" style={{ marginBottom: 16 }}>
           <button
             className="btn-quiet"
-            style={{ minWidth: 44, minHeight: 44, fontSize: 22, lineHeight: 1, padding: 8 }}
+            style={{ minWidth: 44, minHeight: 44, fontSize: 23, lineHeight: 1, padding: 8 }}
             onClick={() => setPhase({ name: 'hub' })}
             aria-label="Duel stoppen"
           >
@@ -559,7 +559,7 @@ export function DuelScreen({
 
         <ScoreBar you={correct} them={phase.theirScore} name={opponentName} total={phase.items.length} />
 
-        <div className="row" style={{ gap: 5, justifyContent: 'center', marginBottom: 18 }}>
+        <div className="row" style={{ gap: 4, justifyContent: 'center', marginBottom: 16 }}>
           {phase.items.map((_, i) => (
             <span
               key={i}
@@ -602,16 +602,16 @@ export function DuelScreen({
             ) : (
               <motion.div key="fb" initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 30, opacity: 0 }} transition={{ duration: 0.18 }}>
                 <div className={`sheet-inner ${answered.correct ? 'good' : 'bad'}`}>
-                  <p className={`feedback-title ${answered.correct ? 'ok-text' : 'err-text'}`} style={{ marginBottom: 10 }}>
+                  <p className={`feedback-title ${answered.correct ? 'ok-text' : 'err-text'}`} style={{ marginBottom: 8 }}>
                     {answered.correct ? 'Punt voor jou!' : 'Punt gemist.'}
                   </p>
                   {!answered.correct && answered.correctAnswer && (
-                    <p className="dim" style={{ fontSize: 15, marginBottom: 10, marginTop: -6 }}>
+                    <p className="dim" style={{ fontSize: 14, marginBottom: 8, marginTop: -6 }}>
                       Juiste antwoord: <strong style={{ color: 'var(--text)' }}>{answered.correctAnswer}</strong>
                     </p>
                   )}
                   {answered.correct && answered.spellingTip && (
-                    <p className="dim" style={{ fontSize: 15, marginBottom: 10, marginTop: -6 }}>
+                    <p className="dim" style={{ fontSize: 14, marginBottom: 8, marginTop: -6 }}>
                       Let op de spelling: <strong style={{ color: 'var(--text)' }}>{answered.spellingTip}</strong>
                     </p>
                   )}
@@ -670,18 +670,18 @@ export function DuelScreen({
           {theirScore >= 0 ? (
             <motion.div
               className="row"
-              style={{ justifyContent: 'center', gap: 14, margin: '6px 0 4px' }}
+              style={{ justifyContent: 'center', gap: 12, margin: '6px 0 4px' }}
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', stiffness: 300, damping: 15 }}
             >
-              <span className="display hot-text" style={{ fontSize: 52 }}>
+              <span className="display hot-text" style={{ fontSize: 48 }}>
                 {score}
               </span>
-              <span className="faint display" style={{ fontSize: 30 }}>
+              <span className="faint display" style={{ fontSize: 28 }}>
                 –
               </span>
-              <span className="display gold-text" style={{ fontSize: 52 }}>
+              <span className="display gold-text" style={{ fontSize: 48 }}>
                 {theirScore}
               </span>
             </motion.div>
@@ -691,11 +691,11 @@ export function DuelScreen({
             </p>
           )}
 
-          <p className="dim" style={{ fontSize: 15 }}>
+          <p className="dim" style={{ fontSize: 14 }}>
             {theirScore >= 0 ? `Jij tegen ${opponent} · ${total} vragen` : `${score} van de ${total} goed`}
           </p>
           <div className="divider-gold" />
-          <p className="gold-text display" style={{ fontSize: 20 }}>
+          <p className="gold-text display" style={{ fontSize: 19 }}>
             +{phase.xp} XP
           </p>
         </motion.div>
@@ -703,7 +703,7 @@ export function DuelScreen({
         {isBotNaam(phase.payload.n) ? (
           <motion.div
             className="glass"
-            style={{ padding: 20, marginTop: 22 }}
+            style={{ padding: 16, marginTop: 24 }}
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
@@ -717,7 +717,7 @@ export function DuelScreen({
               return (
                 <>
                   <strong className="card-title">{won ? '👑 Verslagen!' : 'Nog een keer?'}</strong>
-                  <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 14px' }}>
+                  <p className="dim" style={{ fontSize: 14, margin: '8px 0 14px' }}>
                     {allesGehad
                       ? 'Je hebt alle drie de bots verslagen. Er is er geen die je nog kan bijhouden: tijd om een echte vriend uit te dagen.'
                       : won
@@ -725,7 +725,7 @@ export function DuelScreen({
                         : `${opponent} speelt elke ronde anders. Nog een keer proberen, of eerst een makkelijkere pakken?`}
                   </p>
                   {volgende ? (
-                    <button className="btn btn-primary" style={{ marginBottom: 10 }} onClick={() => challengeBot(volgende)}>
+                    <button className="btn btn-primary" style={{ marginBottom: 8 }} onClick={() => challengeBot(volgende)}>
                       ⚔️ Nu {volgende.naam.replace('🤖 ', '')}
                     </button>
                   ) : null}
@@ -742,13 +742,13 @@ export function DuelScreen({
         ) : (
         <motion.div
           className="glass"
-          style={{ padding: 20, marginTop: 22 }}
+          style={{ padding: 16, marginTop: 24 }}
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
         >
           <strong className="card-title">{theirScore >= 0 ? '📨 Stuur je uitslag terug' : '🔗 Stuur de uitdaging door'}</strong>
-          <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 14px' }}>
+          <p className="dim" style={{ fontSize: 14, margin: '8px 0 14px' }}>
             {theirScore >= 0 ? (
               <>
                 Stuur deze link terug naar {opponent}. Als {opponent} hem opent, ziet die meteen de uitslag van jullie duel —{' '}
@@ -799,25 +799,25 @@ export function DuelScreen({
           <h1 className="display" style={{ fontSize: 34, margin: '8px 0', overflowWrap: 'anywhere' }}>
             {won ? 'Jij wint! 🏆' : tie ? 'Gelijkspel!' : `${phase.opponent} wint.`}
           </h1>
-          <div className="row" style={{ justifyContent: 'center', gap: 14, margin: '6px 0' }}>
-            <span className="display hot-text" style={{ fontSize: 52 }}>
+          <div className="row" style={{ justifyContent: 'center', gap: 12, margin: '6px 0' }}>
+            <span className="display hot-text" style={{ fontSize: 48 }}>
               {phase.yours}
             </span>
-            <span className="faint display" style={{ fontSize: 30 }}>
+            <span className="faint display" style={{ fontSize: 28 }}>
               –
             </span>
-            <span className="display gold-text" style={{ fontSize: 52 }}>
+            <span className="display gold-text" style={{ fontSize: 48 }}>
               {phase.theirs}
             </span>
           </div>
-          <p className="dim" style={{ fontSize: 15 }}>
+          <p className="dim" style={{ fontSize: 14 }}>
             Jij tegen {phase.opponent} · {phase.total} vragen
           </p>
           <div className="divider-gold" />
-          <p className="gold-text display" style={{ fontSize: 20 }}>
+          <p className="gold-text display" style={{ fontSize: 19 }}>
             +{phase.xp} XP
           </p>
-          <div style={{ marginTop: 30 }}>
+          <div style={{ marginTop: 32 }}>
             <button className="btn btn-primary" onClick={backToHub}>
               Klaar
             </button>
@@ -844,7 +844,7 @@ export function DuelScreen({
       <div className="ambient-orb orb-a" />
       <div className="ambient-orb orb-b" />
 
-      <div className="spread" style={{ marginBottom: 18 }}>
+      <div className="spread" style={{ marginBottom: 16 }}>
         <div>
           <p className="eyebrow">Vrienden</p>
           <h1 className="display" style={{ fontSize: 28, margin: '6px 0 0' }}>
@@ -853,7 +853,7 @@ export function DuelScreen({
         </div>
         {duelsWon > 0 && (
           <div className="glass" style={{ padding: '8px 14px', textAlign: 'center' }}>
-            <strong className="display gold-text" style={{ fontSize: 22 }}>
+            <strong className="display gold-text" style={{ fontSize: 23 }}>
               {duelsWon}
             </strong>
             <p className="stat-label" style={{ marginTop: 0 }}>
@@ -870,19 +870,19 @@ export function DuelScreen({
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
           style={{
-            padding: 22,
+            padding: 24,
             marginBottom: 16,
             borderColor: 'var(--line-hot)',
             boxShadow: '0 0 30px rgba(236,72,153,0.28)',
           }}
         >
-          <div className="row" style={{ gap: 10, marginBottom: 6 }}>
-            <span style={{ fontSize: 26 }}>⚔️</span>
+          <div className="row" style={{ gap: 8, marginBottom: 4 }}>
+            <span style={{ fontSize: 28 }}>⚔️</span>
             <div style={{ minWidth: 0 }}>
-              <strong style={{ fontSize: 17 }}>
+              <strong style={{ fontSize: 16 }}>
                 {eigenLink ? 'Dit is jouw eigen uitdaging' : `${safeIncoming.n || 'Een vriend'} daagt je uit!`}
               </strong>
-              <p className="dim" style={{ fontSize: 13 }}>
+              <p className="dim" style={{ fontSize: 12.5 }}>
                 <Flag code={courseFlagCode[safeIncoming.c]} size={13} /> {courses[safeIncoming.c]?.name ?? 'Onbekende cursus'} ·{' '}
                 {safeIncoming.q} vragen
               </p>
@@ -890,7 +890,7 @@ export function DuelScreen({
           </div>
           {openForIncoming ? (
             <>
-              <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 14px' }}>
+              <p className="dim" style={{ fontSize: 14, margin: '8px 0 14px' }}>
                 Dit is het antwoord op jouw uitdaging. Jij scoorde {openForIncoming.score} van de {openForIncoming.total} — benieuwd of
                 dat genoeg was?
               </p>
@@ -900,7 +900,7 @@ export function DuelScreen({
             </>
           ) : eigenLink ? (
             <>
-              <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 14px' }}>
+              <p className="dim" style={{ fontSize: 14, margin: '8px 0 14px' }}>
                 Je hebt deze ronde al gespeeld ({openMatch?.score} van de {openMatch?.total}). Stuur de link naar je vriend; zodra hij
                 gespeeld heeft, stuurt hij een link terug en zie je hier de uitslag.
               </p>
@@ -916,7 +916,7 @@ export function DuelScreen({
             </>
           ) : (
             <>
-              <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 14px' }}>
+              <p className="dim" style={{ fontSize: 14, margin: '8px 0 14px' }}>
                 {safeIncoming.x >= 0
                   ? `${safeIncoming.n || 'Je vriend'} scoorde ${safeIncoming.x} van de ${safeIncoming.q}. Jij krijgt exact dezelfde vragen — versla die score.`
                   : 'Jij krijgt exact dezelfde vragen als je vriend. Wie scoort er hoger?'}
@@ -927,7 +927,7 @@ export function DuelScreen({
             </>
           )}
           {codeError && (
-            <p style={{ color: 'var(--err)', fontSize: 13.5, margin: '12px 0 0', fontWeight: 600 }}>{codeError}</p>
+            <p style={{ color: 'var(--err)', fontSize: 14, margin: '12px 0 0', fontWeight: 600 }}>{codeError}</p>
           )}
           <button
             className="btn-quiet"
@@ -941,15 +941,15 @@ export function DuelScreen({
 
       {/* --- oefenduel tegen een bot: de weekmissie is ook zonder vrienden haalbaar --- */}
       {myPoolSize > 0 && (
-        <div className="card-hero" style={{ padding: 22, marginBottom: 16 }}>
+        <div className="card-hero" style={{ padding: 24, marginBottom: 16 }}>
           <div className="spread">
             <strong className="card-title">🤖 Oefenduel</strong>
-            <span className="faint" style={{ fontSize: 11.5 }}>telt mee voor je weekmissie</span>
+            <span className="faint" style={{ fontSize: 11 }}>telt mee voor je weekmissie</span>
           </div>
-          <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 14px' }}>
+          <p className="dim" style={{ fontSize: 14, margin: '8px 0 14px' }}>
             Geen vriend bij de hand? Deze drie spelen altijd mee. Ze maken hun eigen fouten — elke ronde is anders.
           </p>
-          <div className="col" style={{ gap: 10 }}>
+          <div className="col" style={{ gap: 8 }}>
             {BOTS.map((bot) => {
               const verslagen = botsVerslagen.includes(bot.naam)
               return (
@@ -960,7 +960,7 @@ export function DuelScreen({
                     justifyContent: 'space-between',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 10,
+                    gap: 8,
                     ...(verslagen ? { borderColor: 'var(--line-gold)', background: 'rgba(255,197,61,0.09)' } : {}),
                   }}
                   onClick={() => challengeBot(bot)}
@@ -969,7 +969,7 @@ export function DuelScreen({
                     {verslagen && '👑 '}
                     {bot.naam}
                   </span>
-                  <span className="faint" style={{ fontSize: 12, textAlign: 'right' }}>
+                  <span className="faint" style={{ fontSize: 12.5, textAlign: 'right' }}>
                     {verslagen ? 'Verslagen — nog eens?' : bot.uitleg}
                   </span>
                 </button>
@@ -985,9 +985,9 @@ export function DuelScreen({
       )}
 
       {/* --- zelf uitdagen --- */}
-      <div className="glass" style={{ padding: 22, marginBottom: 16 }}>
+      <div className="glass" style={{ padding: 24, marginBottom: 16 }}>
         <strong className="card-title">⚔️ Daag een vriend uit</strong>
-        <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 14px' }}>
+        <p className="dim" style={{ fontSize: 14, margin: '8px 0 14px' }}>
           Jij speelt eerst {QUESTIONS} vragen {myCourse ? `in het ${myCourse.name}` : 'in jouw cursus'}. Daarna krijg je een link met
           jouw score erin — stuur die naar je vriend en die krijgt precies dezelfde vragen. Geen account nodig.
         </p>
@@ -1001,7 +1001,7 @@ export function DuelScreen({
           aria-label="Jouw naam"
         />
         {myPoolSize === 0 ? (
-          <p className="dim" style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--err)' }}>
+          <p className="dim" style={{ fontSize: 14, fontWeight: 600, color: 'var(--err)' }}>
             Er zijn nog geen vragen in deze cursus. Doe eerst een les.
           </p>
         ) : (
@@ -1013,9 +1013,9 @@ export function DuelScreen({
 
       {/* --- open uitdagingen --- */}
       {open.length > 0 && (
-        <div className="glass" style={{ padding: 22, marginBottom: 16 }}>
+        <div className="glass" style={{ padding: 24, marginBottom: 16 }}>
           <strong className="card-title">⏳ Wacht op antwoord</strong>
-          <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 12px' }}>
+          <p className="dim" style={{ fontSize: 14, margin: '8px 0 12px' }}>
             Deze uitdagingen staan nog open. Kwijtgeraakt? Kopieer de link hier opnieuw.
           </p>
           <div className="col" style={{ gap: 12 }}>
@@ -1027,7 +1027,7 @@ export function DuelScreen({
                   </span>
                   <button
                     className="btn-quiet"
-                    style={{ minWidth: 44, minHeight: 44, padding: '4px 8px', fontSize: 18, lineHeight: 1, flexShrink: 0 }}
+                    style={{ minWidth: 44, minHeight: 44, padding: '4px 8px', fontSize: 19, lineHeight: 1, flexShrink: 0 }}
                     onClick={() => saveOpen(open.filter((x) => x.s !== d.s))}
                     aria-label="Uitdaging verwijderen"
                   >
@@ -1046,9 +1046,9 @@ export function DuelScreen({
       )}
 
       {/* --- code invoeren --- */}
-      <div className="glass" style={{ padding: 22, marginBottom: 16 }}>
+      <div className="glass" style={{ padding: 24, marginBottom: 16 }}>
         <strong className="card-title">📥 Code van je vriend</strong>
-        <p className="dim" style={{ fontSize: 13.5, margin: '8px 0 12px' }}>
+        <p className="dim" style={{ fontSize: 14, margin: '8px 0 12px' }}>
           Link of code gekregen? Plak hem hier. Is het een nieuwe uitdaging, dan speel je meteen. Is het het antwoord op jouw
           uitdaging, dan zie je direct de uitslag.
         </p>
@@ -1066,11 +1066,11 @@ export function DuelScreen({
           autoCapitalize="off"
           autoCorrect="off"
           spellCheck={false}
-          style={{ marginBottom: 12, fontSize: 15 }}
+          style={{ marginBottom: 12, fontSize: 14 }}
           aria-label="Duel-code van je vriend"
         />
         {codeError && (
-          <p style={{ color: 'var(--err)', fontSize: 13.5, marginBottom: 12, fontWeight: 600 }}>
+          <p style={{ color: 'var(--err)', fontSize: 14, marginBottom: 12, fontWeight: 600 }}>
             {codeError}
           </p>
         )}
@@ -1080,14 +1080,14 @@ export function DuelScreen({
       </div>
 
       {/* --- geschiedenis --- */}
-      <div className="glass" style={{ padding: 22 }}>
+      <div className="glass" style={{ padding: 24 }}>
         <strong className="card-title">📜 Laatste duels</strong>
         {history.length === 0 ? (
-          <p className="dim" style={{ fontSize: 13.5, marginTop: 8 }}>
+          <p className="dim" style={{ fontSize: 14, marginTop: 8 }}>
             Nog geen duels gespeeld. Daag iemand uit — winnen levert 25 XP op, meedoen altijd nog 10.
           </p>
         ) : (
-          <div style={{ marginTop: 10 }}>
+          <div style={{ marginTop: 8 }}>
             {history.map((d, i) => (
               <div
                 key={i}
@@ -1096,22 +1096,22 @@ export function DuelScreen({
               >
                 <div style={{ minWidth: 0 }}>
                   <strong
-                    style={{ fontSize: 14.5, display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                    style={{ fontSize: 14, display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
                   >
                     {d.opponent}
                   </strong>
-                  <p className="faint" style={{ fontSize: 12 }}>
+                  <p className="faint" style={{ fontSize: 12.5 }}>
                     {new Date(`${d.day}T00:00`).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' })} · {d.total} vragen
                   </p>
                 </div>
                 <div className="row" style={{ gap: 8, flexShrink: 0 }}>
                   <span
                     className="display"
-                    style={{ fontSize: 18, fontWeight: 800, color: d.won ? 'var(--ok)' : d.yourScore === d.theirScore ? 'var(--gold)' : 'var(--err)' }}
+                    style={{ fontSize: 19, fontWeight: 800, color: d.won ? 'var(--ok)' : d.yourScore === d.theirScore ? 'var(--gold)' : 'var(--err)' }}
                   >
                     {d.yourScore}-{d.theirScore}
                   </span>
-                  <span style={{ fontSize: 15 }}>{d.won ? '🏆' : d.yourScore === d.theirScore ? '🤝' : '💀'}</span>
+                  <span style={{ fontSize: 14 }}>{d.won ? '🏆' : d.yourScore === d.theirScore ? '🤝' : '💀'}</span>
                 </div>
               </div>
             ))}

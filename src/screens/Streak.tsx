@@ -95,25 +95,25 @@ export function StreakScreen({ onBack, onLeren }: { onBack?: () => void; onLeren
       )}
 
       {/* grote vlam */}
-      <div className="center" style={{ marginBottom: 22 }}>
+      <div className="center" style={{ marginBottom: 24 }}>
         <motion.div
-          style={{ fontSize: 82, lineHeight: 1, filter: `${flame.filter} ${flame.glow}` }}
+          style={{ fontSize: 96, lineHeight: 1, filter: `${flame.filter} ${flame.glow}` }}
           animate={streak > 0 ? { scale: [1, 1.08, 1], rotate: [0, -3, 3, 0] } : {}}
           transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         >
           🔥
         </motion.div>
-        <h1 className="display gold-text" style={{ fontSize: 56, margin: '2px 0 0' }}>
+        <h1 className="display gold-text" style={{ fontSize: 48, margin: '2px 0 0' }}>
           {streak}
         </h1>
         <p className="dim" style={{ fontSize: 16, marginTop: -2 }}>
           {streak === 1 ? 'dag op rij' : 'dagen op rij'}
         </p>
-        <p className="hot-text" style={{ fontSize: 13.5, fontWeight: 800, marginTop: 4 }}>
+        <p className="hot-text" style={{ fontSize: 14, fontWeight: 800, marginTop: 4 }}>
           {flame.naam}
         </p>
         {streak === 0 && (
-          <p className="faint" style={{ fontSize: 13, marginTop: 8 }}>
+          <p className="faint" style={{ fontSize: 12.5, marginTop: 8 }}>
             Doe vandaag één les en je reeks begint.
           </p>
         )}
@@ -121,10 +121,10 @@ export function StreakScreen({ onBack, onLeren }: { onBack?: () => void; onLeren
 
       {/* het scherm vertelde wat je moest doen, maar bood geen manier om het te doen */}
       {onLeren && (
-        <div style={{ marginBottom: 18 }}>
+        <div style={{ marginBottom: 16 }}>
           <button
             className="btn btn-primary"
-            style={{ padding: 15, fontSize: 15.5 }}
+            style={{ padding: 16, fontSize: 16 }}
             onClick={() => {
               sfx('tap')
               onLeren()
@@ -136,7 +136,7 @@ export function StreakScreen({ onBack, onLeren }: { onBack?: () => void; onLeren
       )}
 
       {streak > 0 && (
-        <div style={{ marginBottom: 18 }}>
+        <div style={{ marginBottom: 16 }}>
           <ShareButton
             variant="primary"
             label="Deel je reeks"
@@ -151,7 +151,7 @@ export function StreakScreen({ onBack, onLeren }: { onBack?: () => void; onLeren
         </div>
       )}
 
-      <div className="stat-grid" style={{ marginBottom: 20 }}>
+      <div className="stat-grid" style={{ marginBottom: 16 }}>
         <div className="glass stat-card">
           <div className="stat-value">{bestStreak}</div>
           <div className="stat-label">Beste reeks</div>
@@ -164,9 +164,9 @@ export function StreakScreen({ onBack, onLeren }: { onBack?: () => void; onLeren
 
       {/* volgende mijlpaal */}
       {next && (
-        <div className="glass" style={{ padding: 18, marginBottom: 20, borderColor: 'var(--line-gold)' }}>
+        <div className="glass" style={{ padding: 16, marginBottom: 16, borderColor: 'var(--line-gold)' }}>
           <div className="spread" style={{ marginBottom: 8 }}>
-            <strong style={{ fontSize: 15 }}>Volgende mijlpaal: {next.naam}</strong>
+            <strong style={{ fontSize: 14 }}>Volgende mijlpaal: {next.naam}</strong>
             <span className="gold-text" style={{ fontWeight: 800, fontSize: 14 }}>
               {next.days} dagen
             </span>
@@ -181,22 +181,22 @@ export function StreakScreen({ onBack, onLeren }: { onBack?: () => void; onLeren
       )}
 
       {/* kalender */}
-      <div className="glass" style={{ padding: 18, marginBottom: 20 }}>
-        <div className="spread" style={{ marginBottom: 14 }}>
-          <button className="btn-quiet" style={{ fontSize: 20, padding: '4px 12px' }} onClick={() => setMonthOffset((m) => m - 1)}>
+      <div className="glass" style={{ padding: 16, marginBottom: 16 }}>
+        <div className="spread" style={{ marginBottom: 12 }}>
+          <button className="btn-quiet" style={{ fontSize: 19, padding: '4px 12px' }} onClick={() => setMonthOffset((m) => m - 1)}>
             ‹
           </button>
-          <strong style={{ fontSize: 15, textTransform: 'capitalize' }}>{label}</strong>
+          <strong style={{ fontSize: 14, textTransform: 'capitalize' }}>{label}</strong>
           <button
             className="btn-quiet"
-            style={{ fontSize: 20, padding: '4px 12px', opacity: monthOffset >= 0 ? 0.3 : 1 }}
+            style={{ fontSize: 19, padding: '4px 12px', opacity: monthOffset >= 0 ? 0.3 : 1 }}
             disabled={monthOffset >= 0}
             onClick={() => setMonthOffset((m) => Math.min(0, m + 1))}
           >
             ›
           </button>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 6 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4 }}>
           {DAGEN.map((d, i) => (
             <div key={i} className="faint center" style={{ fontSize: 11, fontWeight: 700, paddingBottom: 4 }}>
               {d}
@@ -212,7 +212,7 @@ export function StreakScreen({ onBack, onLeren }: { onBack?: () => void; onLeren
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: 10,
-                fontSize: 13,
+                fontSize: 12.5,
                 fontWeight: 700,
                 background: c.done ? 'var(--grad-gold)' : c.day ? 'var(--surface)' : 'transparent',
                 color: c.done ? 'var(--ink-on-gold)' : 'var(--text-faint)',
@@ -224,7 +224,7 @@ export function StreakScreen({ onBack, onLeren }: { onBack?: () => void; onLeren
             </div>
           ))}
         </div>
-        <p className="faint center" style={{ fontSize: 12, marginTop: 12 }}>
+        <p className="faint center" style={{ fontSize: 12.5, marginTop: 12 }}>
           {doneThisMonth} {doneThisMonth === 1 ? 'actieve dag' : 'actieve dagen'} deze maand
         </p>
       </div>
@@ -242,11 +242,11 @@ export function StreakScreen({ onBack, onLeren }: { onBack?: () => void; onLeren
               className="spread"
               style={{ padding: '11px 0', borderBottom: i < MILESTONES.length - 1 ? '1px solid var(--line)' : 'none', opacity: done ? 1 : 0.65 }}
             >
-              <span className="row" style={{ gap: 10 }}>
-                <span style={{ fontSize: 18, filter: done ? 'none' : 'grayscale(1)' }}>{done ? '🔥' : '🔒'}</span>
-                <span className="col" style={{ gap: 1 }}>
+              <span className="row" style={{ gap: 8 }}>
+                <span style={{ fontSize: 19, filter: done ? 'none' : 'grayscale(1)' }}>{done ? '🔥' : '🔒'}</span>
+                <span className="col" style={{ gap: 0 }}>
                   <strong style={{ fontSize: 14 }}>{m.naam}</strong>
-                  <span className="faint" style={{ fontSize: 12 }}>
+                  <span className="faint" style={{ fontSize: 12.5 }}>
                     {m.days} dagen · {m.beloning}
                   </span>
                 </span>
@@ -261,7 +261,7 @@ export function StreakScreen({ onBack, onLeren }: { onBack?: () => void; onLeren
         })}
       </div>
 
-      <p className="faint center" style={{ fontSize: 12.5, marginBottom: 10 }}>
+      <p className="faint center" style={{ fontSize: 12.5, marginBottom: 8 }}>
         Mis je een dag? Je bescherming vangt dat automatisch op — {reached.length > 0 ? 'je hebt al ' + reached.length + ' mijlpalen gehaald.' : 'geen straf, ooit.'}
       </p>
     </div>

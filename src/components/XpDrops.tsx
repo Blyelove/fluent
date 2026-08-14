@@ -108,7 +108,7 @@ export function XpDrops() {
             // REGEN: het bedrag valt uiteen in losse cijfers die wegdwarrelen
             if (xpStijl === 'regen') {
               return (
-                <div key={d.id} style={{ position: 'absolute', right: 0, display: 'flex', gap: 1 }}>
+                <div key={d.id} style={{ position: 'absolute', right: 0, display: 'flex', gap: 0 }}>
                   {`+${d.xp}`.split('').map((teken, j) => (
                     <motion.span
                       key={j}
@@ -133,7 +133,7 @@ export function XpDrops() {
                   animate={{ opacity: [0, 1, 1, 0], scale: 1, y: kalm ? 0 : -18 }}
                   transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1] }}
                   className="num"
-                  style={{ ...basis, fontSize: 22 }}
+                  style={{ ...basis, fontSize: 23 }}
                 >
                   +{d.xp} xp
                 </motion.div>
@@ -150,7 +150,7 @@ export function XpDrops() {
                   exit={{ opacity: 0 }}
                   transition={{ type: 'spring', stiffness: 260, damping: 24 }}
                   className="num"
-                  style={{ ...basis, fontSize: 17 }}
+                  style={{ ...basis, fontSize: 16 }}
                 >
                   +{d.xp} xp
                 </motion.div>
@@ -165,7 +165,7 @@ export function XpDrops() {
                 exit={{ opacity: 0, y: kalm ? 0 : -52 }}
                 transition={{ duration: 1.1, ease: [0.2, 0.7, 0.3, 1] }}
                 className="num"
-                style={{ ...basis, fontSize: 17 }}
+                style={{ ...basis, fontSize: 16 }}
               >
                 +{d.xp} xp
               </motion.div>
@@ -269,7 +269,7 @@ export function XpDrops() {
                 <span className="gold-text num">niveau {viering.level}</span>
               </h3>
               {viering.level === 92 && (
-                <p className="dim" style={{ fontSize: 13.5 }}>
+                <p className="dim" style={{ fontSize: 14 }}>
                   Niveau 92: de helft van de XP naar 99 is binnen. Wie dit snapt, speelde RuneScape.
                 </p>
               )}
@@ -279,7 +279,7 @@ export function XpDrops() {
                 </p>
               )}
               {viering.level !== 92 && viering.level !== 99 && (
-                <p className="dim" style={{ fontSize: 13 }}>
+                <p className="dim" style={{ fontSize: 12.5 }}>
                   {volgendeMijlpaal(viering.level)
                     ? `Volgende mijlpaal: niveau ${volgendeMijlpaal(viering.level)}`
                     : 'De top is in zicht.'}
@@ -287,7 +287,7 @@ export function XpDrops() {
               )}
               <button
                 className="btn btn-primary"
-                style={{ marginTop: 14, padding: 12, fontSize: 14.5 }}
+                style={{ marginTop: 12, padding: 12, fontSize: 14 }}
                 onClick={() => { sfx('tap'); setViering(null) }}
               >
                 Verder trainen

@@ -83,10 +83,10 @@ export function WoordBoom({
             <p className="faint" style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', fontWeight: 700 }}>
               {familie.herkomst}
             </p>
-            <p className="display gold-text" style={{ fontSize: 27, lineHeight: 1.15, margin: '2px 0' }}>
+            <p className="display gold-text" style={{ fontSize: 28, lineHeight: 1.15, margin: '2px 0' }}>
               {familie.stam}
             </p>
-            <p className="dim" style={{ fontSize: 13.5 }}>
+            <p className="dim" style={{ fontSize: 14 }}>
               {familie.stamBetekenis}
             </p>
           </motion.div>
@@ -132,7 +132,7 @@ export function WoordBoom({
                   className="row"
                   onClick={() => { sfx('tap'); speak(l.woord, courses[l.taal].ttsLang) }}
                   style={{
-                    gap: 11,
+                    gap: 12,
                     padding: '11px 13px',
                     minHeight: 48,
                     borderRadius: 14,
@@ -142,14 +142,14 @@ export function WoordBoom({
                   }}
                 >
                   <Flag code={courseFlagCode[l.taal]} size={22} />
-                  <span className="col" style={{ flex: 1, minWidth: 0, gap: 1 }}>
+                  <span className="col" style={{ flex: 1, minWidth: 0, gap: 0 }}>
                     <span style={{ fontSize: 16, fontWeight: 700 }}>{l.woord}</span>
                     <span className="faint" style={{ fontSize: 12.5 }}>
                       {l.nl}
                     </span>
                   </span>
                   {jouwe ? (
-                    <span className="hot-text" style={{ fontSize: 11.5, fontWeight: 800, flexShrink: 0 }}>
+                    <span className="hot-text" style={{ fontSize: 11, fontWeight: 800, flexShrink: 0 }}>
                       JIJ LEERDE DIT
                     </span>
                   ) : kreegXp ? (
@@ -157,7 +157,7 @@ export function WoordBoom({
                       +3 XP
                     </span>
                   ) : (
-                    <span className="faint" style={{ fontSize: 15, flexShrink: 0 }}>
+                    <span className="faint" style={{ fontSize: 14, flexShrink: 0 }}>
                       🔊
                     </span>
                   )}
@@ -166,17 +166,17 @@ export function WoordBoom({
             })}
           </div>
 
-          <p className="dim" style={{ fontSize: 13, marginTop: 14, lineHeight: 1.5 }}>
+          <p className="dim" style={{ fontSize: 12.5, marginTop: 12, lineHeight: 1.5 }}>
             💡 {familie.weetje}
           </p>
 
           {ontdekt && anderen.length > 0 && (
-            <p className="gold-text center" style={{ fontSize: 13.5, fontWeight: 700, marginTop: 10 }}>
+            <p className="gold-text center" style={{ fontSize: 14, fontWeight: 700, marginTop: 8 }}>
               Je werd zojuist beter in {anderen.length} andere {anderen.length === 1 ? 'taal' : 'talen'}
             </p>
           )}
 
-          <button className="btn btn-primary" style={{ marginTop: 14, padding: 13, fontSize: 15 }} onClick={() => { sfx('tap'); onSluiten() }}>
+          <button className="btn btn-primary" style={{ marginTop: 12, padding: 12, fontSize: 14 }} onClick={() => { sfx('tap'); onSluiten() }}>
             {ontdekt ? 'Verder leren' : 'Sluiten'}
           </button>
         </motion.div>
