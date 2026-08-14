@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useStore } from '../store'
-import { ARENA_STIJLEN, LEVELUP_STIJLEN, STANDAARD_STIJLEN, XP_STIJLEN, type Richting } from '../stijlen'
+import { ARENA_STIJLEN, BREUK_STIJLEN, LEVELUP_STIJLEN, STANDAARD_STIJLEN, XP_STIJLEN, type Richting } from '../stijlen'
+import { Schildbreuk, type BreukStijl } from './Schildbreuk'
 import { sfx } from '../audio'
 
 /**
@@ -12,9 +13,12 @@ import { sfx } from '../audio'
  * moment af zodat je het ziet voordat je kiest.
  */
 
-const GROEPEN: { sleutel: 'xp' | 'levelup' | 'arena'; titel: string; uitleg: string; opties: Richting[] }[] = [
+type Sleutel = 'xp' | 'levelup' | 'arena' | 'breuk'
+
+const GROEPEN: { sleutel: Sleutel; titel: string; uitleg: string; opties: Richting[] }[] = [
   { sleutel: 'xp', titel: 'De XP-drop', uitleg: 'Wat je ziet na elk goed antwoord', opties: XP_STIJLEN },
   { sleutel: 'levelup', titel: 'Het niveau omhoog', uitleg: 'Het moment waar alles voor gebeurt', opties: LEVELUP_STIJLEN },
+  { sleutel: 'breuk', titel: 'De schildbreuk', uitleg: 'De klap als er in de arena een schild sneuvelt', opties: BREUK_STIJLEN },
   { sleutel: 'arena', titel: 'De arena-opkomst', uitleg: 'Hoe het gevecht zich opent', opties: ARENA_STIJLEN },
 ]
 
@@ -23,8 +27,11 @@ export function StijlKiezer() {
   const setStijl = useStore((s) => s.setStijl)
   const awardXp = useStore((s) => s.awardXp)
   const [open, setOpen] = useState(false)
+  /* de breuk speelt hier écht af, met hetzelfde component als in het gevecht;
+     de teller dwingt een nieuwe mount af zodat je hem opnieuw kunt zien */
+  const [breukTik, setBreukTik] = useState(0)
 
-  const nu = (sleutel: 'xp' | 'levelup' | 'arena') => stijlen[sleutel] ?? STANDAARD_STIJLEN[sleutel]
+  const nu = (sleutel: Sleutel) => stijlen[sleutel] ?? STANDAARD_STIJLEN[sleutel]
 
   return (
     <>
@@ -79,6 +86,11 @@ export function StijlKiezer() {
                         style={{ minHeight: 36, fontSize: 12.5, padding: '7px 12px' }}
                         onClick={() => {
                           sfx('tap')
+                          if (g.sleutel === 'breuk') {
+                            sfx('wrong')
+                            setBreukTik((t) => t + 1)
+                            return
+                          }
                           // een echte boeking van 1 XP: de drop en, als je toevallig
                           // over een grens gaat, ook de viering komen vanzelf
                           awardXp(1)
@@ -91,13 +103,35 @@ export function StijlKiezer() {
                   <p className="faint" style={{ fontSize: 11.5, marginBottom: 9 }}>
                     {g.uitleg}
                   </p>
+                  {g.sleutel === 'breuk' && (
+                    <div className="row center" style={{ gap: 5, marginBottom: 10, justifyContent: 'center' }}>
+                      {[0, 1, 2].map((i) => (
+                        <span
+                          key={i}
+                          style={{ position: 'relative', width: 22, height: 24, display: 'inline-grid', placeItems: 'center' }}
+                        >
+                          <span style={{ fontSize: 19, opacity: i === 2 && breukTik > 0 ? 0 : 1, filter: 'drop-shadow(0 0 6px rgba(34,211,238,0.6))' }}>
+                            🛡️
+                          </span>
+                          {i === 2 && breukTik > 0 && (
+                            <Schildbreuk key={breukTik} stijl={nu('breuk') as BreukStijl} kalm={false} />
+                          )}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                   <div className="col" style={{ gap: 8 }}>
                     {g.opties.map((o) => {
                       const actief = o.id === nu(g.sleutel)
                       return (
                         <button
                           key={o.id}
-                          onClick={() => { sfx('tap'); setStijl(g.sleutel, o.id) }}
+                          onClick={() => {
+                            sfx('tap')
+                            setStijl(g.sleutel, o.id)
+                            // meteen laten zien wat je net koos
+                            if (g.sleutel === 'breuk') setBreukTik((t) => t + 1)
+                          }}
                           className="row"
                           style={{
                             gap: 11,
@@ -146,7 +180,7 @@ export function StijlKiezer() {
               ))}
 
               <p className="faint center" style={{ fontSize: 11.5, marginBottom: 10 }}>
-                De arena-opkomst zie je bij je volgende gevecht. Proeven kan ook via de link, met ?arena=spot of ?levelup=92.
+                De arena-opkomst zie je bij je volgende gevecht. Proeven kan ook via de link, met ?arena=spot, ?breuk=as of ?levelup=92.
               </p>
               <button className="btn btn-ghost" style={{ padding: 12, fontSize: 14 }} onClick={() => { sfx('tap'); setOpen(false) }}>
                 Sluiten

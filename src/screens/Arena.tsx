@@ -10,6 +10,7 @@ import {
   WINST_BEKERS,
   arenaVoor,
   arenaVragen,
+  botBeurt,
   drukVan,
   gladiatorVoor,
   volgendeArena,
@@ -19,6 +20,7 @@ import {
 import { Avatar } from '../components/Avatar'
 import { isMeester } from '../skills'
 import { STANDAARD_STIJLEN, stijlUitLink } from '../stijlen'
+import { Schildbreuk, type BreukStijl } from '../components/Schildbreuk'
 import { courseFlagCode } from '../countries'
 import { Flag } from '../components/Flag'
 import { sfx, speak } from '../audio'
@@ -35,6 +37,8 @@ import { sfx, speak } from '../audio'
  */
 
 const VRAGEN_MAX = 30
+/** hoelang de breuk in beeld blijft; korter en de scherven worden afgekapt */
+const KLAP_MS = 800
 
 type Fase =
   | { naam: 'opkomst'; tel: number }
@@ -49,6 +53,9 @@ export function ArenaScreen({ onTerug, onPlayingChange }: { onTerug: () => void;
   const look = useStore((s) => s.avatarLook)
   const meester = useStore((s) => isMeester(s.progress[s.courseId]?.xp ?? 0))
   const opkomstStijl = useStore((s) => stijlUitLink('arena') ?? s.stijlen.arena ?? STANDAARD_STIJLEN.arena)
+  const breukStijl = useStore(
+    (s) => (stijlUitLink('breuk') ?? s.stijlen.breuk ?? STANDAARD_STIJLEN.breuk) as BreukStijl,
+  )
   const course = courses[courseId]
   const kalm = Boolean(useReducedMotion())
 
@@ -64,6 +71,8 @@ export function ArenaScreen({ onTerug, onPlayingChange }: { onTerug: () => void;
   const [zijnSchilden, setZijnSchilden] = useState(opScherp ? 1 : SCHILDEN)
   const [gekozen, setGekozen] = useState<number | null>(null)
   const [botDenkt, setBotDenkt] = useState(false)
+  /** wat hij uitstraalt terwijl hij nadenkt: dat mag je aan hem zien */
+  const [botStemming, setBotStemming] = useState<'aarzelt' | 'versnelt' | null>(null)
   const [melding, setMelding] = useState<string | null>(null)
   /** de korte stilte na een nederlaag: het scherm valt even weg */
   const [stilte, setStilte] = useState(false)
@@ -132,22 +141,31 @@ export function ArenaScreen({ onTerug, onPlayingChange }: { onTerug: () => void;
       sfx('wrong')
       setKlap('ik')
       setMijnSchilden((s) => s - 1)
-      later(500, () => setKlap(null))
+      later(KLAP_MS, () => setKlap(null))
     }
 
-    // de tegenstander speelt zijn beurt: hij twijfelt, en jouw tempo drukt
+    // De tegenstander speelt zijn beurt. Hij reageert op de stand: voor staan
+    // laat hem versnellen, achter staan laat hem twijfelen, en jouw tempo
+    // maakt hem grillig. Wat hij voelt mag je zien, dus aarzelen en
+    // versnellen komen als aparte staat het scherm op.
     setBotDenkt(true)
     const druk = goed ? drukVan(ms) : 0
-    const botGoed = Math.random() < Math.max(0.15, tegenstander.kans - druk)
-    const denktijd = Math.max(700, tegenstander.tempo * (0.7 + Math.random() * 0.6))
-    later(denktijd, () => {
+    const beurt = botBeurt(tegenstander, {
+      zijnSchilden: zijnSchilden - (goed ? 1 : 0),
+      mijnSchilden: mijnSchilden - (goed ? 0 : 1),
+      druk,
+    })
+    const botGoed = beurt.goed
+    setBotStemming(beurt.aarzelt ? 'aarzelt' : beurt.versnelt ? 'versnelt' : null)
+    later(beurt.denktijd, () => {
       setBotDenkt(false)
+      setBotStemming(null)
       if (!botGoed) {
         sfx('correct')
         setKlap('hij')
         setZijnSchilden((s) => s - 1)
         setMelding(`${tegenstander.naam} sloeg de plank mis`)
-        later(500, () => setKlap(null))
+        later(KLAP_MS, () => setKlap(null))
       } else {
         setMelding(`${tegenstander.naam} pareerde jouw slag`)
         setSlag('hij')
@@ -172,23 +190,49 @@ export function ArenaScreen({ onTerug, onPlayingChange }: { onTerug: () => void;
   // dus dat doen we niet: de arena leert je tempo, de les leert je stof
   void addMistake
 
-  const schild = (aantal: number, kant: 'ik' | 'hij') => (
-    <div className="row" style={{ gap: 5 }} aria-label={`${aantal} schilden over`}>
-      {Array.from({ length: SCHILDEN }, (_, i) => {
-        const heel = i < aantal
-        return (
-          <motion.span
-            key={i}
-            animate={klap === kant && i === aantal ? { scale: [1, 1.5, 0.4], opacity: [1, 1, 0], rotate: [0, 12, -18] } : {}}
-            transition={{ duration: 0.45 }}
-            style={{ fontSize: 19, filter: heel ? 'drop-shadow(0 0 6px rgba(34,211,238,0.6))' : 'grayscale(1) opacity(0.25)' }}
-          >
-            🛡️
-          </motion.span>
-        )
-      })}
-    </div>
-  )
+  /**
+   * De schilden zijn de levensbalk van het hele gevecht, dus die mogen niet
+   * als bijzaak in de hoek staan. Ze zijn groter dan de rest van de balk, en
+   * de rij van wie geraakt wordt schudt mee: dat is wat een klap voelbaar
+   * maakt op een scherm van 375 breed.
+   */
+  const schild = (aantal: number, kant: 'ik' | 'hij') => {
+    const geraakt = klap === kant
+    return (
+      <motion.div
+        className="row"
+        style={{ gap: 6 }}
+        aria-label={`${aantal} schilden over`}
+        animate={geraakt && !kalm ? { x: [0, -5, 5, -3, 3, 0] } : { x: 0 }}
+        transition={{ duration: 0.34 }}
+      >
+        {Array.from({ length: SCHILDEN }, (_, i) => {
+          const heel = i < aantal
+          // het schild dat nét breekt: de teller staat al één lager, dus dit
+          // is precies het vakje waar de breuk overheen komt te liggen
+          const breekt = geraakt && i === aantal
+          return (
+            <span
+              key={i}
+              style={{ position: 'relative', width: 27, height: 29, display: 'inline-grid', placeItems: 'center' }}
+            >
+              <span
+                style={{
+                  fontSize: 24,
+                  lineHeight: 1,
+                  opacity: breekt ? 0 : 1,
+                  filter: heel ? 'drop-shadow(0 0 7px rgba(34,211,238,0.65))' : 'grayscale(1) opacity(0.22)',
+                }}
+              >
+                🛡️
+              </span>
+              {breekt && <Schildbreuk key={`breuk-${kant}-${aantal}`} stijl={breukStijl} kalm={kalm} />}
+            </span>
+          )
+        })}
+      </motion.div>
+    )
+  }
 
   /* ---------- de opkomst ---------- */
   if (fase.naam === 'opkomst') {
@@ -496,8 +540,22 @@ export function ArenaScreen({ onTerug, onPlayingChange }: { onTerug: () => void;
 
         <div style={{ minHeight: 34, marginTop: 14 }} className="center">
           {botDenkt && (
-            <p className="faint" style={{ fontSize: 12.5 }}>
-              {tegenstander.naam} denkt na…
+            /* Wat hij voelt hoort zichtbaar te zijn. Aarzelt hij, dan weet je
+               dat je hem hebt; versnelt hij, dan weet je dat hij bloed ruikt.
+               Een vaste regel "denkt na" vertelt je niets over de stand. */
+            <p
+              className={botStemming === 'versnelt' ? 'dim' : 'faint'}
+              style={{
+                fontSize: 12.5,
+                fontWeight: botStemming ? 600 : 400,
+                color: botStemming === 'versnelt' ? 'var(--err-tekst, var(--err))' : undefined,
+              }}
+            >
+              {botStemming === 'aarzelt'
+                ? `${tegenstander.naam} aarzelt…`
+                : botStemming === 'versnelt'
+                  ? `${tegenstander.naam} ruikt bloed`
+                  : `${tegenstander.naam} denkt na…`}
             </p>
           )}
           {melding && (

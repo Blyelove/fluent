@@ -129,4 +129,60 @@ export function drukVan(antwoordMs: number): number {
   return 0
 }
 
+/** wat de tegenstander deze beurt doet, en hoe dat eruitziet */
+export interface BotBeurt {
+  /** hoelang hij erover doet, in ms */
+  denktijd: number
+  /** heeft hij hem goed */
+  goed: boolean
+  /** hij doet er opvallend lang over: dat mag je zien */
+  aarzelt: boolean
+  /** hij ruikt bloed en versnelt: dat mag je ook zien */
+  versnelt: boolean
+}
+
+/**
+ * De beurt van de tegenstander, als één berekening.
+ *
+ * Alleen spreiding op de denktijd maakt hem nog geen levend wezen. Hij moet
+ * reageren op de stand, en dat moet je kunnen zien:
+ *
+ * - staat hij voor, dan ruikt hij bloed en gaat hij sneller spelen;
+ * - staat hij achter, dan neemt hij zijn tijd en wordt hij voorzichtiger,
+ *   want wie op zijn laatste schild staat gokt niet meer;
+ * - antwoord jij snel, dan raakt hij van zijn stuk: zijn kans zakt en zijn
+ *   tempo wordt grillig in plaats van gelijkmatig sneller.
+ *
+ * Bewust een pure functie met de toevalsbron erin geknoopt: het gevecht mag
+ * nooit van een animatieframe afhangen, en zo is deze los na te rekenen.
+ */
+export function botBeurt(
+  g: Gladiator,
+  stand: { zijnSchilden: number; mijnSchilden: number; druk: number },
+): BotBeurt {
+  const voorsprong = stand.zijnSchilden - stand.mijnSchilden
+
+  // staat hij voor, dan versnelt hij; staat hij achter, dan neemt hij de tijd
+  let factor = voorsprong > 0 ? Math.pow(0.82, voorsprong) : Math.pow(1.26, -voorsprong)
+
+  // op zijn laatste schild speelt hij op zeker: langzamer én scherper
+  const opScherp = stand.zijnSchilden === 1
+  if (opScherp) factor *= 1.22
+
+  // jouw tempo maakt hem grillig: hoe meer druk, hoe wilder de uitschieters
+  const grilligheid = 0.34 + stand.druk * 2.2
+  const wiegen = 1 - grilligheid / 2 + Math.random() * grilligheid
+
+  const denktijd = Math.max(650, Math.round(g.tempo * factor * wiegen))
+  const kans = Math.max(0.15, Math.min(0.95, g.kans - stand.druk + (opScherp ? 0.08 : 0)))
+
+  return {
+    denktijd,
+    goed: Math.random() < kans,
+    // opvallend lang voor deze tegenstander, dus niet zomaar elke trage beurt
+    aarzelt: denktijd > g.tempo * 1.35,
+    versnelt: denktijd < g.tempo * 0.72,
+  }
+}
+
 export type { CourseId }

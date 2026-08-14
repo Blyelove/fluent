@@ -38,12 +38,21 @@ export const ARENA_STIJLEN: Richting[] = [
   { id: 'spot', naam: 'Spotlicht', kern: 'Donker, dan valt er één spot op jou en één op je tegenstander', gedurfd: true },
 ]
 
-export type StijlSleutel = 'xp' | 'levelup' | 'arena'
+/** Wat er gebeurt op het moment dat een schild breekt */
+export const BREUK_STIJLEN: Richting[] = [
+  { id: 'scherven', naam: 'Scherven', kern: 'Het schild spat uiteen in scherven die alle kanten op vliegen' },
+  { id: 'barst', naam: 'Barst', kern: 'Eerst loopt er een barst doorheen, dan valt hij in twee helften weg' },
+  { id: 'schok', naam: 'Schokgolf', kern: 'Hij klapt naar binnen en er rolt een ring over het scherm' },
+  { id: 'as', naam: 'As', kern: 'Hij brandt van de rand naar binnen weg en dwarrelt als sintels op', gedurfd: true },
+]
+
+export type StijlSleutel = 'xp' | 'levelup' | 'arena' | 'breuk'
 
 export const STANDAARD_STIJLEN: Record<StijlSleutel, string> = {
   xp: 'klassiek',
   levelup: 'kaart',
   arena: 'duel',
+  breuk: 'scherven',
 }
 
 /** Een stijl uit de link halen, om te proeven of vast te leggen */
