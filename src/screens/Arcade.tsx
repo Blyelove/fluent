@@ -335,7 +335,7 @@ export function ArcadeScreen({ onPlayingChange, onDuels }: { onPlayingChange?: (
                 width: '100%',
                 textAlign: 'left',
                 padding: '20px 20px 18px',
-                borderRadius: 26,
+                borderRadius: 24,
                 background: g.grad,
                 color: g.ink,
                 position: 'relative',
@@ -470,7 +470,7 @@ function CloseBtn({ onClick }: { onClick: () => void }) {
       style={{
         width: 46,
         height: 46,
-        borderRadius: 15,
+        borderRadius: 16,
         flexShrink: 0,
         background: 'var(--surface-2)',
         border: '1.5px solid var(--line)',

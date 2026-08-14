@@ -635,7 +635,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
           <div className="glass unit-card rise" id="vandaag" style={{ order: 0, scrollMarginTop: 16, '--d': '180ms' } as CSSProperties}>
             <div className="spread">
               <span className="row" style={{ gap: 8 }}>
-                <span style={{ width: 32, height: 32, borderRadius: 10, background: 'var(--goud-16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>⚜️</span>
+                <span style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--goud-16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>⚜️</span>
                 <strong className="card-title">Dagelijkse missies</strong>
               </span>
               <span className="gold-text num" style={{ fontWeight: 700, fontSize: 14 }}>
@@ -683,7 +683,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                   gap: 8,
                   marginTop: 12,
                   padding: '10px 12px',
-                  borderRadius: 14,
+                  borderRadius: 12,
                   background: 'var(--goud-10)',
                   border: '1.5px solid var(--line-gold)',
                 }}
@@ -722,7 +722,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
           <div className="glass unit-card" style={alles && !geopend ? { borderColor: 'var(--line-gold)', order: 1 } : { order: 1 }}>
             <div className="spread">
               <span className="row" style={{ gap: 8 }}>
-                <span style={{ width: 32, height: 32, borderRadius: 10, background: 'var(--cyaan-16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🎁</span>
+                <span style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--cyaan-16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🎁</span>
                 <strong className="card-title">Weekmissies</strong>
               </span>
               <span className="gold-text num" style={{ fontWeight: 700, fontSize: 14 }}>
@@ -782,7 +782,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
           <div className="glass unit-card" style={{ order: 1 }}>
             <div className="spread">
               <span className="row" style={{ gap: 8 }}>
-                <span style={{ width: 32, height: 32, borderRadius: 10, background: 'var(--hot-16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🎯</span>
+                <span style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--hot-16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🎯</span>
                 <strong className="card-title">Jouw doelen</strong>
               </span>
               <span className="faint num" style={{ fontSize: 12.5 }}>
@@ -873,7 +873,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
           <button className="glass unit-card" onClick={() => { sfx('tap'); setSkillsOpen(true) }} style={{ order: 1, width: '100%', textAlign: 'left' }}>
             <div className="spread">
               <span className="row" style={{ gap: 8 }}>
-                <span style={{ width: 32, height: 32, borderRadius: 10, background: 'var(--goud-16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🎓</span>
+                <span style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--goud-16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🎓</span>
                 <strong className="card-title">Vaardigheden</strong>
               </span>
               <span className="gold-text num" style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 14 }}>

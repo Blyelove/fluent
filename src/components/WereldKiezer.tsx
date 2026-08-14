@@ -106,8 +106,8 @@ export function WereldKiezer() {
                             background: 'var(--hero-vlak) padding-box, var(--hero-rand) border-box',
                           }}
                         />
-                        <span style={{ position: 'absolute', left: 9, top: 51, right: 34, height: 13, borderRadius: 5, background: 'var(--surface-2)', border: '1px solid var(--line)' }} />
-                        <span style={{ position: 'absolute', right: 9, top: 51, width: 20, height: 13, borderRadius: 5, background: 'var(--grad-gold)' }} />
+                        <span style={{ position: 'absolute', left: 9, top: 51, right: 34, height: 13, borderRadius: 4, background: 'var(--surface-2)', border: '1px solid var(--line)' }} />
+                        <span style={{ position: 'absolute', right: 9, top: 51, width: 20, height: 13, borderRadius: 4, background: 'var(--grad-gold)' }} />
                         <span style={{ position: 'absolute', left: 9, bottom: 9, width: 52, height: 15, borderRadius: 999, background: 'var(--grad-hot)' }} />
                       </span>
                     </span>
@@ -209,7 +209,7 @@ export function WereldKiezer() {
                             position: 'relative',
                             width: 58,
                             height: 44,
-                            borderRadius: 10,
+                            borderRadius: 8,
                             overflow: 'hidden',
                             background: 'var(--bg)',
                             border: '1px solid var(--line)',
@@ -227,7 +227,7 @@ export function WereldKiezer() {
                               top: 7,
                               right: 6,
                               height: 17,
-                              borderRadius: 5,
+                              borderRadius: 4,
                               border: '1px solid transparent',
                               background: 'var(--hero-vlak) padding-box, var(--hero-rand) border-box',
                             }}

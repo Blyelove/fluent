@@ -396,7 +396,7 @@ function AntwoordPaneel({
             aria-label="Spreek je antwoord in"
             style={{
               width: 62,
-              borderRadius: 18,
+              borderRadius: 16,
               fontSize: 23,
               background: luistert ? 'linear-gradient(135deg, var(--hot1), var(--hot2))' : 'var(--surface-2)',
               border: luistert ? 'none' : '1.5px solid var(--line)',
@@ -839,7 +839,7 @@ export function GesprekkenScreen({ onExit }: { onExit: () => void }) {
           <div className="col" style={{ flex: 1, minWidth: 0 }}>
             <strong style={{ fontSize: 16 }}>
               💬 Vrij gesprek{' '}
-              <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.06em', color: 'var(--cyan)', border: '1px solid var(--cyaan-50)', borderRadius: 6, padding: '1px 5px' }}>
+              <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.06em', color: 'var(--cyan)', border: '1px solid var(--cyaan-50)', borderRadius: 4, padding: '1px 5px' }}>
                 NIEUW
               </span>
             </strong>

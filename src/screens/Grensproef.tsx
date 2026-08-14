@@ -222,7 +222,7 @@ export function GrensproefScreen({
                   width: 118,
                   height: 118,
                   borderRadius: '50%',
-                  border: '3px dashed var(--gold)',
+                  border: '2px dashed var(--gold)',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',

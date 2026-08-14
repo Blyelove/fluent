@@ -30,7 +30,7 @@ function Page({ children, title, sub }: { children: ReactNode; title?: string; s
           <h2 className="display" style={{ fontSize: 34, margin: '6px 0 6px' }}>
             {title}
           </h2>
-          <div style={{ width: 48, height: 2, background: 'linear-gradient(135deg,#EED9A0,#B08D4C)', borderRadius: 2, marginBottom: 24 }} />
+          <div style={{ width: 48, height: 2, background: 'linear-gradient(135deg,#EED9A0,#B08D4C)', borderRadius: 0, marginBottom: 24 }} />
         </>
       )}
       {children}
@@ -64,7 +64,7 @@ export function Gallery() {
         <p className="dim" style={{ fontSize: 16 }}>
           Taal leren die je niet meer loslaat.
         </p>
-        <div style={{ width: 48, height: 2, background: 'linear-gradient(135deg,#EED9A0,#B08D4C)', borderRadius: 2, margin: '22px 0' }} />
+        <div style={{ width: 48, height: 2, background: 'linear-gradient(135deg,#EED9A0,#B08D4C)', borderRadius: 0, margin: '22px 0' }} />
         <p className="faint" style={{ fontSize: 14, maxWidth: 420 }}>
           Compleet overzicht van alle visuele groeistappen: kleuren, typografie, Auro's evolutie per niveau, het gouden leerpad en elk
           UI-element — om samen te beoordelen.
@@ -78,8 +78,8 @@ export function Gallery() {
       <Page title="Kleuren & typografie">
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 12 }}>
           {SWATCHES.map((s) => (
-            <div key={s.hex} className="glass" style={{ padding: 12, borderRadius: 14 }}>
-              <div style={{ height: 56, borderRadius: 10, background: s.hex, border: '1px solid var(--glans-10)' }} />
+            <div key={s.hex} className="glass" style={{ padding: 12, borderRadius: 12 }}>
+              <div style={{ height: 56, borderRadius: 8, background: s.hex, border: '1px solid var(--glans-10)' }} />
               <p style={{ fontSize: 12.5, fontWeight: 700, marginTop: 8 }}>{s.name}</p>
               <p className="faint" style={{ fontSize: 11 }}>
                 {s.hex} · {s.note}
@@ -309,13 +309,13 @@ export function Gallery() {
             <p className="eyebrow" style={{ marginBottom: 8 }}>
               Les-feedback
             </p>
-            <div className="sheet-inner good" style={{ borderRadius: 18, marginBottom: 12 }}>
+            <div className="sheet-inner good" style={{ borderRadius: 16, marginBottom: 12 }}>
               <p className="feedback-title ok-text">Uitstekend.</p>
               <button className="btn btn-primary" style={{ marginTop: 8 }}>
                 Verder
               </button>
             </div>
-            <div className="sheet-inner bad" style={{ borderRadius: 18 }}>
+            <div className="sheet-inner bad" style={{ borderRadius: 16 }}>
               <p className="feedback-title err-text">Bijna.</p>
               <p className="dim" style={{ fontSize: 14 }}>
                 Juiste antwoord: <strong style={{ color: '#F2ECDF' }}>buenos días</strong>

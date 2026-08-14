@@ -211,7 +211,7 @@ export function StreakScreen({ onBack, onLeren }: { onBack?: () => void; onLeren
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                borderRadius: 10,
+                borderRadius: 8,
                 fontSize: 12.5,
                 fontWeight: 700,
                 background: c.done ? 'var(--grad-gold)' : c.day ? 'var(--surface)' : 'transparent',

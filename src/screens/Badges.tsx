@@ -112,7 +112,7 @@ function BadgeOrb({ b, size }: { b: BadgeState; size: number }) {
           background: locked
             ? 'var(--surface-2)'
             : `radial-gradient(circle at 38% 30%, ${color}dd, ${color}55 62%, ${color}22 100%)`,
-          border: `2.5px solid ${locked ? 'var(--line)' : maxed ? 'var(--gold)' : `${color}aa`}`,
+          border: `2px solid ${locked ? 'var(--line)' : maxed ? 'var(--gold)' : `${color}aa`}`,
           filter: locked ? 'grayscale(1)' : 'none',
           opacity: locked ? 0.5 : 1,
         }}

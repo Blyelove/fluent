@@ -326,7 +326,7 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
           <div className="card-hero" style={{ padding: 24, marginBottom: 16 }}>
             <div className="spread">
               <span className="row" style={{ gap: 8 }}>
-                <span style={{ width: 32, height: 32, borderRadius: 10, background: 'var(--hot-16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🎯</span>
+                <span style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--hot-16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🎯</span>
                 <strong className="card-title">Jouw fouten</strong>
               </span>
               <span className="hot-text num" style={{ fontWeight: 700, fontSize: 16 }}>
@@ -362,7 +362,7 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
         <div className={mijnFouten.length === 0 && due.length > 0 ? 'card-hero' : 'glass'} style={{ padding: 24, marginBottom: 16 }}>
           <div className="spread">
             <span className="row" style={{ gap: 8 }}>
-              <span style={{ width: 32, height: 32, borderRadius: 10, background: 'var(--hot-16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🧠</span>
+              <span style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--hot-16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🧠</span>
               <strong className="card-title">Herhaling</strong>
             </span>
             {due.length > 0 && <span className="gold-text num" style={{ fontWeight: 700 }}>{due.length} klaar</span>}
@@ -402,7 +402,7 @@ export function ReviewScreen({ onGoLearn, onPraten }: { onGoLearn?: () => void; 
 
         <div className="glass" style={{ padding: 24 }}>
           <span className="row" style={{ gap: 8 }}>
-            <span style={{ width: 32, height: 32, borderRadius: 10, background: 'var(--cyaan-16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>📝</span>
+            <span style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--cyaan-16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>📝</span>
             <strong className="card-title">Eigen toets</strong>
           </span>
           <p className="dim" style={{ fontSize: 14, margin: '8px 0 12px' }}>

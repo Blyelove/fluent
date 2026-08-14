@@ -219,7 +219,7 @@ export function PersonaPicker({ value, onChange }: { value: AvatarStyle; onChang
               title={h.naam}
               style={{
                 minHeight: 76,
-                borderRadius: 14,
+                borderRadius: 12,
                 padding: '3px 0 2px',
                 background: actief ? 'var(--hot-16)' : 'var(--surface-2)',
                 border: actief ? '2px solid var(--hot2)' : '1.5px solid var(--line)',

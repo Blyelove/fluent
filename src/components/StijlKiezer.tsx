@@ -157,7 +157,7 @@ export function StijlKiezer() {
                             gap: 12,
                             padding: '11px 13px',
                             minHeight: 52,
-                            borderRadius: 14,
+                            borderRadius: 12,
                             textAlign: 'left',
                             background: actief ? 'var(--surface-3)' : 'var(--surface)',
                             border: `1.5px solid ${actief ? 'var(--line-hot)' : 'var(--line)'}`,
@@ -175,7 +175,7 @@ export function StijlKiezer() {
                                     letterSpacing: '0.06em',
                                     color: 'var(--cyan)',
                                     border: '1px solid var(--cyan)',
-                                    borderRadius: 6,
+                                    borderRadius: 4,
                                     padding: '1px 5px',
                                   }}
                                 >

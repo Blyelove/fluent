@@ -169,7 +169,7 @@ function DivisionDots({ leagueId }: { leagueId: number }) {
           right: 6,
           top: 24,
           height: 2,
-          borderRadius: 2,
+          borderRadius: 0,
           background: 'linear-gradient(90deg, var(--glans-16), var(--glans-05))',
         }}
       />
@@ -229,7 +229,7 @@ function ZoneDivider({ kind }: { kind: 'promotie' | 'degradatie' }) {
       className="row"
       style={{ gap: 8, padding: '10px 2px 8px' }}
     >
-      <span style={{ flex: 1, height: 2, borderRadius: 2, background: `linear-gradient(90deg, transparent, ${c})` }} />
+      <span style={{ flex: 1, height: 2, borderRadius: 0, background: `linear-gradient(90deg, transparent, ${c})` }} />
       <span
         className="display"
         style={{
@@ -246,7 +246,7 @@ function ZoneDivider({ kind }: { kind: 'promotie' | 'degradatie' }) {
       >
         {promo ? '↑ PROMOTIEZONE' : 'DEGRADATIEZONE ↓'}
       </span>
-      <span style={{ flex: 1, height: 2, borderRadius: 2, background: `linear-gradient(90deg, ${c}, transparent)` }} />
+      <span style={{ flex: 1, height: 2, borderRadius: 0, background: `linear-gradient(90deg, ${c}, transparent)` }} />
     </motion.div>
   )
 }

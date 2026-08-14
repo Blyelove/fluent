@@ -470,7 +470,7 @@ export function WorldMapScreen({
                         position: 'absolute',
                         inset: -7,
                         borderRadius: '50%',
-                        border: '3px solid var(--gold)',
+                        border: '2px solid var(--gold)',
                       }}
                       animate={{ scale: [1, 1.22, 1], opacity: [0.9, 0.25, 0.9] }}
                       transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}

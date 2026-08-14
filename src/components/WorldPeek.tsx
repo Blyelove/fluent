@@ -58,7 +58,7 @@ export function WorldPeek({
     <div className="glass unit-card" style={{ order: 1 }}>
       <div className="spread">
         <span className="row" style={{ gap: 8 }}>
-          <span style={{ width: 32, height: 32, borderRadius: 10, background: 'var(--cyaan-16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🌍</span>
+          <span style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--cyaan-16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🌍</span>
           <strong className="card-title">Wereldverovering</strong>
         </span>
         <span className="gold-text num" style={{ fontWeight: 700, fontSize: 14 }}>

@@ -112,7 +112,7 @@ export function Gatekeeper({
             style={{
               width: 15,
               height: 9,
-              borderRadius: 3,
+              borderRadius: 4,
               background: 'var(--grad-gold)',
               boxShadow: '0 1px 0 var(--inkt-50)',
             }}

@@ -295,7 +295,7 @@ export function SkillsSheet({ onClose }: { onClose: () => void }) {
           <div className="glass" style={{ padding: '13px 15px', marginTop: 12 }}>
             <div className="spread">
               <span className="row" style={{ gap: 8 }}>
-                <span style={{ width: 30, height: 30, borderRadius: 9, background: 'rgba(74,222,128,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0 }}>🌳</span>
+                <span style={{ width: 30, height: 30, borderRadius: 8, background: 'rgba(74,222,128,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0 }}>🌳</span>
                 <strong className="card-title">Woordenstamboom</strong>
               </span>
               <span className="gold-text num" style={{ fontWeight: 700, fontSize: 14 }}>

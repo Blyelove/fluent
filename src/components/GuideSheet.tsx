@@ -44,7 +44,7 @@ export function GuideSheet({
         style={{
           width: 30,
           height: 30,
-          borderRadius: 9,
+          borderRadius: 8,
           flexShrink: 0,
           background: 'var(--hot-25)',
           border: '1px solid var(--hot-50)',

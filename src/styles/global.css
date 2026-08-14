@@ -181,6 +181,60 @@ html, body { height: 100%; }
 html { overflow-x: clip; }
 body { overflow-x: clip; }
 
+/* ═══ OPTISCH UITLIJNEN ═══
+
+   Wiskundig gecentreerd is niet hetzelfde als gecentreerd ogen. Drie plekken
+   waar het oog iets anders ziet dan de rekenmachine:
+
+   1. Een driehoek heeft zijn massa links van zijn midden, dus een speelknop
+      met een ▶ erin lijkt naar links te staan terwijl hij precies in het
+      midden staat. Hij schuift een haar naar rechts.
+   2. Emoji hangen in bijna elk lettertype iets te hoog op de regel, doordat ze
+      op een andere hoogte zijn getekend dan de letters ernaast.
+   3. Een cijfer in een rondje staat optisch te laag: cijfers hebben geen
+      staart onder de regel, dus de ruimte eronder oogt groter dan die erboven.
+
+   De correcties zijn bewust klein. Wie ze los ziet merkt niets; wie het scherm
+   in zijn geheel ziet merkt dat het klopt. */
+
+/* Een kop die over twee regels valt, hoort in twee gelijke regels te vallen.
+   Zonder dit blijft er van "Vrienden & mensen" één woord op de tweede regel
+   achter, en dat is precies het soort scheefheid dat je niet kunt aanwijzen
+   maar wel voelt. */
+h1,
+h2,
+h3,
+.display,
+.card-title {
+  text-wrap: balance;
+}
+
+/* Eén regelritme per maat. De regelafstand stond overal net iets anders,
+   waardoor twee blokken naast elkaar nooit op dezelfde lijn uitkwamen. Groot
+   heeft strak nodig, klein heeft lucht nodig: dat is geen smaak maar hoe het
+   oog werkt. */
+:root {
+  --regel-groot: 1.12;
+  --regel-midden: 1.3;
+  --regel-klein: 1.45;
+}
+
+.display {
+  line-height: var(--regel-groot);
+}
+
+body,
+p,
+button,
+.card-title {
+  line-height: var(--regel-midden);
+}
+
+.faint,
+.dim {
+  line-height: var(--regel-klein);
+}
+
 /* Schuifbalken in de huisstijl. De grijze systeembalk van Windows viel hard
    uit de toon in het donkere neon-ontwerp; deze is dun, paars en verdwijnt in
    de achtergrond. Gebruik .no-scrollbar voor stroken die je met de duim
