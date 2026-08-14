@@ -434,6 +434,20 @@ Stoppen kan met `/loop stop` of door de cron-taak te verwijderen.
 
 ## Logboek
 
+- **14-08-2026, ronde 68** - **De drie pijlers staan nu niet meer op papier maar in een meting, en dat legde twee echte gebreken in pijler 1 bloot.**
+
+  **Gebrek 1: een mijlpaal was kleiner dan een gewoon niveau.** De mijlpaalkaart had meer padding, een groter cijfer en een grotere kop, en was tóch twaalf pixels kleiner, omdat de gewone kaart toevallig meer regels tekst droeg. Zo'n verschil zie je met het oog niet en met een liniaal meteen. Nu 252 tegen 229, met een gouden rand en gloed erbij.
+
+  **Gebrek 2: de meestermantel hing niet overal.** Wel op je profiel en in de arena, niet op het leerscherm, terwijl punt 1c "overal zichtbaar" zegt. Opgelost, en er is nu `?meester=1` om het te kunnen zien: zonder zo'n link is 99 alleen te bereiken door zestigduizend XP te verdienen en dus in de praktijk niet te controleren.
+
+  **`scripts/momenten-proef.mjs`** meet nu de momenten in plaats van de rustige schermen: elk van de zes mijlpalen, het formaatverschil, de regel bij 92, dezelfde mijlpaal in álle zestien werelden, en de mantel op drie schermen. Zestien controles, ook groen tegen de live link.
+
+  **LES: innerText is de gerénderde tekst.** Een kop met `text-transform: uppercase` komt er in hoofdletters uit, dus een zoekopdracht op kleine letters vindt niets en meldt "stuk" over iets dat perfect werkt. Datzelfde script gaf ook 7205 pixels hoogte terug omdat het de eerste div pakte die de kaart bevat, en dat is een voorouder van het hele scherm. **Regel: zoek hoofdletterongevoelig, en pak bij een maat altijd het kleinste element dat past, nooit het eerste.**
+
+  **De audit is minder breekbaar:** hij weigerde botweg als een pagina de wereld nog niet had gezet. Nu probeert hij het driemaal met oplopend geduld en gaat pas stuk als het echt stuk is. De strengheid blijft, de ruis verdwijnt.
+
+  **Stand van het doel:** pijler 1 volledig gemeten (XP-drop, zes mijlpalen, formaat, mantel overal), pijler 2 volledig op online matchmaking na (breuken, gedrag, schaduwduels), pijler 3 op 96 van 96 combinaties schoon inclusief de niveaumomenten per wereld, punt 4 op vier groepen met vijftien richtingen, punt 5 gemeten en gehandhaafd, punt 6 elke ronde live met bewijs.
+
 - **14-08-2026, ronde 67** - **Pijler 1 nagemeten, en de animatiegrens uit punt 5 stond alleen op papier.**
 
   **Pijler 1 is niet aangenomen maar gemeten.** `scripts/les-proef.mjs` speelt een echte les en kijkt naar het scherm: de XP-drop valt na een goed antwoord, het niveaumoment komt met de mijlpaal erbij, en het profiel toont het raster met 99 per taal, het totaalniveau en de arenarang. Zes controles groen. Het bewijsbeeld liet en passant zien dat de woordenstamboom klopt: één Spaans woord tilde het Italiaans in dezelfde les een niveau omhoog.
