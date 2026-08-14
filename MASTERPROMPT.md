@@ -434,6 +434,16 @@ Stoppen kan met `/loop stop` of door de cron-taak te verwijderen.
 
 ## Logboek
 
+- **14-08-2026, ronde 67** - **Pijler 1 nagemeten, en de animatiegrens uit punt 5 stond alleen op papier.**
+
+  **Pijler 1 is niet aangenomen maar gemeten.** `scripts/les-proef.mjs` speelt een echte les en kijkt naar het scherm: de XP-drop valt na een goed antwoord, het niveaumoment komt met de mijlpaal erbij, en het profiel toont het raster met 99 per taal, het totaalniveau en de arenarang. Zes controles groen. Het bewijsbeeld liet en passant zien dat de woordenstamboom klopt: één Spaans woord tilde het Italiaans in dezelfde les een niveau omhoog.
+
+  **LES: een grens die je meet maar niet meetelt, bestaat niet.** De audit telde de oneindige animaties al netjes, maar `telFouten` liet die kolom weg. De grens van drie uit punt 5 werd dus nergens afgedwongen, terwijl er wel een getal in het rapport stond dat eruitzag als bewaking.
+
+  **LES: en toen bleek de teller ook nog de helft te missen.** Hij keek alleen naar `animationIterationCount`, en animaties die vanuit JavaScript lopen staan niet in de berekende stijl. Op het drukste moment dat er is, matchpoint in een lopend gevecht, meldde hij nul terwijl het duidelijk bewoog. In de broncode staan 51 keer `repeat: Infinity` verspreid over twaalf bestanden. Met `document.getAnimations()` erbij vond de audit meteen een echte overtreding: vier tegelijk op het leerscherm in vijf werelden. **Regel: als een teller nul meldt op een plek waar het zichtbaar beweegt, is de teller stuk, niet het scherm.**
+
+  **Wat er stuk was:** de aura van je personage draaide als drie losse animaties met drie ritmes (gloed op 2,4 s, vuur op 0,6 s, vleugels op 1,5 s). Samen met de reeksvlam waren dat er vier. Nu ademt de aura als één geheel, wat ook rustiger leest dan drie ritmes over elkaar heen.
+
 - **14-08-2026, ronde 66** - **De Arena is een ervaring geworden: de klap die je voelt, een tegenstander die zich gedraagt, en vriendduels in dezelfde jas.** Daarmee is punt 2 van het doel rond, op online matchmaking na.
 
   **De schildbreuk.** Een schild dat wegpoft is een teller die eentje omlaag gaat. Nu breekt hij, in vier richtingen die je zelf kiest in de proeverij: Scherven, Barst, Schokgolf en de gedurfde As. Alle vier met dezelfde lichtflits op het moment van inslag, want dat ene lichte frame is wat een breuk tot een klap maakt. **LES: een effect dat je niet kunt zien, bestaat niet, en dat merk je alleen als je het fotografeert.** Drie keer op rij bleek het anders dan gedacht: de schilden stonden op 19 pixels als bijzaak in de balk terwijl ze de levensbalk van het gevecht zijn (nu 24, en de rij van wie geraakt wordt schudt mee); de scherven waren uitgeknipte stukjes schildemoji en dus donker op een donkere arena (nu eigen lichte scherven); en van de zes vlieghoeken bleven er drie onzichtbaar omdat de balk bovenaan staat en alles wat omhoog vliegt door de schermrand wordt weggeknipt (nu opzij en omlaag). Ook duurde de breuk 300 ms te kort, dus de scherven werden halverwege afgekapt. **Regel: tel in de foto hoeveel delen er écht in beeld staan, anders gaat een lege foto door voor bewijs.**

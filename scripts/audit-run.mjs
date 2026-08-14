@@ -47,8 +47,17 @@ const WERELDEN = [
 
 const wacht = (ms) => new Promise((r) => setTimeout(r, ms))
 
+/** het prestatiecontract: hoogstens drie dingen die eeuwig blijven bewegen */
+const MAX_ANIMATIES = 3
+
 const telFouten = (u) =>
-  u.contrastFouten.length + u.tikdoelenTeKlein.length + u.middenstreepjes.length + (u.horizontaalScroll ? 1 : 0)
+  u.contrastFouten.length +
+  u.tikdoelenTeKlein.length +
+  u.middenstreepjes.length +
+  (u.horizontaalScroll ? 1 : 0) +
+  // deze werd wel gemeten maar niet meegeteld, dus de grens uit het doel stond
+  // er alleen op papier
+  (u.oneindigeAnimaties.aantal > MAX_ANIMATIES ? 1 : 0)
 
 async function haalDoel() {
   for (let poging = 0; poging < 40; poging++) {
@@ -160,6 +169,8 @@ for (const u of stuk.slice(0, 24)) {
   if (u.tikdoelenTeKlein.length) delen.push('tikdoel ' + u.tikdoelenTeKlein.map((t) => `"${t.t}" ${t.w}x${t.h}`).join(' | '))
   if (u.horizontaalScroll) delen.push('horizontale scroll')
   if (u.middenstreepjes.length) delen.push('middenstreepje ' + u.middenstreepjes.join(' | '))
+  if (u.oneindigeAnimaties.aantal > MAX_ANIMATIES)
+    delen.push(`${u.oneindigeAnimaties.aantal} oneindige animaties (${u.oneindigeAnimaties.soorten.join(', ')}), hoogstens ${MAX_ANIMATIES}`)
   console.log(`${u.scherm}/${u.wereld}: ${delen.join('; ')}`)
 }
 process.exit(1)

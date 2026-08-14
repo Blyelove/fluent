@@ -292,41 +292,32 @@ export function Avatar({
         </clipPath>
       </defs>
 
-      {/* aura (niveau 9+; kosmisch vanaf 19) */}
-      {hasGlow && (
-        <motion.circle
-          cx="100"
-          cy="110"
-          r="95"
-          fill={cosmic ? `url(#av-cosmic-${uid})` : `url(#av-glow-${uid})`}
-          animate={amb({ opacity: [0.7, 1, 0.7] })}
-          transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
-        />
-      )}
-
-      {/* vuur-aura (niveau 13+) */}
-      {hasFire && (
+      {/* De aura: gloed (9+), vuur (13+) en vleugels (16+) ademen samen.
+          Bewust één animatie in plaats van drie met elk hun eigen ritme. Op
+          niveau 16 liepen er zo vier oneindige animaties tegelijk op het
+          leerscherm, één meer dan het prestatiecontract toestaat, en drie
+          losse ritmes over elkaar heen lezen ook onrustiger dan één adem. */}
+      {(hasGlow || hasFire || hasWings) && (
         <motion.g
-          animate={amb({ opacity: [0.65, 1, 0.65], scaleY: [1, 1.08, 1] })}
-          transition={{ duration: 0.6, repeat: Infinity, ease: 'easeInOut' }}
-          style={{ originX: '100px', originY: '170px' }}
+          animate={amb({ opacity: [0.72, 1, 0.72], rotate: [-2.5, 2.5, -2.5] })}
+          transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+          style={{ originX: '100px', originY: '124px' }}
         >
-          <ellipse cx="58" cy="148" rx="10" ry="28" fill="#FF8A3D" opacity="0.5" />
-          <ellipse cx="142" cy="148" rx="10" ry="28" fill="#FF8A3D" opacity="0.5" />
-          <ellipse cx="58" cy="140" rx="5" ry="17" fill="#FFC53D" opacity="0.75" />
-          <ellipse cx="142" cy="140" rx="5" ry="17" fill="#FFC53D" opacity="0.75" />
-        </motion.g>
-      )}
-
-      {/* energievleugels (niveau 16+) */}
-      {hasWings && (
-        <motion.g
-          animate={amb({ rotate: [-4, 4, -4] })}
-          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-          style={{ originX: '100px', originY: '118px' }}
-        >
-          <path d="M70 112 Q26 84 24 126 Q42 146 70 134 Z" fill="#22D3EE" opacity="0.7" />
-          <path d="M130 112 Q174 84 176 126 Q158 146 130 134 Z" fill="#A855F7" opacity="0.7" />
+          {hasGlow && <circle cx="100" cy="110" r="95" fill={cosmic ? `url(#av-cosmic-${uid})` : `url(#av-glow-${uid})`} />}
+          {hasFire && (
+            <>
+              <ellipse cx="58" cy="148" rx="10" ry="28" fill="#FF8A3D" opacity="0.5" />
+              <ellipse cx="142" cy="148" rx="10" ry="28" fill="#FF8A3D" opacity="0.5" />
+              <ellipse cx="58" cy="140" rx="5" ry="17" fill="#FFC53D" opacity="0.75" />
+              <ellipse cx="142" cy="140" rx="5" ry="17" fill="#FFC53D" opacity="0.75" />
+            </>
+          )}
+          {hasWings && (
+            <>
+              <path d="M70 112 Q26 84 24 126 Q42 146 70 134 Z" fill="#22D3EE" opacity="0.7" />
+              <path d="M130 112 Q174 84 176 126 Q158 146 130 134 Z" fill="#A855F7" opacity="0.7" />
+            </>
+          )}
         </motion.g>
       )}
 

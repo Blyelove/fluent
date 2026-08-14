@@ -84,13 +84,37 @@ window.__auditFluent = async function auditFluent() {
     return uit
   }
 
+  /**
+   * Alles wat eeuwig blijft bewegen, en niet alleen de CSS-animaties.
+   *
+   * Dit keek eerst alleen naar animationIterationCount, en dat is precies de
+   * helft van het verhaal: animaties die vanuit JavaScript lopen staan niet in
+   * de berekende stijl. De teller meldde nul op een scherm waar het duidelijk
+   * bewoog. document.getAnimations ziet ze allebei.
+   */
   function oneindigeAnimaties() {
+    const namen = new Set()
     let n = 0
     document.querySelectorAll('body *').forEach((e) => {
       const cs = getComputedStyle(e)
-      if (cs.animationName !== 'none' && cs.animationIterationCount === 'infinite') n++
+      if (cs.animationName !== 'none' && cs.animationIterationCount === 'infinite') {
+        n++
+        namen.add(cs.animationName)
+      }
     })
-    return n
+    try {
+      for (const a of document.getAnimations()) {
+        const t = a.effect && a.effect.getTiming ? a.effect.getTiming() : null
+        if (!t || t.iterations !== Infinity) continue
+        // een CSS-animatie staat hierboven al geteld
+        if (a.constructor && a.constructor.name === 'CSSAnimation') continue
+        n++
+        namen.add(a.constructor ? a.constructor.name : 'script')
+      }
+    } catch {
+      /* oudere browser zonder getAnimations: dan telt alleen de CSS-kant */
+    }
+    return { aantal: n, soorten: [...namen].slice(0, 6) }
   }
 
   function echteHorizontaleScroll() {
