@@ -47,6 +47,14 @@
         opacity: 0;
         visibility: hidden;
       }
+      /* En de lijn moet ook écht stoppen. Onzichtbaar is niet hetzelfde als
+         gestopt: hij draaide vrolijk door zodra de app het had overgenomen, en
+         telde daarmee mee als vierde oneindige animatie op elk scherm. Dat
+         kost batterij voor iets wat niemand meer ziet. */
+      body:has(#root > *) .opening-spoor span,
+      body.app-staat .opening-spoor span {
+        animation: none;
+      }
       .opening-naam {
         margin: 0;
         font-family: system-ui, sans-serif;
