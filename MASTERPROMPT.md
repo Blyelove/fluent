@@ -434,6 +434,18 @@ Stoppen kan met `/loop stop` of door de cron-taak te verwijderen.
 
 ## Logboek
 
+- **14-08-2026, ronde 69** - **Punt 1a en 1d bewezen, en vijftien richtingen nagelopen op echte code.**
+
+  **1a, de XP-drop zweeft omhoog.** Nu met een echte baan, gemeten op de live link: top 71 naar 12 pixels terwijl de doorzichtigheid van 0,16 naar 1 loopt en weer uitdooft, op 17 pixels tekst en één tegelijk. Dus omhoog, zichtbaar, en subtiel.
+
+  **1d, niets rekent na.** `scripts/pijler-proef.mjs` rekent de RuneScape-curve zélf uit vanuit de opgeslagen XP en legt dat naast het scherm: 66, 74, 56, 36, 29, 23 tegenover exact dezelfde reeks. Zes van de zes gelijk, dus er loopt nergens een eigen teller mee. De tegels worden gelezen via hun aria-label, want dat draagt het niveau uit en is niet afhankelijk van opmaak.
+
+  **Punt 4, alle richtingen bestaan echt.** `scripts/richtingen-proef.mjs` legt de catalogus naast de tekencode: vijftien richtingen over vier groepen, elke groep met een gedurfde optie, en achter elke naam zit code in plaats van een stille terugval op de standaard. Welke richting wint is een keuze van de gebruiker, niet iets wat af te maken valt.
+
+  **LES: een te grove steekproef is net zo fout als een kapotte teller.** De drop leeft 1,1 seconde. Drie monsters vielen op een trage verbinding allemaal op de startstand, en de proef meldde drie keer op rij dat de drop stilstond op de live link terwijl hij het perfect deed. Bijna had ik een werkend effect "gerepareerd". Wat het redde was een losse meting die de drop midden in zijn vlucht ving (opacity 0,66, translateY min 18) en dus het tegendeel bewees. **Regel: bemonster een animatie dicht en lang genoeg om de hele vlucht te vangen, en wantrouw een reeks metingen die allemaal exact hetzelfde getal geven.**
+
+  **Open, en niet door mij te sluiten:** online matchmaking (punt 2d) wacht op een Supabase-project met sleutels van de gebruiker. Het schaduwduel is zo gebouwd dat de opname straks van een server komt in plaats van uit een link, dus dat is een aansluiting en geen herbouw.
+
 - **14-08-2026, ronde 68** - **De drie pijlers staan nu niet meer op papier maar in een meting, en dat legde twee echte gebreken in pijler 1 bloot.**
 
   **Gebrek 1: een mijlpaal was kleiner dan een gewoon niveau.** De mijlpaalkaart had meer padding, een groter cijfer en een grotere kop, en was tóch twaalf pixels kleiner, omdat de gewone kaart toevallig meer regels tekst droeg. Zo'n verschil zie je met het oog niet en met een liniaal meteen. Nu 252 tegen 229, met een gouden rand en gloed erbij.

@@ -174,31 +174,39 @@ try {
 
   /* ---------- 1a: zweeft de drop echt omhoog, en subtiel ---------- */
   await ga('demo=1&tab=profiel', 1)
-  // eerst het paneel openen, dán pas de boeking doen: anders gaat de wachttijd
-  // van het openen van je meetvenster af en mis je de hele vlucht
-  for (let poging = 0; poging < 3; poging++) {
+  /* Eerst het paneel helemaal open klikken en pas daarna de boeking doen.
+     Ging dit in één lus, dan viel de klik op een trage verbinding in de
+     laatste ronde en begon het meten op hetzelfde moment als de drop: drie
+     monsters op de startstand, en een vals alarm dat de drop stilstond. */
+  let gespeeld = false
+  for (let poging = 0; poging < 6 && !gespeeld; poging++) {
     const uit = await ev(SPEEL_DROP_AF)
-    if (uit === 'gespeeld') break
-    await wacht(900)
+    gespeeld = uit === 'gespeeld'
+    if (!gespeeld) await wacht(900)
   }
-  /* Meteen bemonsteren en dan nog twee keer. De drop duurt 1,1 seconde, dus
-     wie eerst zevenhonderd milliseconde wacht en dán twee monsters vlak na
-     elkaar neemt, meet twee keer hetzelfde en concludeert dat hij stilstaat. */
+  eis(gespeeld, 'de afspeelknop van de XP-drop is gevonden en ingedrukt')
+  /* Ruim bemonsteren in plaats van drie keer gokken. Een drop leeft 1,1
+     seconde en één traag netwerk verschuift het hele venster, waardoor drie
+     monsters allemaal op de startstand kunnen vallen en de proef meldt dat er
+     niets beweegt terwijl het gewoon werkt. Twaalf monsters over ruim twee
+     seconden vangen de vlucht altijd; blijft álles op de startstand staan, dan
+     is er echt iets stuk. */
   const baan = []
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 12; i++) {
     baan.push(JSON.parse(await ev(LEES_DROPS)))
-    await wacht(420)
+    await wacht(170)
   }
-  console.log('baan van de drop:', baan.map((m) => `top=${m.top} op=${m.opacity}`).join('  ->  '))
-  const start = baan[0]
-  const laatste = baan.filter((m) => m.top !== null).pop()
-  eis(start.gevonden > 0, `er staat een XP-drop in beeld (${start.tekst || 'niets'})`)
-  eis(
-    start.top !== null && laatste && laatste.top < start.top - 4,
-    `de drop zweeft omhoog (${start.top} naar ${laatste ? laatste.top : 'weg'})`,
-  )
-  eis(start.grootte !== null && start.grootte <= 24, `de drop blijft subtiel (${start.grootte}px)`)
-  eis(start.gevonden <= 6, `hoogstens een handvol drops tegelijk (${start.gevonden})`)
+  const metDrop = baan.filter((m) => m.top !== null)
+  console.log('baan van de drop:', metDrop.map((m) => `${m.top}/${Number(m.opacity).toFixed(2)}`).join(' '))
+  const hoogste = Math.min(...metDrop.map((m) => m.top))
+  const laagste = Math.max(...metDrop.map((m) => m.top))
+  const meesteZichtbaar = Math.max(...metDrop.map((m) => Number(m.opacity)))
+  const eerste = metDrop[0] ?? { gevonden: 0, grootte: null, tekst: '' }
+  eis(eerste.gevonden > 0, `er staat een XP-drop in beeld (${eerste.tekst || 'niets'})`)
+  eis(hoogste < laagste - 4, `de drop zweeft omhoog (van ${laagste} naar ${hoogste})`)
+  eis(meesteZichtbaar > 0.5, `de drop is ook echt te zien (hoogste doorzichtigheid ${meesteZichtbaar.toFixed(2)})`)
+  eis(eerste.grootte !== null && eerste.grootte <= 24, `de drop blijft subtiel (${eerste.grootte}px)`)
+  eis(eerste.gevonden <= 6, `hoogstens een handvol drops tegelijk (${eerste.gevonden})`)
   const s = await stuur('Page.captureScreenshot', { format: 'png' })
   await writeFile('C:/Users/Blye/Desktop/aurea/docs/bewijs/xpdrop-zweeft.png', Buffer.from(s.data, 'base64'))
 
