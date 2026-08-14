@@ -9,6 +9,7 @@ import { initAudioManifest, initVoices, setSoundEnabled } from './audio'
 import { LEAGUES, standings, yourRank } from './leagues'
 import { readDuelFromUrl } from './duel'
 import { leesSchaduwUitLink } from './arena-duel'
+import { MAX_SKILL_LEVEL, xpVoorSkillLevel } from './skills'
 import { Onboarding } from './screens/Onboarding'
 import { AuthScreen } from './screens/Auth'
 import { Gallery } from './screens/Gallery'
@@ -118,14 +119,22 @@ export default function App() {
 
   useEffect(() => {
     const alGebruiker = useStore.getState().currentUser
+    const vraag = new URLSearchParams(window.location.search)
+    /* ?meester=1 zet het Spaans op 99. Zonder zo'n link is de meestermantel
+       alleen te zien door zestigduizend XP te verdienen, en dus in de praktijk
+       niet te controleren of vast te leggen. */
+    const meesterDemo = vraag.has('meester')
     // demo mag nooit een echte sessie overschrijven
-    if (new URLSearchParams(window.location.search).has('demo') && (!alGebruiker || alGebruiker === 'demo')) {
+    if ((vraag.has('demo') || meesterDemo) && (!alGebruiker || alGebruiker === 'demo')) {
       try { sessionStorage.setItem('fluent-session', '1') } catch { /* geen sessie nodig */ }
       useStore.setState({
         currentUser: 'demo', rememberMe: true, onboarded: true, courseId: 'es',
         streak: 34, bestStreak: 41, dailyGoalXp: 40,
         progress: {
-          es: { xp: 5200, completed: ['es-u1-l1', 'es-u1-l2', 'es-u1-l3', 'es-u2-l1', 'es-u2-l2', 'es-u2-l3', 'es-u3-l1'] },
+          es: {
+            xp: meesterDemo ? xpVoorSkillLevel(MAX_SKILL_LEVEL) : 5200,
+            completed: ['es-u1-l1', 'es-u1-l2', 'es-u1-l3', 'es-u2-l1', 'es-u2-l2', 'es-u2-l3', 'es-u3-l1'],
+          },
           en: { xp: 2400, completed: [] }, fr: { xp: 900, completed: [] },
           de: { xp: 120, completed: [] }, it: { xp: 60, completed: [] }, pt: { xp: 30, completed: [] },
         },

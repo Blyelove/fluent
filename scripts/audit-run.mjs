@@ -125,22 +125,31 @@ try {
 
   for (const scherm of SCHERMEN) {
     for (const wereld of WERELDEN) {
-      await stuur('Page.navigate', { url: `${BASIS}?demo=1&${scherm.vraag}&wereld=${wereld}` })
-      await wacht(2100)
-      // de schaalinstelling van Windows rekt het venster na het laden weer op,
-      // dus de maat wordt na élke navigatie opnieuw vastgezet
-      await stuur('Emulation.setDeviceMetricsOverride', maat)
-      await wacht(450)
-      await stuur('Runtime.evaluate', { expression: bron })
-      const roep = await stuur('Runtime.evaluate', {
-        expression: 'window.__auditFluent().then((r) => JSON.stringify(r))',
-        awaitPromise: true,
-        returnByValue: true,
-        timeout: 30000,
-      })
-      const r = JSON.parse(roep.result.value)
-      if (r.venster !== BREEDTE) throw new Error(`breedte klopt niet: ${r.venster} in plaats van ${BREEDTE}`)
-      if (r.wereld !== wereld) throw new Error(`wereld klopt niet: ${r.wereld} in plaats van ${wereld}`)
+      /* Meten, en de meting weggooien als de condities niet kloppen. Een trage
+         start levert soms een pagina op die de wereld nog niet heeft gezet;
+         dan is nog een poging met meer geduld het juiste antwoord, en niet
+         een uitslag die je toch maar opschrijft. Blijft het misgaan, dan is er
+         echt iets stuk en moet het hard stukgaan. */
+      let r = null
+      for (let poging = 0; poging < 3 && !r; poging++) {
+        await stuur('Page.navigate', { url: `${BASIS}?demo=1&${scherm.vraag}&wereld=${wereld}` })
+        await wacht(2100 + poging * 1500)
+        // de schaalinstelling van Windows rekt het venster na het laden weer
+        // op, dus de maat wordt na élke navigatie opnieuw vastgezet
+        await stuur('Emulation.setDeviceMetricsOverride', maat)
+        await wacht(450)
+        await stuur('Runtime.evaluate', { expression: bron })
+        const roep = await stuur('Runtime.evaluate', {
+          expression: 'window.__auditFluent().then((x) => JSON.stringify(x))',
+          awaitPromise: true,
+          returnByValue: true,
+          timeout: 30000,
+        })
+        const kandidaat = JSON.parse(roep.result.value)
+        if (kandidaat.venster === BREEDTE && kandidaat.wereld === wereld) r = kandidaat
+        else console.log(`  opnieuw: ${scherm.naam}/${wereld} gaf ${kandidaat.wereld} op ${kandidaat.venster}px`)
+      }
+      if (!r) throw new Error(`${scherm.naam}/${wereld} kwam na drie pogingen niet in de juiste staat`)
       uitslagen.push({ scherm: scherm.naam, wereld, ...r })
     }
     const stuk = uitslagen.filter((u) => u.scherm === scherm.naam && telFouten(u) > 0)

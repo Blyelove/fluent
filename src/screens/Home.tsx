@@ -13,7 +13,7 @@ import { Flag } from '../components/Flag'
 import { Avatar } from '../components/Avatar'
 import { GuideSheet } from '../components/GuideSheet'
 import { SkillsSheet } from '../components/SkillsSheet'
-import { skillStand } from '../skills'
+import { isMeester, skillStand } from '../skills'
 import { StreakScreen } from './Streak'
 import { WorldMapScreen } from './WorldMap'
 import { WorldPeek } from '../components/WorldPeek'
@@ -95,6 +95,9 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
   const goals = useStore((s) => s.goals)
   const goalsDoneCount = useStore((s) => s.goalsDone.length)
   const look = useStore((s) => s.avatarLook)
+  // de meestermantel hoort overal te hangen zodra je 99 haalt, niet alleen op
+  // je profiel; hier draagt je personage hem dus ook op het leerpad
+  const meesterNu = useStore((s) => isMeester(s.progress[s.courseId]?.xp ?? 0))
   const boostUntil = useStore((s) => s.boostUntil)
   const leagueId = useStore((s) => s.leagueId)
   const weekXp = useStore((s) => s.weekXp)
@@ -304,7 +307,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                 aria-label="Bekijk je vaardigheden"
                 style={{ position: 'relative', minWidth: 56, minHeight: 56, flexShrink: 0 }}
               >
-                <Avatar size={56} level={lp.level} courseId={courseId} look={look} />
+                <Avatar size={56} level={lp.level} courseId={courseId} look={look} meester={meesterNu} />
                 <span
                   className="num"
                   style={{
@@ -1039,7 +1042,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
                   {/* jouw personage staat op je route te wachten */}
                   {state === 'current' && (
                     <span style={{ position: 'absolute', bottom: 'calc(100% - 10px)', left: '50%', transform: 'translateX(-50%)', pointerEvents: 'none' }}>
-                      <Avatar size={58} still level={levelProgress(xpAll).level} courseId={courseId} look={look} />
+                      <Avatar size={58} still level={levelProgress(xpAll).level} courseId={courseId} look={look} meester={meesterNu} />
                     </span>
                   )}
                   {state === 'done' ? (

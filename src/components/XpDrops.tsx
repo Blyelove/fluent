@@ -244,16 +244,27 @@ export function XpDrops() {
                       borderBottom: '3px solid var(--gold)',
                       color: 'var(--hero-tekst)',
                     }
-                  : { padding: viering.mijlpaal ? '30px 26px' : '24px 24px', maxWidth: 320, width: '100%' }
+                  : {
+                      /* Een mijlpaal moet ook echt groter zijn en niet alleen
+                         andere woorden dragen. Gemeten was de mijlpaalkaart
+                         zelfs twaalf pixels kleiner dan een gewoon niveau,
+                         omdat de gewone kaart toevallig meer regels had. Nu is
+                         hij breder, ruimer en gerand in goud. */
+                      padding: viering.mijlpaal ? '34px 28px' : '22px 24px',
+                      maxWidth: viering.mijlpaal ? 360 : 310,
+                      width: '100%',
+                      border: viering.mijlpaal ? '2px solid var(--line-gold)' : undefined,
+                      boxShadow: viering.mijlpaal ? 'var(--glow-gold)' : undefined,
+                    }
               }
             >
               <p className="eyebrow" style={{ color: 'var(--hero-eyebrow)' }}>
                 {viering.mijlpaal ? 'Mijlpaal bereikt' : 'Niveau omhoog'}
               </p>
-              <p style={{ fontSize: viering.mijlpaal ? 58 : 44, lineHeight: 1.1, margin: '6px 0 2px' }} aria-hidden="true">
+              <p style={{ fontSize: viering.mijlpaal ? 68 : 42, lineHeight: 1.1, margin: viering.mijlpaal ? '10px 0 6px' : '6px 0 2px' }} aria-hidden="true">
                 {viering.level >= 99 ? '👑' : viering.mijlpaal ? '🎇' : '✨'}
               </p>
-              <h3 className="display" style={{ fontSize: viering.mijlpaal ? 28 : 24, marginBottom: 4 }}>
+              <h3 className="display" style={{ fontSize: viering.mijlpaal ? 31 : 23, marginBottom: viering.mijlpaal ? 7 : 4 }}>
                 Je {courses[viering.taal].name} is nu{' '}
                 <span className="gold-text num">niveau {viering.level}</span>
               </h3>
