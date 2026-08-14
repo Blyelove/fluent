@@ -276,6 +276,18 @@ export function Avatar({
   const torsoHoog = Math.round(66 * bouw.hoog)
   const torsoOnder = 106 + torsoHoog
 
+  /* De broek en de schoenen stonden vast, terwijl de garderobe wél beloofde
+     dat je ze verdient. Een belofte die het personage niet nakomt voelt als
+     straf, dus die stukken bestaan nu echt. */
+  const netteBroek = level >= 4
+  const goudZoom = level >= 15
+  const leren = level >= 4
+  const goudSchoen = level >= 18
+  const broekKleur = goudZoom ? '#241d3d' : netteBroek ? '#2b2547' : '#3D3654'
+  const broekKleur2 = goudZoom ? '#1d1733' : netteBroek ? '#231e3c' : '#332C48'
+  const schoenKleur = goudSchoen ? '#c79a3a' : leren ? '#5a3a24' : '#2C2640'
+  const zoolKleur = goudSchoen ? '#ffe08a' : leren ? '#c9b28f' : '#E8E6F5'
+
   const hasScarf = level >= 2
   const hasHat = level >= 3
   const hasOutfit = level >= 4
@@ -450,7 +462,7 @@ export function Avatar({
         width="14"
         height="42"
         rx="7"
-        fill="#3D3654"
+        fill={broekKleur}
         animate={running ? { rotate: [22, -22, 22] } : {}}
         transition={{ duration: 0.32, repeat: Infinity, ease: 'easeInOut' }}
         style={{ originX: '89px', originY: '170px' }}
@@ -461,15 +473,22 @@ export function Avatar({
         width="14"
         height="42"
         rx="7"
-        fill="#332C48"
+        fill={broekKleur2}
         animate={running ? { rotate: [-22, 22, -22] } : {}}
         transition={{ duration: 0.32, repeat: Infinity, ease: 'easeInOut' }}
         style={{ originX: '111px', originY: '170px' }}
       />
-      <ellipse cx="89" cy="209" rx="11" ry="6" fill="#2C2640" />
-      <ellipse cx="111" cy="209" rx="11" ry="6" fill="#2C2640" />
-      <ellipse cx="89" cy="213" rx="11.5" ry="2.6" fill="#E8E6F5" />
-      <ellipse cx="111" cy="213" rx="11.5" ry="2.6" fill="#E8E6F5" />
+      <ellipse cx={89 - bouw.spreid} cy="209" rx="11" ry="6" fill={schoenKleur} />
+      <ellipse cx={111 + bouw.spreid} cy="209" rx="11" ry="6" fill={schoenKleur} />
+      {/* de gouden zoom onder aan de broek: het teken van niveau 15 */}
+      {goudZoom && (
+        <g fill="var(--gold, #ffc53d)">
+          <rect x={82 - bouw.spreid} y="200" width="14" height="3.4" rx="1.7" />
+          <rect x={104 + bouw.spreid} y="200" width="14" height="3.4" rx="1.7" />
+        </g>
+      )}
+      <ellipse cx={89 - bouw.spreid} cy="213" rx="11.5" ry="2.6" fill={zoolKleur} />
+      <ellipse cx={111 + bouw.spreid} cy="213" rx="11.5" ry="2.6" fill={zoolKleur} />
 
       {/* armen */}
       <motion.rect

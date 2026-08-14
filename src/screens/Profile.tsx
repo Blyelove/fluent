@@ -7,6 +7,7 @@ import { arenaVoor } from '../arena'
 import { SkillRaster, SkillsSheet } from '../components/SkillsSheet'
 import { WereldKiezer } from '../components/WereldKiezer'
 import { StijlKiezer } from '../components/StijlKiezer'
+import { Garderobe } from '../components/Garderobe'
 import { courseFlagCode } from '../countries'
 import { Flag } from '../components/Flag'
 import { Avatar, normalizePersona } from '../components/Avatar'
@@ -321,6 +322,7 @@ export function ProfileScreen() {
           </div>
         </div>
         <WereldKiezer />
+        <Garderobe />
         <StijlKiezer />
         {/* stond hier als dode tekst; nu draai je er zo doorheen */}
         <div className="spread" style={{ padding: '10px 0', borderBottom: '1px solid var(--line)' }}>
