@@ -434,6 +434,14 @@ Stoppen kan met `/loop stop` of door de cron-taak te verwijderen.
 
 ## Logboek
 
+- **14-08-2026, ronde 73** - **Punt 2 en punt 4 afgemaakt: één hoekenfamilie, haarlijnranden, een vast regelritme, en zes groepen richtingen.**
+
+  Veertien verschillende hoekstralen door elkaar (2, 3, 5, 6, 8, 9, 10, 12, 14, 15, 16, 18, 26 en de pil) zijn er zes geworden uit één familie. Randdiktes terug op de haarlijnen 1, 1,5 en 2. Koppen breken nu in twee gelijke regels, en er is één regelritme per maat.
+
+  De proeverij heeft nu **zes groepen met 23 richtingen**, elk met een gedurfde: naast de XP-drop, het niveaumoment, de schildbreuk en de arena-opkomst nu ook **het materiaal** (waas, rand, diep, en de gedurfde Ademend) en **de wereldgroei** (aangroeien, oplichten, opbouwen, en de gedurfde Omslag). De afspeelknop laat het echte moment op het echte document zien.
+
+  **LES: zoek en vervang over broncode is alleen veilig als je weet in welke context het teken staat.** Mijn poging om het speeldriehoekje optisch uit te lijnen zette een span om elke "▶ " heen, ook waar dat teken in een gewone tekststring stond in plaats van in JSX. Op de knop kwam letterlijk `<span className="speeldriehoek">▶</span> Doorgaan` te staan. De typecontrole zag niets, de bouw slaagde, de audit bleef schoon: alleen de schermafdruk ving het. **Regel: na elke codemod die tekst raakt, kijken naar het scherm en niet alleen naar de meters.**
+
 - **14-08-2026, ronde 72** - **Het pixelwerk en de kleurtaal, en de wereld groeit nu echt elke tien niveaus.**
 
   **918 afwijkingen van de ladders opgeruimd.** Op het leerscherm stonden achttien verschillende lettergroottes: 10,5 en 11 en 11,5 en 12 en 12,5 en 13 en 13,5 en 14 en 14,5. Elk verschil op zich zie je niet, achttien ervan bij elkaar zie je wél, en dat is precies waarom een scherm rommelig aanvoelt zonder dat je kunt aanwijzen waarom. Eén typeladder van acht tekstmaten plus drie displaymaten, één maatladder van 4, 8, 12, 16, 24, 32, 48. Het leerscherm gebruikt er nu zeven.
