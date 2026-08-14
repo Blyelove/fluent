@@ -1,17 +1,19 @@
 /**
- * De systematische audit: loopt élk scherm langs in élke taalwereld en meet
- * de harde eisen. Draait in de pagina, niet in Node.
+ * De systematische audit: meet de harde eisen op de pagina zoals die nu staat.
+ * Draait in de pagina, niet in Node. De runner (scripts/audit-run.mjs) opent
+ * elke combinatie van scherm en wereld via een eigen link en roept dit aan.
  *
  * Gemeten per combinatie: contrast van alle zichtbare tekst, tikdoelen onder
  * 44px, oneindige animaties, echte horizontale scroll en middenstreepjes.
  *
- * Emoji en gradiënttekst worden overgeslagen: die hebben hun eigen kleuren
- * en meten als tekst geeft valse alarmen.
+ * Gradiënttekst en elementen die alleen uit emoji bestaan worden overgeslagen:
+ * die hebben hun eigen kleuren en meten als tekst geeft valse alarmen. Tekst
+ * mét een emoji ertussen wordt wél gemeten, want daar staan echte woorden in.
  */
-window.__auditFluent = async function auditFluent(schermen, werelden) {
+window.__auditFluent = async function auditFluent() {
   const wacht = (ms) => new Promise((r) => setTimeout(r, ms))
   const el = document.documentElement
-  const EMOJI = /\p{Extended_Pictographic}/u
+  const EMOJI = /\p{Extended_Pictographic}/gu
 
   const f = (v) => {
     v /= 255
@@ -49,7 +51,11 @@ window.__auditFluent = async function auditFluent(schermen, werelden) {
     document.querySelectorAll('body *').forEach((e) => {
       const t = (e.textContent || '').trim()
       if (!t || t.length > 60 || e.children.length > 0) return
-      if (EMOJI.test(t)) return
+      // Alleen élement dat niets anders dan emoji bevat overslaan. Eerder viel
+      // hier ook "🌳 HOUTEN ARENA" af, en zo bleef goud op een lichte muur
+      // ongemeten omdat er toevallig een boompje voor stond.
+      const zonderEmoji = t.replace(EMOJI, '').replace(/[️‍\s]/g, '')
+      if (zonderEmoji.length < 2) return
       const cs = getComputedStyle(e)
       if (cs.visibility === 'hidden' || cs.display === 'none') return
       if (/rgba\(0, 0, 0, 0\)/.test(cs.color)) return
@@ -107,31 +113,22 @@ window.__auditFluent = async function auditFluent(schermen, werelden) {
 
   if (window.innerWidth < 300) return { fout: `venster te smal om te meten: ${window.innerWidth}px` }
 
-  const rapport = { venster: window.innerWidth, schermen: {} }
-  for (const scherm of schermen) {
-    // naar het scherm toe via de knop in de onderbalk
-    const nav = [...document.querySelectorAll('.nav-item, button')].find((b) => (b.textContent || '').trim() === scherm.knop)
-    if (nav) {
-      nav.click()
-      await wacht(700)
-    }
-    const perWereld = {}
-    for (const wereld of werelden) {
-      if (wereld === 'neon') el.removeAttribute('data-wereld')
-      else el.setAttribute('data-wereld', wereld)
-      await wacht(60)
-      const c = contrastFouten()
-      if (c.length) perWereld[wereld] = c.slice(0, 3)
-    }
-    el.removeAttribute('data-wereld')
-    rapport.schermen[scherm.naam] = {
-      contrastFouten: perWereld,
-      tikdoelenTeKlein: kleineTikdoelen(),
-      oneindigeAnimaties: oneindigeAnimaties(),
-      horizontaalScroll: echteHorizontaleScroll(),
-      middenstreepjes: middenstreepjes(),
-    }
+  /**
+   * Eén meting van de pagina zoals die nu staat. De wereld wordt niet meer
+   * hier omgezet: de app zet zijn eigen wereld terug zodra hij hertekent, en
+   * op de Arena gebeurt dat continu. Dan meet je een donkere wereld terwijl je
+   * denkt een lichte te meten en meldt de audit onterecht dat alles schoon is.
+   * De runner pint de wereld daarom via ?wereld= in de link, en dit stuk meet
+   * alleen nog wat er staat.
+   */
+  return {
+    venster: window.innerWidth,
+    wereld: el.getAttribute('data-wereld') ?? 'neon',
+    contrastFouten: contrastFouten().slice(0, 4),
+    tikdoelenTeKlein: kleineTikdoelen(),
+    oneindigeAnimaties: oneindigeAnimaties(),
+    horizontaalScroll: echteHorizontaleScroll(),
+    middenstreepjes: middenstreepjes(),
   }
-  return rapport
 }
 'audit geladen'

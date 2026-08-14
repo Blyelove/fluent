@@ -237,7 +237,9 @@ export function ArenaScreen({ onTerug, onPlayingChange }: { onTerug: () => void;
             }}
           />
         )}
-        <p className="eyebrow" style={{ color: 'var(--hero-eyebrow)' }}>
+        {/* geen hero-token: dit staat op de pagina zelf en niet op de heldkaart,
+            en in een lichte wereld is dat romige goud dan onleesbaar */}
+        <p className="eyebrow" style={{ color: 'var(--goud-tekst-dim)' }}>
           {rang.emoji} {rang.naam}
         </p>
         <div className="row" style={{ justifyContent: 'center', gap: 18, margin: '22px 0 10px', alignItems: 'center' }}>

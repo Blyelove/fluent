@@ -1,10 +1,20 @@
 /**
- * Draait de audit uit scripts/audit.js in een echte headless Edge op een
- * echte telefoonbreedte. Het browserpaneel in de editor springt telkens terug
- * naar zijn eigen breedte, en dan meet je tikdoelen en horizontale scroll op
- * de verkeerde maat. Hier staat de breedte vast.
+ * Draait de audit uit scripts/audit.js over élke combinatie van scherm en
+ * taalwereld, in een echte headless browser op een echte telefoonbreedte.
  *
- * Gebruik: node scripts/audit-run.mjs [breedte] [url]
+ * Twee dingen die eerder misgingen, en waarom het nu zo werkt:
+ *
+ * 1. Het browserpaneel in de editor springt terug naar zijn eigen breedte. Op
+ *    465 valt alles net binnen het scherm en zie je de echte problemen niet.
+ *    De breedte wordt hier afgedwongen én nagemeten voordat er geteld wordt.
+ * 2. De wereld werd vroeger door de audit zelf op het document gezet, maar de
+ *    app zet zijn eigen wereld terug zodra hij hertekent, en op de Arena
+ *    gebeurt dat continu. Dan meet je een donkere wereld terwijl je denkt een
+ *    lichte te meten, en meldt de audit onterecht dat alles schoon is. Nu pint
+ *    elke combinatie zichzelf via ?wereld= in de link, en de meting weigert
+ *    als de wereld of de breedte niet klopt.
+ *
+ * Gebruik: node scripts/audit-run.mjs [breedte]
  */
 import { spawn } from 'node:child_process'
 import { readFile, mkdtemp, rm } from 'node:fs/promises'
@@ -13,18 +23,18 @@ import { join } from 'node:path'
 
 const BREEDTE = Number(process.argv[2] ?? 375)
 const HOOGTE = 812
-const URL_BASIS = process.argv[3] ?? 'http://localhost:5199/?demo=1&tab=leren'
 const EDGE = 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'
 // elke draaibeurt een eigen poort: een Edge die van een vorige poging is
 // blijven hangen, houdt de oude poort vast en dan meet je zijn tabblad
 const POORT = 9300 + (process.pid % 600)
 
 const SCHERMEN = [
-  { naam: 'Leren', knop: 'Leren' },
-  { naam: 'Spelen', knop: 'Spelen' },
-  { naam: 'Divisie', knop: 'Divisie' },
-  { naam: 'Oefenen', knop: 'Oefenen' },
-  { naam: 'Profiel', knop: 'Profiel' },
+  { naam: 'Leren', vraag: 'tab=leren' },
+  { naam: 'Spelen', vraag: 'tab=spelen' },
+  { naam: 'Divisie', vraag: 'tab=divisie' },
+  { naam: 'Oefenen', vraag: 'tab=oefenen' },
+  { naam: 'Profiel', vraag: 'tab=profiel' },
+  { naam: 'Arena', vraag: 'tab=spelen&arena=1' },
 ]
 const WERELDEN = [
   'neon', 'azulejo', 'flamenco', 'trencadis', 'solysombra', 'encre', 'nuit', 'papier',
@@ -32,6 +42,9 @@ const WERELDEN = [
 ]
 
 const wacht = (ms) => new Promise((r) => setTimeout(r, ms))
+
+const telFouten = (u) =>
+  u.contrastFouten.length + u.tikdoelenTeKlein.length + u.middenstreepjes.length + (u.horizontaalScroll ? 1 : 0)
 
 async function haalDoel() {
   for (let poging = 0; poging < 40; poging++) {
@@ -46,7 +59,7 @@ async function haalDoel() {
     }
     await wacht(250)
   }
-  throw new Error('geen debugdoel gevonden; start Edge niet al ergens anders')
+  throw new Error('geen debugdoel gevonden; draait de ontwikkelserver op 5199?')
 }
 
 function verbind(ws) {
@@ -54,11 +67,11 @@ function verbind(ws) {
   const open = new Map()
   ws.addEventListener('message', (e) => {
     const bericht = JSON.parse(e.data)
-    const wacht = open.get(bericht.id)
-    if (!wacht) return
+    const belofte = open.get(bericht.id)
+    if (!belofte) return
     open.delete(bericht.id)
-    if (bericht.error) wacht.mis(new Error(bericht.error.message))
-    else wacht.raak(bericht.result)
+    if (bericht.error) belofte.mis(new Error(bericht.error.message))
+    else belofte.raak(bericht.result)
   })
   return (methode, params = {}) =>
     new Promise((raak, mis) => {
@@ -78,51 +91,50 @@ const edge = spawn(EDGE, [
   `--remote-debugging-port=${POORT}`,
   `--user-data-dir=${profiel}`,
   `--window-size=${BREEDTE},${HOOGTE}`,
-  URL_BASIS,
+  'http://localhost:5199/?demo=1&tab=leren',
 ])
 edge.stderr.on('data', () => { /* Edge klaagt over taakproviders, dat is ruis */ })
 
-let uit = { fout: 'niet gedraaid' }
+const uitslagen = []
 try {
   const doel = await haalDoel()
   const ws = new WebSocket(doel.webSocketDebuggerUrl)
   await new Promise((r) => ws.addEventListener('open', r, { once: true }))
   const stuur = verbind(ws)
-
   await stuur('Page.enable')
   await stuur('Runtime.enable')
-  // De echte telefoonmaat afdwingen, los van het venster van de browser.
+
+  const bron = await readFile(new URL('./audit.js', import.meta.url), 'utf8')
   // Bewust mobile: false. Met mobile: true valt een pagina zonder eigen
   // viewport-regel terug op de oude bureaubladbreedte van 980, en dan meet je
   // een maat die geen enkel apparaat heeft.
-  await stuur('Emulation.setDeviceMetricsOverride', {
-    width: BREEDTE, height: HOOGTE, deviceScaleFactor: 1, mobile: false,
-  })
-  await stuur('Page.reload', { ignoreCache: true })
-  await wacht(3500)
+  const maat = { width: BREEDTE, height: HOOGTE, deviceScaleFactor: 1, mobile: false }
 
-  // de schaalinstelling van Windows rekt het venster na het laden weer op, dus
-  // de maat wordt hier nog een keer vastgezet en daarna echt nagemeten
-  await stuur('Emulation.setDeviceMetricsOverride', {
-    width: BREEDTE, height: HOOGTE, deviceScaleFactor: 1, mobile: false,
-  })
-  await wacht(500)
-  const gemeten = (await stuur('Runtime.evaluate', { expression: 'window.innerWidth', returnByValue: true })).result.value
-  if (gemeten !== BREEDTE) throw new Error(`breedte klopt niet: ${gemeten} in plaats van ${BREEDTE}`)
-
-  const bron = await readFile(new URL('./audit.js', import.meta.url), 'utf8')
-  await stuur('Runtime.evaluate', { expression: bron })
-
-  const roep = await Promise.race([
-    stuur('Runtime.evaluate', {
-      expression: `window.__auditFluent(${JSON.stringify(SCHERMEN)}, ${JSON.stringify(WERELDEN)}).then(r => JSON.stringify(r))`,
-      awaitPromise: true,
-      returnByValue: true,
-      timeout: 300000,
-    }),
-    wacht(240000).then(() => { throw new Error('de audit gaf binnen vier minuten geen antwoord') }),
-  ])
-  uit = JSON.parse(roep.result.value)
+  for (const scherm of SCHERMEN) {
+    for (const wereld of WERELDEN) {
+      await stuur('Page.navigate', { url: `http://localhost:5199/?demo=1&${scherm.vraag}&wereld=${wereld}` })
+      await wacht(2100)
+      // de schaalinstelling van Windows rekt het venster na het laden weer op,
+      // dus de maat wordt na élke navigatie opnieuw vastgezet
+      await stuur('Emulation.setDeviceMetricsOverride', maat)
+      await wacht(450)
+      await stuur('Runtime.evaluate', { expression: bron })
+      const roep = await stuur('Runtime.evaluate', {
+        expression: 'window.__auditFluent().then((r) => JSON.stringify(r))',
+        awaitPromise: true,
+        returnByValue: true,
+        timeout: 30000,
+      })
+      const r = JSON.parse(roep.result.value)
+      if (r.venster !== BREEDTE) throw new Error(`breedte klopt niet: ${r.venster} in plaats van ${BREEDTE}`)
+      if (r.wereld !== wereld) throw new Error(`wereld klopt niet: ${r.wereld} in plaats van ${wereld}`)
+      uitslagen.push({ scherm: scherm.naam, wereld, ...r })
+    }
+    const stuk = uitslagen.filter((u) => u.scherm === scherm.naam && telFouten(u) > 0)
+    console.log(
+      `${scherm.naam.padEnd(8)} ${stuk.length ? `${stuk.length}/16 werelden stuk: ${stuk.map((u) => u.wereld).join(', ')}` : '16/16 schoon'}`,
+    )
+  }
 } finally {
   // Edge zet zichzelf voort in kindprocessen, dus alleen de ouder afsluiten
   // laat de poort bezet achter; de hele boom moet weg
@@ -131,19 +143,19 @@ try {
   await rm(profiel, { recursive: true, force: true }).catch(() => {})
 }
 
-// kort verslag: alleen wat stuk is telt
-const regels = []
-let fouten = 0
-for (const [scherm, d] of Object.entries(uit.schermen ?? {})) {
-  const werelden = Object.keys(d.contrastFouten)
-  const n = werelden.length + d.tikdoelenTeKlein.length + d.middenstreepjes.length + (d.horizontaalScroll ? 1 : 0)
-  fouten += n
-  regels.push(
-    `${scherm.padEnd(9)} contrast:${werelden.length ? werelden.join(',') : 'schoon'}` +
-      `  tikdoelen:${d.tikdoelenTeKlein.length}  scroll:${d.horizontaalScroll}  streepjes:${d.middenstreepjes.length}`,
-  )
+const stuk = uitslagen.filter((u) => telFouten(u) > 0)
+console.log(`\n${uitslagen.length} combinaties gemeten op ${BREEDTE}px`)
+if (!stuk.length) {
+  console.log('SCHOON')
+  process.exit(0)
 }
-console.log(`venster: ${uit.venster}px`)
-console.log(regels.join('\n'))
-console.log(fouten === 0 ? '\nSCHOON' : `\n${fouten} PUNTEN OPEN\n` + JSON.stringify(uit.schermen, null, 1).slice(0, 2600))
-process.exit(fouten === 0 ? 0 : 1)
+console.log(`${stuk.length} STUK\n`)
+for (const u of stuk.slice(0, 24)) {
+  const delen = []
+  if (u.contrastFouten.length) delen.push('contrast ' + u.contrastFouten.map((c) => `"${c.t}" ${c.c}`).join(' | '))
+  if (u.tikdoelenTeKlein.length) delen.push('tikdoel ' + u.tikdoelenTeKlein.map((t) => `"${t.t}" ${t.w}x${t.h}`).join(' | '))
+  if (u.horizontaalScroll) delen.push('horizontale scroll')
+  if (u.middenstreepjes.length) delen.push('middenstreepje ' + u.middenstreepjes.join(' | '))
+  console.log(`${u.scherm}/${u.wereld}: ${delen.join('; ')}`)
+}
+process.exit(1)

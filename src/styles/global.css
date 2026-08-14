@@ -95,6 +95,18 @@
   --goud-tekst: var(--gold-bright);
   --goud-tekst-dim: var(--gold);
 
+  /* Twee knoppen die één ding zeggen: is deze wereld licht of donker.
+     Een lichte wereld zet ze allebei aan, en dan kloppen alle kleuren die
+     niet uit de wereld zelf komen, zonder dat je ze stuk voor stuk hoeft na
+     te lopen. Een nieuwe lichte wereld hoeft alleen deze twee te zetten.
+
+     --inkt-oplichten: de heldkaart blijft ook in een lichte wereld donker,
+     dus een accentkleur die daar overheen valt moet lichter worden.
+     --metaal-verdiepen: de divisiekleuren zijn echte metalen (brons, zilver)
+     en staan vast; op een licht vlak moeten die juist dieper. */
+  --inkt-oplichten: 0%;
+  --metaal-verdiepen: 0%;
+
   --beweging-duur: 0.38s;
   --beweging-curve: cubic-bezier(0.2, 0.8, 0.2, 1);
   --beweging-tik: 0.08s;
@@ -305,9 +317,13 @@ input, textarea {
   --text-dim: var(--hero-dim);
   --text-faint: var(--hero-faint);
   /* de held blijft donker, ook in een lichte wereld, dus hier hoort het felle
-     goud en niet het diepe goud dat de rest van een lichte wereld gebruikt */
+     goud en niet het diepe goud dat de rest van een lichte wereld gebruikt,
+     en hetzelfde geldt voor de systeemkleuren die hier bovenop komen */
   --goud-tekst: var(--gold-bright);
   --goud-tekst-dim: var(--gold-bright);
+  --cyaan-tekst: color-mix(in srgb, var(--cyan), #fff var(--inkt-oplichten));
+  --ok-tekst: color-mix(in srgb, var(--ok), #fff var(--inkt-oplichten));
+  --err-tekst: color-mix(in srgb, var(--err), #fff var(--inkt-oplichten));
 }
 
 /* drukbare statuschips: dezelfde drukfysica als elke knop in de app */

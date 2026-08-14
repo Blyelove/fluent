@@ -80,6 +80,8 @@
   --ink-on-gold: #fdfbf5;
   --goud-tekst: var(--gold-deep);
   --goud-tekst-dim: #5a3d11;
+  --inkt-oplichten: 58%;
+  --metaal-verdiepen: 46%;
   --cyan: #1d6a7a;
   --ok: #15803d;
   --ok-bg: rgba(21, 128, 61, 0.12);
@@ -239,6 +241,8 @@
   --ink-on-gold: #fdf8ee;
   --goud-tekst: var(--gold-deep);
   --goud-tekst-dim: #63400b;
+  --inkt-oplichten: 58%;
+  --metaal-verdiepen: 46%;
   --cyan: #0d6070;
   --ok: #15803d;
   --ok-bg: rgba(21, 128, 61, 0.12);

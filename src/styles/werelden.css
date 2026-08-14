@@ -176,6 +176,8 @@
   --ink-on-gold: #fff8ec;
   --goud-tekst: var(--gold-deep);
   --goud-tekst-dim: #7c3a0c;
+  --inkt-oplichten: 58%;
+  --metaal-verdiepen: 46%;
   --cyan: #0e7490;
   --ok: #15803d;
   --ok-bg: rgba(21, 128, 61, 0.12);

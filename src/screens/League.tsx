@@ -69,6 +69,16 @@ function alpha(hex: string, a: number): string {
   return `rgba(${r}, ${g}, ${b}, ${a})`
 }
 
+/**
+ * Een divisiekleur als tekst op de pagina. Brons, zilver en goud zijn echte
+ * metalen en staan vast, dus in een lichte wereld zijn ze te licht om te
+ * lezen. --metaal-verdiepen staat daar aan en trekt de kleur naar de inkt toe;
+ * in een donkere wereld is hij nul en verandert er niets.
+ */
+function metaalInkt(kleur: string): string {
+  return `color-mix(in srgb, ${kleur}, var(--text) var(--metaal-verdiepen))`
+}
+
 /* ---------------- medaille ---------------- */
 
 function Medal({ leagueId, calm }: { leagueId: number; calm: boolean }) {
@@ -193,7 +203,7 @@ function DivisionDots({ leagueId }: { leagueId: number }) {
                 />
               </div>
               {current && (
-                <span className="display" style={{ fontSize: 9.5, letterSpacing: '0.06em', color: l.color }}>
+                <span className="display" style={{ fontSize: 9.5, letterSpacing: '0.06em', color: metaalInkt(l.color) }}>
                   NU
                 </span>
               )}
@@ -225,7 +235,7 @@ function ZoneDivider({ kind }: { kind: 'promotie' | 'degradatie' }) {
         style={{
           fontSize: 10.5,
           letterSpacing: '0.14em',
-          color: c,
+          color: metaalInkt(c),
           padding: '4px 10px',
           borderRadius: 999,
           border: `1.5px solid ${c}`,
@@ -347,7 +357,10 @@ export function LeagueScreen({ onLeren }: { onLeren?: () => void } = {}) {
   }, [])
 
   const league = LEAGUES[leagueId] ?? LEAGUES[0]
+  // brons en zilver zijn vaste metalen en dus te licht voor een lichte wereld;
+  // --metaal-verdiepen staat daar aan en trekt ze naar de inkt toe
   const color = league.color
+  const inkt = metaalInkt(league.color)
   // `hours` verandert hooguit één keer per uur, dus de ranglijst ververst netjes mee
   // zonder dat we elke minuut opnieuw rekenen
   const list = useMemo(() => standings(leagueId, weekXp), [leagueId, weekXp, hours])
@@ -408,10 +421,12 @@ export function LeagueScreen({ onLeren }: { onLeren?: () => void } = {}) {
     })
   }, [empty, zone, color])
 
-  // cyaan is de systeemkleur; goud blijft voor echte beloningen
+  // Cyaan is de systeemkleur; goud blijft voor echte beloningen. Bewust de
+  // tekstvarianten: deze kaart is de heldkaart en die is ook in een lichte
+  // wereld donker, dus het donkere cyaan van zo'n wereld zou erin verdwijnen.
   const zoneCard = empty
     ? {
-        c: 'var(--cyan)',
+        c: 'var(--cyaan-tekst, var(--cyan))',
         bg: 'rgba(34, 211, 238, 0.1)',
         glow: 'rgba(34, 211, 238, 0.25)',
         title: 'De competitie start binnenkort',
@@ -419,7 +434,7 @@ export function LeagueScreen({ onLeren }: { onLeren?: () => void } = {}) {
       }
     : zone === 'promotie'
       ? {
-          c: 'var(--ok)',
+          c: 'var(--ok-tekst, var(--ok))',
           bg: 'var(--ok-bg)',
           glow: 'rgba(74, 222, 128, 0.3)',
           title: 'Je staat op promotie!',
@@ -429,14 +444,14 @@ export function LeagueScreen({ onLeren }: { onLeren?: () => void } = {}) {
         }
       : zone === 'degradatie'
         ? {
-            c: 'var(--err)',
+            c: 'var(--err-tekst, var(--err))',
             bg: 'var(--err-bg)',
             glow: 'rgba(251, 113, 133, 0.3)',
             title: 'Pas op: je zakt uit deze divisie',
             body: `Nog ${fmt(toSafe)} XP en je staat weer veilig op plek ${safeRank}. Eén les kan al genoeg zijn.`,
           }
         : {
-            c: 'var(--cyan)',
+            c: 'var(--cyaan-tekst, var(--cyan))',
             bg: 'rgba(34, 211, 238, 0.1)',
             glow: 'rgba(34, 211, 238, 0.25)',
             title: `Veilig in de ${thisLabel}`,
@@ -505,7 +520,7 @@ export function LeagueScreen({ onLeren }: { onLeren?: () => void } = {}) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.12, duration: 0.3 }}
           className="display"
-          style={{ fontSize: 30, color, textShadow: `0 0 26px ${alpha(color, 0.55)}` }}
+          style={{ fontSize: 30, color: inkt, textShadow: `0 0 26px ${alpha(color, 0.55)}` }}
         >
           {divisionLabel(leagueId)}
         </motion.h1>
