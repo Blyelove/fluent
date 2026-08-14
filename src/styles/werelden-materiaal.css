@@ -139,3 +139,50 @@ html::before {
   --materiaal-maat: 34px 34px;
   --materiaal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34' height='34'%3E%3Cg stroke='%23ffd166' fill='none'%3E%3Cpath d='M8.5 0V34' stroke-width='1.2' stroke-dasharray='3 4'/%3E%3Cpath d='M25.5 0V34' stroke-width='1.2' stroke-dasharray='3 4'/%3E%3C/g%3E%3C/svg%3E");
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   DE GARDEROBE VAN ELKE WERELD
+
+   Dezelfde speler, zestien garderobes. Het personage weet zelf niet in welke
+   wereld het staat: élke stof ligt er altijd op met dekking nul, en hier zet
+   één wereld er precies één op één. Wisselen van wereld verkleedt je poppetje
+   dus vanzelf, zonder een regel logica in het component.
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  --stof-streep: 0;
+  --stof-stip: 0;
+  --stof-ruit: 0;
+  --stof-visgraat: 0;
+  --stof-golf: 0;
+  --kraag-v: 0;
+  --kraag-hoog: 0;
+  --kleding-accent: rgba(255, 255, 255, 0.85);
+}
+
+/* Spanje in vier smaken */
+[data-wereld='azulejo'] { --stof-ruit: 0.75; --kleding-accent: #cfe3ff; --kraag-hoog: 0.9; }
+[data-wereld='flamenco'] { --stof-stip: 0.9; --kleding-accent: #fff0f4; --kraag-v: 0.85; }
+[data-wereld='trencadis'] { --stof-ruit: 0.6; --kleding-accent: #b9ffe9; --kraag-v: 0.8; }
+[data-wereld='solysombra'] { --stof-streep: 0.55; --kleding-accent: #fff1d6; }
+
+/* Frankrijk: het matrozenshirt en de art deco */
+[data-wereld='encre'] { --stof-streep: 0.8; --kleding-accent: #eef3ff; }
+[data-wereld='nuit'] { --stof-visgraat: 0.8; --kleding-accent: #e8cf9a; --kraag-hoog: 0.85; }
+
+/* Duitsland: geschept papier en het Bauhaus-raster */
+[data-wereld='papier'] { --stof-streep: 0.5; --kleding-accent: #1d2140; }
+[data-wereld='raster'] { --stof-ruit: 0.7; --kleding-accent: #f3ecdd; --kraag-hoog: 0.8; }
+[data-wereld='schwarzwald'] { --stof-ruit: 0.85; --kleding-accent: #cfe0cf; --kraag-v: 0.7; }
+
+/* Italië: fresco, marmer */
+[data-wereld='fresco'] { --stof-stip: 0.6; --kleding-accent: #ffe6cc; --kraag-v: 0.75; }
+[data-wereld='notte'] { --stof-visgraat: 0.7; --kleding-accent: #e6dcc4; --kraag-hoog: 0.9; }
+
+/* Portugal: de calçada en de Taag */
+[data-wereld='calcada'] { --stof-golf: 0.9; --kleding-accent: #ffffff; }
+[data-wereld='saudade'] { --stof-golf: 0.7; --kleding-accent: #d8f0f5; --kraag-v: 0.8; }
+
+/* Engeland: messing en het krijtstreepje van Savile Row */
+[data-wereld='messing'] { --stof-visgraat: 0.75; --kleding-accent: #f0d9a8; --kraag-hoog: 0.85; }
+[data-wereld='soho'] { --stof-streep: 0.7; --kleding-accent: #ffe9b0; --kraag-v: 0.8; }

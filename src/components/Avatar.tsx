@@ -330,7 +330,7 @@ export function Avatar({
           <stop offset="100%" stopColor="#A855F7" stopOpacity="0" />
         </radialGradient>
         <clipPath id={`av-torso-${uid}`}>
-          <rect x="68" y="106" width="64" height="66" rx="20" />
+          <rect x={torsoX} y="106" width={torsoBreed} height={torsoHoog} rx="20" />
         </clipPath>
       </defs>
 
@@ -516,7 +516,60 @@ export function Avatar({
           <rect x="68" y="150" width="64" height="9" fill={s.accent} />
         </g>
       )}
-      {hasOutfit && !s.stripes && <rect x="68" y="106" width="64" height="10" rx="5" fill={s.accent} opacity="0.9" />}
+      {hasOutfit && !s.stripes && <rect x={torsoX} y="106" width={torsoBreed} height="10" rx="5" fill={s.accent} opacity="0.9" />}
+
+      {/* DE STOF VAN JOUW TAALWERELD.
+          Zestien werelden, zestien garderobes, en dat zonder dat dit component
+          hoeft te weten in welke wereld het staat: elke stof ligt er altijd,
+          maar met dekking nul. De wereldstijl zet er precies één op één. Dus
+          verandert de kleding vanzelf mee als je van wereld wisselt, en er is
+          geen enkele extra regel logica voor nodig. */}
+      <g clipPath={`url(#av-torso-${uid})`}>
+        {/* streep: het matrozenshirt, de krijtstreep, het zonnescherm */}
+        <g style={{ opacity: 'var(--stof-streep, 0)' }} fill="var(--kleding-accent, #ffffff)">
+          <rect x={torsoX} y="118" width={torsoBreed} height="7" />
+          <rect x={torsoX} y="134" width={torsoBreed} height="7" />
+          <rect x={torsoX} y="150" width={torsoBreed} height="7" />
+        </g>
+        {/* stip: de volantjurk */}
+        <g style={{ opacity: 'var(--stof-stip, 0)' }} fill="var(--kleding-accent, #ffffff)">
+          <circle cx={torsoX + 12} cy="120" r="3.4" />
+          <circle cx={torsoX + 32} cy="132" r="3.4" />
+          <circle cx={torsoX + 52} cy="120" r="3.4" />
+          <circle cx={torsoX + 22} cy="148" r="3.4" />
+          <circle cx={torsoX + 42} cy="148" r="3.4" />
+          <circle cx={torsoX + 12} cy="162" r="3.4" />
+          <circle cx={torsoX + 52} cy="162" r="3.4" />
+        </g>
+        {/* ruit: het tegelmotief en de tiroler ruit */}
+        <g style={{ opacity: 'var(--stof-ruit, 0)' }} fill="none" stroke="var(--kleding-accent, #ffffff)" strokeWidth="2">
+          <path d={`M${torsoX} 118 L${torsoX + torsoBreed} 158M${torsoX} 158 L${torsoX + torsoBreed} 118`} />
+          <path d={`M${torsoX} 148 L${torsoX + torsoBreed} 188M${torsoX} 188 L${torsoX + torsoBreed} 148`} />
+          <path d={`M${torsoX} 88 L${torsoX + torsoBreed} 128M${torsoX} 128 L${torsoX + torsoBreed} 88`} />
+        </g>
+        {/* visgraat: geweven wol */}
+        <g style={{ opacity: 'var(--stof-visgraat, 0)' }} fill="none" stroke="var(--kleding-accent, #ffffff)" strokeWidth="1.6">
+          {[112, 124, 136, 148, 160].map((y) => (
+            <path key={y} d={`M${torsoX} ${y + 6} L${torsoX + torsoBreed / 2} ${y} L${torsoX + torsoBreed} ${y + 6}`} />
+          ))}
+        </g>
+        {/* golf: de calçada en de zee */}
+        <g style={{ opacity: 'var(--stof-golf, 0)' }} fill="none" stroke="var(--kleding-accent, #ffffff)" strokeWidth="2.2">
+          {[122, 142, 162].map((y) => (
+            <path
+              key={y}
+              d={`M${torsoX} ${y} C${torsoX + torsoBreed * 0.25} ${y - 8} ${torsoX + torsoBreed * 0.4} ${y + 8} ${torsoX + torsoBreed * 0.6} ${y} C${torsoX + torsoBreed * 0.78} ${y - 8} ${torsoX + torsoBreed * 0.9} ${y + 8} ${torsoX + torsoBreed} ${y}`}
+            />
+          ))}
+        </g>
+      </g>
+      {/* de snit: een kraag die per wereld anders valt */}
+      <g style={{ opacity: 'var(--kraag-v, 0)' }}>
+        <path d={`M${100 - 13} 106 L100 122 L${100 + 13} 106`} fill="none" stroke="var(--kleding-accent, #ffffff)" strokeWidth="3" strokeLinejoin="round" />
+      </g>
+      <g style={{ opacity: 'var(--kraag-hoog, 0)' }}>
+        <rect x={torsoX + 12} y="104" width={torsoBreed - 24} height="9" rx="4.5" fill="var(--kleding-accent, #ffffff)" />
+      </g>
       {/* neon-rand (niveau 12+) */}
       {hasNeon && (
         <>
