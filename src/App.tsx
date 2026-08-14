@@ -8,6 +8,7 @@ import { dueEntries, useStore } from './store'
 import { initAudioManifest, initVoices, setSoundEnabled } from './audio'
 import { LEAGUES, standings, yourRank } from './leagues'
 import { readDuelFromUrl } from './duel'
+import { leesSchaduwUitLink } from './arena-duel'
 import { Onboarding } from './screens/Onboarding'
 import { AuthScreen } from './screens/Auth'
 import { Gallery } from './screens/Gallery'
@@ -93,6 +94,8 @@ export default function App() {
 
   // duel-uitnodiging uit de link halen (eenmalig bij het openen)
   const incomingDuel = useMemo(() => readDuelFromUrl(), [])
+  // een vriend die zijn arenapotje opnam en jou uitdaagt tegen zijn schaduw
+  const schaduw = useMemo(() => leesSchaduwUitLink(), [])
 
   /**
    * Nieuwe versies mogen nooit onzichtbaar blijven hangen: de service worker
@@ -132,7 +135,7 @@ export default function App() {
     void initAudioManifest()
     setSoundEnabled(soundOn)
     useStore.getState().registerVisit()
-    if (incomingDuel) setTab('play')
+    if (incomingDuel || schaduw) setTab('play')
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -193,7 +196,7 @@ export default function App() {
           onPraten={() => setPraten(true)}
         />
       )}
-      {tab === 'play' && <PlayScreen incomingDuel={incomingDuel} onPlayingChange={setGamePlaying} />}
+      {tab === 'play' && <PlayScreen incomingDuel={incomingDuel} schaduw={schaduw} onPlayingChange={setGamePlaying} />}
       {tab === 'league' && <LeagueScreen onLeren={() => setTab('home')} />}
       {tab === 'review' && <ReviewScreen onGoLearn={() => setTab('home')} onPraten={() => setPraten(true)} />}
       {tab === 'profile' && <ProfileScreen />}

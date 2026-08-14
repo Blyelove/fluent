@@ -84,13 +84,27 @@ export interface ArenaVraag {
   zeg: string
 }
 
-function schud<T>(arr: T[]): T[] {
+/**
+ * Schudden met of zonder zaad. Met zaad krijgen twee spelers exact dezelfde
+ * vragen in dezelfde volgorde, en dat is de hele voorwaarde voor een eerlijk
+ * schaduwduel: anders vecht je vriend tegen andere woorden dan jij.
+ */
+function schud<T>(arr: T[], rand: () => number = Math.random): T[] {
   const a = [...arr]
   for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
+    const j = Math.floor(rand() * (i + 1))
     ;[a[i], a[j]] = [a[j], a[i]]
   }
   return a
+}
+
+/** een eenvoudige, overal gelijke toevalsbron uit één getal */
+function uitZaad(zaad: number): () => number {
+  let s = zaad >>> 0
+  return () => {
+    s = (s * 1664525 + 1013904223) >>> 0
+    return s / 4294967296
+  }
 }
 
 /**
@@ -98,7 +112,8 @@ function schud<T>(arr: T[]): T[] {
  * opties in de doeltaal. Kort genoeg om op tempo te spelen, echt genoeg om
  * van te leren.
  */
-export function arenaVragen(course: Course, aantal: number): ArenaVraag[] {
+export function arenaVragen(course: Course, aantal: number, zaad?: number): ArenaVraag[] {
+  const rand = zaad === undefined ? Math.random : uitZaad(zaad)
   const paren: { word: string; nl: string }[] = []
   const gezien = new Set<string>()
   for (const s of course.sections)
@@ -113,9 +128,9 @@ export function arenaVragen(course: Course, aantal: number): ArenaVraag[] {
         }
   if (paren.length < 4) return []
   const vragen: ArenaVraag[] = []
-  for (const p of schud(paren).slice(0, aantal)) {
-    const anderen = schud(paren.filter((x) => x.word !== p.word)).slice(0, 3).map((x) => x.word)
-    const opties = schud([p.word, ...anderen])
+  for (const p of schud(paren, rand).slice(0, aantal)) {
+    const anderen = schud(paren.filter((x) => x.word !== p.word), rand).slice(0, 3).map((x) => x.word)
+    const opties = schud([p.word, ...anderen], rand)
     vragen.push({ prompt: p.nl, opties, juist: opties.indexOf(p.word), zeg: p.word })
   }
   return vragen

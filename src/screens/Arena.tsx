@@ -21,6 +21,7 @@ import { Avatar } from '../components/Avatar'
 import { isMeester } from '../skills'
 import { STANDAARD_STIJLEN, stijlUitLink } from '../stijlen'
 import { Schildbreuk, type BreukStijl } from '../components/Schildbreuk'
+import { encodeSchaduw, schaduwLink, type SchaduwBeurt, type SchaduwDuel } from '../arena-duel'
 import { courseFlagCode } from '../countries'
 import { Flag } from '../components/Flag'
 import { sfx, speak } from '../audio'
@@ -45,13 +46,24 @@ type Fase =
   | { naam: 'strijd' }
   | { naam: 'uitslag'; gewonnen: boolean; bekersNa: number }
 
-export function ArenaScreen({ onTerug, onPlayingChange }: { onTerug: () => void; onPlayingChange?: (b: boolean) => void }) {
+export function ArenaScreen({
+  onTerug,
+  onPlayingChange,
+  schaduw,
+}: {
+  onTerug: () => void
+  onPlayingChange?: (b: boolean) => void
+  /** de opname van een vriend: dan vecht je tegen zijn schaduw in plaats van tegen een poortwachter */
+  schaduw?: SchaduwDuel | null
+}) {
   const courseId = useStore((s) => s.courseId)
   const bekers = useStore((s) => s.bekers)
   const boekArena = useStore((s) => s.boekArena)
   const addMistake = useStore((s) => s.addMistake)
   const look = useStore((s) => s.avatarLook)
   const meester = useStore((s) => isMeester(s.progress[s.courseId]?.xp ?? 0))
+  // dezelfde naam als bij de duels: één plek waar je jezelf noemt
+  const naamVanJou = useStore((s) => s.duelName.trim().slice(0, 16) || 'Uitdager')
   const opkomstStijl = useStore((s) => stijlUitLink('arena') ?? s.stijlen.arena ?? STANDAARD_STIJLEN.arena)
   const breukStijl = useStore(
     (s) => (stijlUitLink('breuk') ?? s.stijlen.breuk ?? STANDAARD_STIJLEN.breuk) as BreukStijl,
@@ -60,8 +72,20 @@ export function ArenaScreen({ onTerug, onPlayingChange }: { onTerug: () => void;
   const kalm = Boolean(useReducedMotion())
 
   const rang = arenaVoor(bekers)
-  const [tegenstander] = useState<Gladiator>(() => gladiatorVoor(bekers))
-  const vragen = useMemo(() => arenaVragen(course, VRAGEN_MAX), [course])
+  /* Het zaad bepaalt de vragen. Bij een uitdaging komt het uit de link, zodat
+     je vriend exact jouw vragen krijgt; anders is het nieuw en houden we het
+     vast om er later een uitdaging van te kunnen maken. */
+  const [zaad] = useState<number>(() => schaduw?.s ?? Math.floor(Math.random() * 2 ** 31))
+  const [tegenstander] = useState<Gladiator>(() =>
+    schaduw
+      ? { naam: schaduw.n, kans: 0.5, tempo: 3500, uitleg: 'Speelde precies deze vragen, en dit is hoe het hem verging' }
+      : gladiatorVoor(bekers),
+  )
+  const vragen = useMemo(() => arenaVragen(course, VRAGEN_MAX, zaad), [course, zaad])
+  /** jouw eigen beurten, om er een uitdaging van te kunnen maken */
+  const opname = useRef<SchaduwBeurt[]>([])
+  const [uitdaging, setUitdaging] = useState<string | null>(null)
+  const [gedeeld, setGedeeld] = useState(false)
 
   const [fase, setFase] = useState<Fase>({ naam: 'opkomst', tel: 3 })
   const [vraagIdx, setVraagIdx] = useState(0)
@@ -115,6 +139,20 @@ export function ArenaScreen({ onTerug, onPlayingChange }: { onTerug: () => void;
     if (geboekt.current) return
     geboekt.current = true
     const bekersNa = boekArena(gewonnen)
+    // van jouw net gespeelde potje meteen een uitdaging maken; alleen bij een
+    // eigen gevecht, want de schaduw van je vriend doorsturen slaat nergens op
+    if (!schaduw && opname.current.length) {
+      setUitdaging(
+        encodeSchaduw({
+          v: 1,
+          c: courseId,
+          s: zaad,
+          n: naamVanJou,
+          b: opname.current.slice(0, 40),
+          o: gewonnen ? Math.max(1, mijnSchilden) : 0,
+        }),
+      )
+    }
     if (gewonnen) {
       sfx('complete')
       confetti({ particleCount: 170, spread: 110, origin: { y: 0.5 }, colors: ['#FFC53D', '#FFE08A', '#FFFFFF'], disableForReducedMotion: true })
@@ -144,17 +182,29 @@ export function ArenaScreen({ onTerug, onPlayingChange }: { onTerug: () => void;
       later(KLAP_MS, () => setKlap(null))
     }
 
-    // De tegenstander speelt zijn beurt. Hij reageert op de stand: voor staan
-    // laat hem versnellen, achter staan laat hem twijfelen, en jouw tempo
-    // maakt hem grillig. Wat hij voelt mag je zien, dus aarzelen en
-    // versnellen komen als aparte staat het scherm op.
+    // jouw beurt vastleggen, zodat hier een uitdaging van te maken is
+    opname.current.push({ g: goed ? 1 : 0, t: Math.min(30000, Math.round(ms / 100) * 100) })
+
+    /* De beurt van de tegenstander. Tegen een poortwachter wordt die berekend:
+       voor staan laat hem versnellen, achter staan laat hem twijfelen, en jouw
+       tempo maakt hem grillig. Tegen een schaduw wordt er niets berekend, want
+       dan speelt je vriend zijn eigen opgenomen beurt terug: precies wat hij
+       had, in precies zijn eigen tempo. */
     setBotDenkt(true)
     const druk = goed ? drukVan(ms) : 0
-    const beurt = botBeurt(tegenstander, {
-      zijnSchilden: zijnSchilden - (goed ? 1 : 0),
-      mijnSchilden: mijnSchilden - (goed ? 0 : 1),
-      druk,
-    })
+    const opgenomen = schaduw?.b[vraagIdx]
+    const beurt = opgenomen
+      ? {
+          denktijd: Math.max(650, Math.min(9000, opgenomen.t)),
+          goed: opgenomen.g === 1,
+          aarzelt: opgenomen.t > 6000,
+          versnelt: opgenomen.t < 2200,
+        }
+      : botBeurt(tegenstander, {
+          zijnSchilden: zijnSchilden - (goed ? 1 : 0),
+          mijnSchilden: mijnSchilden - (goed ? 0 : 1),
+          druk,
+        })
     const botGoed = beurt.goed
     setBotStemming(beurt.aarzelt ? 'aarzelt' : beurt.versnelt ? 'versnelt' : null)
     later(beurt.denktijd, () => {
@@ -313,9 +363,19 @@ export function ArenaScreen({ onTerug, onPlayingChange }: { onTerug: () => void;
                 background: 'var(--paneel-diep)',
                 border: '2px solid var(--line-hot)',
                 boxShadow: 'var(--glow-hot)',
+                overflow: 'hidden',
               }}
             >
-              ⚔️
+              {schaduw ? (
+                /* Een schaduw hoort er als een schaduw uit te zien: het is een
+                   echt mens dat dit potje al speelde, geen poortwachter met
+                   zwaarden. Zelfde personage als het jouwe, helemaal donker. */
+                <span style={{ filter: 'brightness(0) opacity(0.62)', display: 'flex' }}>
+                  <Avatar size={78} level={12} courseId={courseId} look={look} still />
+                </span>
+              ) : (
+                '⚔️'
+              )}
             </div>
             <strong className="card-title">{tegenstander.naam}</strong>
           </motion.div>
@@ -354,9 +414,13 @@ export function ArenaScreen({ onTerug, onPlayingChange }: { onTerug: () => void;
             {fase.gewonnen ? 'Overwinning!' : 'Nipt verloren'}
           </h1>
           <p className="dim" style={{ fontSize: 14.5 }}>
-            {fase.gewonnen
-              ? `Je sloeg ${tegenstander.naam} uit de ${rang.naam}.`
-              : `${tegenstander.naam} hield één schild over. De revanche staat klaar.`}
+            {schaduw
+              ? fase.gewonnen
+                ? `Je versloeg de schaduw van ${tegenstander.naam} op zijn eigen vragen.`
+                : `De schaduw van ${tegenstander.naam} hield stand. De revanche staat klaar.`
+              : fase.gewonnen
+                ? `Je sloeg ${tegenstander.naam} uit de ${rang.naam}.`
+                : `${tegenstander.naam} hield één schild over. De revanche staat klaar.`}
           </p>
           <div className="card-hero" style={{ padding: 18, margin: '20px 0' }}>
             <div className="spread">
@@ -392,6 +456,30 @@ export function ArenaScreen({ onTerug, onPlayingChange }: { onTerug: () => void;
           >
             ⚔️ {fase.gewonnen ? 'Volgend gevecht' : 'Revanche'}
           </button>
+          {uitdaging && (
+            /* Hetzelfde potje dat je net speelde, als uitdaging. Je vriend
+               krijgt exact jouw vragen en vecht tegen jouw opgenomen tempo,
+               dus het is een gevecht en geen scorevergelijking. */
+            <button
+              className="btn btn-ghost"
+              style={{ padding: 12, fontSize: 14, marginBottom: 10 }}
+              onClick={() => {
+                sfx('tap')
+                const link = schaduwLink(uitdaging)
+                const tekst = `Ik hield het ${vraagIdx + 1} vragen vol in de ${rang.naam} van Fluent. Vecht tegen mijn schaduw: ${link}`
+                if (navigator.share) {
+                  void navigator.share({ text: tekst }).catch(() => {})
+                } else {
+                  void navigator.clipboard?.writeText(tekst).then(
+                    () => setGedeeld(true),
+                    () => setGedeeld(false),
+                  )
+                }
+              }}
+            >
+              🤝 {gedeeld ? 'Link gekopieerd!' : 'Daag een vriend uit'}
+            </button>
+          )}
           <button className="btn btn-ghost" style={{ padding: 12, fontSize: 14 }} onClick={() => { sfx('tap'); onTerug() }}>
             Terug naar de speelhal
           </button>
