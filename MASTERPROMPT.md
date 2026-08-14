@@ -434,6 +434,16 @@ Stoppen kan met `/loop stop` of door de cron-taak te verwijderen.
 
 ## Logboek
 
+- **14-08-2026, ronde 76** - **Elk punt van het ontwerpdoel is nu gemeten in plaats van beweerd, en er zijn acht groepen richtingen.**
+
+  **Twee groepen erbij**, zodat élke beslissing zijn richtingen heeft: de personagekiezer (Raster, Strook, Groot, en de gedurfde Dobbelsteen die de rijen vervangt door één knop) en wat je nog niet hebt in je garderobe (Silhouet, Nevel, Omtrek, en de gedurfde Kier). Daarmee **31 richtingen over 8 groepen**, elke groep met een gedurfde.
+
+  **`scripts/ontwerp-proef.mjs` meet nu de punten die alleen op papier stonden:** de garderobe heeft zeven plekken en dertig stukken met hun eis erbij; vijf houdingen geven vijf verschillende tekeningen; er zit geen enkel rasterbeeld in de app; alle zestien werelden hebben echt materiaal; en drie spelers krijgen drie verschillende werelden terwijl dezelfde speler er altijd dezelfde krijgt.
+
+  **LES: een meting mag ook te streng zijn.** Mijn controle op afbeeldingen rekende de vlaggen als overtreding, terwijl svg juist telt als tekening: scherp op elk scherm is wat het doel bedoelt, en dat zijn ze. Een te strenge meting kost net zoveel tijd als een te losse, want je gaat iets repareren dat niet stuk is.
+
+  **Met `?houding=verslagen` of `?houding=denk`** is elke houding te bekijken zonder ervoor te hoeven verliezen of rennen.
+
 - **14-08-2026, ronde 75** - **Bewijs in plaats van bewering, en dat legde een gebroken belofte bloot.**
 
   **Punt 1a is nu aangetoond voor álle tien de onderdelen**, niet als lijst met namen maar als evenveel verschillende tekeningen: gezichtsvorm 8, ogen 8, wenkbrauwen 8, neus 8, mond 8, lichaamsbouw 8, haarmodel 10, huidtint 8, haarkleur 12, kledingkleur 10.
