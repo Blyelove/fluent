@@ -14,7 +14,9 @@
  *    elke combinatie zichzelf via ?wereld= in de link, en de meting weigert
  *    als de wereld of de breedte niet klopt.
  *
- * Gebruik: node scripts/audit-run.mjs [breedte]
+ * Gebruik: node scripts/audit-run.mjs [breedte] [basis-url]
+ * De basis-url is standaard de ontwikkelserver; geef de live link mee om te
+ * meten wat er écht bij een bezoeker aankomt.
  */
 import { spawn } from 'node:child_process'
 import { readFile, mkdtemp, rm } from 'node:fs/promises'
@@ -22,6 +24,8 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 const BREEDTE = Number(process.argv[2] ?? 375)
+const BASIS = (process.argv[3] ?? 'http://localhost:5199/').replace(/\/?$/, '/')
+const GASTHEER = new URL(BASIS).host
 const HOOGTE = 812
 const EDGE = 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'
 // elke draaibeurt een eigen poort: een Edge die van een vorige poging is
@@ -52,14 +56,14 @@ async function haalDoel() {
       const lijst = await fetch(`http://127.0.0.1:${POORT}/json/list`).then((r) => r.json())
       // op de url matchen en niet zomaar de eerste pagina pakken: anders meet
       // je een willekeurig ander tabblad en hangt de audit voor altijd
-      const pagina = lijst.find((t) => t.type === 'page' && t.webSocketDebuggerUrl && t.url.includes('localhost:5199'))
+      const pagina = lijst.find((t) => t.type === 'page' && t.webSocketDebuggerUrl && t.url.includes(GASTHEER))
       if (pagina) return pagina
     } catch {
       /* de browser is nog aan het opstarten */
     }
     await wacht(250)
   }
-  throw new Error('geen debugdoel gevonden; draait de ontwikkelserver op 5199?')
+  throw new Error(`geen debugdoel gevonden op ${GASTHEER}; draait de server?`)
 }
 
 function verbind(ws) {
@@ -91,7 +95,7 @@ const edge = spawn(EDGE, [
   `--remote-debugging-port=${POORT}`,
   `--user-data-dir=${profiel}`,
   `--window-size=${BREEDTE},${HOOGTE}`,
-  'http://localhost:5199/?demo=1&tab=leren',
+  `${BASIS}?demo=1&tab=leren`,
 ])
 edge.stderr.on('data', () => { /* Edge klaagt over taakproviders, dat is ruis */ })
 
@@ -112,7 +116,7 @@ try {
 
   for (const scherm of SCHERMEN) {
     for (const wereld of WERELDEN) {
-      await stuur('Page.navigate', { url: `http://localhost:5199/?demo=1&${scherm.vraag}&wereld=${wereld}` })
+      await stuur('Page.navigate', { url: `${BASIS}?demo=1&${scherm.vraag}&wereld=${wereld}` })
       await wacht(2100)
       // de schaalinstelling van Windows rekt het venster na het laden weer op,
       // dus de maat wordt na élke navigatie opnieuw vastgezet
