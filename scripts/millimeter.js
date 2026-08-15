@@ -30,9 +30,27 @@ window.__millimeter = function millimeter() {
     return r.width > 2 && r.height > 2
   }
 
-  /** de blokken die het scherm dragen: directe kinderen van de schil */
-  const blokken = () => {
+  /**
+   * Het vlak dat nu bovenop ligt.
+   *
+   * Eerst was dat altijd `.shell`, en dat gaf twee blinde vlekken: een open
+   * paneel werd niet gemeten maar het scherm eronder, en schermen zonder schil
+   * werden helemaal niet gemeten en meldden vrolijk nul fouten. Een maat die
+   * stilzwijgend niets meet is erger dan geen maat.
+   */
+  const vlak = () => {
+    const paneel = [...document.querySelectorAll('.modal-panel')].filter(zichtbaar).pop()
+    if (paneel) return paneel
     const schil = document.querySelector('.shell')
+    if (schil && zichtbaar(schil)) return schil
+    // geen schil en geen paneel: dan het grootste blok dat de pagina draagt
+    const kandidaten = [...document.querySelectorAll('body > div > *, #root > *')].filter(zichtbaar)
+    return kandidaten.sort((a, b) => b.getBoundingClientRect().height - a.getBoundingClientRect().height)[0] ?? null
+  }
+
+  /** de blokken die het scherm dragen: directe kinderen van het bovenste vlak */
+  const blokken = () => {
+    const schil = vlak()
     if (!schil) return []
     return [...schil.children].filter((n) => {
       if (!zichtbaar(n)) return false
@@ -47,7 +65,7 @@ window.__millimeter = function millimeter() {
        beeld begint en losse knopen die in het midden staan zijn geen
        uitlijnfout: die hóren daar. De maat daarvoor is de breedte, want een
        dragend blok vult het scherm en een versiering niet. */
-    const schil = document.querySelector('.shell')
+    const schil = vlak()
     const schilBreed = schil ? schil.getBoundingClientRect().width : 375
     const dragend = blokken().filter((n) => {
       // decor zweeft los boven het scherm en draagt dus niets
@@ -144,7 +162,8 @@ window.__millimeter = function millimeter() {
       }
       return false
     }
-    for (const n of document.querySelectorAll('.shell *')) {
+    const opper = vlak()
+    for (const n of opper ? opper.querySelectorAll('*') : []) {
       if (!zichtbaar(n)) continue
       const t = (n.textContent || '').trim()
       if (!t || n.children.length > 0) continue
@@ -154,7 +173,7 @@ window.__millimeter = function millimeter() {
       if (r.left < 6 || r.right > breed - 6) uit.push({ t: t.slice(0, 20), reden: `zijrand links ${Math.round(r.left)} rechts ${Math.round(breed - r.right)}` })
     }
     // en de onderruimte: helemaal onderaan moet de laatste inhoud vrij staan
-    const schil = document.querySelector('.shell')
+    const schil = vlak()
     if (schil && onderruimte <= 1) {
       const laatste = [...schil.children].filter(zichtbaar).pop()
       if (laatste && laatste.getBoundingClientRect().bottom > hoog - balkHoog + 4) {
@@ -166,9 +185,11 @@ window.__millimeter = function millimeter() {
 
   if (window.innerWidth < 300) return { fout: `venster te smal: ${window.innerWidth}` }
 
-  const schil = document.querySelector('.shell')
+  const schil = vlak()
   return {
     venster: window.innerWidth,
+    // een vlak dat niet te vinden is, is een fout en geen nul
+    geenVlak: schil ? 0 : 1,
     wereld: el.getAttribute('data-wereld') ?? 'neon',
     // waar de schil zelf staat: schuift die, dan schuift alles mee en zijn de
     // randmetingen daaronder een gevolg en geen eigen fout

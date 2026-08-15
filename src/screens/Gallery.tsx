@@ -9,6 +9,11 @@ import { Flag } from '../components/Flag'
  */
 
 const PAGE: CSSProperties = {
+  /* Dit is een document van 794 breed, geen scherm: een stijlgids die je van
+     boven naar beneden leest. Op een telefoon liep hij honderden pixels buiten
+     beeld en was hij dus onleesbaar. Het schalen gebeurt in de stijl onder de
+     klasse .galerij-blad, want een berekening als min(1, 100vw / 794) is geen
+     geldige waarde voor zoom en wordt stilzwijgend weggegooid. */
   width: 794,
   minHeight: 1122,
   margin: '0 auto',
@@ -23,7 +28,7 @@ const PAGE: CSSProperties = {
 
 function Page({ children, title, sub }: { children: ReactNode; title?: string; sub?: string }) {
   return (
-    <div style={PAGE}>
+    <div className="galerij-blad" style={PAGE}>
       {title && (
         <>
           <p className="eyebrow">{sub ?? 'Fluent · Visuele stijlgids'}</p>
@@ -53,7 +58,10 @@ export function Gallery() {
   return (
     <div style={{ background: '#0B0A08' }}>
       {/* ======== omslag ======== */}
-      <div style={{ ...PAGE, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+      <div
+        className="galerij-blad"
+        style={{ ...PAGE, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}
+      >
         <Avatar size={170} level={10} courseId="es" still />
         <p className="eyebrow" style={{ marginTop: 32 }}>
           Visuele stijlgids & groeisysteem

@@ -434,6 +434,14 @@ Stoppen kan met `/loop stop` of door de cron-taak te verwijderen.
 
 ## Logboek
 
+- **15-08-2026, ronde 79** - **Elke millimeter klopt nu ook op de smalste telefoon, en de maat kijkt naar achttien schermen in plaats van zes.**
+
+  De vorige ronde meldde nul fouten over zes schermen. Dat klopte, en het was tegelijk te weinig: de maat kwam alleen bij schermen met een eigen link, en dat is precies het deel van de app dat toch al goed was. De maat loopt nu de weg ernaartoe af, knop voor knop, en meet achttien schermen: ook de les, de wereldkaart, de badges, de garderobe, de personagemaker, de vaardigheden en de wereldkiezer. Meteen twee blinde vlekken dicht: een open paneel werd niet gemeten maar het scherm eronder, en een scherm zonder schil meldde vrolijk nul fouten omdat er niets te meten viel. Een maat die stilzwijgend niets meet is erger dan geen maat, dus `geenVlak` telt nu als fout.
+
+  **Daarna gemeten op 320 pixels, de smalste telefoon die nog verkocht wordt.** Op 375 was alles al schoon; op 320 stak het embleem van je tegenstander elf pixels buiten beeld. De oorzaak was niet het embleem maar de naam ernaast: bij een lange naam als "Zilveren Sanne" duwde de tekst de hele rij opzij. Nu kort de naam in met een beletselteken en houden de schilden en het embleem hun ruimte, want de schilden zijn de stand van het gevecht en die moet je altijd volledig kunnen zien. De opkomst kreeg dezelfde behandeling: beide vechters delen de breedte gelijk, en de rij heeft de zijmarge die de rest van de app overal aanhoudt.
+
+  **Les:** een fout aan de rand van het scherm zit bijna nooit in het ding dat eruit steekt, maar in het ding ernaast dat te veel ruimte pakt.
+
 - **15-08-2026, ronde 78** - **De millimetermaat: van 78 punten die niet klopten naar nul, op elk scherm.**
 
   De audit meet of iets stuk is. `scripts/millimeter-run.mjs` meet of iets klópt, en dat is een andere vraag. Vier dingen die je met het oog nooit optelt: staat alles op één linkerlijn, komen de verticale afstanden uit de maatladder, reageert elke knop op je duim, en plakt er niets tegen de rand. Zes schermen, 78 punten, nu nul, ook gemeten tegen de live link.

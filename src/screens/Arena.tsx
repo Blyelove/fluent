@@ -340,8 +340,12 @@ export function ArenaScreen({
         {/* 24 boven en 12 onder: tweeëntwintig en tien staan allebei net naast
             de maatladder, en juist in de opkomst van een gevecht moet het
             ritme kloppen omdat er verder niets afleidt */}
-        <div className="row" style={{ justifyContent: 'center', gap: 16, margin: '24px 0 12px', alignItems: 'center' }}>
-          <motion.div initial={{ x: kalm ? 0 : -60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ type: 'spring', stiffness: 200, damping: 20 }} className="col center" style={{ gap: 4 }}>
+        {/* padding erbij: de opkomst staat in een schil zonder marge, en op een
+            telefoon van 320 stond het embleem van je tegenstander vijf pixels
+            van de rand. Niets hoort dichter bij de rand te komen dan de marge
+            die de rest van de app aanhoudt. */}
+        <div className="row" style={{ justifyContent: 'center', gap: 16, margin: '24px 0 12px', padding: '0 16px', alignItems: 'center' }}>
+          <motion.div initial={{ x: kalm ? 0 : -60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ type: 'spring', stiffness: 200, damping: 20 }} className="col center" style={{ gap: 4, flex: '1 1 0', minWidth: 0 }}>
             <Avatar size={92} look={look} courseId={courseId} meester={meester} />
             <strong className="card-title">Jij</strong>
           </motion.div>
@@ -354,11 +358,20 @@ export function ArenaScreen({
           >
             VS
           </motion.span>
-          <motion.div initial={{ x: kalm ? 0 : 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ type: 'spring', stiffness: 200, damping: 20 }} className="col center" style={{ gap: 4 }}>
+          {/* beide kanten delen de breedte gelijk: anders duwt een lange naam de
+              hele rij opzij en steekt het embleem op 320 buiten beeld */}
+          <motion.div
+            initial={{ x: kalm ? 0 : 60, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+            className="col center"
+            style={{ gap: 4, flex: '1 1 0', minWidth: 0 }}
+          >
             <div
               style={{
                 width: 92,
                 height: 92,
+                flexShrink: 0,
                 borderRadius: '50%',
                 display: 'flex',
                 alignItems: 'center',
@@ -582,8 +595,12 @@ export function ArenaScreen({
         )}
       </AnimatePresence>
 
-      {/* de stand: twee vechters, twee rijen schilden */}
-      <div className="spread" style={{ padding: '10px 0 12px', borderBottom: '1px solid var(--line)' }}>
+      {/* De stand: twee vechters, twee rijen schilden. Zijmarge erbij, want de
+          arena staat in een schil zonder marge: op een telefoon van 320 stond
+          het embleem van je tegenstander vijf pixels van de rand, terwijl de
+          rest van de app overal zestien tot twintig aanhoudt. En 12 in plaats
+          van 10 boven, want tien staat naast de maatladder. */}
+      <div className="spread" style={{ padding: '12px 16px', borderBottom: '1px solid var(--line)' }}>
         <div className="row" style={{ gap: 8 }}>
           {/* je personage speelt mee: hij zakt als hij een klap krijgt en
               wiegt terwijl de ander nadenkt. Stilstaan terwijl er iets gebeurt
@@ -604,15 +621,23 @@ export function ArenaScreen({
         <span className="display hot-text" style={{ fontSize: 19 }}>
           VS
         </span>
-        <div className="row" style={{ gap: 8 }}>
-          <div className="col" style={{ gap: 0, alignItems: 'flex-end' }}>
-            <strong style={{ fontSize: 12.5, fontWeight: 700 }}>{tegenstander.naam}</strong>
+        {/* De naam mag inkorten, de schilden en het embleem nooit. Op een
+            telefoon van 320 duwde een lange naam als "Zilveren Sanne" het
+            embleem elf pixels buiten beeld; de schilden zijn de stand van het
+            gevecht en die moet je altijd volledig zien. */}
+        <div className="row" style={{ gap: 8, minWidth: 0, flexShrink: 1 }}>
+          <div className="col" style={{ gap: 0, alignItems: 'flex-end', minWidth: 0 }}>
+            <strong
+              style={{ fontSize: 12.5, fontWeight: 700, maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+            >
+              {tegenstander.naam}
+            </strong>
             {schild(zijnSchilden, 'hij')}
           </div>
           <motion.span
             animate={botDenkt && !kalm ? { rotate: [0, -8, 8, 0] } : {}}
             transition={{ duration: 0.9, repeat: botDenkt ? Infinity : 0 }}
-            style={{ fontSize: 28 }}
+            style={{ fontSize: 28, flexShrink: 0 }}
           >
             ⚔️
           </motion.span>
