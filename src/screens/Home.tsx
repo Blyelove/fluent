@@ -18,6 +18,7 @@ import { StreakScreen } from './Streak'
 import { WorldMapScreen } from './WorldMap'
 import { WorldPeek } from '../components/WorldPeek'
 import { sfx } from '../audio'
+import { DagTaak, dagVormUitLink } from '../components/DagTaak'
 import { feestPalet } from '../wereldkleuren'
 
 interface Props {
@@ -82,6 +83,9 @@ function GoalRing({ value, goal }: { value: number; goal: number }) {
 }
 
 export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten }: Props) {
+  /* Eén keer lezen bij het openen. De link verandert niet tijdens het spelen,
+     en elke render opnieuw de adresbalk uitpluizen is werk voor niets. */
+  const dagVorm = useMemo(() => dagVormUitLink(), [])
   const courseId = useStore((s) => s.courseId)
   const streak = useStore((s) => s.streak)
   const todayXp = useStore((s) => s.todayXp)
@@ -503,21 +507,19 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
 
       {/* Compacte statusbalk: houdt de dagelijkse haakjes zichtbaar zonder het pad weg te duwen */}
       {(() => {
-        const lessonsToday = isToday ? todayLessonsRaw : 0
-        const perfectToday = isToday ? todayPerfectRaw : 0
-        const fixedToday = isToday ? todayFixedRaw : 0
-        const questsDone =
-          (xpShown >= dailyGoalXp ? 1 : 0) + (lessonsToday >= 2 ? 1 : 0) + (perfectToday >= 1 ? 1 : 0)
         const weekDone =
           (weekXp >= 500 ? 1 : 0) + (weekLessons >= 10 ? 1 : 0) + (weekArcade >= 3 ? 1 : 0) + (weekDuels >= 1 ? 1 : 0)
-        const naarVandaag = () => {
+        const naarWeek = () => {
           sfx('tap')
-          document.getElementById('vandaag')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+          document.getElementById('weekmissies')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
         }
         // korte woorden erbij: een los cijfer naast een plaatje zegt niets
+        /* De chip "Vandaag 0/3" is weg. Hij stond honderd pixels boven een blok
+           dat exact hetzelfde getal toonde, en twee keer hetzelfde zeggen is
+           geen nadruk maar ruis. De weekchip springt nu naar de weekkaart en
+           niet meer naar de dagkaart, want daar ging hij per ongeluk heen. */
         const chips: { key: string; icon: string; label: string; klaar: boolean; hot?: boolean; actie: () => void }[] = [
-          { key: 'dag', icon: '⚜️', label: `Vandaag ${questsDone}/3`, klaar: questsDone === 3, actie: naarVandaag },
-          { key: 'week', icon: '🎁', label: `Week ${weekDone}/4`, klaar: weekDone === 4, actie: naarVandaag },
+          { key: 'week', icon: '🎁', label: `Week ${weekDone}/4`, klaar: weekDone === 4, actie: naarWeek },
           {
             key: 'divisie',
             icon: '🏆',
@@ -628,6 +630,10 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
         ]
         const doneCount = quests.filter((q) => q.done).length
         const bonusIn = questBonusDay !== null && isToday && questBonusDay === todayDay
+        /* Drie nieuwe vormen, plus de oude als vierde zodat je ze naast elkaar
+           kunt zetten in plaats van op je geheugen te vertrouwen. Kies met
+           ?dag=spoor, ?dag=orbs, ?dag=boog of ?dag=klassiek. */
+        if (dagVorm !== 'klassiek') return <DagTaak vorm={dagVorm} missies={quests} kistOpen={bonusIn} />
         return (
           // de dagmissies zijn de dagelijkse haak: die horen boven het pad,
           // niet zeven schermen eronder. De rest van de kaarten blijft achter
@@ -719,7 +725,7 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
         const alles = klaar === missies.length
         const geopend = weekChestWeek === weekIndex()
         return (
-          <div className="glass unit-card" style={alles && !geopend ? { borderColor: 'var(--line-gold)', order: 1 } : { order: 1 }}>
+          <div className="glass unit-card" id="weekmissies" style={alles && !geopend ? { borderColor: 'var(--line-gold)', order: 1 } : { order: 1 }}>
             <div className="spread">
               <span className="row" style={{ gap: 8 }}>
                 <span style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--cyaan-16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🎁</span>
@@ -1066,7 +1072,9 @@ export function HomeScreen({ onStartLesson, onReview, onLeague, onPlay, onPraten
         )
       })()}
 
-      <p className="faint center" style={{ fontSize: 12.5, marginTop: 24, order: 2 }}>
+      {/* 16 en geen 24: de kaart erboven heeft zelf al 16 onder zich, en samen
+          gaven ze een gat van 40 dat naast de maatladder valt */}
+      <p className="faint center" style={{ fontSize: 12.5, marginTop: 16, order: 2 }}>
         Sectie 4 en verder zijn in de maak. Jouw reis gaat door tot B2.
       </p>
 

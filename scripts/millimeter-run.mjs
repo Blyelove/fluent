@@ -39,6 +39,11 @@ const SCHERMEN = [
   { naam: 'Proeverij', vraag: 'tab=profiel', pad: ['Momenten en effecten'] },
   { naam: 'Personage', vraag: 'tab=profiel', pad: ['Personage aanpassen'] },
   { naam: 'Wereldkiezer', vraag: 'tab=profiel', pad: ['Taalwereld'] },
+  /* De dagtaak heeft drie vormen. Alleen de standaard meten zou betekenen dat
+     de andere twee pas stukgaan als iemand ze kiest. */
+  { naam: 'Dag orbs', vraag: 'tab=leren&dag=orbs' },
+  { naam: 'Dag boog', vraag: 'tab=leren&dag=boog' },
+  { naam: 'Dag blad', vraag: 'tab=leren', pad: ['Vandaag'] },
 ]
 
 const profiel = await mkdtemp(join(tmpdir(), 'mm-'))

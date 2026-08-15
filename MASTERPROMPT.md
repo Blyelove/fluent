@@ -434,6 +434,16 @@ Stoppen kan met `/loop stop` of door de cron-taak te verwijderen.
 
 ## Logboek
 
+- **15-08-2026, ronde 80** - **De eerste blik: de dagmissies waren de duurste lege ruimte van de app.**
+
+  Op het Lerenscherm stond "0/3" twee keer binnen honderd pixels: één keer als chip en honderd pixels lager nog eens als kop van een kaart. Die kaart was ruim tweehonderdvijftig pixels hoog en liet bij nul procent letterlijk niets zien: drie lege rondjes, drie balkjes van vijf pixels hoog die op een donkere achtergrond onvindbaar zijn, en een grijze zin die uitlegt wat je krijgt. Daardoor begon het leerpad, waar de app eigenlijk over gaat, pas onder de onderbalk.
+
+  **Drie richtingen, alle drie echt te zien in de app.** `?dag=spoor` maakt er één doorlopend spoor van met drie stations en de kist aan het eind, want een spoor is een vorm die je bij nul procent nog steeds ziet liggen. `?dag=orbs` zet er drie ringmeters neer in RuneScape-stijl: een ring die voor een kwart vol is lees je in een oogopslag, een balk van vijf pixels niet. `?dag=boog` is de gedurfde: geen kaart meer, alleen een strook van drie segmenten met de kist ernaast, en daarmee staat de eerste les van het leerpad gewoon op het eerste scherm. `?dag=klassiek` laat de oude kaart staan, zodat je ze naast elkaar kunt zetten in plaats van op je geheugen te vertrouwen. Alle cijfers die uit de strook verdwenen zitten achter één tik in een blad, inclusief hoe ver je op elke missie bent.
+
+  **Een fout in mijn eigen maat gevonden en dat was de belangrijkste vondst.** De millimetermaat las de blokken in de volgorde van de code, maar het Lerenscherm zet blokken om met `order`, dus hij vergeleek afstanden tussen blokken die helemaal niet naast elkaar staan. Dezelfde stijlen gaven de ene keer een fout en de andere keer niet. Nu sorteert hij op de plek op het scherm, en meteen kwam er een echt gat van 40 boven water tussen de laatste kaart en de slotzin. De maat kijkt nu ook naar alle drie de vormen én naar het blad erachter: 21 schermen, nul punten op 375 én op 320.
+
+  **Les:** als een maat soms wel en soms niet aanslaat bij dezelfde stijlen, is de maat stuk en niet het scherm.
+
 - **15-08-2026, ronde 79** - **Elke millimeter klopt nu ook op de smalste telefoon, en de maat kijkt naar achttien schermen in plaats van zes.**
 
   De vorige ronde meldde nul fouten over zes schermen. Dat klopte, en het was tegelijk te weinig: de maat kwam alleen bij schermen met een eigen link, en dat is precies het deel van de app dat toch al goed was. De maat loopt nu de weg ernaartoe af, knop voor knop, en meet achttien schermen: ook de les, de wereldkaart, de badges, de garderobe, de personagemaker, de vaardigheden en de wereldkiezer. Meteen twee blinde vlekken dicht: een open paneel werd niet gemeten maar het scherm eronder, en een scherm zonder schil meldde vrolijk nul fouten omdat er niets te meten viel. Een maat die stilzwijgend niets meet is erger dan geen maat, dus `geenVlak` telt nu als fout.

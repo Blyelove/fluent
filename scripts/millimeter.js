@@ -48,16 +48,28 @@ window.__millimeter = function millimeter() {
     return kandidaten.sort((a, b) => b.getBoundingClientRect().height - a.getBoundingClientRect().height)[0] ?? null
   }
 
-  /** de blokken die het scherm dragen: directe kinderen van het bovenste vlak */
+  /**
+   * De blokken die het scherm dragen: directe kinderen van het bovenste vlak,
+   * op volgorde van hoe ze op het scherm staan.
+   *
+   * Dat laatste is geen detail. Het leerscherm zet blokken om met `order`, dus
+   * de volgorde in de code is niet de volgorde die je ziet. Zolang deze maat
+   * de kinderen op codevolgorde afliep, vergeleek hij afstanden tussen blokken
+   * die helemaal niet naast elkaar staan: sommige gaten kwamen er negatief uit
+   * en vielen weg, andere waren een optelsom van alles ertussen. De ene keer
+   * meldde hij een fout en de andere keer niet, met precies dezelfde stijlen.
+   */
   const blokken = () => {
     const schil = vlak()
     if (!schil) return []
-    return [...schil.children].filter((n) => {
-      if (!zichtbaar(n)) return false
-      // decor telt niet mee voor ritme en lijn: het hoort juist los te zweven
-      const pos = getComputedStyle(n).position
-      return pos !== 'absolute' && pos !== 'fixed'
-    })
+    return [...schil.children]
+      .filter((n) => {
+        if (!zichtbaar(n)) return false
+        // decor telt niet mee voor ritme en lijn: het hoort juist los te zweven
+        const pos = getComputedStyle(n).position
+        return pos !== 'absolute' && pos !== 'fixed'
+      })
+      .sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top)
   }
 
   function uitlijning() {
